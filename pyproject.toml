@@ -1,0 +1,35 @@
+[project]
+name = "bike-lane-karen"
+version = "0.1.0"
+description = "Austin 311 Bicycle Infrastructure Complaints Catalog"
+readme = "README.md"
+dependencies = [
+    "requests",
+    "beautifulsoup4",
+    "pandas",
+    "pyarrow",
+    "streamlit",
+    "plotly",
+    "typer[all]",
+]
+
+[project.scripts]
+search-311 = "search_311_categories:main"
+scrape-bicycle = "scrape_bicycle_complaints:main"
+analyze-311 = "analyze_complaints:main"
+
+[tool.setuptools]
+py-modules = [
+    "search_311_categories",
+    "scrape_bicycle_complaints",
+    "analyze_complaints",
+    "filter_csv",
+    "dashboard",
+    "bicycle_dashboard",
+    "check_tickets",
+    "test_category_search"
+]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

@@ -1,0 +1,2096 @@
+<!DOCTYPE html>
+<html class="h-full bg-gray-100 antialiased" lang="en">
+  <head>
+    <style type="text/css">
+  :root {
+    --spot-org-primary-50: 242, 246, 244;
+    --spot-org-primary-100: 230, 238, 233;
+    --spot-org-primary-200: 191, 211, 201;
+    --spot-org-primary-300: 153, 185, 169;
+    --spot-org-primary-400: 77, 133, 104;
+    --spot-org-primary-500: 0, 80, 39;
+    --spot-org-primary-600: 0, 72, 35;
+    --spot-org-primary-700: 0, 60, 29;
+    --spot-org-primary-800: 0, 48, 23;
+    --spot-org-primary-900: 0, 39, 19;
+
+    --spot-org-secondary-50: 244, 244, 246;
+    --spot-org-secondary-100: 233, 233, 237;
+    --spot-org-secondary-200: 200, 201, 211;
+    --spot-org-secondary-300: 167, 168, 184;
+    --spot-org-secondary-400: 100, 102, 131;
+    --spot-org-secondary-500: 34, 37, 78;
+    --spot-org-secondary-600: 31, 33, 70;
+    --spot-org-secondary-700: 26, 28, 59;
+    --spot-org-secondary-800: 20, 22, 47;
+    --spot-org-secondary-900: 17, 18, 38;
+  }
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>
+      City of Austin
+    </title>
+    <meta name="csrf-param" content="authenticity_token" />
+<meta name="csrf-token" content="Xyju2XfXzbbNbPiJNorxkiyfujsezQW_HwjKrGN9CeT3ve2G54hadznD4ocM7iYb3sb8fLzeEWkVA6qN8xktSA" />
+    
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="/manifest.webmanifest">
+      <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <script src="/assets/application.esbuild-7b7bb77bb98d66bc2a5d2be0a1425edfc924a6d9c35e8a69b4b496316a9514c6.js" defer="defer" data-turbo-track="reload"></script>
+    
+    <link rel="stylesheet" href="/assets/application-tailwind-f9fe14c1a557939510f9cccd0a17f5c7a88d79bf47c0cfbde2ad7e749e646f70.css" media="all" data-turbo-track="reload" />
+      <meta name="cloudinary_cloud_name" content="spot-moto" />
+    
+  </head>
+  <body class="h-full">
+    <div class="min-h-full">
+      <header class="bg-white shadow-sm" data-controller="toggle">
+  <div class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
+    <div class="flex justify-between h-16">
+      <div class="flex px-2 lg:px-0">
+        <div class="flex-shrink-0 flex items-center">
+          <a href="/">
+              <noscript><img class="h-8 w-auto" alt="Austin 3-1-1" src="https://spot-moto-res.cloudinary.com/image/upload/f_auto/v1/austin/shared/austin-avatar2" /></noscript><img alt="Austin 3-1-1" class="h-8 w-auto cld-responsive" data-src="https://spot-moto-res.cloudinary.com/image/upload/f_auto/c_scale,dpr_auto,w_auto/v1/austin/shared/austin-avatar2" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+</a>        </div>
+        <nav aria-label="Global" class="hidden lg:ml-6 lg:flex lg:items-center lg:space-x-4">
+          <a aria-label="Home" class="text-gray-900 hover:bg-org-secondary-300 hover:text-gray-900 rounded-md py-2 px-3 inline-flex items-center text-sm font-medium" href="/">Home</a>
+          <a aria-label="News" class="text-gray-900 hover:bg-org-secondary-300 hover:text-gray-900 rounded-md py-2 px-3 inline-flex items-center text-sm font-medium" href="/posts">News</a>
+          <a aria-label="Requests" class="text-gray-900 hover:bg-org-secondary-300 hover:text-gray-900 rounded-md py-2 px-3 inline-flex items-center text-sm font-medium" href="/tickets">Requests</a>
+        </nav>
+      </div>
+      <div class="flex-1 flex items-center justify-center px-2 lg:ml-6 lg:justify-end">
+        <div class="max-w-lg w-full lg:max-w-xs">
+            <form action="/tickets" accept-charset="UTF-8" method="get">
+              <label for="search" class="sr-only">Search</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="h-5 w-5 text-gray-400"><title>Search</title>
+  <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"></path>
+</svg>
+                </div>
+                <input id="search" name="filter[search]" type="search" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white shadow-xs placeholder-gray-500 focus:outline-hidden focus:placeholder-gray-400 focus:ring-1 focus:ring-org-primary-600 focus:border-org-primary-600 sm:text-sm" placeholder="Search requests">
+              </div>
+</form>        </div>
+      </div>
+      <div class="flex items-center lg:hidden">
+        <!-- Mobile menu button -->
+        <button type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-org-primary-500" aria-expanded="false" data-action="click->toggle#toggle touch->toggle#toggle">
+          <span class="sr-only">Open main menu</span>
+          <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" class="block h-6 w-6"><title>Menu</title>
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+</svg>
+        </button>
+      </div>
+
+      <!-- Mobile menu, show/hide based on mobile menu state. -->
+      <div class="hidden lg:hidden" data-toggle-target="toggleable">
+        <!--
+          Mobile menu overlay, show/hide based on mobile menu state.
+        -->
+        <div class="z-40 fixed inset-0 bg-black/25" aria-hidden="true"></div>
+        <!--
+          Mobile menu, show/hide based on mobile menu state.
+        -->
+        <div class="z-50 absolute top-0 right-0 max-w-none w-full p-2 transition transform origin-top">
+          <div class="rounded-lg shadow-lg ring-1 ring-black/5 bg-white divide-y divide-gray-200">
+            <div class="pt-3 pb-2">
+              <div class="flex items-center justify-between px-4">
+                <div>
+                    <noscript><img class="h-8 w-auto" alt="Austin 3-1-1" src="https://spot-moto-res.cloudinary.com/image/upload/f_auto/v1/austin/shared/austin-avatar2" /></noscript><img alt="Austin 3-1-1" class="h-8 w-auto cld-responsive" data-src="https://spot-moto-res.cloudinary.com/image/upload/f_auto/c_scale,dpr_auto,w_auto/v1/austin/shared/austin-avatar2" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" />
+                </div>
+                <div class="-mr-2">
+                  <button type="button" class="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-hidden focus:ring-2 focus:ring-inset focus:ring-org-primary-500">
+                    <span class="sr-only">Close menu</span>
+                    <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true" class="h-6 w-6" data-action="click-&gt;toggle#toggle touch-&gt;toggle#hide"><title>Close</title>
+  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+</svg>
+                  </button>
+                </div>
+              </div>
+              <div class="mt-3 px-2 space-y-1">
+                <a class="block rounded-md px-3 py-2 text-base text-gray-900 font-medium hover:bg-gray-100 hover:text-gray-800" href="/">Home</a>
+                <a class="block rounded-md px-3 py-2 text-base text-gray-900 font-medium hover:bg-gray-100 hover:text-gray-800" href="/posts">News</a>
+                <a class="block rounded-md px-3 py-2 text-base text-gray-900 font-medium hover:bg-gray-100 hover:text-gray-800" href="/tickets">Requests</a>
+                <a class="block rounded-md px-3 py-2 text-base text-gray-900 font-medium hover:bg-gray-100 hover:text-gray-800" href="/language/edit">Language</a>
+              </div>
+            </div>
+            <div class="pt-4 pb-2">
+              <div class="py-4 max-w-7xl mx-auto px-4 sm:px-6">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="hidden lg:ml-4 lg:flex lg:items-center">
+        <a class="ml-5 flex-shrink-0 bg-white rounded-full p-1 text-gray-400 hover:text-gray-500 focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-org-primary-500" href="/language/edit">
+          <span class="sr-only">Change Language</span>
+          <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true" class="h-6 w-6"><title>Languages</title>
+  <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path>
+</svg>
+</a>
+      </div>
+    </div>
+  </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+  <div class="border-t border-gray-200 py-3">
+    <nav class="flex" aria-label="breadcrumbs">
+      <div class="sm:block">
+        <ol role="list" class="list-none flex items-center space-x-4">
+          <li>
+            <div>
+              <a class="text-gray-400 hover:text-gray-500" href="/">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 h-5 w-5  ">
+  <path fill-rule="evenodd" d="M9.293 2.293a1 1 0 011.414 0l7 7A1 1 0 0117 11h-1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-3a1 1 0 00-1-1H9a1 1 0 00-1 1v3a1 1 0 01-1 1H5a1 1 0 01-1-1v-6H3a1 1 0 01-.707-1.707l7-7z" clip-rule="evenodd"></path>
+</svg>
+                <span class="sr-only">Home</span>
+</a>            </div>
+          </li>
+            <li>
+  <div class="flex items-center">
+    <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true" class="flex-shrink-0 h-5 w-5 text-gray-300"><title>Right slash</title>
+  <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z"></path>
+</svg>
+    <a class="ml-4 text-sm font-medium text-gray-500 hover:text-gray-700" aria-current="page" href="/tickets">Requests</a>
+  </div>
+</li>
+
+        </ol>
+      </div>
+</nav>  </div>
+</div>
+
+
+</header>
+
+      <main class="py-6">
+          <div class="mb-6">
+              <div class="max-w-3xl mx-auto px-4 sm:px-6 md:flex md:items-center md:justify-between md:space-x-5 lg:max-w-7xl lg:px-8">
+    <div class="flex items-center space-x-5">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900" id="reports-title">
+          Requests
+          <span class="font-normal text-gray-500">
+              (1,959,899)
+          </span>
+        </h1>
+      </div>
+    </div>
+  </div>
+
+          </div>
+        <div class="max-w-3xl mx-auto grid grid-cols-1 gap-6 sm:px-6 lg:max-w-7xl lg:grid-flow-col-dense lg:grid-cols-3">
+          <div class="space-y-6 lg:col-start-1 lg:col-span-2">
+            
+
+            
+
+<section aria-labelledby="reports-title">
+  <div class="bg-white shadow-sm overflow-hidden sm:rounded-md">
+    <ul role="list" class="divide-y divide-gray-200 list-none ">
+        <li>
+          <div data-controller="linkable-node" data-linkable-node-url-value="/tickets/26-00091727" class="block hover:bg-gray-50 cursor-pointer">
+            <section aria-labelledby="ticket-506e13ff-8c49-4b87-9ea2-990dbcb41a64-title">
+  <div class="flex items-center px-4 py-4 sm:px-6 sm:py-6">
+    <div class="min-w-0 flex-1 flex items-center">
+      <div class="hidden sm:block flex-shrink-0 self-start pr-4">
+        <img class="mt-1 w-[28px] h-auto" alt="" ssl_detected="true" src="/ticket_types/dpi/3/normal/DSOUCVMC" />
+      </div>
+      <div class="space-y-4">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-lg font-bold line-clamp-2 h4" id="ticket-506e13ff-8c49-4b87-9ea2-990dbcb41a64-title">
+            <a class="no-underline text-gray-800 hover:text-gray-800" aria-label="View Outdoor Commercial Venue Music Complaint request #26-00091727" href="/tickets/26-00091727">Outdoor Commercial Venue Music Complaint</a>
+</h2>          <p class="text-sm text-gray-500 line-clamp-1">
+            <address class="not-italic">506 Rio Grande St, Austin</address>
+          </p>
+        </div>
+          <div>
+            <p class="text-gray-700 block text-lg leading-snug line-clamp-5">
+              Very loud thumping bass near rio grande and west 6th.  Please investigate and call police if nessary
+            </p>
+          </div>
+        <div class="mt-4">
+          <div class="flex flex-row space-x-2">
+            <span class="text-xs font-extrabold px-1 py-0.5 rounded border text-white bg-status-open-800 border-status-open-900">DUPLICATE (OPEN)</span>
+            
+            <span class="text-sm text-gray-500">
+              <time datetime="2026-03-26T03:32:56Z">1m ago</time>
+            </span>
+              <span class="text-sm text-gray-500">#26-00091727</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="h-5 w-5 text-gray-400"><title>Chevron right</title>
+  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+</svg>
+    </div>
+  </div>
+</section>
+</div>        </li>
+        <li>
+          <div data-controller="linkable-node" data-linkable-node-url-value="/tickets/26-00091724" class="block hover:bg-gray-50 cursor-pointer">
+            <section aria-labelledby="ticket-c9c58469-ad36-42a6-8243-b0b5910aeb4d-title">
+  <div class="flex items-center px-4 py-4 sm:px-6 sm:py-6">
+    <div class="min-w-0 flex-1 flex items-center">
+      <div class="hidden sm:block flex-shrink-0 self-start pr-4">
+        <img class="mt-1 w-[28px] h-auto" alt="" ssl_detected="true" src="/ticket_types/dpi/3/normal/SBDEBROW" />
+      </div>
+      <div class="space-y-4">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-lg font-bold line-clamp-2 h4" id="ticket-c9c58469-ad36-42a6-8243-b0b5910aeb4d-title">
+            <a class="no-underline text-gray-800 hover:text-gray-800" aria-label="View Debris in Street request #26-00091724" href="/tickets/26-00091724">Debris in Street</a>
+</h2>          <p class="text-sm text-gray-500 line-clamp-1">
+            <address class="not-italic">8535 Connor Ln, Austin</address>
+          </p>
+        </div>
+        <div class="mt-4">
+          <div class="flex flex-row space-x-2">
+            <span class="text-xs font-extrabold px-1 py-0.5 rounded border text-white bg-status-open-800 border-status-open-900">OPEN</span>
+            
+            <span class="text-sm text-gray-500">
+              <time datetime="2026-03-26T03:31:04Z">3m ago</time>
+            </span>
+              <span class="text-sm text-gray-500">#26-00091724</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="h-5 w-5 text-gray-400"><title>Chevron right</title>
+  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+</svg>
+    </div>
+  </div>
+</section>
+</div>        </li>
+        <li>
+          <div data-controller="linkable-node" data-linkable-node-url-value="/tickets/26-00091722" class="block hover:bg-gray-50 cursor-pointer">
+            <section aria-labelledby="ticket-512ecf4f-9c4f-4987-a3ad-3da9354ae8b2-title">
+  <div class="flex items-center px-4 py-4 sm:px-6 sm:py-6">
+    <div class="min-w-0 flex-1 flex items-center">
+      <div class="hidden sm:block flex-shrink-0 self-start pr-4">
+        <img class="mt-1 w-[28px] h-auto" alt="" ssl_detected="true" src="/ticket_types/dpi/3/normal/PARKINGV" />
+      </div>
+      <div class="space-y-4">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-lg font-bold line-clamp-2 h4" id="ticket-512ecf4f-9c4f-4987-a3ad-3da9354ae8b2-title">
+            <a class="no-underline text-gray-800 hover:text-gray-800" aria-label="View Parking Violation Enforcement request #26-00091722" href="/tickets/26-00091722">Parking Violation Enforcement</a>
+</h2>          <p class="text-sm text-gray-500 line-clamp-1">
+            <address class="not-italic">11650 Stonehollow Dr, Austin</address>
+          </p>
+        </div>
+          <div>
+            <p class="text-gray-700 block text-lg leading-snug line-clamp-5">
+              Apartment resident parking on driving lane 
+            </p>
+          </div>
+        <div class="mt-4">
+          <div class="flex flex-row space-x-2">
+            <span class="text-xs font-extrabold px-1 py-0.5 rounded border text-white bg-status-open-800 border-status-open-900">OPEN</span>
+            
+            <span class="text-sm text-gray-500">
+              <time datetime="2026-03-26T03:26:56Z">7m ago</time>
+            </span>
+              <span class="text-sm text-gray-500">#26-00091722</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="h-5 w-5 text-gray-400"><title>Chevron right</title>
+  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+</svg>
+    </div>
+  </div>
+</section>
+</div>        </li>
+        <li>
+          <div data-controller="linkable-node" data-linkable-node-url-value="/tickets/26-00091717" class="block hover:bg-gray-50 cursor-pointer">
+            <section aria-labelledby="ticket-c52d791e-0de0-4ca5-8fa8-cda0cd5828da-title">
+  <div class="flex items-center px-4 py-4 sm:px-6 sm:py-6">
+    <div class="min-w-0 flex-1 flex items-center">
+      <div class="hidden sm:block flex-shrink-0 self-start pr-4">
+        <img class="mt-1 w-[28px] h-auto" alt="" ssl_detected="true" src="/ticket_types/dpi/3/normal/DSOUCVMC" />
+      </div>
+      <div class="space-y-4">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-lg font-bold line-clamp-2 h4" id="ticket-c52d791e-0de0-4ca5-8fa8-cda0cd5828da-title">
+            <a class="no-underline text-gray-800 hover:text-gray-800" aria-label="View Outdoor Commercial Venue Music Complaint request #26-00091717" href="/tickets/26-00091717">Outdoor Commercial Venue Music Complaint</a>
+</h2>          <p class="text-sm text-gray-500 line-clamp-1">
+            <address class="not-italic">506 Rio Grande St, Austin</address>
+          </p>
+        </div>
+          <div>
+            <p class="text-gray-700 block text-lg leading-snug line-clamp-5">
+              It’s pretty loud for after 10 on a Wednesday. Some people need to go to work in the morning. 
+            </p>
+          </div>
+        <div class="mt-4">
+          <div class="flex flex-row space-x-2">
+            <span class="text-xs font-extrabold px-1 py-0.5 rounded border text-white bg-status-open-800 border-status-open-900">DUPLICATE (OPEN)</span>
+            
+            <span class="text-sm text-gray-500">
+              <time datetime="2026-03-26T03:16:55Z">17m ago</time>
+            </span>
+              <span class="text-sm text-gray-500">#26-00091717</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="h-5 w-5 text-gray-400"><title>Chevron right</title>
+  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+</svg>
+    </div>
+  </div>
+</section>
+</div>        </li>
+        <li>
+          <div data-controller="linkable-node" data-linkable-node-url-value="/tickets/26-00091716" class="block hover:bg-gray-50 cursor-pointer">
+            <section aria-labelledby="ticket-4929fe02-bdae-469d-9f7a-2705c4f65a43-title">
+  <div class="flex items-center px-4 py-4 sm:px-6 sm:py-6">
+    <div class="min-w-0 flex-1 flex items-center">
+      <div class="hidden sm:block flex-shrink-0 self-start pr-4">
+        <img class="mt-1 w-[28px] h-auto" alt="" ssl_detected="true" src="/ticket_types/dpi/3/normal/DSOUCVMC" />
+      </div>
+      <div class="space-y-4">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-lg font-bold line-clamp-2 h4" id="ticket-4929fe02-bdae-469d-9f7a-2705c4f65a43-title">
+            <a class="no-underline text-gray-800 hover:text-gray-800" aria-label="View Outdoor Commercial Venue Music Complaint request #26-00091716" href="/tickets/26-00091716">Outdoor Commercial Venue Music Complaint</a>
+</h2>          <p class="text-sm text-gray-500 line-clamp-1">
+            <address class="not-italic">510 Rio Grande St, Austin</address>
+          </p>
+        </div>
+        <div class="mt-4">
+          <div class="flex flex-row space-x-2">
+            <span class="text-xs font-extrabold px-1 py-0.5 rounded border text-white bg-status-open-800 border-status-open-900">OPEN</span>
+            
+            <span class="text-sm text-gray-500">
+              <time datetime="2026-03-26T03:16:41Z">17m ago</time>
+            </span>
+              <span class="text-sm text-gray-500">#26-00091716</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="h-5 w-5 text-gray-400"><title>Chevron right</title>
+  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+</svg>
+    </div>
+  </div>
+</section>
+</div>        </li>
+        <li>
+          <div data-controller="linkable-node" data-linkable-node-url-value="/tickets/26-00091714" class="block hover:bg-gray-50 cursor-pointer">
+            <section aria-labelledby="ticket-34a442b9-fa08-486a-98b2-934d71ad3398-title">
+  <div class="flex items-center px-4 py-4 sm:px-6 sm:py-6">
+    <div class="min-w-0 flex-1 flex items-center">
+      <div class="hidden sm:block flex-shrink-0 self-start pr-4">
+        <img class="mt-1 w-[28px] h-auto" alt="" ssl_detected="true" src="/ticket_types/dpi/3/normal/SIGNTRA1" />
+      </div>
+      <div class="space-y-4">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-lg font-bold line-clamp-2 h4" id="ticket-34a442b9-fa08-486a-98b2-934d71ad3398-title">
+            <a class="no-underline text-gray-800 hover:text-gray-800" aria-label="View Traffic Sign Maintenance request #26-00091714" href="/tickets/26-00091714">Traffic Sign Maintenance</a>
+</h2>          <p class="text-sm text-gray-500 line-clamp-1">
+            <address class="not-italic">1048 Liberty Park Dr, Austin</address>
+          </p>
+        </div>
+          <div>
+            <p class="text-gray-700 block text-lg leading-snug line-clamp-5">
+              No truck sign needs to be replaced because it is faded and Paul needs to be replaced with breakaway pole
+            </p>
+          </div>
+        <div class="mt-4">
+          <div class="flex flex-row space-x-2">
+            <span class="text-xs font-extrabold px-1 py-0.5 rounded border text-white bg-status-open-800 border-status-open-900">OPEN</span>
+            
+            <span class="text-sm text-gray-500">
+              <time datetime="2026-03-26T03:14:57Z">19m ago</time>
+            </span>
+              <span class="text-sm text-gray-500">#26-00091714</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="h-5 w-5 text-gray-400"><title>Chevron right</title>
+  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+</svg>
+    </div>
+  </div>
+</section>
+</div>        </li>
+        <li>
+          <div data-controller="linkable-node" data-linkable-node-url-value="/tickets/26-00091712" class="block hover:bg-gray-50 cursor-pointer">
+            <section aria-labelledby="ticket-19aeed92-8070-490e-8bd6-dd4bc9e0f549-title">
+  <div class="flex items-center px-4 py-4 sm:px-6 sm:py-6">
+    <div class="min-w-0 flex-1 flex items-center">
+      <div class="hidden sm:block flex-shrink-0 self-start pr-4">
+        <img class="mt-1 w-[28px] h-auto" alt="" ssl_detected="true" src="/ticket_types/dpi/3/normal/DSOUCVMC" />
+      </div>
+      <div class="space-y-4">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-lg font-bold line-clamp-2 h4" id="ticket-19aeed92-8070-490e-8bd6-dd4bc9e0f549-title">
+            <a class="no-underline text-gray-800 hover:text-gray-800" aria-label="View Outdoor Commercial Venue Music Complaint request #26-00091712" href="/tickets/26-00091712">Outdoor Commercial Venue Music Complaint</a>
+</h2>          <p class="text-sm text-gray-500 line-clamp-1">
+            <address class="not-italic">400 Colorado St, Austin</address>
+          </p>
+        </div>
+          <div>
+            <p class="text-gray-700 block text-lg leading-snug line-clamp-5">
+              Music 
+            </p>
+          </div>
+        <div class="mt-4">
+          <div class="flex flex-row space-x-2">
+            <span class="text-xs font-extrabold px-1 py-0.5 rounded border text-white bg-status-open-800 border-status-open-900">OPEN</span>
+            
+            <span class="text-sm text-gray-500">
+              <time datetime="2026-03-26T03:14:55Z">19m ago</time>
+            </span>
+              <span class="text-sm text-gray-500">#26-00091712</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="h-5 w-5 text-gray-400"><title>Chevron right</title>
+  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+</svg>
+    </div>
+  </div>
+</section>
+</div>        </li>
+        <li>
+          <div data-controller="linkable-node" data-linkable-node-url-value="/tickets/26-00091711" class="block hover:bg-gray-50 cursor-pointer">
+            <section aria-labelledby="ticket-1dbbd016-7e2d-4a88-b146-2c433fb15173-title">
+  <div class="flex items-center px-4 py-4 sm:px-6 sm:py-6">
+    <div class="min-w-0 flex-1 flex items-center">
+      <div class="hidden sm:block flex-shrink-0 self-start pr-4">
+        <img class="mt-1 w-[28px] h-auto" alt="" ssl_detected="true" src="/ticket_types/dpi/3/normal/SIGNTRA1" />
+      </div>
+      <div class="space-y-4">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-lg font-bold line-clamp-2 h4" id="ticket-1dbbd016-7e2d-4a88-b146-2c433fb15173-title">
+            <a class="no-underline text-gray-800 hover:text-gray-800" aria-label="View Traffic Sign Maintenance request #26-00091711" href="/tickets/26-00091711">Traffic Sign Maintenance</a>
+</h2>          <p class="text-sm text-gray-500 line-clamp-1">
+            <address class="not-italic">2819 Montebello Rd, Austin</address>
+          </p>
+        </div>
+          <div>
+            <p class="text-gray-700 block text-lg leading-snug line-clamp-5">
+              Fire truck sign needs to be replaced (cracking and rusted) and pole needs to be replaced with break away pole. 
+            </p>
+          </div>
+        <div class="mt-4">
+          <div class="flex flex-row space-x-2">
+            <span class="text-xs font-extrabold px-1 py-0.5 rounded border text-white bg-status-open-800 border-status-open-900">OPEN</span>
+            
+            <span class="text-sm text-gray-500">
+              <time datetime="2026-03-26T03:12:55Z">21m ago</time>
+            </span>
+              <span class="text-sm text-gray-500">#26-00091711</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="h-5 w-5 text-gray-400"><title>Chevron right</title>
+  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+</svg>
+    </div>
+  </div>
+</section>
+</div>        </li>
+        <li>
+          <div data-controller="linkable-node" data-linkable-node-url-value="/tickets/26-00091708" class="block hover:bg-gray-50 cursor-pointer">
+            <section aria-labelledby="ticket-0275ded6-ebb4-4848-9635-e1775f8f6b79-title">
+  <div class="flex items-center px-4 py-4 sm:px-6 sm:py-6">
+    <div class="min-w-0 flex-1 flex items-center">
+      <div class="hidden sm:block flex-shrink-0 self-start pr-4">
+        <img class="mt-1 w-[28px] h-auto" alt="" ssl_detected="true" src="/ticket_types/dpi/3/normal/DSOUCVMC" />
+      </div>
+      <div class="space-y-4">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-lg font-bold line-clamp-2 h4" id="ticket-0275ded6-ebb4-4848-9635-e1775f8f6b79-title">
+            <a class="no-underline text-gray-800 hover:text-gray-800" aria-label="View Outdoor Commercial Venue Music Complaint request #26-00091708" href="/tickets/26-00091708">Outdoor Commercial Venue Music Complaint</a>
+</h2>          <p class="text-sm text-gray-500 line-clamp-1">
+            <address class="not-italic">4716 E 7th St, Austin</address>
+          </p>
+        </div>
+          <div>
+            <p class="text-gray-700 block text-lg leading-snug line-clamp-5">
+              Outdoor music
+            </p>
+          </div>
+        <div class="mt-4">
+          <div class="flex flex-row space-x-2">
+            <span class="text-xs font-extrabold px-1 py-0.5 rounded border text-white bg-status-open-800 border-status-open-900">OPEN</span>
+            
+            <span class="text-sm text-gray-500">
+              <time datetime="2026-03-26T03:10:57Z">23m ago</time>
+            </span>
+              <span class="text-sm text-gray-500">#26-00091708</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="h-5 w-5 text-gray-400"><title>Chevron right</title>
+  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+</svg>
+    </div>
+  </div>
+</section>
+</div>        </li>
+        <li>
+          <div data-controller="linkable-node" data-linkable-node-url-value="/tickets/26-00091706" class="block hover:bg-gray-50 cursor-pointer">
+            <section aria-labelledby="ticket-502ef944-a900-44a0-8810-1e7271973546-title">
+  <div class="flex items-center px-4 py-4 sm:px-6 sm:py-6">
+    <div class="min-w-0 flex-1 flex items-center">
+      <div class="hidden sm:block flex-shrink-0 self-start pr-4">
+        <img class="mt-1 w-[28px] h-auto" alt="" ssl_detected="true" src="/ticket_types/dpi/3/normal/PARKINGV" />
+      </div>
+      <div class="space-y-4">
+        <div class="min-w-0 flex-1">
+          <h2 class="text-lg font-bold line-clamp-2 h4" id="ticket-502ef944-a900-44a0-8810-1e7271973546-title">
+            <a class="no-underline text-gray-800 hover:text-gray-800" aria-label="View Parking Violation Enforcement request #26-00091706" href="/tickets/26-00091706">Parking Violation Enforcement</a>
+</h2>          <p class="text-sm text-gray-500 line-clamp-1">
+            <address class="not-italic">110 Chicon St, Austin</address>
+          </p>
+        </div>
+          <div>
+            <p class="text-gray-700 block text-lg leading-snug line-clamp-5">
+              Blocking my drive way.  I was extremely dangerous to pull in from the eastbound lane of 2nd Street.  We are located at 110 Chicon St. But the drive way is in the back on 2nd Street.  It’s a silver Honda suv
+            </p>
+          </div>
+        <div class="mt-4">
+          <div class="flex flex-row space-x-2">
+            <span class="text-xs font-extrabold px-1 py-0.5 rounded border text-white bg-status-open-800 border-status-open-900">OPEN</span>
+            
+            <span class="text-sm text-gray-500">
+              <time datetime="2026-03-26T03:06:55Z">27m ago</time>
+            </span>
+              <span class="text-sm text-gray-500">#26-00091706</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true" class="h-5 w-5 text-gray-400"><title>Chevron right</title>
+  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+</svg>
+    </div>
+  </div>
+</section>
+</div>        </li>
+    </ul>
+      <div class="p-6 border-t border-gray-200">
+        <nav aria-label="pager" class="space-x-1 py-1" role="navigation">
+  <span class="text-gray-400 bg-gray-100 rounded-sm px-4 py-2 cursor-not-allowed">&lsaquo; Prev</span>
+  <span class="text-org-primary-700 font-semibold px-2.5 py-1.5">1</span>
+  <span><a href="/tickets?page=2" class="text-gray-400 rounded-full px-2.5 py-1.5 hover:bg-org-secondary-200 hover:text-org-primary-700">2</a></span>
+  <span><a href="/tickets?page=3" class="text-gray-400 rounded-full px-2.5 py-1.5 hover:bg-org-secondary-200 hover:text-org-primary-700">3</a></span>
+  <span><a href="/tickets?page=4" class="text-gray-400 rounded-full px-2.5 py-1.5 hover:bg-org-secondary-200 hover:text-org-primary-700">4</a></span>
+  <span><a href="/tickets?page=5" class="text-gray-400 rounded-full px-2.5 py-1.5 hover:bg-org-secondary-200 hover:text-org-primary-700">5</a></span>
+  <span class="text-gray-400 text-xl px-4 py-2">&hellip;</span>
+  <span><a href="/tickets?page=20" class="text-gray-400 rounded-full px-2.5 py-1.5 hover:bg-org-secondary-200 hover:text-org-primary-700">20</a></span>
+  <span><a href="/tickets?page=2" aria-label="next" class="text-white hover:text-white bg-org-primary-700 rounded-sm px-4 py-2">Next &rsaquo;</a></span>
+
+      </div>
+  </div>
+</section>
+
+
+          </div>
+            <div class="flex flex-col space-y-6">
+                  <section aria-labelledby="filters-section-title">
+  <div class="bg-white shadow-sm sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h2 id="filters-section-title" class="text-lg leading-6 font-medium text-gray-900">Filters</h2>
+    </div>
+    <div class="border-t border-gray-200 px-6">
+        <div class="my-4">
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</h3>
+          <ul class="py-4 list-none space-y-4">
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Closed" href="/tickets?filter%5Bfacets%5D%5Bstatus%5D%5B%5D=closed">Closed</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1,956,704)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Open" href="/tickets?filter%5Bfacets%5D%5Bstatus%5D%5B%5D=open">Open</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (3,195)
+                  </span>
+              </li>
+          </ul>
+        </div>
+        <div class="my-4">
+          <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider">Ticket Type</h3>
+          <ul class="py-4 list-none space-y-4">
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Loose Dog" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ACLONAG">Loose Dog</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (185,855)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Graffiti Abatement - Public Property" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=HHSGRAFF">Graffiti Abatement - Public Property</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (152,319)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Non Emergency Noise Complaint" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=APDNONNO">Non Emergency Noise Complaint</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (137,227)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Traffic Signal - Maintenance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=TRASIGMA">Traffic Signal - Maintenance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (132,180)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Animal Protection - Assistance Request" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ACINFORM">Animal Protection - Assistance Request</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (112,018)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Injured / Sick Animal" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=COAACINJ">Injured / Sick Animal</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (102,401)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Austin Energy Street Light Issue - Address" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=STREETL2">Austin Energy Street Light Issue - Address</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (94,828)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Adopted/Impounded/Surrendered Animal" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ASASISST">Adopted/Impounded/Surrendered Animal</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (75,153)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Parking Violation Enforcement" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PARKINGV">Parking Violation Enforcement</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (68,081)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Storm Debris Collection" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SWSSTORM">Storm Debris Collection</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (55,314)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Water Conservation Violation" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=WWREPORT">Water Conservation Violation</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (55,308)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Pothole Repair" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SBPOTREP">Pothole Repair</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (40,687)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Debris in Street" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SBDEBROW">Debris in Street</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (40,333)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Shared Micromobility" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DOCKMOBI">Shared Micromobility</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (39,043)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Park Maintenance - Grounds" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PRGRDISS">Park Maintenance - Grounds</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (36,598)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Animal Proper Care" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ACPROPER">Animal Proper Care</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (35,973)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Animal Bite" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ACBITE2">Animal Bite</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (30,595)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Found (Confined) Dog Assistance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ACFOUND">Found (Confined) Dog Assistance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (27,151)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Dead Animal Collection" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ZZARDEAC">Dead Animal Collection</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (26,714)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Traffic Sign Maintenance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SIGNTRA1">Traffic Sign Maintenance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (25,390)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Obstruction in Right of Way" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=OBSTMIDB">Obstruction in Right of Way</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (22,316)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Channels/Creeks/Drainage Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DRCHANEL">Channels/Creeks/Drainage Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (18,047)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Sidewalk Repair" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SBSIDERE">Sidewalk Repair</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (17,940)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Traffic Sign New" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SIGNNEWT">Traffic Sign New</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (16,734)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Wildlife Exposure" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=WILDEXPO">Wildlife Exposure</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (16,380)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by DSD - Follow-Up" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DSREFOUP">DSD - Follow-Up</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (16,270)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Concerns in the Right of Way" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=CONCERNS">Concerns in the Right of Way</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (15,827)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Pavement Failure" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SBPAVEFA">Pavement Failure</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (14,981)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Street and Bridge Miscellaneous" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SBGENRL">Street and Bridge Miscellaneous</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (13,201)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Loose Animal Not Dog" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ACLOANIM">Loose Animal Not Dog</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (13,037)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Vicious Dog Complaint" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=COAACDD">Vicious Dog Complaint</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (12,915)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Parking Sign Maintenance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SIGNPARK">Parking Sign Maintenance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (12,531)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Coyote Complaints" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ACCOYTE">Coyote Complaints</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (11,372)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Billboard Complaint" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=CCSIGBIL">Billboard Complaint</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (10,407)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Road Markings/Striping - Maintenance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ROADMARK">Road Markings/Striping - Maintenance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (9,750)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Street Name Sign Maintenance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SIGNSTRE">Street Name Sign Maintenance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (9,738)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Tree Issue Right of Way" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PWTRISRW">Tree Issue Right of Way</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (9,700)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Storm Drain Services" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DRILID">Storm Drain Services</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (9,398)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Speed Management" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=TRAFFICC">Speed Management</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (9,355)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Traffic Signal - New" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=TRASIGNE">Traffic Signal - New</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (8,548)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Loud Commercial Music" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=LOUDMUS1">Loud Commercial Music</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (8,539)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Construction items in Right of Way" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=CONSTRUC">Construction items in Right of Way</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (8,465)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Water Related Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=AWUBEEMT">Water Related Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (8,448)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Outdoor Commercial Venue Music Complaint" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DSOUCVMC">Outdoor Commercial Venue Music Complaint</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (7,950)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Tree and Environmental Complaint" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DSDENVCO">Tree and Environmental Complaint</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (7,613)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Homeless - Violet Kiosk and Storage Carts" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=HOMELESR">Homeless - Violet Kiosk and Storage Carts</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (7,499)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Park Maintenance - Grounds Plumbing Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PRGRDPLB">Park Maintenance - Grounds Plumbing Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (7,324)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Alley &amp; Unpaved Street Maintenance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SBALLEY">Alley &amp; Unpaved Street Maintenance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (7,276)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by View Obstruction and Fencing at Intersection" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=OBSINTTR">View Obstruction and Fencing at Intersection</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (6,786)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Utility Cut Repair" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SBUTILCT">Utility Cut Repair</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (6,601)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Found Animal Report - Keep" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=COAFAR">Found Animal Report - Keep</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (6,424)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by School Zone Beacon - Maintenance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SCHOOLZ2">School Zone Beacon - Maintenance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (6,304)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Bicycle Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PWBICYCL">Bicycle Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (6,221)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Lost Item in Storm Drainage System" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ZZANIMAL">Lost Item in Storm Drainage System</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (6,115)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Special Event" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=EVENTDAY">Special Event</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (6,085)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by ARR Dead Animal Collection" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SWSDEADA">ARR Dead Animal Collection</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (5,966)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Street Resurfacing" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SBSTRES">Street Resurfacing</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (5,368)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Construction Concerns in Right of Way" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ATCOCIRW">Construction Concerns in Right of Way</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (5,275)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Road Markings/Striping - New" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ROADMAR2">Road Markings/Striping - New</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (5,210)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by New Sidewalk/Curb Ramp/ADA Route" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PWSIDEWL">New Sidewalk/Curb Ramp/ADA Route</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (4,961)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Fireworks Complaint" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=AFDFIREW">Fireworks Complaint</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (4,777)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Flooding Current" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DRFLOODG">Flooding Current</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (4,773)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Street Sweeping" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ZZARSTSW">Street Sweeping</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (4,770)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Park Maintenance - Grounds Electrical Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PRGRDELC">Park Maintenance - Grounds Electrical Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (4,514)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Park - Tree Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PATRISPA">Park - Tree Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (4,409)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Curb/Gutter Repair" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SBCURBGU">Curb/Gutter Repair</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (4,177)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Alarm Administration" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DSDALARM">Alarm Administration</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (4,140)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Drainage Pond Maintenance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DRPMAINT">Drainage Pond Maintenance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (4,015)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Standing Water" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DRSSPIPE">Standing Water</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (3,868)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Telecommunication/Gas Utility Complaint" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=TELECOMP">Telecommunication/Gas Utility Complaint</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (3,719)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Dog Restraint Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DOGRESTR">Dog Restraint Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (3,219)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Park Maintenance - Building Plumbing Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PRBLDPLB">Park Maintenance - Building Plumbing Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (2,767)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Found Pet Report" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PERECFPR">Found Pet Report</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (2,680)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Animal Trapped in Storm Drain" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ACTRAP">Animal Trapped in Storm Drain</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (2,338)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Flooding Past" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DRFLOODR">Flooding Past</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (2,302)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Traffic Signal - Modification" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ATTRSIMO">Traffic Signal - Modification</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (2,185)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Austin Resource Recovery - Pet Search" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SWSPETSE">Austin Resource Recovery - Pet Search</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1,833)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Erosion" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ZZEROSIO">Erosion</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1,736)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Ditch/Driveway Pipe Services" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DRDITCH">Ditch/Driveway Pipe Services</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1,540)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by School Zone Sign Maintenance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SIGNSCHO">School Zone Sign Maintenance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1,496)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Park Building Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PRBLDISS">Park Building Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1,478)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Neighborhood Home Programs" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=LEAD1">Neighborhood Home Programs</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1,258)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Aquatic Maintenance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PARAQUIN">Aquatic Maintenance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1,219)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Guardrail New/Repair" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SBGRDRN">Guardrail New/Repair</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1,214)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Alarm Administration" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=APDALAAD">Alarm Administration</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1,211)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Mowing Medians" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PWDMOWME">Mowing Medians</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1,178)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by COVID-19 Austin Code Non-Compliance Concern" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=AUSCODCO">COVID-19 Austin Code Non-Compliance Concern</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (964)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Parks - Building A/C &amp; Heating Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PRBLDACH">Parks - Building A/C &amp; Heating Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (958)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Emergency Water Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=AWEMWAIS">Emergency Water Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (897)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Bridge Repair" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SBBRIDRE">Bridge Repair</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (818)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Environmental Spills" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=WPDENVSP">Environmental Spills</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (796)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by ARR Street Sweeping" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SWSSTSWE">ARR Street Sweeping</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (780)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by School Issues - Crossing Guards" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SCHOOLIS">School Issues - Crossing Guards</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (643)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Electric Vehicle Station Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=AEELVESI">Electric Vehicle Station Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (622)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Parks - Building Electric Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PRBLDELE">Parks - Building Electric Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (532)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Community Voices" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=COMENGFE">Community Voices</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (517)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Lady Bird Lake Debris Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=DRTWNLAK">Lady Bird Lake Debris Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (495)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Watershed Grow Zone Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=WATGROZO">Watershed Grow Zone Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (457)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Austin Resource Recovery - Special Services" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SWSSPECS">Austin Resource Recovery - Special Services</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (383)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Commercial Use of Parkland" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=COMPARLN">Commercial Use of Parkland</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (356)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Pedestrian Crossing New/Modify" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=TPPECRNE">Pedestrian Crossing New/Modify</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (345)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Park Cemeteries" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PRCEMET1">Park Cemeteries</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (343)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Stray Assistance" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PERECESA">Stray Assistance</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (322)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Private Hauler License Violation" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=COCPWHLV">Private Hauler License Violation</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (190)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Street Light- Future Repair Scheduled" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=AESTREF1">Street Light- Future Repair Scheduled</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (134)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Aquatic Program Inquiries" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PAAQPRIN">Aquatic Program Inquiries</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (117)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Corridor Program - Corridor Feedback" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=CORMORPG">Corridor Program - Corridor Feedback</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (99)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Tree Issue ROW" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PRTRROWM">Tree Issue ROW</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (87)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Harmful Algae" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=WPDALGAE">Harmful Algae</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (56)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by City of Austin Vehicle Report" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=31CRCIVR">City of Austin Vehicle Report</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (39)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Sign - Traffic Sign Emergency" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SIGNTRAF">Sign - Traffic Sign Emergency</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (27)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by School Zone - New/Review/Changes" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SCHOOLZ1">School Zone - New/Review/Changes</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (13)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by AW Auxiliary Water" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=AWUAUXWA">AW Auxiliary Water</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (12)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Tree Issue ROW/Emergency (PW)" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PRTRROWE">Tree Issue ROW/Emergency (PW)</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (9)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by AW - Manhole" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=AWUMANHO">AW - Manhole</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (8)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Animal Control - Jurisdiction Issue" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ACJURISS">Animal Control - Jurisdiction Issue</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (3)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Homelessness Matters" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=ZZPUBCON">Homelessness Matters</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (3)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Street Lighting - General" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=AESTRGEN">Street Lighting - General</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (2)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by 311 CC - Helpline Call" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=HLCALL">311 CC - Helpline Call</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (2)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Traffic Engineering - General" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=TRANSPOR">Traffic Engineering - General</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (2)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by DSD - Case Updates/Code Connect Messages" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=CODCOMGE">DSD - Case Updates/Code Connect Messages</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Construction/Permitting- ROW" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=CONSTRU1">Construction/Permitting- ROW</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by CSR Disposition Change" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=CSRDISCH">CSR Disposition Change</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Parking Machine Issue" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=PARMACIS">Parking Machine Issue</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Signs &amp; Markings Jurisdiction Issues" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SIGNSMAR">Signs &amp; Markings Jurisdiction Issues</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by Street Lights New" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=STREETL1">Street Lights New</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1)
+                  </span>
+              </li>
+              <li
+                class="leading-5 text-left"
+                style="list-style: outside none none; word-break: break-word;"
+              >
+                  <a class="text-org-primary-600 focus:text-org-primary-800 hover:text-org-primary-800" aria-label="Filter by ARR Missed Yard Trimmings/Compost" href="/tickets?filter%5Bfacets%5D%5Bticket_type_code%5D%5B%5D=SWSYARDT">ARR Missed Yard Trimmings/Compost</a>
+                  <span
+                    class="text-neutral-400"
+                    style="list-style: outside none none; word-break: break-word;">
+                    (1)
+                  </span>
+              </li>
+          </ul>
+        </div>
+    </div>
+  </div>
+</section>
+
+
+            </div>
+        </div>
+      </main>
+      <footer class="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8l h-auto text-sm pb-4 lg:px-6">
+  <div class="flex flex-col-reverse text-sm lg:flex-row lg:justify-between lg:p-0">
+    <div class="flex items-center justify-center">
+      <a class="sm:inline-block" href="https://www.connectedbits.com">
+        <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:serif="http://www.serif.com/" width="24" height="24" viewBox="0 0 80 81" version="1.1" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;" role="img" aria-labelledby="alqe012b4sykg9g76tvmyy7vygtb1fwk" class="fill-current text-gray-600 hover:text-gray-700"><title id="alqe012b4sykg9g76tvmyy7vygtb1fwk">Connected Bits, LLC</title>
+    <path d="M71.47,0L8.1,0C3.656,0 -0,3.656 0,8.1L0,49.45C0,53.894 3.656,57.55 8.1,57.55L13.5,57.55L13.5,80.4L39.06,57.55L71.47,57.55C75.914,57.55 79.57,53.894 79.57,49.45L79.57,8.1C79.57,3.656 75.914,0 71.47,0ZM39.79,39.6C39.787,39.6 39.783,39.6 39.78,39.6C32.939,39.6 27.31,33.971 27.31,27.13C27.31,20.289 32.939,14.66 39.78,14.66C46.621,14.66 52.25,20.289 52.25,27.13C52.25,33.967 46.627,39.595 39.79,39.6Z" style="fill:rgb(87,86,86);fill-rule:nonzero;"></path>
+    <path d="M45.92,23.17C45.92,24.574 44.764,25.73 43.36,25.73C41.956,25.73 40.8,24.574 40.8,23.17C40.8,21.766 41.956,20.61 43.36,20.61L43.42,20.61C42.326,19.955 41.075,19.61 39.8,19.61C35.932,19.61 32.75,22.792 32.75,26.66C32.75,30.527 35.932,33.71 39.8,33.71C43.667,33.71 46.85,30.527 46.85,26.66C46.85,25.432 46.529,24.226 45.92,23.16L45.92,23.17Z" style="fill:rgb(86,86,86);fill-rule:nonzero;"></path>
+</svg>
+</a>      <div class="ml-4 text-gray-700"><a class="text-gray-700 hover:text-gray-800" href="https://www.connectedbits.com">© 2026 Connected Bits, LLC</a></div>
+    </div>
+    <div class="flex flex-wrap justify-center">
+        <a class="text-gray-700 hover:text-gray-800 no-underline block lg:my-0 mb-2 mr-4" href="/auth?client_id=28bc945d-ddbd-4680-a0f3-c250eab3e446&amp;redirect_uri=%2F&amp;response_type=cookie&amp;scope=read+write">Workers</a>
+        <a class="text-gray-700 hover:text-gray-800 no-underline block lg:my-0 mb-2 mr-4" href="/manage">Staff</a>
+      <a class="text-gray-700 hover:text-gray-800 no-underline block lg:my-0 mb-2 mr-4" href="https://www.austintexas.gov/department/311/smart-phone-app">About Us</a>
+      <a class="text-gray-700 hover:text-gray-800 no-underline block lg:my-0 mb-2 mr-4" href="https://www.austintexas.gov/page/privacy-policy">Privacy Policy</a>
+      <a class="text-gray-700 hover:text-gray-800 no-underline block lg:my-0 mb-2" href="https://www.austintexas.gov/page/terms-service-austin-3-1-1-smartphone-application">Terms Of Service</a>
+    </div>
+  </div>
+</footer>
+
+    </div>
+    
+  </body>
+</html>
