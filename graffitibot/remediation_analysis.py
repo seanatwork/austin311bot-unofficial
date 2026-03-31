@@ -7,17 +7,38 @@ based on different time periods and patterns.
 """
 
 import sqlite3
+import logging
 from datetime import datetime, timedelta
 from collections import defaultdict, Counter
 import statistics
 
+from config import Config
+
+logger = logging.getLogger(__name__)
+
+
 class GraffitiRemediationAnalyzer:
-    def __init__(self, db_path="../311_categories.db"):
-        self.db_path = db_path
-        self.service_code = "HHSGRAFF"
+    def __init__(self, db_path: str = None):
+        self.db_path = db_path or Config.DB_PATH
+        self.service_code = Config.SERVICE_CODE
     
     def get_graffiti_with_dates(self, days_back: int = 90) -> list:
-        """Get graffiti records with date information"""
+        """Get graffiti records with date information
+        
+        Args:
+            days_back: Number of days to look back (1-365)
+            
+        Returns:
+            List of graffiti records with date information
+        """
+        # Validate input
+        if days_back < Config.MIN_ANALYSIS_DAYS or days_back > Config.MAX_ANALYSIS_DAYS:
+            raise ValueError(
+                f"days_back must be between {Config.MIN_ANALYSIS_DAYS} and "
+                f"{Config.MAX_ANALYSIS_DAYS}"
+            )
+        
+        logger.info(f"Fetching graffiti records for last {days_back} days")
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
@@ -210,9 +231,19 @@ class GraffitiRemediationAnalyzer:
 # Command Functions
 def remediation_command(days_back: int = 90) -> str:
     """Show remediation analysis for specific period"""
-    analyzer = GraffitiRemediationAnalyzer()
-    analysis = analyzer.analyze_by_period(days_back)
-    return analyzer.format_remediation_report(analysis)
+    try:
+        analyzer = GraffitiRemediationAnalyzer()
+        analysis = analyzer.analyze_by_period(days_back)
+        return analyzer.format_remediation_report(analysis)
+    except ValueError as e:
+        logger.warning(f"Invalid input: {e}")
+        return f"❌ Invalid input: {e}"
+    except sqlite3.Error as e:
+        logger.error(f"Database error: {e}")
+        return "❌ Database error. Please check if the database exists."
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        return f"❌ An error occurred: {e}"
 
 def compare_command() -> str:
     """Compare remediation times across multiple periods"""

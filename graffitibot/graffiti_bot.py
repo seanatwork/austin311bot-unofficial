@@ -9,17 +9,41 @@ Based on analysis of 404 graffiti records from Austin 311 system.
 import sqlite3
 import json
 import re
+import logging
 from datetime import datetime, timedelta
 from collections import Counter, defaultdict
 from typing import List, Dict, Optional, Tuple
 
+from config import Config
+
+logger = logging.getLogger(__name__)
+
+
 class GraffitiAnalysisBot:
-    def __init__(self, db_path="../311_categories.db"):
-        self.db_path = db_path
-        self.service_code = "HHSGRAFF"
+    def __init__(self, db_path: str = None):
+        self.db_path = db_path or Config.DB_PATH
+        self.service_code = Config.SERVICE_CODE
         
     def get_graffiti_data(self, days_back: int = 90) -> List[Dict]:
-        """Get graffiti data from database"""
+        """Get graffiti data from database
+        
+        Args:
+            days_back: Number of days to look back (1-365)
+            
+        Returns:
+            List of graffiti records
+            
+        Raises:
+            ValueError: If days_back is out of valid range
+        """
+        # Validate input
+        if days_back < Config.MIN_ANALYSIS_DAYS or days_back > Config.MAX_ANALYSIS_DAYS:
+            raise ValueError(
+                f"days_back must be between {Config.MIN_ANALYSIS_DAYS} and "
+                f"{Config.MAX_ANALYSIS_DAYS}"
+            )
+        
+        logger.info(f"Fetching graffiti data for last {days_back} days")
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
         
@@ -272,14 +296,29 @@ class GraffitiAnalysisBot:
 # Bot Command Functions
 def analyze_graffiti_command(days_back: int = 90) -> str:
     """Main analysis command"""
-    bot = GraffitiAnalysisBot()
-    records = bot.get_graffiti_data(days_back)
-    
-    if not records:
-        return "📝 No graffiti data found for analysis."
-    
-    analysis = bot.analyze_patterns(records)
-    return bot.format_analysis_report(analysis)
+    try:
+        bot = GraffitiAnalysisBot()
+        records = bot.get_graffiti_data(days_back)
+
+        if not records:
+            return (
+                "📝 No graffiti data found for analysis.\n\n"
+                "💡 Try:\n"
+                "  • Use a longer time period: `/analyze 180`\n"
+                "  • Run data ingestion: `python ingest_graffiti_data.py`"
+            )
+
+        analysis = bot.analyze_patterns(records)
+        return bot.format_analysis_report(analysis)
+    except ValueError as e:
+        logger.warning(f"Invalid input: {e}")
+        return f"❌ Invalid input: {e}"
+    except sqlite3.Error as e:
+        logger.error(f"Database error: {e}")
+        return "❌ Database error. Please check if the database exists."
+    except Exception as e:
+        logger.error(f"Unexpected error: {e}")
+        return f"❌ An error occurred: {e}"
 
 def hotspot_command(area: str = None) -> str:
     """Show graffiti hotspots"""
