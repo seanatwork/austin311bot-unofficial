@@ -111,204 +111,206 @@ def fetch_all_traffic_complaints(days_back: int = 90, limit_per_code: int = 100)
     return all_records
 
 
-# =============================================================================
-# HOTSPOTS BY STREET
-# =============================================================================
-
-def _extract_street(address: str) -> str:
-    addr = address.replace(", Austin", "").strip()
-    parts = addr.split(" ", 1)
-    if len(parts) == 2 and parts[0].isdigit():
-        return parts[1].strip()
-    return addr
-
-
-def get_hotspots(days_back: int = 90) -> dict:
-    records = fetch_all_traffic_complaints(days_back)
-    if not records:
-        return {"hotspots": [], "total": 0, "days_back": days_back}
-
-    street_counts: dict = {}
-    street_types: dict = {}
-
-    for r in records:
-        address = (r.get("address") or "").strip()
-        street = _extract_street(address) if address else "Unknown"
-        label = r.get("_service_label", "Unknown")
-
-        street_counts[street] = street_counts.get(street, 0) + 1
-        street_types.setdefault(street, {})
-        street_types[street][label] = street_types[street].get(label, 0) + 1
-
-    hotspots = sorted(street_counts.items(), key=lambda x: -x[1])
-    return {
-        "hotspots": hotspots,
-        "street_types": street_types,
-        "total": len(records),
-        "days_back": days_back,
-    }
-
-
-def format_hotspots(data: dict) -> str:
-    hotspots = data.get("hotspots", [])
-    street_types = data.get("street_types", {})
-    total = data.get("total", 0)
-    days_back = data.get("days_back", 90)
-
-    if not hotspots:
-        return "📝 No infrastructure complaints found."
-
-    msg = f"🚦 *Top Infrastructure Complaint Streets*\n"
-    msg += f"_Last {days_back} days · {total} total complaints_\n\n"
-
-    top = hotspots[:10]
-    max_count = top[0][1]
-
-    for i, (street, count) in enumerate(top, 1):
-        bar = "█" * min(10, round(count / max_count * 10))
-        msg += f"{i}. *{street}*\n"
-        msg += f"   {bar} {count} complaint{'s' if count > 1 else ''}\n"
-        types = street_types.get(street, {})
-        top_types = sorted(types.items(), key=lambda x: -x[1])[:2]
-        if top_types:
-            type_str = " · ".join(f"{t} ({c})" for t, c in top_types)
-            msg += f"   _{type_str}_\n"
-        msg += "\n"
-
-    return msg
+# High-volume codes only — keeps API calls to 4 and results meaningful
+BACKLOG_CODES = {
+    "SBPOTREP": "Pothole Repair",
+    "TRASIGMA": "Traffic Signal",
+    "STREETL2": "Street Light",
+    "SBDEBROW": "Debris in Street",
+}
 
 
 # =============================================================================
-# STATS BY COMPLAINT TYPE
+# INFRA BACKLOG
 # =============================================================================
 
-def get_stats(days_back: int = 90) -> dict:
-    records = fetch_all_traffic_complaints(days_back)
-    if not records:
-        return {"total": 0, "days_back": days_back}
-
+def get_infra_backlog() -> dict:
+    """Fetch open infrastructure complaints across the 4 highest-volume codes."""
     now = _utc_now()
-    half = timedelta(days=days_back // 2)
-    cutoff = now - half
-
+    start = now - timedelta(days=90)
     type_counts: dict = {}
-    recent_total = 0
-    older_total = 0
+    oldest: list = []  # (days_open, label, addr, ticket_id)
 
-    for r in records:
-        label = r.get("_service_label", "Unknown")
-        type_counts[label] = type_counts.get(label, 0) + 1
-
-        requested_str = r.get("requested_datetime") or ""
+    for code, label in BACKLOG_CODES.items():
         try:
-            req = datetime.fromisoformat(requested_str.replace("Z", "+00:00"))
-            if req >= cutoff:
-                recent_total += 1
-            else:
-                older_total += 1
-        except ValueError:
-            pass
+            params = {
+                "service_code": code,
+                "status": "open",
+                "start_date": _isoformat_z(start),
+                "end_date": _isoformat_z(now),
+                "per_page": 100,
+                "page": 1,
+            }
+            records = _make_request(params)
+            type_counts[label] = len(records)
+            for r in records:
+                dt_str = r.get("requested_datetime") or ""
+                addr = (r.get("address") or "Unknown").replace(", Austin", "").strip()
+                ticket_id = r.get("service_request_id") or ""
+                try:
+                    req = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+                    oldest.append(((now - req).days, label, addr, ticket_id))
+                except (ValueError, TypeError):
+                    pass
+        except Exception as e:
+            logger.warning(f"backlog fetch {code}: {e}")
 
     return {
-        "total": len(records),
+        "total_open": sum(type_counts.values()),
         "type_counts": type_counts,
-        "recent_total": recent_total,
-        "older_total": older_total,
-        "half_days": days_back // 2,
-        "days_back": days_back,
+        "oldest_10": sorted(oldest, key=lambda x: -x[0])[:10],
     }
 
 
-def format_stats(data: dict) -> str:
-    if data.get("total", 0) == 0:
-        return f"📝 No infrastructure complaints found in the past {data.get('days_back', 90)} days."
+def format_infra_backlog(data: dict) -> str:
+    """Returns the summary text. Oldest tickets are rendered as buttons by the handler."""
+    total_open = data.get("total_open", 0)
+    type_counts = data.get("type_counts", {})
 
-    total = data["total"]
-    msg = f"🚧 *Infrastructure & Transportation — Last {data['days_back']} Days*\n\n"
+    if not total_open:
+        return "✅ No open infrastructure complaints in the last 90 days."
 
-    recent = data.get("recent_total", 0)
-    older = data.get("older_total", 0)
-    half = data.get("half_days", 45)
-    if older > 0:
-        trend = round(((recent - older) / older) * 100)
-        arrow = "📈" if trend > 0 else "📉" if trend < 0 else "➡️"
-        trend_str = f"+{trend}%" if trend > 0 else f"{trend}%"
-        msg += f"{arrow} *Volume trend:* {trend_str} (last {half} days vs prior {half})\n"
-    msg += f"📊 *Total complaints:* {total}\n\n"
+    msg = "📋 *Infrastructure Backlog*\n"
+    msg += f"_{total_open} open complaints · last 90 days_\n\n"
 
-    msg += "📋 *By complaint type:*\n"
-    for label, count in sorted(data["type_counts"].items(), key=lambda x: -x[1]):
-        pct = count / total * 100
-        bar = "█" * min(10, round(pct / 10))
-        msg += f"   *{label}*: {count} ({pct:.1f}%)\n"
-        msg += f"   {bar}\n"
+    msg += "*Open by type:*\n"
+    max_count = max(type_counts.values()) if type_counts else 1
+    for label, count in sorted(type_counts.items(), key=lambda x: -x[1]):
+        bar = "█" * min(10, round(count / max_count * 10))
+        msg += f"  {bar} *{label}*: {count}\n"
 
+    msg += "\n*Oldest unresolved — tap to look up:*"
     return msg
 
 
+def build_backlog_keyboard(data: dict):
+    """Returns a list of button rows for the oldest unresolved tickets."""
+    from telegram import InlineKeyboardButton
+    oldest_10 = data.get("oldest_10", [])
+    rows = []
+    for days_open, label, addr, ticket_id in oldest_10:
+        age_emoji = "🔴" if days_open >= 30 else "🟡" if days_open >= 14 else "🟢"
+        short_addr = addr[:28] + "…" if len(addr) > 30 else addr
+        btn_label = f"{age_emoji} {days_open}d · {short_addr}"
+        rows.append([InlineKeyboardButton(btn_label, callback_data=f"tlookup_{ticket_id}")])
+    return rows
+
+
 # =============================================================================
-# RESPONSE TIMES
+# POTHOLE REPAIR TIMER
 # =============================================================================
 
-def get_response_times(days_back: int = 90) -> dict:
-    records = fetch_all_traffic_complaints(days_back)
-    if not records:
-        return {"total": 0, "days_back": days_back}
+def get_pothole_repair_times(days_back: int = 180) -> dict:
+    """Fetch SBPOTREP records and calculate reported→closed repair times."""
+    end = _utc_now()
+    start = end - timedelta(days=days_back)
+    params = {
+        "service_code": "SBPOTREP",
+        "start_date": _isoformat_z(start),
+        "end_date": _isoformat_z(end),
+        "per_page": 100,
+        "page": 1,
+    }
+    records = _make_request(params)
 
-    type_times: dict = {}
+    repair_days: list = []
+    open_count = 0
+    slowest: list = []  # (days, address)
 
     for r in records:
-        if (r.get("status") or "").lower() != "closed":
-            continue
+        status = (r.get("status") or "").lower()
         requested_str = r.get("requested_datetime") or ""
         updated_str = r.get("updated_datetime") or ""
-        if not requested_str or not updated_str:
+        if not requested_str:
             continue
+
+        if status != "closed":
+            open_count += 1
+            continue
+
         try:
             req = datetime.fromisoformat(requested_str.replace("Z", "+00:00"))
             upd = datetime.fromisoformat(updated_str.replace("Z", "+00:00"))
-            days = (upd - req).days
-            if 0 <= days <= 365:
-                label = r.get("_service_label", "Unknown")
-                type_times.setdefault(label, []).append(days)
-        except ValueError:
+            d = (upd - req).days
+            if 0 <= d <= 365:
+                repair_days.append(d)
+                addr = (r.get("address") or "Unknown").replace(", Austin", "").strip()
+                slowest.append((d, addr))
+        except (ValueError, TypeError):
             pass
 
-    averages = {
-        label: round(sum(times) / len(times), 1)
-        for label, times in type_times.items()
-        if times
-    }
+    if not repair_days:
+        return {"total": 0, "open_count": open_count, "days_back": days_back}
 
-    overall_all = [d for times in type_times.values() for d in times]
-    overall_avg = round(sum(overall_all) / len(overall_all), 1) if overall_all else None
+    repair_days.sort()
+    avg = round(sum(repair_days) / len(repair_days), 1)
+    median = repair_days[len(repair_days) // 2]
+    fastest = repair_days[0]
+    slowest_5 = sorted(slowest, key=lambda x: -x[0])[:5]
+
+    # Bucket distribution: <1 week, 1–2 wks, 2–4 wks, >4 wks
+    buckets = {"< 1 week": 0, "1–2 weeks": 0, "2–4 weeks": 0, "> 4 weeks": 0}
+    for d in repair_days:
+        if d < 7:
+            buckets["< 1 week"] += 1
+        elif d < 14:
+            buckets["1–2 weeks"] += 1
+        elif d < 28:
+            buckets["2–4 weeks"] += 1
+        else:
+            buckets["> 4 weeks"] += 1
 
     return {
-        "averages": averages,
-        "overall_avg": overall_avg,
-        "total_closed": len(overall_all),
+        "total": len(repair_days),
+        "open_count": open_count,
+        "avg": avg,
+        "median": median,
+        "fastest": fastest,
+        "slowest_5": slowest_5,
+        "buckets": buckets,
         "days_back": days_back,
     }
 
 
-def format_response_times(data: dict) -> str:
-    if not data.get("averages"):
-        return "📝 Not enough closed complaints to calculate response times."
+def format_pothole_repair_times(data: dict) -> str:
+    if not data.get("total"):
+        return (
+            f"📝 No closed pothole repairs found in the past {data.get('days_back', 180)} days.\n"
+            f"_({data.get('open_count', 0)} currently open)_"
+        )
 
-    msg = f"⏱ *Infrastructure Response Times*\n"
-    msg += f"_Based on {data['total_closed']} closed complaints (last {data['days_back']} days)_\n\n"
+    total = data["total"]
+    avg = data["avg"]
+    median = data["median"]
+    fastest = data["fastest"]
+    open_count = data["open_count"]
+    buckets = data["buckets"]
+    slowest_5 = data["slowest_5"]
+    days_back = data["days_back"]
 
-    if data.get("overall_avg") is not None:
-        msg += f"📊 *Overall average:* {data['overall_avg']} days\n\n"
+    if avg <= 7:
+        verdict = "🟢 City is filling potholes quickly"
+    elif avg <= 21:
+        verdict = "🟡 Repair times are moderate"
+    else:
+        verdict = "🔴 Repairs are running slow"
 
-    msg += "📋 *By complaint type:*\n"
-    for label, avg in sorted(data["averages"].items(), key=lambda x: x[1]):
-        if avg <= 3:
-            speed = "🟢"
-        elif avg <= 14:
-            speed = "🟡"
-        else:
-            speed = "🔴"
-        msg += f"   {speed} *{label}:* {avg} days avg\n"
+    msg = f"🕳️ *Pothole Repair Tracker*\n"
+    msg += f"_Last {days_back} days · {total} closed repairs · {open_count} still open_\n\n"
+    msg += f"{verdict}\n\n"
+    msg += f"⏱ *Avg repair time:* {avg} days\n"
+    msg += f"📊 *Median:* {median} days  ·  *Fastest:* {fastest} day{'s' if fastest != 1 else ''}\n\n"
+
+    msg += "*How long repairs took:*\n"
+    max_bucket = max(buckets.values()) or 1
+    for label, count in buckets.items():
+        bar = "█" * min(10, round(count / max_bucket * 10))
+        pct = round(count / total * 100)
+        msg += f"  `{label:<12}` {bar} {count} ({pct}%)\n"
+
+    if slowest_5:
+        msg += "\n*Slowest repairs:*\n"
+        for d, addr in slowest_5:
+            msg += f"  🔴 {d} days — _{addr}_\n"
 
     return msg

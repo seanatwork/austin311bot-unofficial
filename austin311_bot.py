@@ -31,13 +31,11 @@ from telegram.ext import (
 from graffiti.config import Config as GraffitiConfig
 from graffiti.graffiti_bot import (
     analyze_graffiti_command,
-    hotspot_command,
     patterns_command,
 )
 from graffiti.remediation_analysis import (
     remediation_command,
     compare_command,
-    trends_command,
 )
 
 # Bicycle service
@@ -62,22 +60,19 @@ from animalsvc.animal_bot import (
 
 # Infrastructure & Transportation service
 from infrastructureandtransportation.traffic_bot import (
-    get_hotspots as get_traffic_hotspots,
-    get_stats as get_traffic_stats,
-    get_response_times as get_traffic_response_times,
-    format_hotspots as format_traffic_hotspots,
-    format_stats as format_traffic_stats,
-    format_response_times as format_traffic_response_times,
+    get_infra_backlog,
+    format_infra_backlog,
+    build_backlog_keyboard,
+    get_pothole_repair_times,
+    format_pothole_repair_times,
 )
 
 # Noise complaints service
 from noisecomplaints.noise_bot import (
     get_hotspots as get_noise_hotspots,
-    get_stats as get_noise_stats,
-    get_response_times as get_noise_response_times,
     format_hotspots as format_noise_hotspots,
-    format_stats as format_noise_stats,
-    format_response_times as format_noise_response_times,
+    get_peak_times as get_noise_peak_times,
+    format_peak_times as format_noise_peak_times,
 )
 
 # Restaurant inspections service
@@ -184,8 +179,7 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         keyboard = [
             [InlineKeyboardButton("📊 Analyze", callback_data="graffiti_analyze"),
              InlineKeyboardButton("🗺️ Hotspots", callback_data="graffiti_hotspot")],
-            [InlineKeyboardButton("⏰ Remediation", callback_data="graffiti_remediation"),
-             InlineKeyboardButton("📈 Trends", callback_data="graffiti_trends")],
+            [InlineKeyboardButton("⏰ Remediation", callback_data="graffiti_remediation")],
             [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
         ]
         text = "*🎨 Graffiti Analysis*\nPattern detection, hotspots, remediation tracking."
@@ -216,18 +210,16 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     elif service == "traffic":
         keyboard = [
-            [InlineKeyboardButton("📊 Stats", callback_data="traffic_stats"),
-             InlineKeyboardButton("🗺️ Hotspots", callback_data="traffic_hotspots")],
-            [InlineKeyboardButton("⏰ Response Times", callback_data="traffic_response")],
+            [InlineKeyboardButton("📋 Infra Backlog", callback_data="traffic_backlog"),
+             InlineKeyboardButton("🕳️ Pothole Timer", callback_data="traffic_potholes")],
             [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
         ]
         text = "*🚦 Traffic & Infrastructure*\nPotholes, signals, street lights, sidewalks, and more."
 
     elif service == "noise":
         keyboard = [
-            [InlineKeyboardButton("📊 Stats", callback_data="noise_stats"),
-             InlineKeyboardButton("🗺️ Hotspots", callback_data="noise_hotspots")],
-            [InlineKeyboardButton("⏰ Response Times", callback_data="noise_response")],
+            [InlineKeyboardButton("🗺️ Hotspots", callback_data="noise_hotspots"),
+             InlineKeyboardButton("🕐 Peak Times", callback_data="noise_peak")],
             [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
         ]
         text = "*🔊 Noise Complaints*\nNon-emergency noise, outdoor venues, fireworks."
@@ -304,24 +296,12 @@ async def graffiti_remediation_cb(update: Update, context: ContextTypes.DEFAULT_
         await query.edit_message_text(f"❌ Error: {e}")
 
 
-async def graffiti_trends_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-    await query.edit_message_text("⏳ Analyzing trends...")
-    try:
-        result = trends_command()
-        await _send_chunked(query, result)
-    except Exception as e:
-        logger.error(f"graffiti trends: {e}")
-        await query.edit_message_text(f"❌ Error: {e}")
-
 
 async def graffiti_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("📊 Analyze", callback_data="graffiti_analyze"),
          InlineKeyboardButton("🗺️ Hotspots", callback_data="graffiti_hotspot")],
-        [InlineKeyboardButton("⏰ Remediation", callback_data="graffiti_remediation"),
-         InlineKeyboardButton("📈 Trends", callback_data="graffiti_trends")],
+        [InlineKeyboardButton("⏰ Remediation", callback_data="graffiti_remediation")],
     ]
     await update.message.reply_text(
         "*🎨 Graffiti Analysis*\nChoose a view:",
@@ -496,44 +476,55 @@ async def animal_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 # =============================================================================
 
 
-async def traffic_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def traffic_backlog_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Fetching infrastructure stats...")
+    await query.edit_message_text("⏳ Loading infrastructure backlog...")
     try:
-        await _send_chunked(query, format_traffic_stats(get_traffic_stats()))
+        data = get_infra_backlog()
+        text = format_infra_backlog(data)
+        keyboard = build_backlog_keyboard(data)
+        await query.edit_message_text(
+            text,
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup(keyboard) if keyboard else None,
+        )
     except Exception as e:
-        logger.error(f"traffic stats: {e}")
+        logger.error(f"traffic backlog: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
 
 
-async def traffic_hotspots_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def ticket_lookup_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Finding infrastructure hotspots...")
+    ticket_id = query.data.replace("tlookup_", "")
+    await query.edit_message_text(f"🔍 Looking up ticket #{ticket_id}...")
     try:
-        await _send_chunked(query, format_traffic_hotspots(get_traffic_hotspots()))
+        record = lookup_ticket(ticket_id)
+        if not record:
+            await query.edit_message_text(f"❌ No ticket found for #{ticket_id}.")
+            return
+        await _send_chunked(query, format_ticket(record))
     except Exception as e:
-        logger.error(f"traffic hotspots: {e}")
+        logger.error(f"ticket lookup cb: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
 
 
-async def traffic_response_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def traffic_potholes_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Calculating response times...")
+    await query.edit_message_text("⏳ Calculating pothole repair times...")
     try:
-        await _send_chunked(query, format_traffic_response_times(get_traffic_response_times()))
+        await _send_chunked(query, format_pothole_repair_times(get_pothole_repair_times()))
     except Exception as e:
-        logger.error(f"traffic response: {e}")
+        logger.error(f"traffic potholes: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
 
 
 async def traffic_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("📊 Stats", callback_data="traffic_stats"),
-         InlineKeyboardButton("🗺️ Hotspots", callback_data="traffic_hotspots")],
-        [InlineKeyboardButton("⏰ Response Times", callback_data="traffic_response")],
+        [InlineKeyboardButton("📋 Infra Backlog", callback_data="traffic_backlog"),
+         InlineKeyboardButton("🕳️ Pothole Timer", callback_data="traffic_potholes")],
     ]
     await update.message.reply_text(
         "*🚦 Traffic & Infrastructure*\nChoose a view:",
@@ -547,17 +538,6 @@ async def traffic_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 # =============================================================================
 
 
-async def noise_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-    await query.edit_message_text("⏳ Fetching noise complaint stats...")
-    try:
-        await _send_chunked(query, format_noise_stats(get_noise_stats()))
-    except Exception as e:
-        logger.error(f"noise stats: {e}")
-        await query.edit_message_text(f"❌ Error: {e}")
-
-
 async def noise_hotspots_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
@@ -569,22 +549,21 @@ async def noise_hotspots_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         await query.edit_message_text(f"❌ Error: {e}")
 
 
-async def noise_response_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def noise_peak_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Calculating response times...")
+    await query.edit_message_text("⏳ Analyzing peak complaint times...")
     try:
-        await _send_chunked(query, format_noise_response_times(get_noise_response_times()))
+        await _send_chunked(query, format_noise_peak_times(get_noise_peak_times()))
     except Exception as e:
-        logger.error(f"noise response: {e}")
+        logger.error(f"noise peak: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
 
 
 async def noisecomplaints_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("📊 Stats", callback_data="noise_stats"),
-         InlineKeyboardButton("🗺️ Hotspots", callback_data="noise_hotspots")],
-        [InlineKeyboardButton("⏰ Response Times", callback_data="noise_response")],
+        [InlineKeyboardButton("🗺️ Hotspots", callback_data="noise_hotspots"),
+         InlineKeyboardButton("🕐 Peak Times", callback_data="noise_peak")],
     ]
     await update.message.reply_text(
         "*🔊 Noise Complaints*\nChoose a view:",
@@ -632,7 +611,6 @@ def create_application() -> Application:
     app.add_handler(CallbackQueryHandler(graffiti_analyze_cb, pattern="^graffiti_analyze"))
     app.add_handler(CallbackQueryHandler(graffiti_hotspot_cb, pattern="^graffiti_hotspot"))
     app.add_handler(CallbackQueryHandler(graffiti_remediation_cb, pattern="^graffiti_remediation"))
-    app.add_handler(CallbackQueryHandler(graffiti_trends_cb, pattern="^graffiti_trends"))
 
     # Bicycle inline
     app.add_handler(CallbackQueryHandler(bicycle_recent_cb, pattern="^bicycle_recent"))
@@ -647,14 +625,13 @@ def create_application() -> Application:
     app.add_handler(CallbackQueryHandler(animal_stats_cb, pattern="^animal_stats"))
 
     # Traffic inline
-    app.add_handler(CallbackQueryHandler(traffic_stats_cb, pattern="^traffic_stats"))
-    app.add_handler(CallbackQueryHandler(traffic_hotspots_cb, pattern="^traffic_hotspots"))
-    app.add_handler(CallbackQueryHandler(traffic_response_cb, pattern="^traffic_response"))
+    app.add_handler(CallbackQueryHandler(traffic_backlog_cb, pattern="^traffic_backlog"))
+    app.add_handler(CallbackQueryHandler(traffic_potholes_cb, pattern="^traffic_potholes"))
+    app.add_handler(CallbackQueryHandler(ticket_lookup_cb, pattern="^tlookup_"))
 
     # Noise inline
-    app.add_handler(CallbackQueryHandler(noise_stats_cb, pattern="^noise_stats"))
     app.add_handler(CallbackQueryHandler(noise_hotspots_cb, pattern="^noise_hotspots"))
-    app.add_handler(CallbackQueryHandler(noise_response_cb, pattern="^noise_response"))
+    app.add_handler(CallbackQueryHandler(noise_peak_cb, pattern="^noise_peak"))
 
     # Graffiti slash command
     app.add_handler(CommandHandler("graffiti", graffiti_command))
@@ -684,7 +661,7 @@ def create_application() -> Application:
         await application.bot.set_my_commands([
             BotCommand("start",           "Main menu"),
             BotCommand("help",            "All commands"),
-            BotCommand("graffiti",        "Graffiti — analysis · hotspots · remediation · trends"),
+            BotCommand("graffiti",        "Graffiti — analysis · hotspots · remediation"),
             BotCommand("animal",          "Animal complaints — hotspots · stats · response times"),
             BotCommand("bicycle",         "Bicycle complaints — recent · stats"),
             BotCommand("traffic",         "Traffic & infrastructure — potholes · signals · lights"),

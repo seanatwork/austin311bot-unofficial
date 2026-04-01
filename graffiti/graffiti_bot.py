@@ -320,6 +320,32 @@ def analyze_graffiti_command(days_back: int = 90) -> str:
         logger.error(f"Unexpected error: {e}")
         return f"❌ An error occurred: {e}"
 
+def get_hotspot_clusters(days_back: int = 90) -> list:
+    """Return top graffiti clusters as list of dicts with lat/lon/count/addresses."""
+    bot = GraffitiAnalysisBot()
+    records = bot.get_graffiti_data(days_back)
+    if not records:
+        return []
+    geo = bot.analyze_geographic_patterns(records)
+    hotspots = geo.get("hotspots", [])
+    result = []
+    for hotspot in hotspots[:8]:
+        nearby = [
+            r["address"] for r in records
+            if r["lat"] and r["long"]
+            and abs(r["lat"] - hotspot["center_lat"]) < 0.001
+            and abs(r["long"] - hotspot["center_lon"]) < 0.001
+            and r["address"]
+        ]
+        result.append({
+            "lat": hotspot["center_lat"],
+            "lon": hotspot["center_lon"],
+            "count": hotspot["count"],
+            "sample_address": nearby[0] if nearby else None,
+        })
+    return result
+
+
 def hotspot_command(area: str = None) -> str:
     """Show graffiti hotspots"""
     bot = GraffitiAnalysisBot()

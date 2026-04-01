@@ -164,136 +164,115 @@ def format_hotspots(data: dict) -> str:
 
 
 # =============================================================================
-# STATS BY COMPLAINT TYPE
+# PEAK TIMES & WEEKLY TREND
 # =============================================================================
 
-def get_stats(days_back: int = 90) -> dict:
-    records = fetch_all_noise_complaints(days_back)
+# Austin local time approximation (CDT = UTC-5, CST = UTC-6; we use -6 as default)
+_AUSTIN_OFFSET = timedelta(hours=-6)
+
+_DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+_DAY_SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
+
+def _fmt_hour(h: int) -> str:
+    if h == 0:
+        return "12am"
+    if h < 12:
+        return f"{h}am"
+    if h == 12:
+        return "12pm"
+    return f"{h - 12}pm"
+
+
+def get_peak_times(days_back: int = 56) -> dict:
+    records = fetch_all_noise_complaints(days_back, limit_per_code=100)
     if not records:
         return {"total": 0, "days_back": days_back}
 
     now = _utc_now()
-    half = timedelta(days=days_back // 2)
-    cutoff = now - half
-
-    type_counts: dict = {}
-    recent_total = 0
-    older_total = 0
+    # day_hour[weekday][hour] = count
+    day_hour: list = [[0] * 24 for _ in range(7)]
+    weekly: list = [0] * 8  # index 7 = most recent week, 0 = oldest
 
     for r in records:
-        label = r.get("_service_label", "Unknown")
-        type_counts[label] = type_counts.get(label, 0) + 1
-
-        requested_str = r.get("requested_datetime") or ""
+        dt_str = r.get("requested_datetime") or ""
+        if not dt_str:
+            continue
         try:
-            req = datetime.fromisoformat(requested_str.replace("Z", "+00:00"))
-            if req >= cutoff:
-                recent_total += 1
-            else:
-                older_total += 1
-        except ValueError:
+            dt_utc = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+            dt_local = dt_utc + _AUSTIN_OFFSET
+            day_hour[dt_local.weekday()][dt_local.hour] += 1
+
+            days_ago = (now - dt_utc).days
+            week_idx = min(7, days_ago // 7)
+            weekly[7 - week_idx] += 1
+        except (ValueError, TypeError):
             pass
 
+    # Overall peak (day + hour)
+    peak_day = peak_hour = peak_count = 0
+    for d in range(7):
+        for h in range(24):
+            if day_hour[d][h] > peak_count:
+                peak_count = day_hour[d][h]
+                peak_day, peak_hour = d, h
+
+    # Per-day peak hour
+    day_peaks = [
+        (_DAYS[d], _DAY_SHORT[d], day_hour[d].index(max(day_hour[d])), max(day_hour[d]))
+        for d in range(7)
+    ]
+
+    # Week-start labels (Mon of each week, oldest first)
+    week_labels = []
+    for i in range(8):
+        week_start = now - timedelta(days=(7 - i) * 7)
+        week_labels.append(week_start.strftime("%-m/%-d"))
+
     return {
-        "total": len(records),
-        "type_counts": type_counts,
-        "recent_total": recent_total,
-        "older_total": older_total,
-        "half_days": days_back // 2,
+        "total": sum(weekly),
         "days_back": days_back,
+        "peak_day": _DAYS[peak_day],
+        "peak_hour": peak_hour,
+        "peak_count": peak_count,
+        "day_peaks": day_peaks,
+        "weekly": weekly,
+        "week_labels": week_labels,
     }
 
 
-def format_stats(data: dict) -> str:
-    if data.get("total", 0) == 0:
-        return f"📝 No noise complaints found in the past {data.get('days_back', 90)} days."
+def format_peak_times(data: dict) -> str:
+    if not data.get("total"):
+        return "📝 Not enough data to analyze peak times."
 
-    total = data["total"]
-    msg = f"🔇 *Noise Complaints — Last {data['days_back']} Days*\n\n"
+    peak_day = data["peak_day"]
+    peak_hour = data["peak_hour"]
+    peak_count = data["peak_count"]
+    day_peaks = data["day_peaks"]
+    weekly = data["weekly"]
+    week_labels = data["week_labels"]
+    days_back = data["days_back"]
 
-    recent = data.get("recent_total", 0)
-    older = data.get("older_total", 0)
-    half = data.get("half_days", 45)
-    if older > 0:
-        trend = round(((recent - older) / older) * 100)
-        arrow = "📈" if trend > 0 else "📉" if trend < 0 else "➡️"
-        trend_str = f"+{trend}%" if trend > 0 else f"{trend}%"
-        msg += f"{arrow} *Volume trend:* {trend_str} (last {half} days vs prior {half})\n"
-    msg += f"📊 *Total complaints:* {total}\n\n"
+    # Headline
+    msg = f"🕐 *Noise Complaints — When They Happen*\n"
+    msg += f"_Last {days_back} days · {data['total']} total complaints_\n\n"
+    msg += f"📍 *Peak:* {peak_day}s around *{_fmt_hour(peak_hour)}* ({peak_count} complaints)\n\n"
 
-    msg += "📋 *By complaint type:*\n"
-    for label, count in sorted(data["type_counts"].items(), key=lambda x: -x[1]):
-        pct = count / total * 100
-        bar = "█" * min(10, round(pct / 10))
-        msg += f"   *{label}*: {count} ({pct:.1f}%)\n"
-        msg += f"   {bar}\n"
+    # Peak hour per day of week
+    msg += "*Peak hour by day:*\n"
+    for _, short, peak_h, count in day_peaks:
+        bar = "█" * min(8, round(count / max(1, peak_count) * 8))
+        msg += f"  `{short}` {_fmt_hour(peak_h):>5}  {bar} {count}\n"
+
+    msg += "\n"
+
+    # 8-week trend
+    msg += "*Weekly volume — last 8 weeks:*\n"
+    max_week = max(weekly) if weekly else 1
+    for i, (label, count) in enumerate(zip(week_labels, weekly)):
+        bar = "█" * min(10, round(count / max(1, max_week) * 10))
+        recency = " ◀ this wk" if i == 7 else ""
+        msg += f"  `{label}` {bar} {count}{recency}\n"
 
     return msg
 
-
-# =============================================================================
-# RESPONSE TIMES
-# =============================================================================
-
-def get_response_times(days_back: int = 90) -> dict:
-    records = fetch_all_noise_complaints(days_back)
-    if not records:
-        return {"total": 0, "days_back": days_back}
-
-    type_times: dict = {}
-
-    for r in records:
-        if (r.get("status") or "").lower() != "closed":
-            continue
-        requested_str = r.get("requested_datetime") or ""
-        updated_str = r.get("updated_datetime") or ""
-        if not requested_str or not updated_str:
-            continue
-        try:
-            req = datetime.fromisoformat(requested_str.replace("Z", "+00:00"))
-            upd = datetime.fromisoformat(updated_str.replace("Z", "+00:00"))
-            days = (upd - req).days
-            if 0 <= days <= 365:
-                label = r.get("_service_label", "Unknown")
-                type_times.setdefault(label, []).append(days)
-        except ValueError:
-            pass
-
-    averages = {
-        label: round(sum(times) / len(times), 1)
-        for label, times in type_times.items()
-        if times
-    }
-
-    overall_all = [d for times in type_times.values() for d in times]
-    overall_avg = round(sum(overall_all) / len(overall_all), 1) if overall_all else None
-
-    return {
-        "averages": averages,
-        "overall_avg": overall_avg,
-        "total_closed": len(overall_all),
-        "days_back": days_back,
-    }
-
-
-def format_response_times(data: dict) -> str:
-    if not data.get("averages"):
-        return "📝 Not enough closed complaints to calculate response times."
-
-    msg = f"⏱ *Noise Complaint Response Times*\n"
-    msg += f"_Based on {data['total_closed']} closed complaints (last {data['days_back']} days)_\n\n"
-
-    if data.get("overall_avg") is not None:
-        msg += f"📊 *Overall average:* {data['overall_avg']} days\n\n"
-
-    msg += "📋 *By complaint type:*\n"
-    for label, avg in sorted(data["averages"].items(), key=lambda x: x[1]):
-        if avg <= 1:
-            speed = "🟢"
-        elif avg <= 5:
-            speed = "🟡"
-        else:
-            speed = "🔴"
-        msg += f"   {speed} *{label}:* {avg} days avg\n"
-
-    return msg
