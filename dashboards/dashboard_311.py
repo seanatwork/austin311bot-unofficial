@@ -16,14 +16,36 @@ class BicycleDashboard:
         
     def load_data(self):
         """Load data from SQLite database"""
+        import json
         conn = sqlite3.connect(self.db_path)
-        df = pd.read_sql('SELECT * FROM service_requests', conn)
+        df = pd.read_sql('SELECT * FROM open311_requests', conn)
         conn.close()
-        
+
+        # Rename columns to match dashboard expectations
+        df = df.rename(columns={
+            'service_request_id': 'ticket_number',
+            'service_name': 'category_name',
+            'requested_datetime': 'created_date',
+            'ingested_at': 'scraped_at',
+            'status_notes': 'response',
+        })
+
+        # Build a readable description from attributes_json
+        def parse_attributes(raw):
+            try:
+                attrs = json.loads(raw)
+                return '; '.join(f"{a['label']}: {a['value']}" for a in attrs if 'label' in a and 'value' in a)
+            except Exception:
+                return ''
+        df['description'] = df['attributes_json'].apply(parse_attributes)
+
         # Convert datetime columns
-        df['created_date'] = pd.to_datetime(df['created_date'])
-        df['scraped_at'] = pd.to_datetime(df['scraped_at'])
-        
+        df['created_date'] = pd.to_datetime(df['created_date'], utc=True).dt.tz_localize(None)
+        df['scraped_at'] = pd.to_datetime(df['scraped_at'], utc=True).dt.tz_localize(None)
+
+        # Normalize status to uppercase
+        df['status'] = df['status'].str.upper()
+
         return df
 
     def _is_displayable_description(self, description):

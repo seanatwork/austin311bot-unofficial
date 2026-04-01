@@ -1,0 +1,82 @@
+# Austin 311 Service Codes
+# Generated from project analysis and discovery commands
+# Format: SERVICE_CODE - Service Name - Request Count (from discovery sample)
+
+# CONFIRMED SERVICE CODES (from discovery commands)
+
+# INFRASTRUCTURE & TRANSPORTATION
+HHSGRAFF - Graffiti Abatement - Public Property - 152,319 requests (known)
+PARKINGV - Parking Violation Enforcement - 100 requests (discovered)
+SBPOTREP - Pothole Repair - 99 requests (discovered)
+TRASIGMA - Traffic Signal - Maintenance - 70 requests (discovered)
+STREETL2 - Austin Energy Street Light Issue - Address - 87 requests (discovered)
+SBDEBROW - Debris in Street - 67 requests (discovered)
+
+# ANIMAL SERVICES
+ACLONAG - Loose Dog - 86 requests (discovered)
+ACLOANIM - Loose Animal Not Dog - 8 requests (discovered)
+ACBITE2 - Animal Bite - 5 requests (discovered)
+COAACDD - Vicious Dog Complaint - 1 request (discovered)
+
+# NOISE & QUALITY OF LIFE
+DSOUCVMC - Outdoor Commercial Venue Music Complaint - 70 requests (discovered)
+APDNONNO - Non Emergency Noise Complaint - 1 request (discovered)
+
+# ADDITIONAL SERVICE CODES FROM DISCOVERY
+ATTRSIMO - Traffic Signal - Modification - 15 requests
+SIGNSTRE - Street Name Sign Maintenance - 11 requests
+OBSINTTR - View Obstruction and Fencing at Intersection - 3 requests
+SIGNNEWT - Traffic Sign New - 1 request
+ACPROPER - Animal Proper Care - 12 requests
+AFDFIREW - Fireworks Complaint - 6 requests
+ACCOYTE - Coyote Complaints - 4 requests
+DSDENVCO - Tree and Environmental Complaint - 2 requests
+WILDEXPO - Wildlife Exposure - 2 requests
+ACINFORM - Animal Protection - Assistance Request - 1 request
+COMENGFE - Community Voices - 1 request
+TELECOMP - Telecommunication/Gas Utility Complaint - 1 request
+TPPECRNE - Pedestrian Crossing New/Modify - 1 request
+TRASIGNE - Traffic Signal - New - 1 request
+SBGENRL - Street and Bridge Miscellaneous - 1 request
+ZZARSTSW - Street Sweeping - 9 requests
+DRCHANEL - Channels/Creeks/Drainage Issues - 8 requests
+OBSTMIDB - Obstruction in Right of Way - 5 requests
+PWTRISRW - Tree Issue Right of Way - 4 requests
+ATCOCIRW - Construction Concerns in Right of Way - 3 requests
+PRBLDISS - Park Building Issues - 1 request
+SBSTRES - Street Resurfacing - 1 request
+SBSIDERE - Sidewalk Repair - 1 request
+
+# HIGH PRIORITY CATEGORIES (from 311categories.txt - use discovery to find codes)
+# These have high request volumes but need discovery for exact codes:
+# 1. Loose Dog - 185,855 requests ✓ (ACLONAG)
+# 2. Graffiti Abatement - Public Property - 152,319 requests ✓ (HHSGRAFF)
+# 3. Non Emergency Noise Complaint - 137,227 requests (APDNONNO)
+# 4. Traffic Signal - Maintenance - 132,180 requests ✓ (TRASIGMA)
+# 5. Animal Protection - Assistance Request - 112,018 requests (ACINFORM)
+# 6. Injured / Sick Animal - 102,401 requests
+# 7. Austin Energy Street Light Issue - Address - 94,828 requests ✓ (STREETL2)
+# 8. Adopted/Impounded/Surrendered Animal - 75,153 requests
+# 9. Parking Violation Enforcement - 68,080 requests ✓ (PARKINGV)
+# 10. Storm Debris Collection - 55,314 requests
+# 11. Water Conservation Violation - 55,308 requests
+# 12. Pothole Repair - 40,687 requests ✓ (SBPOTREP)
+# 13. Debris in Street - 40,332 requests ✓ (SBDEBROW)
+# 14. Shared Micromobility - 39,043 requests
+# 15. Park Maintenance - Grounds - 36,598 requests
+
+# USAGE EXAMPLES:
+# 
+# Discover service code for any category:
+# python3 open311_ingest.py discover "Category Name" --per-page 100
+#
+# Ingest data once you have the service code:
+# python3 open311_ingest.py ingest --service-code SERVICE_CODE --start-date 2025-01-01T00:00:00Z
+#
+# For graffiti (already known):
+# python3 graffiti/ingest_graffiti_data.py
+#
+# Examples with discovered codes:
+# python3 open311_ingest.py ingest --service-code PARKINGV --start-date 2025-01-01T00:00:00Z
+# python3 open311_ingest.py ingest --service-code SBPOTREP --start-date 2025-01-01T00:00:00Z
+# python3 open311_ingest.py ingest --service-code TRASIGMA --start-date 2025-01-01T00:00:00Z

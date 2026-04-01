@@ -24,23 +24,23 @@ def main():
     command = sys.argv[1].lower()
 
     if command == "demo":
-        from graffitibot.graffiti_bot import analyze_graffiti_command
+        from graffiti.graffiti_bot import analyze_graffiti_command
         print(analyze_graffiti_command(90))
 
     elif command == "ingest":
-        from graffitibot.ingest_graffiti_data import ingest_graffiti_last_90_days
+        from graffiti.ingest_graffiti_data import ingest_graffiti_last_90_days
         ingest_graffiti_last_90_days()
 
     elif command == "analyze":
-        from graffitibot.graffiti_bot import analyze_graffiti_command
+        from graffiti.graffiti_bot import analyze_graffiti_command
         print(analyze_graffiti_command(90))
 
     elif command == "telegram":
-        from graffitibot.telegram_bot import main as telegram_main
+        from austin311_bot import main as telegram_main
         telegram_main()
 
     elif command == "remediation":
-        from graffitibot.remediation_analysis import remediation_command
+        from graffiti.remediation_analysis import remediation_command
         print(remediation_command(90))
 
     elif command == "help":

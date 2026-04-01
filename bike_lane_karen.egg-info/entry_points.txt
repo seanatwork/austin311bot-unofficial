@@ -1,6 +1,7 @@
 [console_scripts]
-analyze-311 = analyze_complaints:main
-open311-aggregate = open311_aggregate_heatmap:main
+austin311-bot = austin311_bot:main
+graffiti-bot = tools.graffiti_bot_cli:main
+open311-aggregate = tools.open311_aggregate_heatmap:main
 open311-ingest = open311_ingest:main
-scrape-bicycle = scrape_bicycle_complaints:main
-search-311 = search_311_categories:main
+scrape-bicycle = bicycle.scrape_bicycle_complaints:main
+search-311 = tools.search_311_categories:main

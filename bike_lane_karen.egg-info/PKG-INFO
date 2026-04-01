@@ -11,6 +11,8 @@ Requires-Dist: streamlit
 Requires-Dist: pydeck
 Requires-Dist: plotly
 Requires-Dist: typer[all]
+Requires-Dist: python-telegram-bot==21.0
+Requires-Dist: python-dotenv
 
 # Bike Lane Karen - Austin 311 Bicycle Infrastructure Complaints Catalog
 
@@ -35,19 +37,38 @@ This project aims to:
 ## Project Structure
 
 ```
-├── dashboard.py                    # Main Streamlit dashboard application
-├── filter_csv.py                   # Script to filter raw 311 data to last 365 days
-├── filter_csv.ps1                  # PowerShell version of the filtering script
-├── scrape_bicycle_complaints.py    # Original bicycle-specific scraper (legacy)
-├── search_311_categories.py        # NEW: General 311 category search tool
-├── test_category_search.py         # Test script for category search functionality
-├── requirements.txt                # Python dependencies
-├── README.md                       # This file
-├── 311austin.htm                   # Austin 311 website HTML for category extraction
-├── 311categories.txt               # List of available 311 categories
-└── data/
-    ├── 311_Service_Requests_-_Austin_Transportation_and_Public_Works_20260322.csv  # Raw dataset (gitignored)
-    └── 311_Service_Requests_Last_365_Days.csv                                      # Filtered dataset
+├── austin311_bot.py               # Main bot functionality
+├── open311_ingest.py              # Open311 API data ingestion
+├── dashboards/                    # Interactive dashboards
+│   ├── dashboard_311.py           # Main 311 dashboard
+│   └── bicycle_dashboard.py      # Bicycle-specific dashboard
+├── tools/                         # Analysis and utility tools
+│   ├── search_311_categories.py  # General 311 category search
+│   ├── global_311_analysis.py    # Global analysis tools
+│   ├── open311_aggregate_heatmap.py  # Heatmap aggregation
+│   ├── open311_parking_heatmap_app.py  # Parking heatmap app
+│   └── view_analysis_report.py   # Report viewing tool
+├── graffitibot/                   # Graffiti analysis bot
+│   ├── graffiti_bot.py           # Main graffiti bot
+│   ├── ingest_graffiti_data.py   # Graffiti data ingestion
+│   ├── remediation_analysis.py   # Remediation time analysis
+│   └── telegram_bot.py           # Telegram integration
+├── bicycle/                       # Bicycle-specific tools
+│   ├── scrape_bicycle_complaints.py  # Bicycle complaint scraper
+│   └── bicycle_complaints.db     # Bicycle database
+├── restchkbot/                    # Restaurant inspection bot
+│   ├── bot.js                    # Main restaurant bot
+│   └── api-client.js             # API client
+├── data/                          # Data files
+│   ├── 311_categories.parquet    # Processed category data
+│   ├── bicycle_complaints.parquet # Bicycle complaint data
+│   └── 311austin.htm             # Austin 311 website HTML
+├── analysis/                      # Analysis reports
+│   └── 311_analysis_report_*.json # Generated analysis reports
+├── 311_categories.db             # Main SQLite database
+├── requirements.txt               # Python dependencies
+├── pyproject.toml               # Project configuration
+└── README.md                     # This file
 ```
 
 ## Setup and Installation
@@ -78,10 +99,16 @@ This project aims to:
 
 ### Running the Dashboard
 
-Start the Streamlit dashboard:
+Start the main 311 dashboard:
 
 ```bash
-streamlit run dashboard.py
+streamlit run dashboards/dashboard_311.py
+```
+
+For bicycle-specific analysis:
+
+```bash
+streamlit run dashboards/bicycle_dashboard.py
 ```
 
 The dashboard will open in your web browser at `http://localhost:8501`
@@ -97,7 +124,7 @@ Important: this is **not** a parking citation lookup or ticket map. It visualize
 The Open311 `services.json` endpoint can be unreliable at times, so the easiest discovery method is to search recent requests by text and see which `service_code` appears.
 
 ```bash
-python open311_ingest.py discover "Parking Violation"
+python open311_ingest.py discover "Parking Violation" --per-page 100
 ```
 
 Pick the `service_code` whose `service_name` matches “Parking Violation Enforcement”.
@@ -107,7 +134,7 @@ Pick the `service_code` whose `service_name` matches “Parking Violation Enforc
 Open311 date filters are limited to 90-day windows, so ingestion automatically backfills in 90-day slices.
 
 ```bash
-python open311_ingest.py ingest --service-code <SERVICE_CODE> --start-date 2025-01-01T00:00:00Z --db-path 311_categories.db
+python open311_ingest.py ingest --service-code <SERVICE_CODE> --start-date 2025-01-01T00:00:00Z --per-page 100 --min-interval-s 6.2 --db-path 311_categories.db
 ```
 
 ### 3) Aggregate into spatial bins (public-safe)
@@ -126,7 +153,9 @@ streamlit run open311_parking_heatmap_app.py
 
 ### Notes
 
-- **Rate limiting**: the API is rate limited (often 10 req/min). If you request an API key, you can pass it to ingestion with `--api-key ...`.
+- **Rate limiting**: the API is rate limited (often 10 req/min). The ingest command now paces itself with `--min-interval-s` when no API key is provided.
+- **Paging behavior**: ingestion uses `per_page` + `page` and keeps paging until empty (with safety checks for repeated pages/no-new IDs).
+- **API key**: if you request an API key, pass it with `--api-key ...` for higher limits.
 - **Privacy**: the app is designed to show **aggregates** by default (bins), not individual request addresses.
 
 ### Dashboard Features
@@ -139,15 +168,10 @@ streamlit run open311_parking_heatmap_app.py
 - **Method Received**: How complaints are submitted to 311
 - **Raw Data View**: Optional table view of filtered data
 
-### Data Processing
-
-The `filter_csv.py` script:
-- Processes the raw 311 dataset (typically >100MB)
-- Filters to include only requests from the last 365 days
-- Handles date parsing for Austin's specific date format
-- Outputs a manageable CSV file for the dashboard
-
-### 311 Category Search Tool (NEW)
+### Database Structure
+- Single `service_requests` table with category columns
+- Indexed by `category_code` and `created_date` for fast queries
+- Supports cross-category analysis and comparisons
 
 The `search_311_categories.py` tool provides flexible scraping of any Austin 311 service category:
 

@@ -17,27 +17,16 @@ dependencies = [
 ]
 
 [project.scripts]
-search-311 = "search_311_categories:main"
-scrape-bicycle = "scrape_bicycle_complaints:main"
-analyze-311 = "analyze_complaints:main"
-open311-ingest = "open311_ingest:main"
-open311-aggregate = "open311_aggregate_heatmap:main"
-graffiti-bot = "tools.graffiti_bot_cli:main"
 austin311-bot = "austin311_bot:main"
+open311-ingest = "open311_ingest:main"
+scrape-bicycle = "bicycle.scrape_bicycle_complaints:main"
+search-311 = "tools.search_311_categories:main"
+open311-aggregate = "tools.open311_aggregate_heatmap:main"
 
 [tool.setuptools]
 py-modules = [
-    "search_311_categories",
-    "scrape_bicycle_complaints",
-    "analyze_complaints",
-    "filter_csv",
-    "dashboard",
-    "bicycle_dashboard",
-    "check_tickets",
     "open311_ingest",
-    "open311_aggregate_heatmap",
-    "open311_parking_heatmap_app",
-    "test_category_search"
+    "austin311_bot",
 ]
 
 [build-system]

@@ -1,7 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(find 'c:\\\\Users\\\\Sean\\\\Documents\\\\VSCode Projects\\\\bike lane karen' -type f \\\\\\(-name *.py -o -name *.md -o -name *.txt -o -name *.json -o -name *.toml -o -name *.cfg -o -name *.ini -o -name *.env* -o -name *.db -o -name *.sqlite -o -name *.sqlite3 \\\\\\))"
-    ]
+    "defaultMode": "bypassPermissions"
   }
 }
