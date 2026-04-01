@@ -23,6 +23,7 @@ analyze-311 = "analyze_complaints:main"
 open311-ingest = "open311_ingest:main"
 open311-aggregate = "open311_aggregate_heatmap:main"
 graffiti-bot = "tools.graffiti_bot_cli:main"
+austin311-bot = "austin311_bot:main"
 
 [tool.setuptools]
 py-modules = [
