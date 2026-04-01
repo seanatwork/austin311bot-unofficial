@@ -77,10 +77,8 @@ from noisecomplaints.noise_bot import (
 
 # Parking enforcement service
 from parking.parking_bot import (
-    get_recent_citations,
     get_stats as get_parking_stats,
     get_hotspots as get_parking_hotspots,
-    format_citations as format_parking_citations,
     format_stats as format_parking_stats,
     format_hotspots as format_parking_hotspots,
 )
@@ -240,8 +238,6 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     elif service == "parking":
         keyboard = [
-            [InlineKeyboardButton("📋 Recent", callback_data="parking_recent"),
-             InlineKeyboardButton("📊 Stats", callback_data="parking_stats")],
             [InlineKeyboardButton("🔥 Hot Zones", callback_data="parking_hotspots")],
             [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
         ]
@@ -596,15 +592,25 @@ async def noisecomplaints_command(update: Update, context: ContextTypes.DEFAULT_
 # =============================================================================
 
 
-async def parking_recent_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def parking_resolution_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Fetching recent parking citations...")
+    await query.edit_message_text("⏳ Calculating resolution times...")
     try:
-        citations = get_recent_citations(limit=10)
-        await _send_chunked(query, format_parking_citations(citations))
+        stats = get_parking_stats()
+        msg = "⏱️ *Parking Resolution Analysis*\n\n"
+        if stats.get("avg_resolution_days"):
+            msg += f"📊 *Average resolution:* {stats['avg_resolution_days']} days\n"
+        else:
+            msg += "📊 *Average resolution:* Not enough closed data\n"
+        msg += f"📋 *Total citations:* {stats['total']}\n"
+        msg += f"✅ *Closed:* {stats['closed']} | 🔴 *Open:* {stats['open']}\n\n"
+        if stats.get("oldest_open"):
+            o = stats["oldest_open"]
+            msg += f"🕰️ *Oldest open:* #{o['id']}\n   {o['address']}\n   {o['days_ago']} days unresolved"
+        await _send_chunked(query, msg)
     except Exception as e:
-        logger.error(f"parking recent: {e}")
+        logger.error(f"parking resolution: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
 
 
@@ -634,8 +640,6 @@ async def parking_hotspots_cb(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def parking_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("📋 Recent", callback_data="parking_recent"),
-         InlineKeyboardButton("📊 Stats", callback_data="parking_stats")],
         [InlineKeyboardButton("🔥 Hot Zones", callback_data="parking_hotspots")],
     ]
     await update.message.reply_text(
@@ -707,9 +711,9 @@ def create_application() -> Application:
     app.add_handler(CallbackQueryHandler(noise_peak_cb, pattern="^noise_peak"))
 
     # Parking inline
-    app.add_handler(CallbackQueryHandler(parking_recent_cb, pattern="^parking_recent"))
     app.add_handler(CallbackQueryHandler(parking_stats_cb, pattern="^parking_stats"))
     app.add_handler(CallbackQueryHandler(parking_hotspots_cb, pattern="^parking_hotspots"))
+    app.add_handler(CallbackQueryHandler(parking_resolution_cb, pattern="^parking_resolution"))
 
     # Graffiti slash command
     app.add_handler(CommandHandler("graffiti", graffiti_command))
