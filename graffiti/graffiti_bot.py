@@ -75,7 +75,8 @@ class GraffitiAnalysisBot:
             'temporal_patterns': self.analyze_temporal_patterns(records),
             'geographic_patterns': self.analyze_geographic_patterns(records),
             'address_patterns': self.analyze_address_patterns(records),
-            'status_notes_patterns': self.analyze_status_notes(records)
+            'status_notes_patterns': self.analyze_status_notes(records),
+            'media_analysis': self.analyze_media_attachments(records)
         }
         
         return analysis
@@ -189,6 +190,16 @@ class GraffitiAnalysisBot:
             'action_patterns': pattern_counts,
             'all_text': all_text
         }
+
+    def analyze_media_attachments(self, records: List[Dict]) -> Dict:
+        """Analyze media attachments (photos)"""
+        media_urls = [r['media_url'] for r in records if r['media_url']]
+        
+        return {
+            'total_with_media': len(media_urls),
+            'media_rate': len(media_urls) / len(records) if records else 0,
+            'sample_urls': media_urls[:3]  # First 3 photo URLs
+        }
     
     def generate_heatmap_data(self, records: List[Dict]) -> List[Dict]:
         """Generate data for heatmap visualization"""
@@ -284,6 +295,16 @@ class GraffitiAnalysisBot:
             if addr.get('common_streets'):
                 report.append(f"   Common streets: {', '.join([word for word, count in addr['common_streets'][:5]])}")
         
+        # Media attachments
+        media = analysis.get('media_analysis')
+        if media and media['total_with_media'] > 0:
+            report.append(f"\n📸 Photo Attachments:")
+            report.append(f"   Reports with photos: {media['total_with_media']} ({media['media_rate']*100:.1f}%)")
+            if media.get('sample_urls'):
+                report.append(f"   Sample photos:")
+                for url in media['sample_urls']:
+                    report.append(f"      • {url}")
+        
         # Insights
         insights = self.generate_insights(analysis)
         if insights:
@@ -346,7 +367,7 @@ def get_hotspot_clusters(days_back: int = 90) -> list:
     return result
 
 
-def hotspot_command(area: str = None) -> str:
+def hotspot_command() -> str:
     """Show graffiti hotspots"""
     bot = GraffitiAnalysisBot()
     records = bot.get_graffiti_data(90)
@@ -409,7 +430,7 @@ def help_command() -> str:
 
 📊 ANALYSIS COMMANDS:
 /analyze [days] - Full graffiti analysis (default: 90 days)
-/hotspot [area] - Show geographic hotspots  
+/hotspot - Show geographic hotspots  
 /patterns [days] - Recent temporal patterns (default: 30 days)
 
 📸 REPORTING COMMANDS (Secondary):
@@ -417,7 +438,7 @@ def help_command() -> str:
 
 📊 EXAMPLES:
 /analyze - 90-day graffiti analysis
-/hotspot downtown - Show downtown hotspots
+/hotspot - Show all hotspots
 /patterns 14 - Last 2 weeks patterns
 /report "123 Main St" "Large tag on wall"
 
@@ -441,8 +462,7 @@ def handle_command(command: str, args: List[str]) -> str:
         return analyze_graffiti_command(days)
     
     elif command in ['hotspot', 'hotspots']:
-        area = args[0] if args else None
-        return hotspot_command(area)
+        return hotspot_command()
     
     elif command in ['patterns', 'pattern']:
         days = int(args[0]) if args and args[0].isdigit() else 30

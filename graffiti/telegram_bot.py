@@ -65,7 +65,6 @@ I analyze graffiti complaints from Austin's 311 system to identify patterns, hot
 /patterns - Recent temporal patterns
 /remediation - Remediation time analysis
 /compare - Compare multiple periods
-/trends - Show 6-month trends
 /help - All available commands
 
 *Quick Start:*
@@ -120,7 +119,6 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 🕒 *REMEDIATION COMMANDS:*
 /remediation [days] - Remediation time analysis (default: 90 days)
 /compare - Compare multiple time periods
-/trends - Show 6-month remediation trends
 
 ℹ️ *GENERAL:*
 /start - Welcome message
@@ -133,7 +131,6 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 `/patterns 14` - Last 2 weeks patterns
 `/remediation` - 90-day remediation analysis
 `/compare` - Compare 30/60/90/180 day periods
-`/trends` - Show improvement/decline trends
 
 💡 *FEATURES:*
 • Geographic hotspot identification
@@ -187,7 +184,6 @@ def create_application() -> Application:
         CommandHandler(["remediation", "remedy"], remediation_command)
     )
     application.add_handler(CommandHandler("compare", remediation_command))
-    application.add_handler(CommandHandler(["trends", "trend"], remediation_command))
 
     # Fallback for unknown text
     application.add_handler(

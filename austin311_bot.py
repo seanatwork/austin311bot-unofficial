@@ -75,6 +75,14 @@ from noisecomplaints.noise_bot import (
     format_peak_times as format_noise_peak_times,
 )
 
+# Parking enforcement service
+from parking.parking_bot import (
+    get_stats as get_parking_stats,
+    get_hotspots as get_parking_hotspots,
+    format_stats as format_parking_stats,
+    format_hotspots as format_parking_hotspots,
+)
+
 # Restaurant inspections service
 from restaurants.restaurant_bot import (
     search_restaurants,
@@ -153,6 +161,10 @@ _💡 Pothole repair is one of the top 311 categories in Austin_
 /noisecomplaints — Hotspots · stats · response times
 _💡 Austin's 6th Street corridor generates some of the highest noise complaint volumes in the city_
 
+🅿️ *Parking:*
+/parking — Citations · hot zones · stats
+_💡 Parking enforcement is one of the top 10 most-requested 311 services in Austin_
+
 🍽️ *Restaurants:*
 /rest — Worst scores · grade report
 /rest <name or address> — Search directly
@@ -224,8 +236,11 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         text = "*🔊 Noise Complaints*\nNon-emergency noise, outdoor venues, fireworks."
 
     elif service == "parking":
-        keyboard = [[InlineKeyboardButton("🔙 Back", callback_data="back_to_main")]]
-        text = "*🅿️ Parking Enforcement*\n\n⚠️ Coming soon."
+        keyboard = [
+            [InlineKeyboardButton("🔥 Hot Zones", callback_data="parking_hotspots")],
+            [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
+        ]
+        text = "*🅿️ Parking Enforcement*\nCitations, hot zones, and enforcement patterns."
 
     else:
         return
@@ -560,6 +575,68 @@ async def noisecomplaints_command(update: Update, context: ContextTypes.DEFAULT_
 
 
 # =============================================================================
+# PARKING ENFORCEMENT HANDLERS
+# =============================================================================
+
+
+async def parking_resolution_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("⏳ Calculating resolution times...")
+    try:
+        stats = get_parking_stats()
+        msg = "⏱️ *Parking Resolution Analysis*\n\n"
+        if stats.get("avg_resolution_days"):
+            msg += f"📊 *Average resolution:* {stats['avg_resolution_days']} days\n"
+        else:
+            msg += "📊 *Average resolution:* Not enough closed data\n"
+        msg += f"📋 *Total citations:* {stats['total']}\n"
+        msg += f"✅ *Closed:* {stats['closed']} | 🔴 *Open:* {stats['open']}\n\n"
+        if stats.get("oldest_open"):
+            o = stats["oldest_open"]
+            msg += f"🕰️ *Oldest open:* #{o['id']}\n   {o['address']}\n   {o['days_ago']} days unresolved"
+        await _send_chunked(query, msg)
+    except Exception as e:
+        logger.error(f"parking resolution: {e}")
+        await query.edit_message_text(f"❌ Error: {e}")
+
+
+async def parking_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("⏳ Fetching parking statistics...")
+    try:
+        stats = get_parking_stats()
+        await _send_chunked(query, format_parking_stats(stats))
+    except Exception as e:
+        logger.error(f"parking stats: {e}")
+        await query.edit_message_text(f"❌ Error: {e}")
+
+
+async def parking_hotspots_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("⏳ Finding parking hot zones...")
+    try:
+        hotspots = get_parking_hotspots()
+        await _send_chunked(query, format_parking_hotspots(hotspots))
+    except Exception as e:
+        logger.error(f"parking hotspots: {e}")
+        await query.edit_message_text(f"❌ Error: {e}")
+
+
+async def parking_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    keyboard = [
+        [InlineKeyboardButton("🔥 Hot Zones", callback_data="parking_hotspots")],
+    ]
+    await update.message.reply_text(
+        "*🅿️ Parking Enforcement*\nChoose a view:",
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+
+# =============================================================================
 # FALLBACK
 # =============================================================================
 
@@ -619,6 +696,11 @@ def create_application() -> Application:
     app.add_handler(CallbackQueryHandler(noise_hotspots_cb, pattern="^noise_hotspots"))
     app.add_handler(CallbackQueryHandler(noise_peak_cb, pattern="^noise_peak"))
 
+    # Parking inline
+    app.add_handler(CallbackQueryHandler(parking_stats_cb, pattern="^parking_stats"))
+    app.add_handler(CallbackQueryHandler(parking_hotspots_cb, pattern="^parking_hotspots"))
+    app.add_handler(CallbackQueryHandler(parking_resolution_cb, pattern="^parking_resolution"))
+
     # Graffiti slash command
     app.add_handler(CommandHandler("graffiti", graffiti_command))
 
@@ -638,6 +720,9 @@ def create_application() -> Application:
     # Noise slash command
     app.add_handler(CommandHandler("noisecomplaints", noisecomplaints_command))
 
+    # Parking slash command
+    app.add_handler(CommandHandler("parking", parking_command))
+
     # Fallback
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo_handler))
     app.add_error_handler(error_handler)
@@ -652,6 +737,7 @@ def create_application() -> Application:
             BotCommand("bicycle",         "Bicycle complaints — recent · stats"),
             BotCommand("traffic",         "Traffic & infrastructure — potholes · signals · lights"),
             BotCommand("noisecomplaints", "Noise complaints — hotspots · stats · response times"),
+            BotCommand("parking",         "Parking enforcement — citations · hot zones · stats"),
             BotCommand("rest",            "Restaurant inspections — worst scores · grades · search"),
             BotCommand("ticket",          "Look up any 311 ticket by ID"),
         ])

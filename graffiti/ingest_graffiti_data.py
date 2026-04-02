@@ -62,6 +62,13 @@ def ingest_graffiti_last_90_days(db_path="../311_categories.db", verbose: bool =
     try:
         _ensure_schema(conn)
 
+        # Ensure index on service_code for query performance
+        cursor = conn.cursor()
+        cursor.execute("""
+            CREATE INDEX IF NOT EXISTS idx_service_code ON open311_requests(service_code)
+        """)
+        conn.commit()
+
         # Check existing graffiti records
         cursor = conn.cursor()
         cursor.execute("""
