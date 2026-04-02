@@ -93,11 +93,6 @@ from restaurants.restaurant_bot import (
     format_grade_distribution,
 )
 
-# Crime stats service
-from crime.crime_bot import (
-    get_recent_crime_stats,
-    format_crime_stats,
-)
 
 logging.basicConfig(
     level=getattr(logging, GraffitiConfig.LOG_LEVEL),
