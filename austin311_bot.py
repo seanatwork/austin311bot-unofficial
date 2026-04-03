@@ -1689,18 +1689,18 @@ def create_application() -> Application:
     # Register commands with Telegram so they appear in autocomplete
     async def post_init(application) -> None:
         await application.bot.set_my_commands([
-            BotCommand("start",           "Main menu"),
-            BotCommand("help",            "All commands"),
-            BotCommand("graffiti",        "Graffiti — analysis · hotspots · remediation"),
-            BotCommand("animal",          "Animal complaints — hotspots · stats · response times"),
-            BotCommand("bicycle",         "Bicycle complaints — recent · stats"),
-            BotCommand("traffic",         "Traffic & infrastructure — potholes · signals · lights"),
-            BotCommand("noise", "Noise complaints — hotspots · stats · response times"),
-            BotCommand("parking",         "Parking enforcement — citations · hot zones · stats"),
-            BotCommand("rest",            "Restaurant inspections — worst scores · grades · search"),
-            BotCommand("ticket",          "Look up any 311 ticket by ID"),
-            BotCommand("crime",           "Recent APD crime stats"),
-            BotCommand("safety",            "Crime by district — stats + city comparison"),
+            BotCommand("start",    "Main menu"),
+            BotCommand("crime",    "Recent APD crime stats"),
+            BotCommand("safety",   "Crime by district — stats + city comparison"),
+            BotCommand("traffic",  "Traffic & infrastructure — signals · lights · sidewalks"),
+            BotCommand("parking",  "Parking enforcement — citations · hot zones · stats"),
+            BotCommand("bicycle",  "Bicycle complaints — recent · stats"),
+            BotCommand("rest",     "Restaurant inspections — worst scores · grades · search"),
+            BotCommand("noise",    "Noise complaints — hotspots · stats · response times"),
+            BotCommand("graffiti", "Graffiti — analysis · hotspots · remediation"),
+            BotCommand("animal",   "Animal complaints — hotspots · stats · response times"),
+            BotCommand("ticket",   "Look up any 311 ticket by ID"),
+            BotCommand("help",     "All commands"),
         ])
 
     app.post_init = post_init
