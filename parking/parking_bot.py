@@ -236,9 +236,36 @@ def get_stats(days_back: int = 90) -> dict:
     }
 
 
-def get_hotspots(days_back: int = 90) -> dict:
-    """Return citation counts grouped by street for hot zone analysis."""
-    citations = get_all_citations(days_back=days_back)
+def get_hotspots(days_back: int = 30) -> dict:
+    """Return citation counts grouped by street for hot zone analysis.
+
+    Uses a short window and page cap so the response stays fast — 300 records
+    is more than enough to identify concentrated enforcement patterns.
+    """
+    end = _utc_now()
+    start = end - timedelta(days=days_back)
+    seen_ids: set = set()
+    citations: list = []
+
+    for page in range(1, 4):  # max 3 pages = 300 records, no sleep
+        params = {
+            "service_code": SERVICE_CODE,
+            "start_date": _isoformat_z(start),
+            "end_date": _isoformat_z(end),
+            "per_page": 100,
+            "page": page,
+        }
+        records = _make_request(params)
+        if not records:
+            break
+        for r in records:
+            sid = r.get("service_request_id")
+            if sid and sid not in seen_ids:
+                seen_ids.add(sid)
+                citations.append(r)
+        if len(records) < 100:
+            break
+
     if not citations:
         return {"hotspots": [], "total": 0, "days_back": days_back}
 
@@ -316,7 +343,7 @@ def format_hotspots(data: dict) -> str:
         return "📝 No parking enforcement data found."
 
     msg = f"🅿️ *Parking Enforcement Hot Zones*\n"
-    msg += f"_Last {days_back} days · {total} total citations_\n\n"
+    msg += f"_Last {days_back} days · {total} citations sampled_\n\n"
 
     top = hotspots[:8]
     max_count = top[0][1]

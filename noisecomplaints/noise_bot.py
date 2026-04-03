@@ -113,7 +113,11 @@ def get_hotspots(days_back: int = 90) -> dict:
     if not records:
         return {"hotspots": [], "total": 0, "days_back": days_back}
 
-    street_counts: dict = {}
+    half = days_back // 2
+    cutoff = _utc_now() - timedelta(days=half)
+
+    recent_counts: dict = {}   # last half of window
+    older_counts: dict = {}    # prior half of window
     street_types: dict = {}
 
     for r in records:
@@ -121,14 +125,32 @@ def get_hotspots(days_back: int = 90) -> dict:
         street = _extract_street(address) if address else "Unknown"
         label = r.get("_service_label", "Unknown")
 
-        street_counts[street] = street_counts.get(street, 0) + 1
+        dt_str = r.get("requested_datetime") or ""
+        try:
+            dt_utc = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+            in_recent = dt_utc >= cutoff
+        except (ValueError, TypeError):
+            in_recent = True
+
+        if in_recent:
+            recent_counts[street] = recent_counts.get(street, 0) + 1
+        else:
+            older_counts[street] = older_counts.get(street, 0) + 1
+
         street_types.setdefault(street, {})
         street_types[street][label] = street_types[street].get(label, 0) + 1
+
+    # Combined count for ranking
+    all_streets = set(recent_counts) | set(older_counts)
+    street_counts = {s: recent_counts.get(s, 0) + older_counts.get(s, 0) for s in all_streets}
+    # Chronic = appeared in both halves
+    chronic = {s for s in all_streets if s in recent_counts and s in older_counts}
 
     hotspots = sorted(street_counts.items(), key=lambda x: -x[1])
     return {
         "hotspots": hotspots,
         "street_types": street_types,
+        "chronic": chronic,
         "total": len(records),
         "days_back": days_back,
     }
@@ -137,6 +159,7 @@ def get_hotspots(days_back: int = 90) -> dict:
 def format_hotspots(data: dict) -> str:
     hotspots = data.get("hotspots", [])
     street_types = data.get("street_types", {})
+    chronic = data.get("chronic", set())
     total = data.get("total", 0)
     days_back = data.get("days_back", 90)
 
@@ -144,14 +167,16 @@ def format_hotspots(data: dict) -> str:
         return "📝 No noise complaints found."
 
     msg = f"🔊 *Top Noise Complaint Streets*\n"
-    msg += f"_Last {days_back} days · {total} total complaints_\n\n"
+    msg += f"_Last {days_back} days · {total} total complaints_\n"
+    msg += f"_🔴 Chronic = problem both halves of window · 🟡 New = recent only_\n\n"
 
     top = hotspots[:10]
     max_count = top[0][1]
 
     for i, (street, count) in enumerate(top, 1):
+        tag = "🔴" if street in chronic else "🟡"
         bar = "█" * min(10, round(count / max_count * 10))
-        msg += f"{i}. *{street}*\n"
+        msg += f"{i}. {tag} *{street}*\n"
         msg += f"   {bar} {count} complaint{'s' if count > 1 else ''}\n"
         types = street_types.get(street, {})
         top_types = sorted(types.items(), key=lambda x: -x[1])[:2]
@@ -273,6 +298,148 @@ def format_peak_times(data: dict) -> str:
         bar = "█" * min(10, round(count / max(1, max_week) * 10))
         recency = " ◀ this wk" if i == 7 else ""
         msg += f"  `{label}` {bar} {count}{recency}\n"
+
+    return msg
+
+
+# =============================================================================
+# RESOLUTION RATE BY COMPLAINT TYPE
+# =============================================================================
+
+def get_resolution_by_type(days_back: int = 90) -> dict:
+    """Return open/closed counts and resolution rate per complaint type."""
+    records = fetch_all_noise_complaints(days_back)
+    if not records:
+        return {"types": {}, "total": 0, "days_back": days_back}
+
+    types: dict = {}
+    for r in records:
+        label = r.get("_service_label", "Unknown")
+        status = (r.get("status") or "").lower()
+        if label not in types:
+            types[label] = {"open": 0, "closed": 0}
+        if status == "closed":
+            types[label]["closed"] += 1
+        else:
+            types[label]["open"] += 1
+
+    return {"types": types, "total": len(records), "days_back": days_back}
+
+
+_TYPE_EMOJI = {
+    "Non-Emergency Noise Complaint": "🔊",
+    "Outdoor Venue / Music Complaint": "🎵",
+    "Fireworks Complaint": "🎆",
+}
+
+
+def format_resolution_by_type(data: dict) -> str:
+    types = data.get("types", {})
+    total = data.get("total", 0)
+    days_back = data.get("days_back", 90)
+
+    if not types:
+        return "📝 No noise complaint data available."
+
+    msg = "🔊 *Noise Complaints — Resolution by Type*\n"
+    msg += f"_Last {days_back} days · {total} total complaints_\n\n"
+
+    for label, counts in sorted(types.items(), key=lambda x: -(x[1]["open"] + x[1]["closed"])):
+        subtotal = counts["open"] + counts["closed"]
+        resolved_pct = round(counts["closed"] / subtotal * 100) if subtotal else 0
+        open_pct = 100 - resolved_pct
+        bar_filled = round(resolved_pct / 10)
+        bar = "█" * bar_filled + "░" * (10 - bar_filled)
+        emoji = _TYPE_EMOJI.get(label, "📋")
+        msg += f"{emoji} *{label}*\n"
+        msg += f"   {bar} {resolved_pct}% resolved\n"
+        msg += f"   {subtotal} total · {counts['closed']} closed · {counts['open']} still open\n\n"
+
+    return msg
+
+
+# =============================================================================
+# LATE-NIGHT WINDOW BREAKDOWN
+# =============================================================================
+
+def get_night_breakdown(days_back: int = 90) -> dict:
+    """Bucket complaints into Evening / Late Night / Early Morning windows."""
+    records = fetch_all_noise_complaints(days_back)
+    if not records:
+        return {"buckets": {}, "total": 0, "days_back": days_back}
+
+    # Windows in Austin local time (approx UTC-6)
+    buckets: dict = {
+        "evening":   {"label": "Evening",    "hours": "8pm–midnight", "count": 0},
+        "late_night":{"label": "Late Night", "hours": "Midnight–3am", "count": 0},
+        "early_am":  {"label": "Early AM",   "hours": "3am–7am",      "count": 0},
+        "daytime":   {"label": "Daytime",    "hours": "7am–8pm",      "count": 0},
+    }
+    type_buckets: dict = {}  # bucket_key -> {label: count}
+
+    for r in records:
+        dt_str = r.get("requested_datetime") or ""
+        label = r.get("_service_label", "Unknown")
+        try:
+            dt_utc = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+            h = (dt_utc + _AUSTIN_OFFSET).hour
+        except (ValueError, TypeError):
+            continue
+
+        if h >= 20:
+            key = "evening"
+        elif h < 3:
+            key = "late_night"
+        elif h < 7:
+            key = "early_am"
+        else:
+            key = "daytime"
+
+        buckets[key]["count"] += 1
+        type_buckets.setdefault(key, {})
+        type_buckets[key][label] = type_buckets[key].get(label, 0) + 1
+
+    return {
+        "buckets": buckets,
+        "type_buckets": type_buckets,
+        "total": len(records),
+        "days_back": days_back,
+    }
+
+
+def format_night_breakdown(data: dict) -> str:
+    buckets = data.get("buckets", {})
+    type_buckets = data.get("type_buckets", {})
+    total = data.get("total", 0)
+    days_back = data.get("days_back", 90)
+
+    if not total:
+        return "📝 Not enough data."
+
+    msg = "🌙 *Noise Complaints — Time of Night*\n"
+    msg += f"_Last {days_back} days · {total} total complaints_\n\n"
+
+    order = [
+        ("evening",    "🌆"),
+        ("late_night", "🌙"),
+        ("early_am",   "🌅"),
+        ("daytime",    "☀️"),
+    ]
+    max_count = max(b["count"] for b in buckets.values()) or 1
+
+    for key, emoji in order:
+        b = buckets[key]
+        count = b["count"]
+        pct = round(count / total * 100) if total else 0
+        bar = "█" * min(10, round(count / max_count * 10))
+        msg += f"{emoji} *{b['label']}* _{b['hours']}_\n"
+        msg += f"   {bar} {count} complaints ({pct}%)\n"
+        # Top complaint type for this window
+        tb = type_buckets.get(key, {})
+        if tb:
+            top_type, top_count = max(tb.items(), key=lambda x: x[1])
+            msg += f"   _Most common: {top_type} ({top_count})_\n"
+        msg += "\n"
 
     return msg
 

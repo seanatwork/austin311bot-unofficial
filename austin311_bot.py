@@ -65,8 +65,8 @@ from infrastructureandtransportation.traffic_bot import (
     get_infra_backlog,
     format_infra_backlog,
     build_backlog_keyboard,
-    get_pothole_repair_times,
-    format_pothole_repair_times,
+    get_signal_maintenance,
+    format_signal_maintenance,
 )
 
 # Noise complaints service
@@ -75,6 +75,10 @@ from noisecomplaints.noise_bot import (
     format_hotspots as format_noise_hotspots,
     get_peak_times as get_noise_peak_times,
     format_peak_times as format_noise_peak_times,
+    get_resolution_by_type as get_noise_resolution,
+    format_resolution_by_type as format_noise_resolution,
+    get_night_breakdown as get_noise_night,
+    format_night_breakdown as format_noise_night,
 )
 
 # Parking enforcement service
@@ -134,6 +138,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         [InlineKeyboardButton("🔊 Noise Complaints", callback_data="service_noise")],
         [InlineKeyboardButton("🅿️ Parking", callback_data="service_parking")],
         [InlineKeyboardButton("🚔 Police & Crime", callback_data="service_police")],
+        [InlineKeyboardButton("🏗️ Code Violations", callback_data="service_code"),
+         InlineKeyboardButton("📝 Report Issue", callback_data="service_report")],
     ]
     await update.message.reply_text(
         "🏛️ *Welcome to Austin 311 Bot!*\n\nSelect a service:",
@@ -193,6 +199,9 @@ _From APD Crime Reports_
 /code — Building permits approved
 _🏗️ permits data (last 365 days)_
 
+📝 *Report Issue:*
+/report — Under consideration
+
 🏊 *Pool Hours:* https://www.austintexas.gov/parks/locations/pools-and-splash-pads
 
 ℹ️ /start — Main menu  |  /help — This message"""
@@ -244,7 +253,7 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     elif service == "traffic":
         keyboard = [
             [InlineKeyboardButton("📋 Infra Backlog", callback_data="traffic_backlog"),
-             InlineKeyboardButton("🕳️ Pothole Timer", callback_data="traffic_potholes")],
+             InlineKeyboardButton("🚦 Broken Signals", callback_data="traffic_signals")],
             [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
         ]
         text = "*🚦 Traffic & Infrastructure*\nPotholes, signals, street lights, sidewalks, and more."
@@ -253,6 +262,8 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         keyboard = [
             [InlineKeyboardButton("🗺️ Hotspots", callback_data="noise_hotspots"),
              InlineKeyboardButton("🕐 Peak Times", callback_data="noise_peak")],
+            [InlineKeyboardButton("📋 Resolution by Type", callback_data="noise_resolution"),
+             InlineKeyboardButton("🌙 Night Breakdown", callback_data="noise_night")],
             [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
         ]
         text = "*🔊 Noise Complaints*\nNon-emergency noise, outdoor venues, fireworks."
@@ -271,6 +282,25 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
         ]
         text = "*🚔 Police & Crime*\nAPD incident stats and safety by district."
+
+    elif service == "code":
+        await query.answer()
+        await query.edit_message_text("⏳ Querying building permits...")
+        try:
+            stats = await asyncio.to_thread(_get_building_permit_stats)
+            await query.edit_message_text(_format_permit_stats(stats), parse_mode="Markdown")
+        except Exception as e:
+            logger.error(f"service code: {e}")
+            await query.edit_message_text(f"❌ Error querying data: {e}")
+        return
+
+    elif service == "report":
+        await query.answer()
+        await query.edit_message_text(
+            "🚧 *Report 311 Issue*\n\nThis feature is under construction. Check back soon!",
+            parse_mode="Markdown",
+        )
+        return
 
     else:
         return
@@ -292,6 +322,8 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         [InlineKeyboardButton("🔊 Noise Complaints", callback_data="service_noise")],
         [InlineKeyboardButton("🅿️ Parking", callback_data="service_parking")],
         [InlineKeyboardButton("🚔 Police & Crime", callback_data="service_police")],
+        [InlineKeyboardButton("🏗️ Code Violations", callback_data="service_code"),
+         InlineKeyboardButton("📝 Report Issue", callback_data="service_report")],
     ]
     await query.edit_message_text(
         "🏛️ *Welcome to Austin 311 Bot!*\n\nSelect a service:",
@@ -310,7 +342,7 @@ async def graffiti_analyze_cb(update: Update, context: ContextTypes.DEFAULT_TYPE
     await query.answer()
     await query.edit_message_text("⏳ Analyzing graffiti data...")
     try:
-        result = analyze_graffiti_command(90)
+        result = await asyncio.to_thread(analyze_graffiti_command, 90)
         await _send_chunked(query, result)
     except Exception as e:
         logger.error(f"graffiti analyze: {e}")
@@ -323,7 +355,7 @@ async def graffiti_remediation_cb(update: Update, context: ContextTypes.DEFAULT_
     await query.answer()
     await query.edit_message_text("⏳ Analyzing remediation times...")
     try:
-        result = remediation_command(90)
+        result = await asyncio.to_thread(remediation_command, 90)
         await _send_chunked(query, result)
     except Exception as e:
         logger.error(f"graffiti remediation: {e}")
@@ -353,7 +385,7 @@ async def bicycle_recent_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     await query.answer()
     await query.edit_message_text("⏳ Fetching recent bicycle complaints...")
     try:
-        complaints = get_recent_complaints(limit=10)
+        complaints = await asyncio.to_thread(lambda: get_recent_complaints(limit=10))
         if not complaints:
             await query.edit_message_text("📝 No bicycle complaints found.")
             return
@@ -384,7 +416,7 @@ async def bicycle_ticket_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     ticket_id = query.data.replace("bicycle_ticket_", "")
     await query.edit_message_text(f"⏳ Looking up ticket #{ticket_id}...")
     try:
-        record = lookup_ticket(ticket_id)
+        record = await asyncio.to_thread(lookup_ticket, ticket_id)
         if not record:
             await query.edit_message_text(f"❌ Ticket #{ticket_id} not found.")
             return
@@ -400,7 +432,7 @@ async def bicycle_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await query.answer()
     await query.edit_message_text("⏳ Fetching bicycle statistics...")
     try:
-        stats = get_stats()
+        stats = await asyncio.to_thread(get_stats)
         result = format_stats(stats)
         await _send_chunked(query, result)
     except Exception as e:
@@ -427,7 +459,7 @@ async def ticket_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     ticket_id = context.args[0]
     await update.message.reply_text(f"🔍 Looking up ticket #{ticket_id}...")
     try:
-        record = lookup_ticket(ticket_id)
+        record = await asyncio.to_thread(lookup_ticket, ticket_id)
         if not record:
             await update.message.reply_text(f"❌ No ticket found for #{ticket_id}. Check the ID and try again.")
             return
@@ -447,7 +479,7 @@ async def restaurants_lowscores_cb(update: Update, context: ContextTypes.DEFAULT
     await query.answer()
     await query.edit_message_text("⏳ Fetching worst inspection scores...")
     try:
-        restaurants = get_lowest_scoring(10)
+        restaurants = await asyncio.to_thread(lambda: get_lowest_scoring(10))
         await _send_chunked(query, format_low_scores(restaurants))
     except Exception as e:
         logger.error(f"restaurants lowscores: {e}")
@@ -459,7 +491,7 @@ async def restaurants_grades_cb(update: Update, context: ContextTypes.DEFAULT_TY
     await query.answer()
     await query.edit_message_text("⏳ Loading grade report... (first load may take ~15s while fetching a full year of data)")
     try:
-        data = get_grade_distribution()
+        data = await asyncio.to_thread(get_grade_distribution)
         await _send_chunked(query, format_grade_distribution(data))
     except Exception as e:
         logger.error(f"restaurants grades: {e}")
@@ -471,7 +503,7 @@ async def restaurant_command(update: Update, context: ContextTypes.DEFAULT_TYPE)
         search_term = " ".join(context.args)
         await update.message.reply_text(f"🔍 Searching for: {search_term}...")
         try:
-            results = search_restaurants(search_term)
+            results = await asyncio.to_thread(lambda: search_restaurants(search_term))
             await _send_chunked(update.message, format_search_results(results, search_term))
         except Exception as e:
             logger.error(f"restaurant search cmd: {e}")
@@ -498,7 +530,8 @@ async def animal_hotspots_cb(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()
     await query.edit_message_text("⏳ Finding animal complaint hotspots...")
     try:
-        await _send_chunked(query, format_hotspots(get_hotspots()))
+        data = await asyncio.to_thread(get_hotspots)
+        await _send_chunked(query, format_hotspots(data))
     except Exception as e:
         logger.error(f"animal hotspots: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
@@ -509,7 +542,8 @@ async def animal_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     await query.answer()
     await query.edit_message_text("⏳ Fetching animal complaint stats...")
     try:
-        await _send_chunked(query, format_animal_stats(get_animal_stats()))
+        data = await asyncio.to_thread(get_animal_stats)
+        await _send_chunked(query, format_animal_stats(data))
     except Exception as e:
         logger.error(f"animal stats: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
@@ -520,7 +554,8 @@ async def animal_response_cb(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()
     await query.edit_message_text("⏳ Calculating response times...")
     try:
-        await _send_chunked(query, format_response_times(get_response_times()))
+        data = await asyncio.to_thread(get_response_times)
+        await _send_chunked(query, format_response_times(data))
     except Exception as e:
         logger.error(f"animal response: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
@@ -548,7 +583,7 @@ async def traffic_backlog_cb(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()
     await query.edit_message_text("⏳ Loading infrastructure backlog...")
     try:
-        data = get_infra_backlog()
+        data = await asyncio.to_thread(get_infra_backlog)
         text = format_infra_backlog(data)
         keyboard = build_backlog_keyboard(data)
         await query.edit_message_text(
@@ -567,7 +602,7 @@ async def ticket_lookup_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     ticket_id = query.data.replace("tlookup_", "")
     await query.edit_message_text(f"🔍 Looking up ticket #{ticket_id}...")
     try:
-        record = lookup_ticket(ticket_id)
+        record = await asyncio.to_thread(lookup_ticket, ticket_id)
         if not record:
             await query.edit_message_text(f"❌ No ticket found for #{ticket_id}.")
             return
@@ -577,21 +612,22 @@ async def ticket_lookup_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         await query.edit_message_text(f"❌ Error: {e}")
 
 
-async def traffic_potholes_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def traffic_signals_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Calculating pothole repair times...")
+    await query.edit_message_text("⏳ Fetching broken signal data...")
     try:
-        await _send_chunked(query, format_pothole_repair_times(get_pothole_repair_times()))
+        data = await asyncio.to_thread(get_signal_maintenance)
+        await _send_chunked(query, format_signal_maintenance(data))
     except Exception as e:
-        logger.error(f"traffic potholes: {e}")
+        logger.error(f"traffic signals: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
 
 
 async def traffic_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("📋 Infra Backlog", callback_data="traffic_backlog"),
-         InlineKeyboardButton("🕳️ Pothole Timer", callback_data="traffic_potholes")],
+         InlineKeyboardButton("🚦 Broken Signals", callback_data="traffic_signals")],
     ]
     await update.message.reply_text(
         "*🚦 Traffic & Infrastructure*\nChoose a view:",
@@ -610,7 +646,8 @@ async def noise_hotspots_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     await query.answer()
     await query.edit_message_text("⏳ Finding noise complaint hotspots...")
     try:
-        await _send_chunked(query, format_noise_hotspots(get_noise_hotspots()))
+        data = await asyncio.to_thread(get_noise_hotspots)
+        await _send_chunked(query, format_noise_hotspots(data))
     except Exception as e:
         logger.error(f"noise hotspots: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
@@ -621,9 +658,34 @@ async def noise_peak_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     await query.answer()
     await query.edit_message_text("⏳ Analyzing peak complaint times...")
     try:
-        await _send_chunked(query, format_noise_peak_times(get_noise_peak_times()))
+        data = await asyncio.to_thread(get_noise_peak_times)
+        await _send_chunked(query, format_noise_peak_times(data))
     except Exception as e:
         logger.error(f"noise peak: {e}")
+        await query.edit_message_text(f"❌ Error: {e}")
+
+
+async def noise_resolution_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("⏳ Analyzing resolution rates...")
+    try:
+        data = await asyncio.to_thread(get_noise_resolution)
+        await _send_chunked(query, format_noise_resolution(data))
+    except Exception as e:
+        logger.error(f"noise resolution: {e}")
+        await query.edit_message_text(f"❌ Error: {e}")
+
+
+async def noise_night_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("⏳ Analyzing complaint timing...")
+    try:
+        data = await asyncio.to_thread(get_noise_night)
+        await _send_chunked(query, format_noise_night(data))
+    except Exception as e:
+        logger.error(f"noise night: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
 
 
@@ -631,6 +693,8 @@ async def noisecomplaints_command(update: Update, context: ContextTypes.DEFAULT_
     keyboard = [
         [InlineKeyboardButton("🗺️ Hotspots", callback_data="noise_hotspots"),
          InlineKeyboardButton("🕐 Peak Times", callback_data="noise_peak")],
+        [InlineKeyboardButton("📋 Resolution by Type", callback_data="noise_resolution"),
+         InlineKeyboardButton("🌙 Night Breakdown", callback_data="noise_night")],
     ]
     await update.message.reply_text(
         "*🔊 Noise Complaints*\nChoose a view:",
@@ -788,7 +852,7 @@ async def parking_top_payments_cb(update: Update, context: ContextTypes.DEFAULT_
     await query.answer()
     await query.edit_message_text("⏳ Fetching today's parking activity...")
     try:
-        data = _get_parking_pulse()
+        data = await asyncio.to_thread(_get_parking_pulse)
         if not data:
             await query.edit_message_text("📝 No parking transactions found for today.")
             return
@@ -821,7 +885,7 @@ async def parking_abandoned_cb(update: Update, context: ContextTypes.DEFAULT_TYP
     await query.answer()
     await query.edit_message_text("⏳ Fetching abandoned vehicle data...")
     try:
-        stats = _get_abandoned_vehicle_stats()
+        stats = await asyncio.to_thread(_get_abandoned_vehicle_stats)
         msg = (
             f"🚗 *Abandoned Vehicle Reports*\n\n"
             f"📊 *{stats['total']}* reports in the last 365 days\n"
@@ -843,7 +907,7 @@ async def parking_resolution_cb(update: Update, context: ContextTypes.DEFAULT_TY
     await query.answer()
     await query.edit_message_text("⏳ Calculating resolution times...")
     try:
-        stats = get_parking_stats()
+        stats = await asyncio.to_thread(get_parking_stats)
         msg = "⏱️ *Parking Resolution Analysis*\n\n"
         if stats.get("avg_resolution_days"):
             msg += f"📊 *Average resolution:* {stats['avg_resolution_days']} days\n"
@@ -865,7 +929,7 @@ async def parking_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await query.answer()
     await query.edit_message_text("⏳ Fetching parking statistics...")
     try:
-        stats = get_parking_stats()
+        stats = await asyncio.to_thread(get_parking_stats)
         await _send_chunked(query, format_parking_stats(stats))
     except Exception as e:
         logger.error(f"parking stats: {e}")
@@ -877,7 +941,7 @@ async def parking_hotspots_cb(update: Update, context: ContextTypes.DEFAULT_TYPE
     await query.answer()
     await query.edit_message_text("⏳ Finding parking hot zones...")
     try:
-        hotspots = get_parking_hotspots()
+        hotspots = await asyncio.to_thread(get_parking_hotspots)
         await _send_chunked(query, format_parking_hotspots(hotspots))
     except Exception as e:
         logger.error(f"parking hotspots: {e}")
@@ -902,58 +966,68 @@ async def parking_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 # =============================================================================
 
 
-def _count_building_permits() -> int:
-    """Query Open311 API for building/construction permits in last 365 days."""
+def _get_building_permit_stats() -> dict:
+    """Query Open311 API for building/construction permits in last 365 days.
+
+    Returns per-code counts and service names pulled from the API itself.
+    """
     url = "https://311.austintexas.gov/open311/v2/requests.json"
     start_date = (datetime.now(timezone.utc) - timedelta(days=365)).isoformat().replace("+00:00", "Z")
-    
-    # Construction and permitting related codes found in 311 data
     permit_codes = ["CONSTRU1", "CONSTRUC", "ATCOCIRW", "DSREFOUP"]
-    total = 0
-    
+
+    breakdown = {}  # code -> {"label": str, "count": int}
+
     for code in permit_codes:
-        params = {
-            "service_code": code,
-            "start_date": start_date,
-            "per_page": 100,
-        }
-        
+        params = {"service_code": code, "start_date": start_date, "per_page": 100}
+        count = 0
+        label = code
         page = 1
         while True:
             params["page"] = page
             try:
                 resp = requests.get(url, params=params, timeout=30)
-                if resp.status_code == 200:
-                    data = resp.json()
-                    if not data:
-                        break
-                    total += len(data)
-                    if len(data) < 100:
-                        break
-                    page += 1
-                    if page > 50:
-                        break
-                else:
+                if resp.status_code != 200:
                     break
+                data = resp.json()
+                if not data:
+                    break
+                # Grab service_name from first record if we haven't yet
+                if label == code and data:
+                    label = data[0].get("service_name") or code
+                count += len(data)
+                if len(data) < 100 or page >= 50:
+                    break
+                page += 1
             except Exception:
                 break
-    
-    return total
+        if count > 0:
+            breakdown[code] = {"label": label, "count": count}
+
+    total = sum(v["count"] for v in breakdown.values())
+    return {"total": total, "breakdown": breakdown}
+
+
+def _format_permit_stats(stats: dict) -> str:
+    total = stats["total"]
+    breakdown = stats["breakdown"]
+    msg = "🏗️ *Building Permits — Last 365 Days*\n\n"
+    msg += f"📊 *{total}* total permits\n\n"
+    if breakdown:
+        max_count = max(v["count"] for v in breakdown.values())
+        for v in sorted(breakdown.values(), key=lambda x: -x["count"]):
+            count = v["count"]
+            pct = round(count / total * 100) if total else 0
+            bar = "█" * min(10, round(count / max_count * 10))
+            msg += f"*{v['label']}*\n"
+            msg += f"{bar} {count} ({pct}%)\n\n"
+    return msg.strip()
 
 
 async def code_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(
-        "⏳ Querying building permits approved...",
-        parse_mode="Markdown",
-    )
+    await update.message.reply_text("⏳ Querying building permits...")
     try:
-        count = _count_building_permits()
-        await update.message.reply_text(
-            f"🏗️ *Building Permits Approved*\n\n"
-            f"📊 *{count}* permits in the last 365 days\n\n"
-            f"_Note: Includes building, residential, and construction permits_",
-            parse_mode="Markdown",
-        )
+        stats = await asyncio.to_thread(_get_building_permit_stats)
+        await update.message.reply_text(_format_permit_stats(stats), parse_mode="Markdown")
     except Exception as e:
         logger.error(f"code command: {e}")
         await update.message.reply_text(f"❌ Error querying data: {e}")
@@ -1091,7 +1165,7 @@ async def crime_homicides_cb(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()
     await query.edit_message_text("⏳ Fetching homicide data...")
     try:
-        records = _get_nibrs_homicides()
+        records = await asyncio.to_thread(_get_nibrs_homicides)
         if not records:
             await query.edit_message_text("📝 No homicide records found.")
             return
@@ -1192,7 +1266,7 @@ async def crime_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         end_str = now.strftime("%Y-%m-%d")
         label = f"🚔 APD Crime — {start.strftime('%b %d')} to {now.strftime('%b %d, %Y')}"
 
-        stats = _get_crime_stats(start_str, end_str)
+        stats = await asyncio.to_thread(_get_crime_stats, start_str, end_str)
         msg = _format_crime_stats(stats, label)
 
         keyboard = [
@@ -1484,7 +1558,7 @@ async def police_crime_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         end_str = now.strftime("%Y-%m-%d")
         label = f"🚔 APD Crime — {start.strftime('%b %d')} to {now.strftime('%b %d, %Y')}"
 
-        stats = _get_crime_stats(start_str, end_str)
+        stats = await asyncio.to_thread(_get_crime_stats, start_str, end_str)
         msg = _format_crime_stats(stats, label)
 
         keyboard = [
@@ -1569,12 +1643,14 @@ def create_application() -> Application:
 
     # Traffic inline
     app.add_handler(CallbackQueryHandler(traffic_backlog_cb, pattern="^traffic_backlog"))
-    app.add_handler(CallbackQueryHandler(traffic_potholes_cb, pattern="^traffic_potholes"))
+    app.add_handler(CallbackQueryHandler(traffic_signals_cb, pattern="^traffic_signals"))
     app.add_handler(CallbackQueryHandler(ticket_lookup_cb, pattern="^tlookup_"))
 
     # Noise inline
     app.add_handler(CallbackQueryHandler(noise_hotspots_cb, pattern="^noise_hotspots"))
     app.add_handler(CallbackQueryHandler(noise_peak_cb, pattern="^noise_peak"))
+    app.add_handler(CallbackQueryHandler(noise_resolution_cb, pattern="^noise_resolution"))
+    app.add_handler(CallbackQueryHandler(noise_night_cb, pattern="^noise_night"))
 
     # Parking slash command + inline
     app.add_handler(CommandHandler("parking", parking_command))
@@ -1636,9 +1712,7 @@ def create_application() -> Application:
             BotCommand("parking",         "Parking enforcement — citations · hot zones · stats"),
             BotCommand("rest",            "Restaurant inspections — worst scores · grades · search"),
             BotCommand("ticket",          "Look up any 311 ticket by ID"),
-            BotCommand("report",          "Submit a 311 report (under construction)"),
-            BotCommand("code",              "Building permits approved (last 365 days)"),
-            BotCommand("crime",             "Recent APD crime stats"),
+            BotCommand("crime",           "Recent APD crime stats"),
             BotCommand("safety",            "Crime by district — stats + city comparison"),
         ])
 

@@ -15,7 +15,8 @@
       "Bash(xclip -selection clipboard)",
       "Bash(xsel --clipboard --input)",
       "Bash(xclip -selection clipboard -o)",
-      "Bash(xsel --clipboard --output)"
+      "Bash(xsel --clipboard --output)",
+      "Bash(python3 -)"
     ],
     "defaultMode": "bypassPermissions"
   }

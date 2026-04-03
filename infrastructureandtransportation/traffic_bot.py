@@ -197,25 +197,25 @@ def build_backlog_keyboard(data: dict):
 
 
 # =============================================================================
-# POTHOLE REPAIR TIMER
+# BROKEN TRAFFIC SIGNALS
 # =============================================================================
 
-def get_pothole_repair_times(days_back: int = 180) -> dict:
-    """Fetch SBPOTREP records and calculate reported→closed repair times."""
-    end = _utc_now()
-    start = end - timedelta(days=days_back)
+def get_signal_maintenance(days_back: int = 90) -> dict:
+    """Fetch TRASIGMA records and surface broken signals still waiting for repair."""
+    now = _utc_now()
+    start = now - timedelta(days=days_back)
     params = {
-        "service_code": "SBPOTREP",
+        "service_code": "TRASIGMA",
         "start_date": _isoformat_z(start),
-        "end_date": _isoformat_z(end),
+        "end_date": _isoformat_z(now),
         "per_page": 100,
         "page": 1,
     }
     records = _make_request(params)
 
-    repair_days: list = []
-    open_count = 0
-    longest_waiting: list = []  # (days_waiting, address)
+    open_records = []
+    closed_count = 0
+    closed_days: list = []
 
     for r in records:
         status = (r.get("status") or "").lower()
@@ -224,99 +224,72 @@ def get_pothole_repair_times(days_back: int = 180) -> dict:
         if not requested_str:
             continue
 
-        if status != "closed":
-            open_count += 1
+        if status == "closed":
+            closed_count += 1
             try:
                 req = datetime.fromisoformat(requested_str.replace("Z", "+00:00"))
-                days_waiting = (end - req).days
-                if 0 <= days_waiting <= 365:
-                    addr = (r.get("address") or "Unknown").replace(", Austin", "").strip()
-                    longest_waiting.append((days_waiting, addr))
+                upd = datetime.fromisoformat(updated_str.replace("Z", "+00:00"))
+                d = (upd - req).days
+                if 0 <= d <= 365:
+                    closed_days.append(d)
             except (ValueError, TypeError):
                 pass
-            continue
-
-        try:
-            req = datetime.fromisoformat(requested_str.replace("Z", "+00:00"))
-            upd = datetime.fromisoformat(updated_str.replace("Z", "+00:00"))
-            d = (upd - req).days
-            if 0 <= d <= 365:
-                repair_days.append(d)
-        except (ValueError, TypeError):
-            pass
-
-    if not repair_days:
-        return {"total": 0, "open_count": open_count, "days_back": days_back}
-
-    repair_days.sort()
-    avg = round(sum(repair_days) / len(repair_days), 1)
-    median = repair_days[len(repair_days) // 2]
-    fastest = repair_days[0]
-    longest_waiting_5 = sorted(longest_waiting, key=lambda x: -x[0])[:5]
-
-    # Bucket distribution: <1 week, 1–2 wks, 2–4 wks, >4 wks
-    buckets = {"< 1 week": 0, "1–2 weeks": 0, "2–4 weeks": 0, "> 4 weeks": 0}
-    for d in repair_days:
-        if d < 7:
-            buckets["< 1 week"] += 1
-        elif d < 14:
-            buckets["1–2 weeks"] += 1
-        elif d < 28:
-            buckets["2–4 weeks"] += 1
         else:
-            buckets["> 4 weeks"] += 1
+            try:
+                req = datetime.fromisoformat(requested_str.replace("Z", "+00:00"))
+                days_waiting = (now - req).days
+                addr = (r.get("address") or "Unknown").replace(", Austin, TX", "").replace(", Austin", "").strip()
+                ticket_id = r.get("service_request_id") or ""
+                open_records.append((days_waiting, addr, ticket_id))
+            except (ValueError, TypeError):
+                pass
+
+    open_records.sort(key=lambda x: -x[0])
+    avg_wait = round(sum(x[0] for x in open_records) / len(open_records), 1) if open_records else None
+    avg_fix = round(sum(closed_days) / len(closed_days), 1) if closed_days else None
 
     return {
-        "total": len(repair_days),
-        "open_count": open_count,
-        "avg": avg,
-        "median": median,
-        "fastest": fastest,
-        "longest_waiting_5": longest_waiting_5,
-        "buckets": buckets,
+        "total": len(records),
+        "open_records": open_records,
+        "closed_count": closed_count,
+        "avg_wait_days": avg_wait,
+        "avg_fix_days": avg_fix,
         "days_back": days_back,
     }
 
 
-def format_pothole_repair_times(data: dict) -> str:
-    if not data.get("total"):
-        return (
-            f"📝 No closed pothole repairs found in the past {data.get('days_back', 180)} days.\n"
-            f"_({data.get('open_count', 0)} currently open)_"
-        )
+def format_signal_maintenance(data: dict) -> str:
+    total = data.get("total", 0)
+    open_records = data.get("open_records", [])
+    closed_count = data.get("closed_count", 0)
+    avg_wait = data.get("avg_wait_days")
+    avg_fix = data.get("avg_fix_days")
+    days_back = data.get("days_back", 90)
 
-    total = data["total"]
-    avg = data["avg"]
-    median = data["median"]
-    fastest = data["fastest"]
-    open_count = data["open_count"]
-    buckets = data["buckets"]
-    longest_waiting_5 = data["longest_waiting_5"]
-    days_back = data["days_back"]
+    if not total:
+        return "✅ No traffic signal maintenance requests in the last 90 days."
 
-    if avg <= 7:
-        verdict = "🟢 City is filling potholes quickly"
-    elif avg <= 21:
-        verdict = "🟡 Repair times are moderate"
-    else:
-        verdict = "🔴 Repairs are running slow"
+    open_count = len(open_records)
+    msg = "🚦 *Broken Traffic Signals*\n"
+    msg += f"_Last {days_back} days · {total} reported · {open_count} still broken · {closed_count} fixed_\n\n"
 
-    msg = f"🕳️ *Pothole Repair Tracker*\n"
-    msg += f"_Last {days_back} days · {total} closed repairs · {open_count} still open_\n\n"
-    msg += f"{verdict}\n\n"
-    msg += f"⏱ *Avg repair time:* {avg} days\n"
-    msg += f"📊 *Median:* {median} days  ·  *Fastest:* {fastest} day{'s' if fastest != 1 else ''}\n\n"
+    if avg_fix is not None:
+        if avg_fix <= 7:
+            verdict = "🟢 City is fixing signals quickly"
+        elif avg_fix <= 21:
+            verdict = "🟡 Repair times are moderate"
+        else:
+            verdict = "🔴 Signals are waiting a long time"
+        msg += f"{verdict}\n"
+        msg += f"⏱ *Avg fix time:* {avg_fix} days\n"
 
-    msg += "*How long repairs took:*\n"
-    max_bucket = max(buckets.values()) or 1
-    for label, count in buckets.items():
-        bar = "█" * min(10, round(count / max_bucket * 10))
-        pct = round(count / total * 100)
-        msg += f"  `{label:<12}` {bar} {count} ({pct}%)\n"
+    if avg_wait is not None:
+        msg += f"⏳ *Avg current wait:* {avg_wait} days\n"
 
-    if longest_waiting_5:
-        msg += "\n*Still open — longest waiting:*\n"
-        for d, addr in longest_waiting_5:
-            msg += f"  🕐 {d} days — _{addr}_\n"
+    if open_records:
+        msg += "\n*Still broken — longest waiting:*\n"
+        for days_waiting, addr, ticket_id in open_records[:8]:
+            age_emoji = "🔴" if days_waiting >= 30 else "🟡" if days_waiting >= 14 else "🟢"
+            msg += f"{age_emoji} *{days_waiting}d* — {addr}\n"
 
     return msg
