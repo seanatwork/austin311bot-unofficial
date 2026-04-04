@@ -26,7 +26,13 @@
       "Bash(git commit -m ':*)",
       "Bash(git push:*)",
       "Read(//home/sean/Documents/Projects/austin911bot-unofficial/animalsvc/**)",
-      "Bash(python3 -m py_compile /home/sean/Documents/Projects/austin311bot-unofficial/austin311_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/graffiti/graffiti_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/graffiti/remediation_analysis.py /home/sean/Documents/Projects/austin311bot-unofficial/bicycle/bicycle_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/restaurants/restaurant_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/animalsvc/animal_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/infrastructureandtransportation/traffic_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/noisecomplaints/noise_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/parking/parking_bot.py)"
+      "Bash(python3 -m py_compile /home/sean/Documents/Projects/austin311bot-unofficial/austin311_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/graffiti/graffiti_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/graffiti/remediation_analysis.py /home/sean/Documents/Projects/austin311bot-unofficial/bicycle/bicycle_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/restaurants/restaurant_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/animalsvc/animal_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/infrastructureandtransportation/traffic_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/noisecomplaints/noise_bot.py /home/sean/Documents/Projects/austin311bot-unofficial/parking/parking_bot.py)",
+      "WebFetch(domain:budget.austintexas.gov)",
+      "WebSearch",
+      "WebFetch(domain:dev.socrata.com)",
+      "WebFetch(domain:catalog.data.gov)",
+      "WebFetch(domain:austinmonitor.com)",
+      "WebFetch(domain:atxtoday.6amcity.com)"
     ],
     "defaultMode": "bypassPermissions"
   }

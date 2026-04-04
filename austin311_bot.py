@@ -184,6 +184,7 @@ _💡 Parking enforcement is one of the top 10 most-requested 311 services in Au
 _Last 30 days, top crime types, clearance rate_
 _From APD Crime Reports: https://data.austintexas.gov/resource/fdj4-gpfu_
 /safety — Crime by district with city comparison
+/homeless — Homelessness budget impact across city departments
 
 🎫 *Ticket Lookup:*
 /ticket <id> — Look up any 311 ticket by ID
@@ -274,10 +275,11 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         keyboard = [
             [InlineKeyboardButton("🚔 Crime Stats", callback_data="police_crime"),
              InlineKeyboardButton("🛡️ Safety by District", callback_data="police_safety")],
-            [InlineKeyboardButton("Hate Crimes", callback_data="police_hate")],
+            [InlineKeyboardButton("Hate Crimes", callback_data="police_hate"),
+             InlineKeyboardButton("Homelessness Budget", callback_data="police_homeless")],
             [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
         ]
-        text = "*🚔 Police & Crime*\nAPD incident stats, safety by district, and hate crimes."
+        text = "*🚔 Police & Crime*\nAPD incident stats, safety by district, hate crimes, and homelessness spending."
 
     elif service == "report":
         await query.answer()
@@ -1585,6 +1587,153 @@ async def police_safety_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 
 # =============================================================================
+# HOMELESSNESS BUDGET (Austin Open Budget dataset yeeq-kk6v)
+# =============================================================================
+
+_HOMELESS_DIRECT_DEPTS = [
+    "Homeless Strategies and Operations",
+    "Housing",
+]
+
+_HOMELESS_DOWNSTREAM_DEPTS = [
+    ("Fire",                       "🔥"),
+    ("Emergency Medical Services", "🚑"),
+    ("Public Health",              "🏥"),
+    ("Austin Resource Recovery",   "🗑️"),
+    ("Parks and Recreation",       "🌳"),
+    ("Police",                     "👮"),
+]
+
+
+def _fmt_millions(amount: float) -> str:
+    if amount >= 1_000_000:
+        return f"${amount / 1_000_000:.1f}M"
+    if amount >= 1_000:
+        return f"${amount / 1_000:.0f}K"
+    return f"${amount:.0f}"
+
+
+def _budget_trend(first: float, last: float) -> str:
+    if not first:
+        return ""
+    pct = round((last - first) / first * 100)
+    arrow = "📈" if pct > 5 else "📉" if pct < -5 else "➡️"
+    return f"_{arrow} {'+' if pct > 0 else ''}{pct}%_"
+
+
+def _dept_spend(dept_data: dict, fy: str) -> float:
+    d = dept_data.get(fy, {})
+    return d.get("actual") or d.get("budget") or 0.0
+
+
+def _get_homeless_budget() -> dict:
+    """Fetch annual spend for homelessness-related departments from Austin Open Budget."""
+    url = "https://data.austintexas.gov/resource/yeeq-kk6v.json"
+    all_depts = _HOMELESS_DIRECT_DEPTS + [n for n, _ in _HOMELESS_DOWNSTREAM_DEPTS]
+    dept_list = ",".join(f"'{d}'" for d in all_depts)
+    params = {
+        "$select": "fy,dept_nm,sum(act) as actual,sum(bud) as budget",
+        "$where":  f"dept_nm in({dept_list})",
+        "$group":  "fy,dept_nm",
+        "$order":  "fy ASC,dept_nm ASC",
+        "$limit":  500,
+    }
+    app_token = os.getenv("AUSTIN_APP_TOKEN")
+    headers = {"X-App-Token": app_token} if app_token else {}
+    try:
+        resp = requests.get(url, params=params, headers=headers, timeout=20)
+        resp.raise_for_status()
+        result: dict[str, dict[str, dict]] = {}
+        for row in resp.json():
+            dept = row.get("dept_nm", "")
+            fy = row.get("fy", "")
+            try:
+                actual = float(row.get("actual") or 0)
+                budget = float(row.get("budget") or 0)
+            except (ValueError, TypeError):
+                continue
+            result.setdefault(dept, {})[fy] = {"actual": actual, "budget": budget}
+        return result
+    except Exception as e:
+        logger.error(f"homeless budget: {e}")
+        return {}
+
+
+def _format_homeless_budget(data: dict) -> str:
+    if not data:
+        return "🏠 *Austin Homelessness Budget*\n\nNo data available."
+
+    all_years = sorted({fy for dept_data in data.values() for fy in dept_data})
+    if not all_years:
+        return "🏠 *Austin Homelessness Budget*\n\nNo data available."
+
+    recent = all_years[-5:]
+    first_yr, last_yr = recent[0], recent[-1]
+
+    msg = f"🏠 *Austin Homelessness — Citywide Budget Impact*\n"
+    msg += f"_FY{first_yr}–FY{last_yr} · actual spend where available_\n\n"
+
+    msg += "*Direct Homeless Services:*\n"
+    for dept in _HOMELESS_DIRECT_DEPTS:
+        dept_data = data.get(dept)
+        if not dept_data:
+            continue
+        label = "Homeless Strategies & Ops" if "Homeless" in dept else dept
+        year_strs = "  ".join(
+            f"FY{fy}: {_fmt_millions(_dept_spend(dept_data, fy))}" for fy in recent
+        )
+        trend = _budget_trend(_dept_spend(dept_data, first_yr), _dept_spend(dept_data, last_yr))
+        msg += f"*{label}*\n{year_strs}\n{trend}\n\n"
+
+    msg += "*Downstream Departments:*\n"
+    msg += "_Total dept spend — homelessness is a contributing factor, not the sole driver_\n\n"
+    for dept_name, emoji in _HOMELESS_DOWNSTREAM_DEPTS:
+        dept_data = data.get(dept_name)
+        if not dept_data:
+            continue
+        first_spend = _dept_spend(dept_data, first_yr)
+        last_spend = _dept_spend(dept_data, last_yr)
+        trend = _budget_trend(first_spend, last_spend)
+        msg += (
+            f"{emoji} *{dept_name}*\n"
+            f"  FY{first_yr}: {_fmt_millions(first_spend)} → "
+            f"FY{last_yr}: {_fmt_millions(last_spend)}  {trend}\n\n"
+        )
+
+    msg += "_Source: [Austin Open Budget](https://data.austintexas.gov/d/yeeq-kk6v)_"
+    return msg
+
+
+async def homeless_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("⏳ Fetching homelessness budget data...")
+    try:
+        data = await asyncio.to_thread(_get_homeless_budget)
+        msg = _format_homeless_budget(data)
+        await _send_chunked(update.message, msg)
+    except Exception as e:
+        logger.error(f"homeless command: {e}")
+        await update.message.reply_text(f"❌ Error fetching budget data: {e}")
+
+
+async def police_homeless_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("⏳ Fetching homelessness budget data...")
+    try:
+        data = await asyncio.to_thread(_get_homeless_budget)
+        msg = _format_homeless_budget(data)
+        keyboard = [[InlineKeyboardButton("🔙 Back", callback_data="service_police")]]
+        await query.edit_message_text(
+            msg, parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            disable_web_page_preview=True,
+        )
+    except Exception as e:
+        logger.error(f"police homeless cb: {e}")
+        await query.edit_message_text(f"❌ Error fetching budget data: {e}")
+
+
+# =============================================================================
 # HATE CRIMES DATA (APD Hate Crimes dataset t99n-5ib4)
 # =============================================================================
 
@@ -1819,6 +1968,8 @@ def create_application() -> Application:
     app.add_handler(CallbackQueryHandler(police_crime_cb, pattern="^police_crime$"))
     app.add_handler(CallbackQueryHandler(police_safety_cb, pattern="^police_safety$"))
     app.add_handler(CallbackQueryHandler(police_hate_cb, pattern="^police_hate$"))
+    app.add_handler(CallbackQueryHandler(police_homeless_cb, pattern="^police_homeless$"))
+    app.add_handler(CommandHandler("homeless", homeless_command))
 
 
     # Bicycle slash commands
@@ -1849,6 +2000,7 @@ def create_application() -> Application:
         await application.bot.set_my_commands([
             BotCommand("start",    "Main menu"),
             BotCommand("crime",    "Recent APD crime stats"),
+            BotCommand("homeless", "Homelessness budget — direct services + downstream dept trends"),
             BotCommand("safety",   "Crime by district — stats + city comparison"),
             BotCommand("traffic",  "Traffic & infrastructure — signals · lights · sidewalks"),
             BotCommand("parking",  "Parking enforcement — citations · hot zones · stats"),
