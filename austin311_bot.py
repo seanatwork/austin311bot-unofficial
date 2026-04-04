@@ -1687,7 +1687,7 @@ async def hate_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     try:
         data = await asyncio.to_thread(_get_hate_crimes, 3)
         msg = _format_hate_crimes(data)
-        await _send_chunked(update.message.reply_text, msg, parse_mode="Markdown")
+        await _send_chunked(update.message, msg)
     except Exception as e:
         logger.error(f"hate command: {e}")
         await update.message.reply_text(f"❌ Error fetching hate crime data: {e}")
