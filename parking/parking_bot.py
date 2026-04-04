@@ -161,10 +161,6 @@ def get_stats(days_back: int = 90) -> dict:
     street_counts: dict = {}
     hourly_counts: dict = defaultdict(int)
 
-    half = timedelta(days=days_back // 2)
-    cutoff = now - half
-    recent_half = 0
-    older_half = 0
 
     for r in citations:
         status = (r.get("status") or "").lower()
@@ -194,10 +190,6 @@ def get_stats(days_back: int = 90) -> dict:
                 req_utc = datetime.fromisoformat(requested_str.replace("Z", "+00:00"))
                 req_local = req_utc + _AUSTIN_OFFSET
                 hourly_counts[req_local.hour] += 1
-                if req_utc >= cutoff:
-                    recent_half += 1
-                else:
-                    older_half += 1
             except ValueError:
                 pass
 
@@ -228,9 +220,6 @@ def get_stats(days_back: int = 90) -> dict:
         "top_streets": top_streets,
         "peak_hour": peak_hour,
         "hourly_counts": dict(hourly_counts),
-        "recent_half": recent_half,
-        "older_half": older_half,
-        "half_days": days_back // 2,
         "oldest_open": oldest_open,
         "days_back": days_back,
     }
@@ -301,14 +290,6 @@ def format_stats(stats: dict) -> str:
     days_back = stats.get("days_back", 90)
     msg = f"🅿️ *Parking Enforcement — Last {days_back} Days*\n\n"
 
-    recent = stats.get("recent_half", 0)
-    older = stats.get("older_half", 0)
-    half = stats.get("half_days", 45)
-    if older > 0:
-        trend = round(((recent - older) / older) * 100)
-        arrow = "📈" if trend > 0 else "📉" if trend < 0 else "➡️"
-        trend_str = f"+{trend}%" if trend > 0 else f"{trend}%"
-        msg += f"{arrow} *Volume trend:* {trend_str} (last {half} days vs prior {half})\n"
     msg += f"📊 *Total citations:* {total} ({stats['open']} open · {stats['closed']} closed)\n\n"
 
     if stats.get("avg_resolution_days") is not None:

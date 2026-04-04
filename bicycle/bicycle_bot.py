@@ -154,11 +154,6 @@ def get_stats(days_back: int = 90) -> dict:
     open_tickets = []
     street_counts: dict = {}
 
-    # Split into two halves to show trend
-    half = timedelta(days=days_back // 2)
-    cutoff = now - half
-    recent_half = 0
-    older_half = 0
 
     for r in complaints:
         status = (r.get("status") or "").lower()
@@ -188,17 +183,6 @@ def get_stats(days_back: int = 90) -> dict:
             street = " ".join(parts[1:])
             street_counts[street] = street_counts.get(street, 0) + 1
 
-        # Volume trend: recent half vs older half
-        if requested_str:
-            try:
-                req = datetime.fromisoformat(requested_str.replace("Z", "+00:00"))
-                if req >= cutoff:
-                    recent_half += 1
-                else:
-                    older_half += 1
-            except ValueError:
-                pass
-
     avg_resolution = round(sum(resolution_days) / len(resolution_days), 1) if resolution_days else None
     top_streets = sorted(street_counts.items(), key=lambda x: -x[1])[:5]
 
@@ -224,9 +208,6 @@ def get_stats(days_back: int = 90) -> dict:
         "closed": len(complaints) - len(open_tickets),
         "avg_resolution_days": avg_resolution,
         "top_streets": top_streets,
-        "recent_half": recent_half,
-        "older_half": older_half,
-        "half_days": days_back // 2,
         "oldest_open": oldest_open,
         "days_back": days_back,
     }
@@ -270,15 +251,6 @@ def format_stats(stats: dict) -> str:
     total = stats["total"]
     msg = "🚴 *Bicycle Complaints — Last 90 Days*\n\n"
 
-    # Volume trend
-    recent = stats.get("recent_half", 0)
-    older = stats.get("older_half", 0)
-    half = stats.get("half_days", 45)
-    if older > 0:
-        trend = round(((recent - older) / older) * 100)
-        arrow = "📈" if trend > 0 else "📉" if trend < 0 else "➡️"
-        trend_str = f"+{trend}%" if trend > 0 else f"{trend}%"
-        msg += f"{arrow} *Volume trend:* {trend_str} (last {half} days vs prior {half})\n"
     msg += f"📊 *Total complaints:* {total} ({stats['open']} open · {stats['closed']} closed)\n\n"
 
     # Resolution time

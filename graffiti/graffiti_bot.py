@@ -103,14 +103,10 @@ def analyze_graffiti_command(days_back: int = 90) -> str:
 
     total = len(records)
     now = _utc_now()
-    half = timedelta(days=days_back // 2)
-    cutoff = now - half
     week_ago = now - timedelta(days=7)
 
     open_count = 0
     closed_count = 0
-    recent_half = 0
-    older_half = 0
     last_7_days = 0
     open_waiting = []  # (days_waiting, address, ticket_id)
 
@@ -136,28 +132,15 @@ def analyze_graffiti_command(days_back: int = 90) -> str:
         if dt_str:
             try:
                 dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
-                if dt >= cutoff:
-                    recent_half += 1
-                else:
-                    older_half += 1
                 if dt >= week_ago:
                     last_7_days += 1
             except (ValueError, TypeError):
                 pass
 
-    if older_half > 0:
-        trend = round(((recent_half - older_half) / older_half) * 100)
-        arrow = "📈" if trend > 0 else "📉" if trend < 0 else "➡️"
-        trend_str = f"{arrow} {'+' if trend > 0 else ''}{trend}% vs prior {days_back // 2} days"
-    else:
-        trend_str = None
-
     msg = f"🎨 *Graffiti Analysis — Last {days_back} Days*\n\n"
     msg += f"📊 *Total reports:* {total}\n"
     msg += f"✅ *Closed:* {closed_count}  🔴 *Open:* {open_count}\n"
     msg += f"🗓 *Last 7 days:* {last_7_days} new reports\n"
-    if trend_str:
-        msg += f"{trend_str}\n"
 
     if open_waiting:
         top_waiting = sorted(open_waiting, key=lambda x: -x[0])[:5]

@@ -43,7 +43,10 @@
       "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); print\\(json.dumps\\(data[0], indent=2\\)\\); print\\(f'Total: {len\\(data\\)}'\\)\")",
       "Bash(python3 -m json.tool)",
       "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(type\\(d\\), len\\(d\\) if isinstance\\(d,list\\) else d\\)\")",
-      "Bash(python3 -c \"import json,sys; [print\\(r['sample_date'][:10], r.get\\('watershed',''\\), r.get\\('parameter',''\\)\\) for r in json.load\\(sys.stdin\\)]\")"
+      "Bash(python3 -c \"import json,sys; [print\\(r['sample_date'][:10], r.get\\('watershed',''\\), r.get\\('parameter',''\\)\\) for r in json.load\\(sys.stdin\\)]\")",
+      "WebFetch(domain:www.tceq.texas.gov)",
+      "WebFetch(domain:www.epa.gov)",
+      "WebFetch(domain:www.bathing-water-directive.eu)"
     ],
     "defaultMode": "bypassPermissions"
   }

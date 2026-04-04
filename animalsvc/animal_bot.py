@@ -181,39 +181,19 @@ def format_hotspots(data: dict) -> str:
 # =============================================================================
 
 def get_stats(days_back: int = 90) -> dict:
-    """Return complaint counts and trend by service type."""
+    """Return complaint counts by service type."""
     records = fetch_all_animal_complaints(days_back)
     if not records:
         return {"total": 0, "days_back": days_back}
 
-    now = _utc_now()
-    half = timedelta(days=days_back // 2)
-    cutoff = now - half
-
     type_counts: dict = {}
-    recent_total = 0
-    older_total = 0
-
     for r in records:
         label = r.get("_service_label", "Unknown")
         type_counts[label] = type_counts.get(label, 0) + 1
 
-        requested_str = r.get("requested_datetime") or ""
-        try:
-            req = datetime.fromisoformat(requested_str.replace("Z", "+00:00"))
-            if req >= cutoff:
-                recent_total += 1
-            else:
-                older_total += 1
-        except ValueError:
-            pass
-
     return {
         "total": len(records),
         "type_counts": type_counts,
-        "recent_total": recent_total,
-        "older_total": older_total,
-        "half_days": days_back // 2,
         "days_back": days_back,
     }
 
@@ -224,19 +204,8 @@ def format_stats(data: dict) -> str:
 
     total = data["total"]
     msg = f"🐾 *Animal Complaints — Last {data['days_back']} Days*\n\n"
-
-    # Trend
-    recent = data.get("recent_total", 0)
-    older = data.get("older_total", 0)
-    half = data.get("half_days", 45)
-    if older > 0:
-        trend = round(((recent - older) / older) * 100)
-        arrow = "📈" if trend > 0 else "📉" if trend < 0 else "➡️"
-        trend_str = f"+{trend}%" if trend > 0 else f"{trend}%"
-        msg += f"{arrow} *Volume trend:* {trend_str} (last {half} days vs prior {half})\n"
     msg += f"📊 *Total complaints:* {total}\n\n"
 
-    # Breakdown by type
     msg += "📋 *By complaint type:*\n"
     for label, count in sorted(data["type_counts"].items(), key=lambda x: -x[1]):
         pct = count / total * 100

@@ -207,14 +207,16 @@ async def _send_chunked(target, text: str, parse_mode: str = "Markdown") -> None
 @rate_limited
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("🎨 Graffiti", callback_data="service_graffiti")],
+        [InlineKeyboardButton("🚔 Police & Crime", callback_data="service_police")],
+        [InlineKeyboardButton("💰🏦 City Budget", callback_data="service_budget")],
+        [InlineKeyboardButton("🚦 Traffic & Infrastructure", callback_data="service_traffic")],
         [InlineKeyboardButton("🚴 Bicycle", callback_data="service_bicycle")],
+        [InlineKeyboardButton("💧 Water Quality", callback_data="service_water")],
+        [InlineKeyboardButton("🎨 Graffiti", callback_data="service_graffiti")],
         [InlineKeyboardButton("🍽️ Restaurants", callback_data="service_restaurants")],
         [InlineKeyboardButton("🐾 Animal Services", callback_data="service_animal")],
-        [InlineKeyboardButton("🚦 Traffic & Infrastructure", callback_data="service_traffic")],
         [InlineKeyboardButton("🔊 Noise Complaints", callback_data="service_noise")],
         [InlineKeyboardButton("🅿️ Parking", callback_data="service_parking")],
-        [InlineKeyboardButton("🚔 Police & Crime", callback_data="service_police")],
         [InlineKeyboardButton("ℹ️ About", callback_data="about")],
     ]
     await update.message.reply_text(
@@ -229,6 +231,8 @@ _HELP_TEXT = """📡 *ATX PULSE*
 🚔 *Police & Crime:*
 /crime — Recent APD incident stats (citywide)
 /safety — Crime by district with city comparison
+
+💰🏦 *City Budget:*
 /budget — Homelessness services, NGO grants, pension & benefits
 
 🚦 *Traffic & Infrastructure:*
@@ -348,11 +352,44 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         keyboard = [
             [InlineKeyboardButton("🚔 Crime Stats", callback_data="police_crime"),
              InlineKeyboardButton("🛡️ Safety by District", callback_data="police_safety")],
-            [InlineKeyboardButton("Hate Crimes", callback_data="police_hate"),
-             InlineKeyboardButton("Homelessness Budget", callback_data="police_homeless")],
+            [InlineKeyboardButton("Hate Crimes", callback_data="police_hate")],
             [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
         ]
         text = "*🚔 Police & Crime*\nAPD incident stats, safety by district, hate crimes, and homelessness spending."
+
+    elif service == "budget":
+        await query.edit_message_text("⏳ Fetching budget insights...")
+        try:
+            data = await asyncio.to_thread(_get_homeless_budget)
+            msg = _format_homeless_budget(data)
+        except Exception as e:
+            logger.error(f"service_budget: {e}")
+            await query.edit_message_text(f"❌ Error fetching budget data: {e}")
+            return
+        back = [[InlineKeyboardButton("🔙 Back", callback_data="back_to_main")]]
+        await query.edit_message_text(
+            msg, parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup(back),
+            disable_web_page_preview=True,
+        )
+        return
+
+    elif service == "water":
+        await query.edit_message_text("⏳ Fetching water quality data...")
+        try:
+            data = await asyncio.to_thread(_get_water_quality)
+            msg = _format_water_quality(data)
+        except Exception as e:
+            logger.error(f"service_water: {e}")
+            await query.edit_message_text(f"❌ Error fetching water quality data: {e}")
+            return
+        back = [[InlineKeyboardButton("🔙 Back", callback_data="back_to_main")]]
+        await query.edit_message_text(
+            msg, parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup(back),
+            disable_web_page_preview=True,
+        )
+        return
 
     elif service == "report":
         await query.answer()
@@ -375,14 +412,16 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     query = update.callback_query
     await query.answer()
     keyboard = [
-        [InlineKeyboardButton("🎨 Graffiti", callback_data="service_graffiti")],
+        [InlineKeyboardButton("🚔 Police & Crime", callback_data="service_police")],
+        [InlineKeyboardButton("💰🏦 City Budget", callback_data="service_budget")],
+        [InlineKeyboardButton("🚦 Traffic & Infrastructure", callback_data="service_traffic")],
         [InlineKeyboardButton("🚴 Bicycle", callback_data="service_bicycle")],
+        [InlineKeyboardButton("💧 Water Quality", callback_data="service_water")],
+        [InlineKeyboardButton("🎨 Graffiti", callback_data="service_graffiti")],
         [InlineKeyboardButton("🍽️ Restaurants", callback_data="service_restaurants")],
         [InlineKeyboardButton("🐾 Animal Services", callback_data="service_animal")],
-        [InlineKeyboardButton("🚦 Traffic & Infrastructure", callback_data="service_traffic")],
         [InlineKeyboardButton("🔊 Noise Complaints", callback_data="service_noise")],
         [InlineKeyboardButton("🅿️ Parking", callback_data="service_parking")],
-        [InlineKeyboardButton("🚔 Police & Crime", callback_data="service_police")],
         [InlineKeyboardButton("ℹ️ About", callback_data="about")],
     ]
     await query.edit_message_text(
@@ -2563,25 +2602,29 @@ def _get_water_quality() -> dict:
     return results
 
 
-# Texas/EPA single-sample E. coli threshold for recreational water contact: 235 col/100mL
-_ECOLI_SAFE_THRESHOLD = 235  # col/100mL — exceeding this = caution
+# EPA 2012 Recreational Water Quality Criteria — freshwater E. coli (primary contact)
+# Geometric mean:   ≤126 CFU/100mL  → safe
+# Single-sample:    ≤410 CFU/100mL  → elevated but within limit
+# Above 410:        exceeds single-sample criterion → not recommended
+# Note: these thresholds apply to freshwater only (lakes, rivers, creeks).
+# Coastal/marine water uses enterococci, not E. coli — not applicable here.
 
 
 def _ecoli_verdict(value: float) -> str:
-    """Return a safety emoji + label based on fecal coliform count."""
+    """EPA 2012 freshwater E. coli thresholds (primary contact recreation)."""
     if value <= 126:
-        return "✅ Safe"
-    elif value <= 235:
+        return "✅ Good"
+    elif value <= 410:
         return "⚠️ Elevated"
     else:
-        return "🚫 Unsafe"
+        return "🚫 High — not recommended"
 
 
 def _format_water_quality(data: dict) -> str:
     if not data:
         return "💧 *Austin Surface Water Quality*\n\n❌ No data available."
 
-    msg = "💧 *Austin Surface Water Quality*\n_Is it safe to swim? Latest E. coli readings by watershed_\n\n"
+    msg = "💧 *Austin Surface Water Quality*\n_Freshwater E. coli by watershed (swimming safety)_\n\n"
 
     secondary_params = ["Dissolved Oxygen", "Nitrate (as N)", "Phosphorus", "pH"]
 
@@ -2595,10 +2638,11 @@ def _format_water_quality(data: dict) -> str:
             try:
                 val = float(ecoli["value"])
                 verdict = _ecoli_verdict(val)
+                unit = ecoli.get("unit", "MPN/100mL")
                 val_fmt = f"{val:,.0f}"
                 date = ecoli["date"]
                 msg += f"*{ws}* — {verdict}\n"
-                msg += f"  E. coli: *{val_fmt} col/100mL*"
+                msg += f"  E. coli: *{val_fmt} {unit}*"
                 if date:
                     msg += f" _{date}_"
                 msg += "\n"
@@ -2623,7 +2667,7 @@ def _format_water_quality(data: dict) -> str:
         msg += "\n"
 
     msg += (
-        "_Threshold: >235 col/100mL = caution (TX/EPA recreational standard)_\n"
+        "_✅ ≤126 · ⚠️ 127–410 · 🚫 >410 MPN/100mL (EPA 2012 freshwater primary contact)_\n"
         "_Source: [Surface Water Quality Sampling](https://data.austintexas.gov/d/5tye-7ray)_"
     )
     return msg
