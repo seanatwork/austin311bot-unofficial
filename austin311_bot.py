@@ -108,6 +108,84 @@ logger = logging.getLogger(__name__)
 
 
 # =============================================================================
+# RATE LIMITING (Sliding window: 5 requests per 60 seconds per user)
+# =============================================================================
+
+from collections import defaultdict, deque
+from time import time
+
+_RATE_LIMIT_MAX = 5      # Max requests per window
+_RATE_LIMIT_WINDOW = 60  # Window in seconds
+_rate_tracker: dict[int, deque[float]] = defaultdict(deque)
+
+
+def _is_rate_limited(user_id: int) -> tuple[bool, int]:
+    """Check if user is rate limited. Returns (is_limited, retry_after_seconds)."""
+    now = time()
+    window_start = now - _RATE_LIMIT_WINDOW
+    
+    # Clean old entries outside window
+    dq = _rate_tracker[user_id]
+    while dq and dq[0] < window_start:
+        dq.popleft()
+    
+    if len(dq) >= _RATE_LIMIT_MAX:
+        retry_after = int(dq[0] + _RATE_LIMIT_WINDOW - now) + 1
+        return True, max(1, retry_after)
+    
+    dq.append(now)
+    return False, 0
+
+
+def rate_limited(handler):
+    """Decorator to apply rate limiting to command handlers."""
+    async def wrapper(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        user_id = update.effective_user.id if update.effective_user else None
+        if user_id:
+            limited, retry = _is_rate_limited(user_id)
+            if limited:
+                msg = f"⏳ Rate limit reached. Please wait {retry}s before trying again."
+                if update.callback_query:
+                    await update.callback_query.answer()
+                    await update.callback_query.edit_message_text(msg)
+                elif update.message:
+                    await update.message.reply_text(msg)
+                return
+        return await handler(update, context)
+    return wrapper
+
+
+# =============================================================================
+# TICKET ID VALIDATION
+# =============================================================================
+
+_TICKET_ID_PATTERN = re.compile(r'^[0-9]{2}-[0-9]{8}$')
+
+
+def _validate_ticket_id(ticket_id: str) -> tuple[bool, str]:
+    """Validate 311 ticket ID format. Returns (is_valid, error_message)."""
+    if not ticket_id:
+        return False, "Ticket ID cannot be empty."
+    
+    ticket_id = ticket_id.strip()
+    
+    # Check length (2 + 1 + 8 = 11 chars)
+    if len(ticket_id) != 11:
+        return False, f"Invalid ticket ID length. Expected 11 characters (YY-XXXXXXXX), got {len(ticket_id)}."
+    
+    # Check pattern: YY-XXXXXXXX
+    if not _TICKET_ID_PATTERN.match(ticket_id):
+        return False, "Invalid ticket ID format. Use: YY-XXXXXXXX (e.g., 16-00123456)"
+    
+    # Validate year (00-99 is technically valid, but reject obviously wrong ones)
+    year_part = int(ticket_id[:2])
+    if year_part > 50:  # Assume tickets from 2050+ are errors
+        return False, "Invalid year in ticket ID."
+    
+    return True, ""
+
+
+# =============================================================================
 # HELPERS
 # =============================================================================
 
@@ -128,6 +206,7 @@ async def _send_chunked(target, text: str, parse_mode: str = "Markdown") -> None
 # =============================================================================
 
 
+@rate_limited
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("🎨 Graffiti", callback_data="service_graffiti")],
@@ -147,6 +226,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     )
 
 
+@rate_limited
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     help_text = """🏛️ *AUSTIN 311 BOT*
 
@@ -191,6 +271,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 # =============================================================================
 
 
+@rate_limited
 async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     service = query.data.replace("service_", "")
@@ -281,6 +362,7 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     )
 
 
+@rate_limited
 async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
@@ -307,6 +389,7 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 # =============================================================================
 
 
+@rate_limited
 async def graffiti_analyze_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
@@ -320,6 +403,7 @@ async def graffiti_analyze_cb(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 
 
+@rate_limited
 async def graffiti_remediation_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
@@ -333,6 +417,7 @@ async def graffiti_remediation_cb(update: Update, context: ContextTypes.DEFAULT_
 
 
 
+@rate_limited
 async def graffiti_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("📊 Analyze", callback_data="graffiti_analyze"),
@@ -350,6 +435,7 @@ async def graffiti_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 # =============================================================================
 
 
+@rate_limited
 async def bicycle_recent_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
@@ -384,6 +470,13 @@ async def bicycle_ticket_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     query = update.callback_query
     await query.answer()
     ticket_id = query.data.replace("bicycle_ticket_", "")
+    
+    # Validate ticket ID format
+    is_valid, error_msg = _validate_ticket_id(ticket_id)
+    if not is_valid:
+        await query.edit_message_text(f"❌ {error_msg}")
+        return
+    
     await query.edit_message_text(f"⏳ Looking up ticket #{ticket_id}...")
     try:
         record = await asyncio.to_thread(lookup_ticket, ticket_id)
@@ -410,6 +503,7 @@ async def bicycle_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         await query.edit_message_text(f"❌ Error: {e}")
 
 
+@rate_limited
 async def bicycle_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("📋 Recent", callback_data="bicycle_recent"),
@@ -422,11 +516,19 @@ async def bicycle_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     )
 
 
+@rate_limited
 async def ticket_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if not context.args:
         await update.message.reply_text("Usage: `/ticket <ticket-id>`\nExample: `/ticket 16-00123456`", parse_mode="Markdown")
         return
     ticket_id = context.args[0]
+    
+    # Validate ticket ID format
+    is_valid, error_msg = _validate_ticket_id(ticket_id)
+    if not is_valid:
+        await update.message.reply_text(f"❌ {error_msg}\n\nUsage: `/ticket <ticket-id>`\nExample: `/ticket 16-00123456`", parse_mode="Markdown")
+        return
+    
     await update.message.reply_text(f"🔍 Looking up ticket #{ticket_id}...")
     try:
         record = await asyncio.to_thread(lookup_ticket, ticket_id)
@@ -468,6 +570,7 @@ async def restaurants_grades_cb(update: Update, context: ContextTypes.DEFAULT_TY
         await query.edit_message_text(f"❌ Error: {e}")
 
 
+@rate_limited
 async def restaurant_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if context.args:
         search_term = " ".join(context.args)
@@ -531,6 +634,7 @@ async def animal_response_cb(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await query.edit_message_text(f"❌ Error: {e}")
 
 
+@rate_limited
 async def animal_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("🗺 Hotspots", callback_data="animal_hotspots"),
@@ -570,6 +674,13 @@ async def ticket_lookup_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     query = update.callback_query
     await query.answer()
     ticket_id = query.data.replace("tlookup_", "")
+    
+    # Validate ticket ID format
+    is_valid, error_msg = _validate_ticket_id(ticket_id)
+    if not is_valid:
+        await query.edit_message_text(f"❌ {error_msg}")
+        return
+    
     await query.edit_message_text(f"🔍 Looking up ticket #{ticket_id}...")
     try:
         record = await asyncio.to_thread(lookup_ticket, ticket_id)
@@ -594,6 +705,7 @@ async def traffic_signals_cb(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await query.edit_message_text(f"❌ Error: {e}")
 
 
+@rate_limited
 async def traffic_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("📋 Infra Backlog", callback_data="traffic_backlog"),
@@ -612,9 +724,9 @@ async def traffic_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 # LIVE TRAFFIC INCIDENTS (Real-Time Traffic Incident Reports dx9v-zd7x)
 # =============================================================================
 
-_TRAFFIC_SESSION: requests.Session | None = None
+_TRAFFIC_SESSION = None
 
-def _get_traffic_session() -> requests.Session:
+def _get_traffic_session():
     global _TRAFFIC_SESSION
     if _TRAFFIC_SESSION is None:
         _TRAFFIC_SESSION = requests.Session()
@@ -900,6 +1012,7 @@ async def noise_night_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await query.edit_message_text(f"❌ Error: {e}")
 
 
+@rate_limited
 async def noisecomplaints_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("🗺️ Hotspots", callback_data="noise_hotspots"),
@@ -1161,6 +1274,7 @@ async def parking_hotspots_cb(update: Update, context: ContextTypes.DEFAULT_TYPE
         await query.edit_message_text(f"❌ Error: {e}")
 
 
+@rate_limited
 async def parking_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton("🔥 Hot Zones", callback_data="parking_hotspots"),
@@ -1238,6 +1352,7 @@ def _format_permit_stats(stats: dict) -> str:
     return msg
 
 
+@rate_limited
 async def code_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("⏳ Querying building permits...")
     try:
@@ -1253,6 +1368,7 @@ async def code_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 # =============================================================================
 
 
+@rate_limited
 async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
         "🚧 *Report 311 Issue*\n\nThis feature is under construction. Check back soon!",
@@ -1473,6 +1589,7 @@ async def crime_homicides_cb(update: Update, context: ContextTypes.DEFAULT_TYPE)
         await query.edit_message_text(f"❌ Error: {e}")
 
 
+@rate_limited
 async def crime_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     from datetime import datetime, timedelta, timezone
     await update.message.reply_text("⏳ Fetching crime data...")
@@ -1668,6 +1785,7 @@ DISTRICT_LABELS = {
 }
 
 
+@rate_limited
 async def safety_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
         [InlineKeyboardButton(DISTRICT_LABELS[str(d)], callback_data=f"safety_district_{d}") for d in pair]
@@ -2027,6 +2145,7 @@ def _format_homeless_budget(data: dict) -> str:
     return msg
 
 
+@rate_limited
 async def homeless_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("⏳ Fetching budget insights...")
     try:
@@ -2177,6 +2296,7 @@ def _format_hate_crimes(data: dict) -> str:
     return msg
 
 
+@rate_limited
 async def hate_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("⏳ Fetching hate crime data...")
     try:
