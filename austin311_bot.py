@@ -858,7 +858,8 @@ async def parking_top_payments_cb(update: Update, context: ContextTypes.DEFAULT_
                 bar = "█" * min(10, round(count / max_loc * 10))
                 msg += f"  {bar} {name} — {count}\n"
 
-        await query.edit_message_text(msg, parse_mode="Markdown")
+        msg += "\n_Source: [Austin Parking Meter Transactions](https://data.austintexas.gov/d/5bb2-gtef)_"
+        await query.edit_message_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
     except Exception as e:
         logger.error(f"parking pulse: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
@@ -880,6 +881,7 @@ async def parking_abandoned_cb(update: Update, context: ContextTypes.DEFAULT_TYP
             msg += f"\n🕰️ *Longest open:* #{o['id']}\n   📍 {o['address']}\n   {o['days_ago']} days unresolved\n"
         if stats.get("sample_id"):
             msg += f"\n🔗 [View sample ticket #{stats['sample_id']}](https://311.austintexas.gov/open311/v2/requests/{stats['sample_id']}.json)"
+        msg += "\n\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
         await query.edit_message_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
     except Exception as e:
         logger.error(f"parking abandoned: {e}")
@@ -1004,7 +1006,9 @@ def _format_permit_stats(stats: dict) -> str:
             bar = "█" * min(10, round(count / max_count * 10))
             msg += f"*{v['label']}*\n"
             msg += f"{bar} {count} ({pct}%)\n\n"
-    return msg.strip()
+    msg = msg.strip()
+    msg += "\n\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
+    return msg
 
 
 async def code_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1130,6 +1134,7 @@ def _format_crime_stats(stats: dict, label: str) -> str:
         for crime, count in stats['top_crimes']:
             pct = round(count / total * 100) if total else 0
             msg += f"• {_crime_label(crime)}: {count} ({pct}%)\n"
+    msg += f"\n_Source: [APD Crime Reports](https://data.austintexas.gov/d/fdj4-gpfu)_\n"
     return msg
 
 
@@ -1234,6 +1239,7 @@ async def crime_homicides_cb(update: Update, context: ContextTypes.DEFAULT_TYPE)
             pct = round(c / total_all * 100)
             msg += f"  • {t}: {c} ({pct}%)\n"
 
+        msg += "\n_Source: [APD NIBRS Data](https://data.austintexas.gov/d/i7fg-wrk5)_"
         await _send_chunked(query, msg)
     except Exception as e:
         logger.error(f"crime homicides: {e}")
@@ -1528,6 +1534,7 @@ async def safety_district_cb(update: Update, context: ContextTypes.DEFAULT_TYPE)
             pct = round(count / d_total * 100) if d_total else 0
             msg += f"• {_crime_label(crime)}: {count} ({pct}%)\n"
 
+        msg += "\n_Source: [APD Crime Reports](https://data.austintexas.gov/d/fdj4-gpfu)_"
         await _send_chunked(query, msg)
     except Exception as e:
         logger.error(f"safety district cb: {e}")

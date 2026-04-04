@@ -299,4 +299,5 @@ def format_stats(stats: dict) -> str:
         msg += f"🕰 *Oldest open ticket:* #{oldest['id']}\n"
         msg += f"   {oldest['address']} — {oldest['days_ago']} days unresolved\n"
 
+    msg += "\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg

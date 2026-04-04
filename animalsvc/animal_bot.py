@@ -172,6 +172,7 @@ def format_hotspots(data: dict) -> str:
             msg += f"   _{type_str}_\n"
         msg += "\n"
 
+    msg += "_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
 
 
@@ -243,6 +244,7 @@ def format_stats(data: dict) -> str:
         msg += f"   *{label}*: {count} ({pct:.1f}%)\n"
         msg += f"   {bar}\n"
 
+    msg += "\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
 
 
@@ -313,4 +315,5 @@ def format_response_times(data: dict) -> str:
             speed = "🔴"
         msg += f"   {speed} *{label}:* {avg} days avg\n"
 
+    msg += "\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg

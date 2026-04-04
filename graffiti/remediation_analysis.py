@@ -113,6 +113,7 @@ def remediation_command(days_back: int = 90) -> str:
         for d, addr in top_waiting:
             msg += f"  🕐 {d} days — _{addr}_\n"
 
+    msg += "\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
 
 

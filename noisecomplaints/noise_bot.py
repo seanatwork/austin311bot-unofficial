@@ -185,6 +185,7 @@ def format_hotspots(data: dict) -> str:
             msg += f"   _{type_str}_\n"
         msg += "\n"
 
+    msg += "_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
 
 
@@ -299,6 +300,7 @@ def format_peak_times(data: dict) -> str:
         recency = " ◀ this wk" if i == 7 else ""
         msg += f"  `{label}` {bar} {count}{recency}\n"
 
+    msg += "\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
 
 
@@ -355,6 +357,7 @@ def format_resolution_by_type(data: dict) -> str:
         msg += f"   {bar} {resolved_pct}% resolved\n"
         msg += f"   {subtotal} total · {counts['closed']} closed · {counts['open']} still open\n\n"
 
+    msg += "_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
 
 
@@ -441,5 +444,6 @@ def format_night_breakdown(data: dict) -> str:
             msg += f"   _Most common: {top_type} ({top_count})_\n"
         msg += "\n"
 
+    msg += "_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
 

@@ -166,6 +166,7 @@ def analyze_graffiti_command(days_back: int = 90) -> str:
             url = f"https://311.austintexas.gov/open311/v2/requests/{ticket_id}.json"
             msg += f"  🕐 {days_waiting}d — {addr} [🔗]({url})\n"
 
+    msg += "\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
 
 

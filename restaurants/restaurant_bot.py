@@ -162,6 +162,7 @@ def format_search_results(restaurants: list, search_term: str) -> str:
             msg += f"... and {total_restaurants - i - 1} more. Try a more specific search.\n"
             break
 
+    msg += "\n_Source: [Austin Restaurant Inspections](https://data.austintexas.gov/d/ecmv-9xxi)_"
     return msg
 
 
@@ -289,6 +290,7 @@ def format_grade_distribution(data: dict) -> str:
         msg += f"⚪ *Unscored:* {counts['?']} restaurants\n\n"
 
     msg += f"_Score ranges: A=95-100, B=90-94, C=85-89, D=75-84, F=below 75_"
+    msg += "\n_Source: [Austin Restaurant Inspections](https://data.austintexas.gov/d/ecmv-9xxi)_"
     return msg
 
 
@@ -308,4 +310,5 @@ def format_low_scores(restaurants: list) -> str:
         msg += f"📅 {r.get('inspection_date') or 'Date not available'}\n"
         msg += f"📋 {r.get('process_description') or 'N/A'}\n\n"
 
+    msg += "_Source: [Austin Restaurant Inspections](https://data.austintexas.gov/d/ecmv-9xxi)_"
     return msg

@@ -180,6 +180,7 @@ def format_infra_backlog(data: dict) -> str:
         msg += f"  {bar} *{label}*: {count}\n"
 
     msg += "\n*Oldest unresolved — tap to look up:*"
+    msg += "\n\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
 
 
@@ -292,4 +293,5 @@ def format_signal_maintenance(data: dict) -> str:
             age_emoji = "🔴" if days_waiting >= 30 else "🟡" if days_waiting >= 14 else "🟢"
             msg += f"{age_emoji} *{days_waiting}d* — {addr}\n"
 
+    msg += "\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
