@@ -24,6 +24,7 @@ from telegram.ext import (
     Application,
     CommandHandler,
     CallbackQueryHandler,
+    ConversationHandler,
     MessageHandler,
     filters,
     ContextTypes,
@@ -259,6 +260,15 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 🎫 *Ticket Lookup:*
 /ticket <id> — Look up any 311 ticket by ID
+
+💧 *Water Quality:*
+/water — Surface water quality by watershed
+
+🏗️ *Building Permits:*
+/permits — Permit activity last 30 days
+
+📋 *Submit a Report:*
+/report — File a 311 request (pothole · graffiti · noise · parking · more)
 
 🏊 *Pool Hours:* https://www.austintexas.gov/parks/locations/pools-and-splash-pads
 
@@ -861,22 +871,15 @@ def _get_crash_stats() -> dict:
                    "sum(sus_serious_injry_cnt) as serious,"
                    "sum(pedestrian_death_count) as ped_deaths,"
                    "sum(bicycle_death_count) as bike_deaths,"
+                   "sum(motor_vehicle_death_count) as mv_deaths,"
+                   "sum(motorcycle_death_count) as moto_deaths,"
+                   "sum(micromobility_death_count) as micro_deaths,"
                    "count(*) as total",
         "$where":  f"crash_timestamp_ct > '{cutoff_90}'",
         "$limit":  1,
     }, timeout=20)
     totals_resp.raise_for_status()
     totals = totals_resp.json()[0] if totals_resp.json() else {}
-
-    # Top collision types (90 days)
-    collsn_resp = session.get(url, params={
-        "$select": "collsn_desc, count(*) as total",
-        "$where":  f"crash_timestamp_ct > '{cutoff_90}' AND collsn_desc IS NOT NULL",
-        "$group":  "collsn_desc",
-        "$order":  "total DESC",
-        "$limit":  6,
-    }, timeout=20)
-    collsn_resp.raise_for_status()
 
     # YTD fatalities
     ytd_resp = session.get(url, params={
@@ -888,10 +891,9 @@ def _get_crash_stats() -> dict:
     ytd = ytd_resp.json()[0] if ytd_resp.json() else {}
 
     return {
-        "totals":   totals,
-        "collsn":   collsn_resp.json(),
-        "ytd":      ytd,
-        "cutoff":   cutoff_90[:10],
+        "totals":    totals,
+        "ytd":       ytd,
+        "cutoff":    cutoff_90[:10],
         "ytd_start": ytd_start[:4],
     }
 
@@ -906,7 +908,6 @@ def _fmt_int(val) -> str:
 def _format_crash_stats(data: dict) -> str:
     t = data.get("totals", {})
     ytd = data.get("ytd", {})
-    collsn = data.get("collsn", [])
     cutoff = data.get("cutoff", "")
     year = data.get("ytd_start", "")
 
@@ -917,28 +918,27 @@ def _format_crash_stats(data: dict) -> str:
         f"• Total crashes: {_fmt_int(t.get('total'))}\n"
         f"• Fatalities: {_fmt_int(t.get('deaths'))}\n"
         f"• Serious injuries: {_fmt_int(t.get('serious'))}\n"
-        f"• All injuries: {_fmt_int(t.get('injuries'))}\n"
-        f"• Pedestrian fatalities: {_fmt_int(t.get('ped_deaths'))}\n"
-        f"• Bicycle fatalities: {_fmt_int(t.get('bike_deaths'))}\n\n"
+        f"• All injuries: {_fmt_int(t.get('injuries'))}\n\n"
     )
+
+    # Fatalities by road user — only show non-zero rows
+    modes = [
+        ("Motor vehicle", t.get("mv_deaths")),
+        ("Pedestrian",    t.get("ped_deaths")),
+        ("Motorcycle",    t.get("moto_deaths")),
+        ("Bicycle",       t.get("bike_deaths")),
+        ("Micromobility", t.get("micro_deaths")),
+    ]
+    mode_lines = [f"• {label}: {_fmt_int(v)}" for label, v in modes
+                  if v and float(v) > 0]
+    if mode_lines:
+        msg += "*Fatalities by road user:*\n" + "\n".join(mode_lines) + "\n\n"
 
     msg += (
         f"*{year} YTD:*\n"
         f"• Crashes: {_fmt_int(ytd.get('total'))}\n"
         f"• Fatalities: {_fmt_int(ytd.get('deaths'))}\n\n"
     )
-
-    if collsn:
-        msg += "*Top Collision Types:*\n"
-        for row in collsn:
-            desc = row.get("collsn_desc", "Unknown")
-            # Shorten verbose TxDOT descriptions
-            desc = desc.replace("SAME DIRECTION - ", "Same dir — ")
-            desc = desc.replace("OPPOSITE DIRECTION - ", "Opp dir — ")
-            desc = desc.replace("ONE MOTOR VEHICLE - ", "Single vehicle — ")
-            desc = desc.replace("ANGLE - ", "Angle — ")
-            msg += f"• {desc.title()}: {_fmt_int(row.get('total'))}\n"
-        msg += "\n"
 
     msg += "_Source: [Austin Crash Report Data](https://data.austintexas.gov/d/y2wy-tgr5)_"
     return msg
@@ -1364,16 +1364,183 @@ async def code_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 
 # =============================================================================
-# REPORT COMMAND (Under Construction)
+# REPORT COMMAND — Submit a 311 request via Open311 POST
 # =============================================================================
+
+# Conversation states
+_REPORT_TYPE, _REPORT_LOCATION, _REPORT_DESCRIPTION, _REPORT_CONFIRM = range(4)
+
+# Service types available for submission
+_REPORT_SERVICES = [
+    ("🕳️ Pothole",        "SBPOTREP"),
+    ("🎨 Graffiti",        "HHSGRAFF"),
+    ("🔊 Noise",           "APDNONNO"),
+    ("🚗 Parking",         "PARKINGV"),
+    ("💡 Street Light",    "STREETL2"),
+    ("🪨 Debris/Dumping",  "SBDEBROW"),
+    ("🚶 Sidewalk",        "SBSIDERE"),
+    ("🚦 Traffic Signal",  "TRASIGMA"),
+]
+
+_REPORT_LABEL: dict[str, str] = {code: label for label, code in _REPORT_SERVICES}
 
 
 @rate_limited
-async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def report_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    keyboard = []
+    row = []
+    for label, code in _REPORT_SERVICES:
+        row.append(InlineKeyboardButton(label, callback_data=f"rpt_type_{code}"))
+        if len(row) == 2:
+            keyboard.append(row)
+            row = []
+    if row:
+        keyboard.append(row)
+    keyboard.append([InlineKeyboardButton("❌ Cancel", callback_data="rpt_cancel")])
+
     await update.message.reply_text(
-        "🚧 *Report 311 Issue*\n\nThis feature is under construction. Check back soon!",
+        "📋 *Report a 311 Issue*\n\nWhat would you like to report?",
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+    return _REPORT_TYPE
+
+
+async def report_type_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+    code = query.data.replace("rpt_type_", "")
+    context.user_data["rpt_code"] = code
+    context.user_data["rpt_label"] = _REPORT_LABEL.get(code, code)
+
+    await query.edit_message_text(
+        f"📍 *{_REPORT_LABEL.get(code, code)}*\n\n"
+        "Where is the issue?\n"
+        "• Type an address _or_\n"
+        "• Share your location via the 📎 attachment menu\n\n"
+        "_Send /cancel to abort at any time._",
         parse_mode="Markdown",
     )
+    return _REPORT_LOCATION
+
+
+async def report_location_msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    if update.message.location:
+        loc = update.message.location
+        context.user_data["rpt_lat"] = loc.latitude
+        context.user_data["rpt_long"] = loc.longitude
+        context.user_data["rpt_address"] = None
+    else:
+        context.user_data["rpt_address"] = update.message.text.strip()
+        context.user_data["rpt_lat"] = None
+        context.user_data["rpt_long"] = None
+
+    await update.message.reply_text(
+        "📝 *Describe the issue:*\n"
+        "_Be specific — size, severity, how long it's been there._\n\n"
+        "_Send /cancel to abort._",
+        parse_mode="Markdown",
+    )
+    return _REPORT_DESCRIPTION
+
+
+async def report_description_msg(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data["rpt_desc"] = update.message.text.strip()
+
+    label   = context.user_data.get("rpt_label", "")
+    address = context.user_data.get("rpt_address")
+    lat     = context.user_data.get("rpt_lat")
+    lon     = context.user_data.get("rpt_long")
+    desc    = context.user_data["rpt_desc"]
+    loc_str = address if address else f"{lat:.5f}, {lon:.5f}"
+
+    keyboard = [[
+        InlineKeyboardButton("✅ Submit to Austin 311", callback_data="rpt_confirm"),
+        InlineKeyboardButton("❌ Cancel",               callback_data="rpt_cancel"),
+    ]]
+
+    await update.message.reply_text(
+        f"*Review your report:*\n\n"
+        f"*Type:* {label}\n"
+        f"*Location:* {loc_str}\n"
+        f"*Description:* {desc}\n\n"
+        f"_Ready to submit?_",
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+    return _REPORT_CONFIRM
+
+
+async def report_confirm_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("⏳ Submitting your report to Austin 311…")
+
+    try:
+        result = await asyncio.to_thread(_submit_311_report, dict(context.user_data))
+        ticket_id = result.get("service_request_id", "")
+        notice    = result.get("service_notice", "")
+
+        msg = "✅ *Report Submitted!*\n\n"
+        if ticket_id:
+            msg += f"*Ticket ID:* `{ticket_id}`\n"
+            msg += f"Track it with /ticket {ticket_id}\n"
+        if notice:
+            msg += f"\n_{notice}_\n"
+        msg += "\n_Austin 311 typically responds within 1–5 business days._"
+
+        await query.edit_message_text(msg, parse_mode="Markdown")
+    except Exception as e:
+        logger.error(f"311 submission failed: {e}")
+        await query.edit_message_text(
+            f"❌ *Submission failed*\n\n`{e}`\n\n"
+            "You can also report at austintexas.gov/page/311 or call 3-1-1.",
+            parse_mode="Markdown",
+        )
+
+    context.user_data.clear()
+    return ConversationHandler.END
+
+
+async def report_cancel_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    query = update.callback_query
+    await query.answer()
+    context.user_data.clear()
+    await query.edit_message_text("❌ Report cancelled.")
+    return ConversationHandler.END
+
+
+async def report_cancel_cmd(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data.clear()
+    await update.message.reply_text("❌ Report cancelled.")
+    return ConversationHandler.END
+
+
+def _submit_311_report(user_data: dict) -> dict:
+    """POST a new service request to Austin's Open311 API."""
+    url = "https://311.austintexas.gov/open311/v2/requests.json"
+
+    payload: dict = {
+        "service_code": user_data["rpt_code"],
+        "description":  user_data.get("rpt_desc", ""),
+    }
+
+    if user_data.get("rpt_lat") is not None:
+        payload["lat"]  = str(user_data["rpt_lat"])
+        payload["long"] = str(user_data["rpt_long"])
+    else:
+        payload["address_string"] = user_data.get("rpt_address", "")
+
+    app_token = os.getenv("AUSTIN_APP_TOKEN")
+    if app_token:
+        payload["api_key"] = app_token
+
+    resp = requests.post(url, data=payload, timeout=30)
+    resp.raise_for_status()
+    result = resp.json()
+    if isinstance(result, list) and result:
+        return result[0]
+    return result if isinstance(result, dict) else {}
 
 
 
@@ -2325,6 +2492,268 @@ async def police_hate_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 
 # =============================================================================
+# WATER QUALITY COMMAND (Surface Water Quality Sampling 5tye-7ray)
+# =============================================================================
+
+_WATER_SESSION = None
+
+
+def _get_water_session():
+    global _WATER_SESSION
+    if _WATER_SESSION is None:
+        _WATER_SESSION = requests.Session()
+        app_token = os.getenv("AUSTIN_APP_TOKEN")
+        if app_token:
+            _WATER_SESSION.headers.update({"X-App-Token": app_token})
+    return _WATER_SESSION
+
+
+def _get_water_quality() -> dict:
+    """Fetch latest surface water quality readings per watershed."""
+    session = _get_water_session()
+    url = "https://data.austintexas.gov/resource/5tye-7ray.json"
+
+    # Parameters of interest
+    params_of_interest = {
+        "FECAL COLIFORM BACTERIA": ("Fecal Coliform", "col/100mL"),
+        "DISSOLVED OXYGEN":        ("Dissolved Oxygen", "mg/L"),
+        "NITRATE AS N":            ("Nitrate (as N)", "mg/L"),
+        "PHOSPHORUS":              ("Phosphorus", "mg/L"),
+        "PH":                      ("pH", ""),
+    }
+
+    results: dict[str, dict] = {}  # watershed -> param -> {value, unit, date}
+
+    for param_raw, (label, unit) in params_of_interest.items():
+        try:
+            resp = session.get(url, params={
+                "$select":  "watershed, parameter_type, result, unit, sample_date",
+                "$where":   f"medium='Surface Water' AND upper(parameter_type) like '%{param_raw}%'",
+                "$order":   "sample_date DESC",
+                "$limit":   200,
+            }, timeout=20)
+            resp.raise_for_status()
+            rows = resp.json()
+
+            # Keep only the latest reading per watershed
+            seen: set[str] = set()
+            for row in rows:
+                ws = row.get("watershed", "Unknown").strip()
+                if ws in seen:
+                    continue
+                seen.add(ws)
+                results.setdefault(ws, {})
+                results[ws][label] = {
+                    "value": row.get("result", ""),
+                    "unit":  row.get("unit", unit) or unit,
+                    "date":  row.get("sample_date", "")[:10],
+                }
+        except Exception:
+            pass
+
+    return results
+
+
+# Texas/EPA single-sample E. coli threshold for recreational water contact: 235 col/100mL
+_ECOLI_SAFE_THRESHOLD = 235  # col/100mL — exceeding this = caution
+
+
+def _ecoli_verdict(value: float) -> str:
+    """Return a safety emoji + label based on fecal coliform count."""
+    if value <= 126:
+        return "✅ Safe"
+    elif value <= 235:
+        return "⚠️ Elevated"
+    else:
+        return "🚫 Unsafe"
+
+
+def _format_water_quality(data: dict) -> str:
+    if not data:
+        return "💧 *Austin Surface Water Quality*\n\n❌ No data available."
+
+    msg = "💧 *Austin Surface Water Quality*\n_Is it safe to swim? Latest E. coli readings by watershed_\n\n"
+
+    secondary_params = ["Dissolved Oxygen", "Nitrate (as N)", "Phosphorus", "pH"]
+
+    for ws in sorted(data.keys()):
+        params = data[ws]
+        if not params:
+            continue
+
+        ecoli = params.get("Fecal Coliform")
+        if ecoli:
+            try:
+                val = float(ecoli["value"])
+                verdict = _ecoli_verdict(val)
+                val_fmt = f"{val:,.0f}"
+                date = ecoli["date"]
+                msg += f"*{ws}* — {verdict}\n"
+                msg += f"  E. coli: *{val_fmt} col/100mL*"
+                if date:
+                    msg += f" _{date}_"
+                msg += "\n"
+            except (ValueError, TypeError):
+                msg += f"*{ws}*\n  E. coli: N/A\n"
+        else:
+            msg += f"*{ws}*\n"
+
+        # Secondary params as supporting detail
+        for label in secondary_params:
+            if label not in params:
+                continue
+            p = params[label]
+            val_raw = p["value"]
+            unit = p["unit"]
+            try:
+                val_fmt = f"{float(val_raw):,.2f}".rstrip("0").rstrip(".")
+            except (ValueError, TypeError):
+                val_fmt = val_raw or "N/A"
+            unit_str = f" {unit}" if unit else ""
+            msg += f"  {label}: {val_fmt}{unit_str}\n"
+        msg += "\n"
+
+    msg += (
+        "_Threshold: >235 col/100mL = caution (TX/EPA recreational standard)_\n"
+        "_Source: [Surface Water Quality Sampling](https://data.austintexas.gov/d/5tye-7ray)_"
+    )
+    return msg
+
+
+async def water_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("⏳ Fetching water quality data...")
+    try:
+        data = await asyncio.to_thread(_get_water_quality)
+        msg = _format_water_quality(data)
+        await _send_chunked(update.message, msg)
+    except Exception as e:
+        logger.error(f"water command: {e}")
+        await update.message.reply_text(f"❌ Error fetching water quality data: {e}")
+
+
+# =============================================================================
+# PERMITS COMMAND (Building Permits 3syk-w9eu)
+# =============================================================================
+
+_PERMITS_SESSION = None
+
+
+def _get_permits_session():
+    global _PERMITS_SESSION
+    if _PERMITS_SESSION is None:
+        _PERMITS_SESSION = requests.Session()
+        app_token = os.getenv("AUSTIN_APP_TOKEN")
+        if app_token:
+            _PERMITS_SESSION.headers.update({"X-App-Token": app_token})
+    return _PERMITS_SESSION
+
+
+def _get_permit_stats() -> dict:
+    """Fetch last-30-days building permit activity from Socrata 3syk-w9eu."""
+    session = _get_permits_session()
+    url = "https://data.austintexas.gov/resource/3syk-w9eu.json"
+    base_where = "issued_in_last_30_days='Yes'"
+
+    # Total count
+    total_resp = session.get(url, params={
+        "$select": "count(*) as total",
+        "$where":  base_where,
+        "$limit":  1,
+    }, timeout=20)
+    total_resp.raise_for_status()
+    total = int(float((total_resp.json()[0] or {}).get("total", 0)))
+
+    # By class (Residential / Commercial)
+    class_resp = session.get(url, params={
+        "$select": "permit_class_mapped, count(*) as cnt",
+        "$where":  base_where,
+        "$group":  "permit_class_mapped",
+        "$order":  "cnt DESC",
+        "$limit":  20,
+    }, timeout=20)
+    class_resp.raise_for_status()
+    by_class = {r.get("permit_class_mapped", "Other"): int(float(r.get("cnt", 0)))
+                for r in class_resp.json()}
+
+    # By work class (New / Repair / Remodel / Addition / Demolition etc.)
+    work_resp = session.get(url, params={
+        "$select": "work_class, count(*) as cnt",
+        "$where":  base_where,
+        "$group":  "work_class",
+        "$order":  "cnt DESC",
+        "$limit":  20,
+    }, timeout=20)
+    work_resp.raise_for_status()
+    by_work = {r.get("work_class", "Other"): int(float(r.get("cnt", 0)))
+               for r in work_resp.json()}
+
+    # By council district
+    district_resp = session.get(url, params={
+        "$select": "council_district, count(*) as cnt",
+        "$where":  f"{base_where} AND council_district IS NOT NULL",
+        "$group":  "council_district",
+        "$order":  "cnt DESC",
+        "$limit":  15,
+    }, timeout=20)
+    district_resp.raise_for_status()
+    by_district = {r.get("council_district", "?"): int(float(r.get("cnt", 0)))
+                   for r in district_resp.json()}
+
+    return {
+        "total":       total,
+        "by_class":    by_class,
+        "by_work":     by_work,
+        "by_district": by_district,
+    }
+
+
+def _format_permit_activity(data: dict) -> str:
+    total = data.get("total", 0)
+    by_class = data.get("by_class", {})
+    by_work = data.get("by_work", {})
+    by_district = data.get("by_district", {})
+
+    msg = f"🏗️ *Austin Building Permits — Last 30 Days*\n\n"
+    msg += f"📊 *{total:,}* permits issued\n\n"
+
+    if by_class:
+        msg += "*By Type:*\n"
+        for cls, cnt in sorted(by_class.items(), key=lambda x: -x[1]):
+            pct = round(cnt / total * 100) if total else 0
+            msg += f"  • {cls or 'Other'}: {cnt:,} ({pct}%)\n"
+        msg += "\n"
+
+    if by_work:
+        msg += "*By Work Class:*\n"
+        max_w = max(by_work.values()) if by_work else 1
+        for wc, cnt in sorted(by_work.items(), key=lambda x: -x[1])[:8]:
+            bar = "█" * min(8, round(cnt / max_w * 8))
+            pct = round(cnt / total * 100) if total else 0
+            msg += f"  {bar:<8} {wc or 'Other'}: {cnt:,} ({pct}%)\n"
+        msg += "\n"
+
+    if by_district:
+        msg += "*By Council District:*\n"
+        for dist, cnt in sorted(by_district.items(), key=lambda x: -x[1])[:10]:
+            msg += f"  • District {dist}: {cnt:,}\n"
+        msg += "\n"
+
+    msg += "_Source: [Austin Building Permits](https://data.austintexas.gov/d/3syk-w9eu)_"
+    return msg
+
+
+async def permits_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("⏳ Fetching permit activity...")
+    try:
+        data = await asyncio.to_thread(_get_permit_stats)
+        msg = _format_permit_activity(data)
+        await _send_chunked(update.message, msg)
+    except Exception as e:
+        logger.error(f"permits command: {e}")
+        await update.message.reply_text(f"❌ Error fetching permit data: {e}")
+
+
+# =============================================================================
 # FALLBACK
 # =============================================================================
 
@@ -2431,11 +2860,38 @@ def create_application() -> Application:
     # Noise slash command
     app.add_handler(CommandHandler("noise", noisecomplaints_command))
 
-    # Report slash command
-    app.add_handler(CommandHandler("report", report_command))
+    # Report slash command — ConversationHandler for multi-step 311 submission
+    report_conv = ConversationHandler(
+        entry_points=[CommandHandler("report", report_command)],
+        states={
+            _REPORT_TYPE: [
+                CallbackQueryHandler(report_type_cb, pattern="^rpt_type_"),
+                CallbackQueryHandler(report_cancel_cb, pattern="^rpt_cancel$"),
+            ],
+            _REPORT_LOCATION: [
+                MessageHandler(filters.LOCATION, report_location_msg),
+                MessageHandler(filters.TEXT & ~filters.COMMAND, report_location_msg),
+            ],
+            _REPORT_DESCRIPTION: [
+                MessageHandler(filters.TEXT & ~filters.COMMAND, report_description_msg),
+            ],
+            _REPORT_CONFIRM: [
+                CallbackQueryHandler(report_confirm_cb, pattern="^rpt_confirm$"),
+                CallbackQueryHandler(report_cancel_cb, pattern="^rpt_cancel$"),
+            ],
+        },
+        fallbacks=[CommandHandler("cancel", report_cancel_cmd)],
+        per_user=True,
+        per_chat=True,
+    )
+    app.add_handler(report_conv)
 
     # Code violations slash command
     app.add_handler(CommandHandler("code", code_command))
+
+    # Water quality & building permits
+    app.add_handler(CommandHandler("water", water_command))
+    app.add_handler(CommandHandler("permits", permits_command))
 
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo_handler))
     app.add_error_handler(error_handler)
@@ -2455,6 +2911,9 @@ def create_application() -> Application:
             BotCommand("graffiti", "Graffiti — analysis · hotspots · remediation"),
             BotCommand("animal",   "Animal complaints — hotspots · stats · response times"),
             BotCommand("ticket",   "Look up any 311 ticket by ID"),
+            BotCommand("water",    "Surface water quality — fecal coliform · DO · nutrients"),
+            BotCommand("permits",  "Building permits — last 30 days by type · district"),
+            BotCommand("report",   "Submit a 311 request — pothole · graffiti · noise · more"),
             BotCommand("help",     "All commands"),
         ])
 

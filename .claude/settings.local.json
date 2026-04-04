@@ -3,15 +3,7 @@
     "allow": [
       "WebFetch(domain:www.austintexas.gov)",
       "Bash(python3 -c ':*)",
-      "Bash(curl -s 'https://data.austintexas.gov/resource/5bb2-gtef.json?$limit=1')",
-      "Bash(curl -s 'https://data.austintexas.gov/resource/5bb2-gtef.json?$where=start_time+>=+'\\\\''2026-03-30T00:00:00'\\\\''&$order=amount+DESC&$limit=5')",
-      "Bash(curl -s \"https://data.austintexas.gov/api/views/w675-gknx.json\")",
-      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\([c['fieldName'] for c in d['columns']]\\); print\\(d['name']\\)\")",
-      "Bash(curl -s 'https://data.austintexas.gov/resource/w675-gknx.json?$limit=1000')",
-      "Bash(curl -s \"https://data.austintexas.gov/api/views/i7fg-wrk5.json\")",
-      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(d['name']\\); print\\([c['fieldName'] for c in d['columns']]\\)\")",
-      "Bash(curl -s 'https://data.austintexas.gov/resource/i7fg-wrk5.json?$limit=5&$where=nibrs_category='\\\\''Homicide Offenses'\\\\''')",
-      "Bash(curl -g -s 'https://data.austintexas.gov/resource/i7fg-wrk5.json?$limit=5&$where=nibrs_category=%27Homicide+Offenses%27')",
+      "Bash(curl:*)",
       "Bash(xclip -selection clipboard)",
       "Bash(xsel --clipboard --input)",
       "Bash(xclip -selection clipboard -o)",
@@ -43,7 +35,14 @@
       "Bash(fly secrets:*)",
       "Bash(gh run:*)",
       "Bash(fly deploy:*)",
-      "Bash(fly machine:*)"
+      "Bash(fly machine:*)",
+      "Skill(update-config)",
+      "Skill(update-config:*)",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('austin311_bot.py'\\).read\\(\\)\\); print\\('OK'\\)\")",
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); [print\\(f\\\\\"{s['service_code']:15} {s['service_name']}\\\\\"\\) for s in data[:40]]\")",
+      "Bash(python3 -c \"import json,sys; data=json.load\\(sys.stdin\\); print\\(json.dumps\\(data[0], indent=2\\)\\); print\\(f'Total: {len\\(data\\)}'\\)\")",
+      "Bash(python3 -m json.tool)",
+      "Bash(python3 -c \"import json,sys; d=json.load\\(sys.stdin\\); print\\(type\\(d\\), len\\(d\\) if isinstance\\(d,list\\) else d\\)\")"
     ],
     "defaultMode": "bypassPermissions"
   }
