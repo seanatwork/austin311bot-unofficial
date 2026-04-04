@@ -184,7 +184,6 @@ _💡 Parking enforcement is one of the top 10 most-requested 311 services in Au
 _Last 30 days, top crime types, clearance rate_
 _From APD Crime Reports: https://data.austintexas.gov/resource/fdj4-gpfu_
 /safety — Crime by district with city comparison
-/hate — Hate crime incidents — bias motivation · offender race/ethnicity · offense breakdown
 
 🎫 *Ticket Lookup:*
 /ticket <id> — Look up any 311 ticket by ID
@@ -275,7 +274,7 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         keyboard = [
             [InlineKeyboardButton("🚔 Crime Stats", callback_data="police_crime"),
              InlineKeyboardButton("🛡️ Safety by District", callback_data="police_safety")],
-            [InlineKeyboardButton("🎯 Hate Crimes", callback_data="police_hate")],
+            [InlineKeyboardButton("Hate Crimes", callback_data="police_hate")],
             [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
         ]
         text = "*🚔 Police & Crime*\nAPD incident stats, safety by district, and hate crimes."
@@ -1263,6 +1262,10 @@ async def crime_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
                 "⚰️ Homicides (2019–present)",
                 callback_data="crime_homicides"
             )],
+            [InlineKeyboardButton(
+                "Hate Crimes",
+                callback_data="police_hate"
+            )],
         ]
         await update.message.reply_text(
             msg,
@@ -1604,13 +1607,10 @@ _HATE_BIAS_LABELS: dict[str, str] = {
 }
 
 
-def _get_hate_crimes(years: int = 3) -> dict:
-    """Fetch hate crime incidents from APD dataset, last N years."""
-    from datetime import date
+def _get_hate_crimes() -> dict:
+    """Fetch all hate crime incidents from APD dataset (full history)."""
     url = "https://data.austintexas.gov/resource/t99n-5ib4.json"
-    cutoff = f"{date.today().year - years}-01-01T00:00:00.000"
     params = {
-        "$where":  f"date_of_incident >= '{cutoff}'",
         "$order":  "date_of_incident DESC",
         "$limit":  5000,
         "$select": "date_of_incident,bias,race_ethnicity_of_offenders,offense_s,zip_code",
@@ -1622,11 +1622,12 @@ def _get_hate_crimes(years: int = 3) -> dict:
         resp.raise_for_status()
         data = resp.json()
         if not data:
-            return {"total": 0, "years": years, "bias": {}, "race": {}, "offenses": {}}
+            return {"total": 0, "by_year": {}, "bias": {}, "race": {}, "offenses": {}}
 
         bias_counts: dict[str, int] = {}
         race_counts: dict[str, int] = {}
         offense_counts: dict[str, int] = {}
+        by_year: dict[int, int] = {}
 
         for row in data:
             b = row.get("bias", "Unknown") or "Unknown"
@@ -1638,30 +1639,45 @@ def _get_hate_crimes(years: int = 3) -> dict:
             o = row.get("offense_s", "Unknown") or "Unknown"
             offense_counts[o] = offense_counts.get(o, 0) + 1
 
+            dt = row.get("date_of_incident", "")
+            if dt:
+                try:
+                    year = int(dt[:4])
+                    by_year[year] = by_year.get(year, 0) + 1
+                except (ValueError, IndexError):
+                    pass
+
         return {
             "total":    len(data),
-            "years":    years,
+            "by_year":  dict(sorted(by_year.items())),
             "bias":     dict(sorted(bias_counts.items(), key=lambda x: -x[1])),
             "race":     dict(sorted(race_counts.items(), key=lambda x: -x[1])),
             "offenses": dict(sorted(offense_counts.items(), key=lambda x: -x[1])),
         }
     except Exception as e:
         logger.error(f"hate crimes fetch: {e}")
-        return {"total": 0, "years": years, "bias": {}, "race": {}, "offenses": {}}
+        return {"total": 0, "by_year": {}, "bias": {}, "race": {}, "offenses": {}}
 
 
 def _format_hate_crimes(data: dict) -> str:
     total = data["total"]
-    years = data["years"]
     if total == 0:
-        return f"🎯 *Austin Hate Crimes*\n\nNo data found for the last {years} years."
+        return "🎯 *Austin Hate Crimes*\n\nNo data found."
 
-    from datetime import date
-    end_yr = date.today().year
-    start_yr = end_yr - years
-    msg = f"🎯 *Austin Hate Crimes — {start_yr}–{end_yr}*\n_{total} reported incidents_\n\n"
+    by_year = data["by_year"]
+    years = sorted(by_year.keys())
+    year_range = f"{years[0]}–{years[-1]}" if years else "All years"
+    msg = f"🎯 *Austin Hate Crimes — {year_range}*\n_{total} reported incidents_\n\n"
 
-    msg += "*Bias Motivation:*\n"
+    if by_year:
+        msg += "*Incidents by Year:*\n"
+        max_count = max(by_year.values())
+        for year in years:
+            count = by_year[year]
+            bar = "█" * min(10, round(count / max_count * 10))
+            msg += f"*{year}:* {bar} {count}\n"
+
+    msg += "\n*Bias Motivation:*\n"
     for raw, count in list(data["bias"].items())[:8]:
         label = _HATE_BIAS_LABELS.get(raw, raw)
         pct = round(count / total * 100)
@@ -1685,7 +1701,7 @@ def _format_hate_crimes(data: dict) -> str:
 async def hate_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text("⏳ Fetching hate crime data...")
     try:
-        data = await asyncio.to_thread(_get_hate_crimes, 3)
+        data = await asyncio.to_thread(_get_hate_crimes)
         msg = _format_hate_crimes(data)
         await _send_chunked(update.message, msg)
     except Exception as e:
@@ -1698,7 +1714,7 @@ async def police_hate_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await query.answer()
     await query.edit_message_text("⏳ Fetching hate crime data...")
     try:
-        data = await asyncio.to_thread(_get_hate_crimes, 3)
+        data = await asyncio.to_thread(_get_hate_crimes)
         msg = _format_hate_crimes(data)
         keyboard = [[InlineKeyboardButton("🔙 Back", callback_data="service_police")]]
         await query.edit_message_text(msg, parse_mode="Markdown",
@@ -1797,8 +1813,6 @@ def create_application() -> Application:
     app.add_handler(CallbackQueryHandler(police_safety_cb, pattern="^police_safety$"))
     app.add_handler(CallbackQueryHandler(police_hate_cb, pattern="^police_hate$"))
 
-    # Hate crimes slash command
-    app.add_handler(CommandHandler("hate", hate_command))
 
     # Bicycle slash commands
     app.add_handler(CommandHandler("animal", animal_command))
@@ -1828,7 +1842,6 @@ def create_application() -> Application:
         await application.bot.set_my_commands([
             BotCommand("start",    "Main menu"),
             BotCommand("crime",    "Recent APD crime stats"),
-            BotCommand("hate",     "Hate crime incidents — bias · offender race · offense type"),
             BotCommand("safety",   "Crime by district — stats + city comparison"),
             BotCommand("traffic",  "Traffic & infrastructure — signals · lights · sidewalks"),
             BotCommand("parking",  "Parking enforcement — citations · hot zones · stats"),
