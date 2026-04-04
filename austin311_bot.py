@@ -1691,18 +1691,32 @@ def _get_homeless_budget() -> dict:
         return {}
 
 
+def _austin_current_fy() -> str:
+    """Return the current Austin fiscal year as a string (FY ends Sep 30)."""
+    now = datetime.now()
+    return str(now.year if now.month < 10 else now.year + 1)
+
+
 def _format_homeless_budget(data: dict) -> str:
     if not data:
-        return "🏠 *Austin Homelessness Budget*\n\nNo data available."
+        return "🏠 *Austin Citywide Budget Impact*\n\nNo data available."
 
     all_years = sorted({fy for k, dept_data in data.items() if not k.startswith("_") for fy in dept_data})
     if not all_years:
-        return "🏠 *Austin Homelessness Budget*\n\nNo data available."
+        return "🏠 *Austin Citywide Budget Impact*\n\nNo data available."
+
+    current_fy = _austin_current_fy()
+
+    def fy_label(fy: str) -> str:
+        return f"FY{fy}(partial)" if fy == current_fy else f"FY{fy}"
 
     recent = all_years[-5:]
     first_yr, last_yr = recent[0], recent[-1]
+    # Use last completed year for trend; partial year would produce a misleading result
+    completed = [fy for fy in recent if fy != current_fy]
+    trend_yr = completed[-1] if completed else last_yr
 
-    msg = f"🏠 *Austin Homelessness — Citywide Budget Impact*\n"
+    msg = f"🏠 *Austin Citywide Budget Impact*\n"
     msg += f"_FY{first_yr}–FY{last_yr} · actual spend where available_\n\n"
 
     msg += "*Direct Homeless Services:*\n"
@@ -1712,18 +1726,18 @@ def _format_homeless_budget(data: dict) -> str:
             continue
         label = "Homeless Strategies & Ops" if "Homeless" in dept else dept
         year_strs = "  ".join(
-            f"FY{fy}: {_fmt_millions(_dept_spend(dept_data, fy))}" for fy in recent
+            f"{fy_label(fy)}: {_fmt_millions(_dept_spend(dept_data, fy))}" for fy in recent
         )
-        trend = _budget_trend(_dept_spend(dept_data, first_yr), _dept_spend(dept_data, last_yr))
-        msg += f"*{label}*\n{year_strs}\n{trend}\n\n"
+        trend = _budget_trend(_dept_spend(dept_data, first_yr), _dept_spend(dept_data, trend_yr))
+        msg += f"*{label}*\n{year_strs}" + (f"\n{trend}" if trend else "") + "\n\n"
 
     grants = data.get("_grants_to_subrecipients", {})
     if grants:
         year_strs = "  ".join(
-            f"FY{fy}: {_fmt_millions(_dept_spend(grants, fy))}" for fy in recent
+            f"{fy_label(fy)}: {_fmt_millions(_dept_spend(grants, fy))}" for fy in recent
         )
-        trend = _budget_trend(_dept_spend(grants, first_yr), _dept_spend(grants, last_yr))
-        msg += f"*Grants to NGOs/Nonprofits*\n{year_strs}\n{trend}\n\n"
+        trend = _budget_trend(_dept_spend(grants, first_yr), _dept_spend(grants, trend_yr))
+        msg += f"*Grants to NGOs/Nonprofits*\n{year_strs}" + (f"\n{trend}" if trend else "") + "\n\n"
 
     msg += "*Downstream Departments:*\n"
     for dept_name, emoji in _HOMELESS_DOWNSTREAM_DEPTS:
@@ -1731,43 +1745,47 @@ def _format_homeless_budget(data: dict) -> str:
         if not dept_data:
             continue
         first_spend = _dept_spend(dept_data, first_yr)
+        trend_spend = _dept_spend(dept_data, trend_yr)
         last_spend = _dept_spend(dept_data, last_yr)
-        trend = _budget_trend(first_spend, last_spend)
+        trend = _budget_trend(first_spend, trend_spend)
+        last_label = fy_label(last_yr)
         msg += (
             f"{emoji} *{dept_name}*\n"
             f"  FY{first_yr}: {_fmt_millions(first_spend)} → "
-            f"FY{last_yr}: {_fmt_millions(last_spend)}  {trend}\n\n"
+            f"{last_label}: {_fmt_millions(last_spend)}  {trend}\n\n"
         )
 
     pension = data.get("_pension_benefits", {})
     if pension:
         pension_years = sorted(pension.keys())
         p_recent = pension_years[-5:]
-        p_first, p_last = p_recent[0], p_recent[-1]
+        p_first = p_recent[0]
+        p_completed = [fy for fy in p_recent if fy != current_fy]
+        p_trend_yr = p_completed[-1] if p_completed else p_recent[-1]
         msg += "*Citywide Pension & Benefits:*\n"
         p_strs = "  ".join(
-            f"FY{fy}: {_fmt_millions(pension.get(fy, {}).get('pension', 0.0))}" for fy in p_recent
+            f"{fy_label(fy)}: {_fmt_millions(pension.get(fy, {}).get('pension', 0.0))}" for fy in p_recent
         )
         p_trend = _budget_trend(
             pension.get(p_first, {}).get("pension", 0.0),
-            pension.get(p_last, {}).get("pension", 0.0),
+            pension.get(p_trend_yr, {}).get("pension", 0.0),
         )
-        msg += f"*Pension contributions*\n{p_strs}\n{p_trend}\n\n"
+        msg += f"*Pension contributions*\n{p_strs}" + (f"\n{p_trend}" if p_trend else "") + "\n\n"
         h_strs = "  ".join(
-            f"FY{fy}: {_fmt_millions(pension.get(fy, {}).get('health', 0.0))}" for fy in p_recent
+            f"{fy_label(fy)}: {_fmt_millions(pension.get(fy, {}).get('health', 0.0))}" for fy in p_recent
         )
         h_trend = _budget_trend(
             pension.get(p_first, {}).get("health", 0.0),
-            pension.get(p_last, {}).get("health", 0.0),
+            pension.get(p_trend_yr, {}).get("health", 0.0),
         )
-        msg += f"*Health/dental insurance*\n{h_strs}\n{h_trend}\n\n"
+        msg += f"*Health/dental insurance*\n{h_strs}" + (f"\n{h_trend}" if h_trend else "") + "\n\n"
 
     msg += "_Source: [Austin Open Budget](https://data.austintexas.gov/d/yeeq-kk6v)_"
     return msg
 
 
 async def homeless_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text("⏳ Fetching homelessness budget data...")
+    await update.message.reply_text("⏳ Fetching budget insights...")
     try:
         data = await asyncio.to_thread(_get_homeless_budget)
         msg = _format_homeless_budget(data)
@@ -1780,7 +1798,7 @@ async def homeless_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 async def police_homeless_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Fetching homelessness budget data...")
+    await query.edit_message_text("⏳ Fetching budget insights...")
     try:
         data = await asyncio.to_thread(_get_homeless_budget)
         msg = _format_homeless_budget(data)

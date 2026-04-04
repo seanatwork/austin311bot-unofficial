@@ -33,7 +33,8 @@
       "WebFetch(domain:catalog.data.gov)",
       "WebFetch(domain:austinmonitor.com)",
       "WebFetch(domain:atxtoday.6amcity.com)",
-      "Bash(printf 'feat: Add /budget command with NGO grants and citywide pension/benefits\\\\n\\\\nRenames /homeless to /budget. Adds grants-to-subrecipients breakdown \\(NGO/nonprofit\\\\npass-through\\) and citywide pension contributions + health/dental benefits from the\\\\nAustin Open Budget dataset. Trims help text fluff.')"
+      "Bash(printf 'feat: Add /budget command with NGO grants and citywide pension/benefits\\\\n\\\\nRenames /homeless to /budget. Adds grants-to-subrecipients breakdown \\(NGO/nonprofit\\\\npass-through\\) and citywide pension contributions + health/dental benefits from the\\\\nAustin Open Budget dataset. Trims help text fluff.')",
+      "Bash(printf 'fix: Label partial FY, use completed year for trends, fix extra blank lines\\\\n\\\\nDetects in-progress Austin fiscal year \\(ends Sep 30\\) and labels it \"\\(partial\\)\"\\\\nin all budget sections. Trend arrows compare first to last completed year only,\\\\navoiding misleading signals from partial-year actuals. Fixes spurious blank lines\\\\nwhen budget_trend returns empty string.')"
     ],
     "defaultMode": "bypassPermissions"
   }
