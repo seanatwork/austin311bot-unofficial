@@ -46,7 +46,9 @@
       "Bash(python3 -c \"import json,sys; [print\\(r['sample_date'][:10], r.get\\('watershed',''\\), r.get\\('parameter',''\\)\\) for r in json.load\\(sys.stdin\\)]\")",
       "WebFetch(domain:www.tceq.texas.gov)",
       "WebFetch(domain:www.epa.gov)",
-      "WebFetch(domain:www.bathing-water-directive.eu)"
+      "WebFetch(domain:www.bathing-water-directive.eu)",
+      "WebFetch(domain:www.tabc.texas.gov)",
+      "WebFetch(domain:data.texas.gov)"
     ],
     "defaultMode": "bypassPermissions"
   }

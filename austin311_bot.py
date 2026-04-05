@@ -266,6 +266,9 @@ _HELP_TEXT = """📡 *ATX PULSE*
 🏗️ *Building Permits:*
 /permits — Permit activity last 30 days
 
+🍺 *Bar of the Month:*
+/bars — Top TABC mixed beverage sales · biggest movers
+
 🏊 *Pool Hours:* https://www.austintexas.gov/parks/locations/pools-and-splash-pads
 
 _This bot does not collect, store, or transmit any user data. All requests are processed anonymously._
@@ -2807,6 +2810,156 @@ async def permits_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 
 # =============================================================================
+# BARS COMMAND — TABC Mixed Beverage Sales (data.texas.gov g5bj-yb6k)
+# =============================================================================
+
+_TABC_SESSION = None
+
+
+def _get_tabc_session():
+    global _TABC_SESSION
+    if _TABC_SESSION is None:
+        _TABC_SESSION = requests.Session()
+    return _TABC_SESSION
+
+
+def _get_bar_stats() -> dict:
+    """Fetch top grossing and biggest movers for Austin bars/restaurants."""
+    session = _get_tabc_session()
+    url = "https://data.texas.gov/resource/g5bj-yb6k.json"
+
+    # Find the two most complete recent months (pick by row count, not date)
+    months_resp = session.get(url, params={
+        "$select": "obligation_end_date, count(*) as cnt",
+        "$where":  "upper(location_city)='AUSTIN'",
+        "$group":  "obligation_end_date",
+        "$order":  "obligation_end_date DESC",
+        "$limit":  4,
+    }, timeout=20)
+    months_resp.raise_for_status()
+    months = sorted(months_resp.json(), key=lambda r: -int(r.get("cnt", 0)))
+    if len(months) < 2:
+        raise ValueError("Not enough monthly data available")
+
+    # Use the two most-populated months as current/prior
+    current_month = months[0]["obligation_end_date"][:10]
+    prior_month   = months[1]["obligation_end_date"][:10]
+
+    def fetch_month(month: str) -> dict[str, dict]:
+        """Return {permit_number: {name, address, sales}} deduplicated."""
+        resp = session.get(url, params={
+            "$select": "tabc_permit_number, location_name, location_address, total_sales_receipts",
+            "$where":  f"upper(location_city)='AUSTIN' AND obligation_end_date='{month}T00:00:00.000'",
+            "$order":  "total_sales_receipts DESC",
+            "$limit":  5000,
+        }, timeout=30)
+        resp.raise_for_status()
+        result: dict[str, dict] = {}
+        for r in resp.json():
+            permit = r.get("tabc_permit_number", "")
+            try:
+                sales = float(r.get("total_sales_receipts", 0) or 0)
+            except (ValueError, TypeError):
+                continue
+            if permit not in result or sales > result[permit]["sales"]:
+                result[permit] = {
+                    "name":    (r.get("location_name") or "Unknown").title(),
+                    "address": (r.get("location_address") or "").title(),
+                    "sales":   sales,
+                }
+        return result
+
+    current = fetch_month(current_month)
+    prior   = fetch_month(prior_month)
+
+    # Top 10 by sales this month
+    top10 = sorted(current.values(), key=lambda r: -r["sales"])[:10]
+
+    # Biggest movers: establishments in both months, ranked by $ increase
+    movers = []
+    for permit, cur in current.items():
+        if permit in prior:
+            delta = cur["sales"] - prior[permit]["sales"]
+            if delta > 0 and prior[permit]["sales"] > 0:
+                pct = delta / prior[permit]["sales"] * 100
+                movers.append({
+                    "name":    cur["name"],
+                    "address": cur["address"],
+                    "current": cur["sales"],
+                    "prior":   prior[permit]["sales"],
+                    "delta":   delta,
+                    "pct":     pct,
+                })
+    movers.sort(key=lambda r: -r["delta"])
+    top_movers = movers[:5]
+
+    return {
+        "current_month": current_month,
+        "prior_month":   prior_month,
+        "top10":         top10,
+        "movers":        top_movers,
+    }
+
+
+def _fmt_dollars(val: float) -> str:
+    if val >= 1_000_000:
+        return f"${val / 1_000_000:.1f}M"
+    if val >= 1_000:
+        return f"${val / 1_000:.0f}K"
+    return f"${val:,.0f}"
+
+
+def _format_bar_stats(data: dict) -> str:
+    month_label = data["current_month"][:7]  # YYYY-MM
+    prior_label = data["prior_month"][:7]
+    top10  = data["top10"]
+    movers = data["movers"]
+
+    if not top10:
+        return "🍺 *Austin Bar & Restaurant Sales*\n\n❌ No data available."
+
+    winner = top10[0]
+    msg = (
+        f"🍺 *Austin Bar & Restaurant Sales — {month_label}*\n"
+        f"_Mixed beverage receipts reported to TABC_\n\n"
+        f"🏆 *{winner['name']} is bar of the month!*\n"
+        f"_{winner['address']}_\n"
+        f"*{_fmt_dollars(winner['sales'])}* in sales\n\n"
+    )
+
+    msg += "*Top 10 by Sales:*\n"
+    max_sales = top10[0]["sales"]
+    for i, r in enumerate(top10, 1):
+        bar = "█" * min(8, round(r["sales"] / max_sales * 8))
+        msg += f"{i}. *{r['name']}* — {_fmt_dollars(r['sales'])}\n"
+        msg += f"   {bar}\n"
+
+    if movers:
+        msg += f"\n📈 *Biggest Movers ({prior_label} → {month_label}):*\n"
+        for r in movers:
+            pct_str = f"+{r['pct']:.0f}%"
+            msg += (
+                f"• *{r['name']}*\n"
+                f"  {_fmt_dollars(r['prior'])} → {_fmt_dollars(r['current'])} "
+                f"_{pct_str} · +{_fmt_dollars(r['delta'])}_\n"
+            )
+
+    msg += "\n_Source: [TABC Mixed Beverage Sales](https://data.texas.gov/d/g5bj-yb6k)_"
+    return msg
+
+
+async def bars_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.message.reply_text("⏳ Fetching TABC sales data...")
+    try:
+        data = await asyncio.to_thread(_get_bar_stats)
+        msg = _format_bar_stats(data)
+        await _send_chunked(update.message, msg)
+    except Exception as e:
+        logger.error(f"bars command: {e}")
+        await update.message.reply_text(f"❌ Error fetching bar data: {e}")
+
+
+# =============================================================================
 # FALLBACK
 # =============================================================================
 
@@ -2922,6 +3075,7 @@ def create_application() -> Application:
     # Water quality & building permits
     app.add_handler(CommandHandler("water", water_command))
     app.add_handler(CommandHandler("permits", permits_command))
+    app.add_handler(CommandHandler("bars", bars_command))
 
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, echo_handler))
     app.add_error_handler(error_handler)
@@ -2943,6 +3097,7 @@ def create_application() -> Application:
             BotCommand("ticket",   "Look up any 311 ticket by ID"),
             BotCommand("water",    "Surface water quality — fecal coliform · DO · nutrients"),
             BotCommand("permits",  "Building permits — last 30 days by type · district"),
+            BotCommand("bars",     "Bar of the month — top TABC mixed beverage sales"),
             BotCommand("help",     "All commands"),
         ])
 
