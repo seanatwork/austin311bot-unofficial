@@ -13,6 +13,7 @@ A Telegram bot for exploring Austin 311 service data — graffiti, bicycle compl
 | `/animal` | Hotspots · stats · response times |
 | `/traffic` | Potholes · signals · street lights · sidewalks |
 | `/noisecomplaints` | Noise hotspots · stats · response times |
+| `/parks` | Park maintenance — hotspots · stats · resolution |
 | `/ticket <id>` | Look up any 311 ticket by ID |
 
 ## Setup

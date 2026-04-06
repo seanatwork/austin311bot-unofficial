@@ -106,6 +106,16 @@ from childcare.childcare_bot import get_childcare_stats, format_childcare
 # Water conservation violations
 from waterconservation.water_conservation_bot import get_water_conservation_stats, format_water_conservation
 
+# Parks maintenance service
+from parks.parks_bot import (
+    get_park_stats,
+    get_park_hotspots,
+    get_park_resolution,
+    format_stats as format_park_stats,
+    format_hotspots as format_park_hotspots,
+    format_resolution as format_park_resolution,
+)
+
 
 # Restaurant inspections service
 from restaurants.restaurant_bot import (
@@ -234,6 +244,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         [InlineKeyboardButton("🐾 Animal Services", callback_data="service_animal")],
         [InlineKeyboardButton("🔊 Noise Complaints", callback_data="service_noise")],
         [InlineKeyboardButton("🅿️ Parking", callback_data="service_parking")],
+        [InlineKeyboardButton("🏞️ Parks", callback_data="service_parks")],
         [InlineKeyboardButton("ℹ️ About", callback_data="about")],
     ]
     await update.message.reply_text(
@@ -280,6 +291,9 @@ _HELP_TEXT = """📡 *ATX PULSE*
 
 🅿️ *Parking:*
 /parking — Citations · hot zones · stats
+
+🏞️ *Parks:*
+/parks — Hotspots · stats · resolution times
 
 🎫 *Ticket Lookup:*
 /ticket <id> — Look up any 311 ticket by ID
@@ -375,6 +389,15 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         ]
         text = "*🅿️ Parking Enforcement*\nCitations, hot zones, and enforcement patterns."
 
+    elif service == "parks":
+        keyboard = [
+            [InlineKeyboardButton("🔥 Hotspots", callback_data="parks_hotspots"),
+             InlineKeyboardButton("📊 Stats", callback_data="parks_stats")],
+            [InlineKeyboardButton("⏱️ Resolution", callback_data="parks_resolution")],
+            [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
+        ]
+        text = "*🏞️ Parks Maintenance*\nTrack unresolved complaints by park. Useful for choosing where to go."
+
     elif service == "police":
         keyboard = [
             [InlineKeyboardButton("🚔 Crime Stats", callback_data="police_crime"),
@@ -449,6 +472,7 @@ async def back_to_main(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         [InlineKeyboardButton("🐾 Animal Services", callback_data="service_animal")],
         [InlineKeyboardButton("🔊 Noise Complaints", callback_data="service_noise")],
         [InlineKeyboardButton("🅿️ Parking", callback_data="service_parking")],
+        [InlineKeyboardButton("🏞️ Parks", callback_data="service_parks")],
         [InlineKeyboardButton("ℹ️ About", callback_data="about")],
     ]
     await query.edit_message_text(
@@ -1522,6 +1546,61 @@ async def parking_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     ]
     await update.message.reply_text(
         "*🅿️ Parking Enforcement*\nChoose a view:",
+        parse_mode="Markdown",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+    )
+
+
+# =============================================================================
+# PARKS MAINTENANCE HANDLERS
+# =============================================================================
+
+
+async def parks_hotspots_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("⏳ Finding park complaint hotspots...")
+    try:
+        data = await asyncio.to_thread(get_park_hotspots)
+        await _send_chunked(query, format_park_hotspots(data))
+    except Exception as e:
+        logger.error(f"parks hotspots: {e}")
+        await query.edit_message_text(f"❌ Error: {e}")
+
+
+async def parks_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("⏳ Fetching park maintenance statistics...")
+    try:
+        data = await asyncio.to_thread(get_park_stats)
+        await _send_chunked(query, format_park_stats(data))
+    except Exception as e:
+        logger.error(f"parks stats: {e}")
+        await query.edit_message_text(f"❌ Error: {e}")
+
+
+async def parks_resolution_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("⏳ Calculating park resolution times...")
+    try:
+        data = await asyncio.to_thread(get_park_resolution)
+        await _send_chunked(query, format_park_resolution(data))
+    except Exception as e:
+        logger.error(f"parks resolution: {e}")
+        await query.edit_message_text(f"❌ Error: {e}")
+
+
+@rate_limited
+async def parks_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    keyboard = [
+        [InlineKeyboardButton("🔥 Hotspots", callback_data="parks_hotspots"),
+         InlineKeyboardButton("📊 Stats", callback_data="parks_stats")],
+        [InlineKeyboardButton("⏱️ Resolution", callback_data="parks_resolution")],
+    ]
+    await update.message.reply_text(
+        "*🏞️ Parks Maintenance*\nTrack unresolved complaints by park. Useful for choosing where to go.\n\nChoose a view:",
         parse_mode="Markdown",
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
@@ -3273,6 +3352,12 @@ def create_application() -> Application:
     app.add_handler(CallbackQueryHandler(parking_abandoned_cb, pattern="^parking_abandoned"))
     app.add_handler(CallbackQueryHandler(parking_top_payments_cb, pattern="^parking_top_payments"))
 
+    # Parks slash command + inline
+    app.add_handler(CommandHandler("parks", parks_command))
+    app.add_handler(CallbackQueryHandler(parks_hotspots_cb, pattern="^parks_hotspots"))
+    app.add_handler(CallbackQueryHandler(parks_stats_cb, pattern="^parks_stats"))
+    app.add_handler(CallbackQueryHandler(parks_resolution_cb, pattern="^parks_resolution"))
+
     # Graffiti slash command
     app.add_handler(CommandHandler("graffiti", graffiti_command))
 
@@ -3332,6 +3417,7 @@ def create_application() -> Application:
             BotCommand("safety",   "Crime by district — stats + city comparison"),
             BotCommand("traffic",  "Traffic & infrastructure — signals · lights · sidewalks"),
             BotCommand("parking",  "Parking enforcement — citations · hot zones · stats"),
+            BotCommand("parks",    "Park maintenance — hotspots · stats · resolution times"),
             BotCommand("bicycle",  "Bicycle complaints — recent · stats"),
             BotCommand("rest",     "Restaurant inspections — worst scores · grades · search"),
             BotCommand("noise",    "Noise complaints — hotspots · stats · response times"),
