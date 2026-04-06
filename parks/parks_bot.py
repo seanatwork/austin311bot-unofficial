@@ -81,34 +81,45 @@ def _isoformat_z(dt: datetime) -> str:
     return dt.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
+_PARK_KEYWORDS = (
+    "Park", "Pool", "Recreation Center", "Rec Center", "Greenbelt",
+    "Trail", "Field", "Cemetery", "Cemetary", "Garden", "Plaza",
+    "Preserve", "Reserve", "Lake", "Springs", "Barton",
+)
+
+
 def _extract_park_name(address: str) -> str:
-    """Extract park name from address field.
-    
-    Austin park addresses often look like:
+    """Extract and normalize a park name from an Open311 address field.
+
+    Handles patterns like:
     - 'Zilker Park, 2100 Barton Springs Rd'
     - 'Pease Park, 1100 Kingsbury St'
-    - Just '1234 Some Park Dr, Austin'
-    
-    Returns the park name or street name.
+    - 'Barton Springs Pool, Austin'
+    - '1234 Some St, Austin'
+
+    Returns a title-cased park/street name for consistent bucketing.
     """
     addr = address.strip()
-    if not addr or addr == "Unknown":
+    if not addr or addr.lower() == "unknown":
         return "Unknown"
-    
-    # Remove ", Austin" suffix
-    addr = addr.replace(", Austin", "").replace(", Austin, TX", "").strip()
-    
-    # If address contains 'Park' early, extract up to the comma
-    if "Park" in addr:
-        parts = addr.split(",", 1)
-        return parts[0].strip()
-    
-    # Fall back to street name (remove house number)
-    parts = addr.split(" ", 1)
+
+    # Strip city/state suffixes
+    for suffix in (", Austin, TX", ", Austin TX", ", Austin"):
+        addr = addr.replace(suffix, "")
+    addr = addr.strip()
+
+    # If a known park-type keyword appears before the first comma, use that segment
+    first_segment = addr.split(",", 1)[0].strip()
+    for kw in _PARK_KEYWORDS:
+        if kw.lower() in first_segment.lower():
+            return first_segment.title()
+
+    # Fall back to street name (strip leading house number)
+    parts = first_segment.split(" ", 1)
     if len(parts) == 2 and parts[0].isdigit():
-        return parts[1].strip()
-    
-    return addr
+        return parts[1].strip().title()
+
+    return first_segment.title()
 
 
 def _make_request(params: dict, retries: int = 0) -> list:
@@ -228,16 +239,26 @@ def get_park_hotspots(days_back: int = 90) -> dict:
     # Sort by open complaints (unresolved issues most useful for users)
     hotspots = sorted(park_counts.items(), key=lambda x: -x[1]["open"])
 
+    # Ranked list of park names (index = rank-1, used for drill-down callbacks)
+    ranked_parks = [park for park, _ in hotspots]
+
     return {
         "hotspots": hotspots,
         "park_types": park_types,
         "park_coords": park_coords,
+        "ranked_parks": ranked_parks,
         "total": len(records),
         "days_back": days_back,
     }
 
 
-def format_hotspots(data: dict) -> str:
+def format_hotspots(data: dict, page: int = 1) -> str:
+    """Format park hotspots.
+
+    Args:
+        data: result dict from get_park_hotspots()
+        page: 1 = ranks 1-10, 2 = ranks 11-25
+    """
     hotspots = data.get("hotspots", [])
     park_types = data.get("park_types", {})
     park_coords = data.get("park_coords", {})
@@ -247,39 +268,132 @@ def format_hotspots(data: dict) -> str:
     if not hotspots:
         return "📝 No park maintenance complaints found."
 
-    msg = f"🏞️ *Park Maintenance Hotspots*\n"
+    if page == 1:
+        slice_start, slice_end = 0, 10
+        title_suffix = ""
+    else:
+        slice_start, slice_end = 10, 25
+        title_suffix = " (11–25)"
+
+    top = hotspots[slice_start:slice_end]
+    if not top:
+        return "📝 Not enough parks for a second page."
+
+    msg = f"🏞️ *Park Maintenance Hotspots{title_suffix}*\n"
     msg += f"_Last {days_back} days · {total} total complaints_\n\n"
     msg += f"_Sorted by unresolved (open) complaints_\n\n"
 
-    # Show top 10 parks
-    top = hotspots[:10]
-    max_open = top[0][1]["open"] if top[0][1]["open"] > 0 else 1
+    max_open = max((c["open"] for _, c in hotspots[:10]), default=1) or 1
 
-    for i, (park, counts) in enumerate(top, 1):
+    for i, (park, counts) in enumerate(top, slice_start + 1):
         open_count = counts["open"]
         closed_count = counts["closed"]
         total_count = counts["total"]
-        
-        # Progress bar showing open vs closed
-        bar_open = "🔴" * min(5, round(open_count / max_open * 5)) if open_count > 0 else ""
+
+        # Progress bar relative to page-1 max so bars are comparable
+        bar_open = "🔴" * min(5, round(open_count / max_open * 5)) if open_count > 0 else "⚫"
         bar_closed = "🟢" * min(5, round(closed_count / max_open * 5)) if closed_count > 0 else ""
-        
+
         msg += f"{i}. *{park}*\n"
         msg += f"   {bar_open}{bar_closed} {open_count} open · {closed_count} resolved ({total_count} total)\n"
-        
-        # Show top complaint types
+
+        # Top complaint types
         types = park_types.get(park, {})
         top_types = sorted(types.items(), key=lambda x: -x[1])[:2]
         if top_types:
             type_str = " · ".join(f"{t} ({c})" for t, c in top_types)
             msg += f"   _{type_str}_\n"
-        
-        # Show coordinates if available
+
+        # Clickable map link
         if park in park_coords:
             lat, lon = park_coords[park]
-            msg += f"   📍 {float(lat):.4f}, {float(lon):.4f}\n"
-        
+            msg += f"   [📍 View on map](https://maps.google.com/?q={float(lat):.5f},{float(lon):.5f})\n"
+
         msg += "\n"
+
+    msg += "_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
+    return msg
+
+
+# =============================================================================
+# PARK DRILL-DOWN — Individual complaints for a specific park
+# =============================================================================
+
+def get_park_detail(park_name: str, days_back: int = 90) -> dict:
+    """Return individual complaint records for a single park."""
+    records = fetch_all_park_complaints(days_back)
+    park_records = [
+        r for r in records
+        if _extract_park_name((r.get("address") or "").strip()) == park_name
+    ]
+    # Sort: open first, then by most recently requested
+    def _sort_key(r):
+        status = (r.get("status") or "").lower()
+        dt_str = r.get("requested_datetime") or ""
+        return (0 if status == "open" else 1, dt_str)
+
+    park_records.sort(key=_sort_key)
+    return {
+        "park_name": park_name,
+        "records": park_records,
+        "days_back": days_back,
+    }
+
+
+def format_park_detail(data: dict) -> str:
+    park_name = data.get("park_name", "Unknown")
+    records = data.get("records", [])
+    days_back = data.get("days_back", 90)
+
+    if not records:
+        return f"📝 No complaints found for *{park_name}* in the last {days_back} days."
+
+    open_recs = [r for r in records if (r.get("status") or "").lower() == "open"]
+    closed_recs = [r for r in records if (r.get("status") or "").lower() == "closed"]
+
+    msg = f"🏞️ *{park_name}*\n"
+    msg += f"_Last {days_back} days · {len(records)} complaints · {len(open_recs)} open · {len(closed_recs)} resolved_\n\n"
+
+    # Show up to 15 records (open first, then most recent closed)
+    shown = (records[:15])
+    for r in shown:
+        status = (r.get("status") or "").lower()
+        status_icon = "🔴" if status == "open" else "🟢"
+        label = r.get("_service_label", "Unknown")
+        req_id = r.get("service_request_id", "")
+        dt_str = r.get("requested_datetime") or ""
+        desc = (r.get("description") or "").strip()
+        lat = r.get("lat")
+        lon = r.get("long")
+
+        # Parse date
+        date_fmt = ""
+        if dt_str:
+            try:
+                dt = datetime.fromisoformat(dt_str.replace("Z", "+00:00"))
+                date_fmt = dt.strftime("%b %-d")
+            except ValueError:
+                date_fmt = dt_str[:10]
+
+        msg += f"{status_icon} *{label}*"
+        if date_fmt:
+            msg += f" · {date_fmt}"
+        if req_id:
+            msg += f" · `#{req_id}`"
+        msg += "\n"
+
+        if desc:
+            # Trim long descriptions
+            snippet = desc if len(desc) <= 120 else desc[:117] + "…"
+            msg += f"   _{snippet}_\n"
+
+        if lat and lon:
+            msg += f"   [📍 Map](https://maps.google.com/?q={float(lat):.5f},{float(lon):.5f})\n"
+
+        msg += "\n"
+
+    if len(records) > 15:
+        msg += f"_…and {len(records) - 15} more complaints not shown_\n\n"
 
     msg += "_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg

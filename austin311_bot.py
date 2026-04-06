@@ -111,9 +111,11 @@ from parks.parks_bot import (
     get_park_stats,
     get_park_hotspots,
     get_park_resolution,
+    get_park_detail,
     format_stats as format_park_stats,
     format_hotspots as format_park_hotspots,
     format_resolution as format_park_resolution,
+    format_park_detail,
 )
 
 
@@ -215,15 +217,20 @@ def _validate_ticket_id(ticket_id: str) -> tuple[bool, str]:
 # =============================================================================
 
 
-async def _send_chunked(target, text: str, parse_mode: str = "Markdown") -> None:
-    """Send long messages in ≤4000-char chunks (Telegram limit is 4096)."""
+async def _send_chunked(target, text: str, parse_mode: str = "Markdown", reply_markup=None) -> None:
+    """Send long messages in ≤4000-char chunks (Telegram limit is 4096).
+
+    reply_markup is attached to the last chunk only.
+    """
     chunks = [text[i:i + 4000] for i in range(0, len(text), 4000)]
     for i, chunk in enumerate(chunks):
+        is_last = i == len(chunks) - 1
+        markup = reply_markup if is_last else None
         if i == 0 and hasattr(target, "edit_message_text"):
-            await target.edit_message_text(chunk, parse_mode=parse_mode, disable_web_page_preview=True)
+            await target.edit_message_text(chunk, parse_mode=parse_mode, disable_web_page_preview=True, reply_markup=markup)
         else:
             msg = target.message if hasattr(target, "message") else target
-            await msg.reply_text(chunk, parse_mode=parse_mode, disable_web_page_preview=True)
+            await msg.reply_text(chunk, parse_mode=parse_mode, disable_web_page_preview=True, reply_markup=markup)
 
 
 # =============================================================================
@@ -1556,24 +1563,119 @@ async def parking_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 # =============================================================================
 
 
+def _parks_days_keyboard(view: str) -> InlineKeyboardMarkup:
+    """Return a 30/60/90-day picker keyboard for the given parks view."""
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton("30 days", callback_data=f"parks_{view}_30"),
+        InlineKeyboardButton("60 days", callback_data=f"parks_{view}_60"),
+        InlineKeyboardButton("90 days", callback_data=f"parks_{view}_90"),
+    ]])
+
+
 async def parks_hotspots_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show days-back picker for hotspots."""
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Finding park complaint hotspots...")
+    await query.edit_message_text(
+        "🏞️ *Park Hotspots — choose time window:*",
+        parse_mode="Markdown",
+        reply_markup=_parks_days_keyboard("hotspots"),
+    )
+
+
+def _parks_drill_keyboard(ranked_parks: list, days: int) -> InlineKeyboardMarkup:
+    """Build numbered drill-down buttons for top 10 parks + show-more."""
+    top10 = ranked_parks[:10]
+    # Two rows of 5 number buttons
+    row1 = [
+        InlineKeyboardButton(str(i + 1), callback_data=f"parks_drill_{days}_{i}")
+        for i in range(min(5, len(top10)))
+    ]
+    row2 = [
+        InlineKeyboardButton(str(i + 1), callback_data=f"parks_drill_{days}_{i}")
+        for i in range(5, len(top10))
+    ]
+    rows = [r for r in [row1, row2] if r]
+    rows.append([InlineKeyboardButton("📄 Show more (11–25)", callback_data=f"parks_hotspots_more_{days}")])
+    return InlineKeyboardMarkup(rows)
+
+
+async def parks_hotspots_days_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Fetch hotspots for a chosen number of days."""
+    query = update.callback_query
+    await query.answer()
+    days = int(query.data.split("_")[-1])
+    await query.edit_message_text(f"⏳ Finding park complaint hotspots (last {days} days)...")
     try:
-        data = await asyncio.to_thread(get_park_hotspots)
-        await _send_chunked(query, format_park_hotspots(data))
+        data = await asyncio.to_thread(get_park_hotspots, days)
+        ranked = data.get("ranked_parks", [])
+        keyboard = _parks_drill_keyboard(ranked, days)
+        await _send_chunked(query, format_park_hotspots(data, page=1), reply_markup=keyboard)
     except Exception as e:
         logger.error(f"parks hotspots: {e}")
         await query.edit_message_text(f"❌ Error: {e}")
 
 
-async def parks_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def parks_hotspots_more_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show hotspot ranks 11–25."""
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Fetching park maintenance statistics...")
+    days = int(query.data.split("_")[-1])
+    await query.edit_message_text(f"⏳ Loading ranks 11–25 (last {days} days)...")
     try:
-        data = await asyncio.to_thread(get_park_stats)
+        data = await asyncio.to_thread(get_park_hotspots, days)
+        await _send_chunked(query, format_park_hotspots(data, page=2))
+    except Exception as e:
+        logger.error(f"parks hotspots more: {e}")
+        await query.edit_message_text(f"❌ Error: {e}")
+
+
+async def parks_drill_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Drill into a specific park's individual complaints.
+
+    Callback data format: parks_drill_<days>_<rank_index>
+    """
+    query = update.callback_query
+    await query.answer()
+    parts = query.data.split("_")  # ['parks', 'drill', days, idx]
+    days = int(parts[2])
+    idx = int(parts[3])
+
+    await query.edit_message_text("⏳ Fetching park details...")
+    try:
+        # Re-fetch hotspots to resolve the rank index → park name
+        hotspot_data = await asyncio.to_thread(get_park_hotspots, days)
+        ranked = hotspot_data.get("ranked_parks", [])
+        if idx >= len(ranked):
+            await query.edit_message_text("❌ Park not found at that rank.")
+            return
+        park_name = ranked[idx]
+        await query.edit_message_text(f"⏳ Loading complaints for *{park_name}*…", parse_mode="Markdown")
+        detail = await asyncio.to_thread(get_park_detail, park_name, days)
+        await _send_chunked(query, format_park_detail(detail))
+    except Exception as e:
+        logger.error(f"parks drill: {e}")
+        await query.edit_message_text(f"❌ Error: {e}")
+
+
+async def parks_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show days-back picker for stats."""
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text(
+        "🏞️ *Park Stats — choose time window:*",
+        parse_mode="Markdown",
+        reply_markup=_parks_days_keyboard("stats"),
+    )
+
+
+async def parks_stats_days_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    days = int(query.data.split("_")[-1])
+    await query.edit_message_text(f"⏳ Fetching park maintenance statistics (last {days} days)...")
+    try:
+        data = await asyncio.to_thread(get_park_stats, days)
         await _send_chunked(query, format_park_stats(data))
     except Exception as e:
         logger.error(f"parks stats: {e}")
@@ -1581,11 +1683,23 @@ async def parks_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 
 async def parks_resolution_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show days-back picker for resolution times."""
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Calculating park resolution times...")
+    await query.edit_message_text(
+        "🏞️ *Park Resolution Times — choose time window:*",
+        parse_mode="Markdown",
+        reply_markup=_parks_days_keyboard("resolution"),
+    )
+
+
+async def parks_resolution_days_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    days = int(query.data.split("_")[-1])
+    await query.edit_message_text(f"⏳ Calculating park resolution times (last {days} days)...")
     try:
-        data = await asyncio.to_thread(get_park_resolution)
+        data = await asyncio.to_thread(get_park_resolution, days)
         await _send_chunked(query, format_park_resolution(data))
     except Exception as e:
         logger.error(f"parks resolution: {e}")
@@ -3354,9 +3468,14 @@ def create_application() -> Application:
 
     # Parks slash command + inline
     app.add_handler(CommandHandler("parks", parks_command))
-    app.add_handler(CallbackQueryHandler(parks_hotspots_cb, pattern="^parks_hotspots"))
-    app.add_handler(CallbackQueryHandler(parks_stats_cb, pattern="^parks_stats"))
-    app.add_handler(CallbackQueryHandler(parks_resolution_cb, pattern="^parks_resolution"))
+    app.add_handler(CallbackQueryHandler(parks_drill_cb,          pattern=r"^parks_drill_\d+_\d+$"))
+    app.add_handler(CallbackQueryHandler(parks_hotspots_more_cb,  pattern="^parks_hotspots_more_"))
+    app.add_handler(CallbackQueryHandler(parks_hotspots_days_cb,  pattern="^parks_hotspots_(30|60|90)$"))
+    app.add_handler(CallbackQueryHandler(parks_hotspots_cb,       pattern="^parks_hotspots$"))
+    app.add_handler(CallbackQueryHandler(parks_stats_days_cb,     pattern="^parks_stats_(30|60|90)$"))
+    app.add_handler(CallbackQueryHandler(parks_stats_cb,          pattern="^parks_stats$"))
+    app.add_handler(CallbackQueryHandler(parks_resolution_days_cb, pattern="^parks_resolution_(30|60|90)$"))
+    app.add_handler(CallbackQueryHandler(parks_resolution_cb,     pattern="^parks_resolution$"))
 
     # Graffiti slash command
     app.add_handler(CommandHandler("graffiti", graffiti_command))
