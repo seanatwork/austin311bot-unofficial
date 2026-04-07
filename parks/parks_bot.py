@@ -510,26 +510,118 @@ def get_park_resolution(days_back: int = 90) -> dict:
     }
 
 
+def build_park_name_keyboard(hotspots_data: dict, days: int) -> InlineKeyboardMarkup:
+    """Build keyboard with actual park names for top parks."""
+    from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+    
+    hotspots = hotspots_data.get("hotspots", [])
+    if not hotspots:
+        return InlineKeyboardMarkup([[]])
+    
+    # Show top 7 parks with their actual names
+    top_parks = hotspots[:7]
+    keyboard = []
+    
+    for park, counts in top_parks:
+        open_count = counts["open"]
+        if open_count > 0:
+            label = f"{park} ({open_count} open)"
+        else:
+            label = f"{park} ({counts['total']} total)"
+        
+        # Use park name directly in callback data
+        callback_data = f"parks_detail_{park.replace(' ', '_')}_{days}"
+        keyboard.append([InlineKeyboardButton(label, callback_data=callback_data)])
+    
+    # Add "See more" option if there are more parks
+    if len(hotspots) > 7:
+        keyboard.append([InlineKeyboardButton(f"See more parks ({len(hotspots) - 7} remaining)", callback_data=f"parks_more_{days}")])
+    
+    return InlineKeyboardMarkup(keyboard)
+
+
+def format_unified_overview(hotspots_data: dict, stats_data: dict) -> str:
+    """Format a unified overview combining hotspots and stats."""
+    hotspots = hotspots_data.get("hotspots", [])
+    park_types = hotspots_data.get("park_types", {})
+    park_coords = hotspots_data.get("park_coords", {})
+    total_hotspots = hotspots_data.get("total", 0)
+    days_back = hotspots_data.get("days_back", 90)
+    
+    stats_total = stats_data.get("total", 0)
+    status_counts = stats_data.get("status_counts", {})
+    type_counts = stats_data.get("type_counts", {})
+
+    if not hotspots and stats_total == 0:
+        return "No park maintenance complaints found."
+
+    msg = f"Park Maintenance Overview\n"
+    msg += f"Last {days_back} days\n\n"
+    
+    # Summary stats
+    msg += f"Total complaints: {stats_total}\n"
+    msg += f"Open: {status_counts.get('open', 0)} · Closed: {status_counts.get('closed', 0)}\n\n"
+
+    # Top hotspots with direct park names
+    if hotspots:
+        msg += f"Top Parks by Unresolved Issues:\n"
+        top_parks = hotspots[:7]  # Show top 7 directly
+        
+        for i, (park, counts) in enumerate(top_parks, 1):
+            open_count = counts["open"]
+            closed_count = counts["closed"]
+            total_count = counts["total"]
+            
+            if open_count > 0:
+                msg += f"{i}. {park} - {open_count} open"
+            else:
+                msg += f"{i}. {park} - {total_count} total"
+            
+            # Show top complaint type
+            types = park_types.get(park, {})
+            if types:
+                top_type = max(types.items(), key=lambda x: x[1])
+                msg += f" ({top_type[0]})"
+            
+            msg += "\n"
+        
+        if len(hotspots) > 7:
+            msg += f"... and {len(hotspots) - 7} more parks\n"
+        
+        msg += "\n"
+
+    # Top complaint types
+    if type_counts:
+        msg += f"Top Complaint Types:\n"
+        for label, counts in sorted(type_counts.items(), key=lambda x: -x[1]["total"])[:4]:
+            count = counts["total"]
+            open_count = counts.get("open", 0)
+            msg += f" {label}: {count} ({open_count} open)\n"
+
+    msg += "\nSource: Austin Open311 API"
+    return msg
+
+
 def format_resolution(data: dict) -> str:
     if not data.get("averages"):
-        return "📝 Not enough closed complaints to calculate response times."
+        return "Not enough closed complaints to calculate response times."
 
-    msg = f"⏱ *Park Maintenance Resolution Times*\n"
-    msg += f"_Based on {data['total_closed']} closed complaints (last {data['days_back']} days)_\n\n"
+    msg = f"Park Maintenance Resolution Times\n"
+    msg += f"Based on {data['total_closed']} closed complaints (last {data['days_back']} days)\n\n"
 
     if data.get("overall_avg") is not None:
-        msg += f"📊 *Overall average:* {data['overall_avg']} days\n\n"
+        msg += f"Overall average: {data['overall_avg']} days\n\n"
 
-    msg += "📋 *By complaint type:*\n"
+    msg += "By complaint type:\n"
     for label, avg in sorted(data["averages"].items(), key=lambda x: x[1]):
         # Emoji based on speed
         if avg <= 7:
-            speed = "🟢"
+            speed = ""
         elif avg <= 30:
-            speed = "🟡"
+            speed = ""
         else:
-            speed = "🔴"
-        msg += f"   {speed} *{label}:* {avg} days avg\n"
+            speed = ""
+        msg += f" {speed} {label}: {avg} days avg\n"
 
-    msg += "\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
+    msg += "\nSource: Austin Open311 API"
     return msg
