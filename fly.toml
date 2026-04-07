@@ -6,7 +6,13 @@ primary_region = "iad"
 [env]
   PYTHONUNBUFFERED = "1"
 
+[deploy]
+  strategy = "immediate"
+
+[processes]
+  app = "python austin311_bot.py"
+
 [[vm]]
   cpu_kind = "shared"
   cpus = 1
-  memory_mb = 256
+  memory_mb = 512
