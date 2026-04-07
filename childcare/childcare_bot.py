@@ -11,6 +11,7 @@ Joins on operation_id to show Austin-specific summaries and top violators.
 import logging
 import requests
 from typing import Optional
+from urllib.parse import quote
 
 logger = logging.getLogger(__name__)
 
@@ -219,7 +220,12 @@ def format_childcare(stats: dict) -> str:
             if r["temp_closed"]: flags.append("🔒 closed")
             flag_str = f" · {', '.join(flags)}" if flags else ""
 
-            msg += f"*{r['name']}*{flag_str}\n"
+            # Build Google Maps link from name + address
+            maps_query = f"{r['name']} {r['address']} Austin TX".strip()
+            maps_url = f"https://www.google.com/maps/search/?api=1&query={quote(maps_query)}"
+            name_link = f"[{r['name']}]({maps_url})"
+
+            msg += f"{name_link}{flag_str}\n"
             msg += f"_{r['type']}_\n"
             msg += (
                 f"🔴 {r['high']} high  "
