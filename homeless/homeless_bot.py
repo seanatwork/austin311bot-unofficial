@@ -28,6 +28,7 @@ import requests
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 from collections import defaultdict
+import io
 
 logger = logging.getLogger(__name__)
 
@@ -380,3 +381,163 @@ def format_encampment_locations(data: dict) -> str:
 
     msg += f"\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
+
+
+# =============================================================================
+# INTERACTIVE MAP GENERATION
+# =============================================================================
+
+def fetch_encampment_with_coords(days_back: int = 30) -> dict:
+    """Fetch all encampment reports and filter to those with valid coordinates.
+    
+    Returns both open AND closed requests with location data for mapping.
+    """
+    result = fetch_encampment_reports(days_back)
+    records = result["records"]
+    
+    # Filter to records with valid coordinates
+    located = []
+    for r in records:
+        lat = r.get("lat")
+        lon = r.get("long")
+        if lat and lon:
+            try:
+                lat_f = float(lat)
+                lon_f = float(lon)
+                # Basic validation: should be in Austin area
+                if 30.0 <= lat_f <= 30.5 and -98.0 <= lon_f <= -97.5:
+                    r["_lat"] = lat_f
+                    r["_lon"] = lon_f
+                    located.append(r)
+            except (ValueError, TypeError):
+                pass
+    
+    return {
+        "records": located,
+        "total": len(located),
+        "days_back": days_back,
+        "fetched_at": result["fetched_at"],
+    }
+
+
+def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str]:
+    """Generate an interactive HTML map of encampment reports.
+    
+    Returns:
+        tuple: (BytesIO buffer with HTML content, summary message)
+    """
+    try:
+        import folium
+        from folium.plugins import MarkerCluster
+    except ImportError:
+        return None, "❌ Map generation requires 'folium' library. Install with: pip install folium"
+    
+    data = fetch_encampment_with_coords(days_back)
+    records = data["records"]
+    total = data["total"]
+    
+    if not records:
+        return None, f"🏕️ No encampment reports with location data found in the last {days_back} days."
+    
+    # Count by status
+    open_count = sum(1 for r in records if (r.get("status") or "").lower() == "open")
+    closed_count = sum(1 for r in records if (r.get("status") or "").lower() == "closed")
+    
+    # Create map centered on Austin
+    m = folium.Map(location=[30.2672, -97.7431], zoom_start=11, tiles="CartoDB positron")
+    
+    # Add marker clusters for open and closed
+    cluster_open = MarkerCluster(name="🔴 Open Reports").add_to(m)
+    cluster_closed = MarkerCluster(name="🟢 Closed Reports").add_to(m)
+    
+    # Add markers
+    for r in records:
+        lat = r["_lat"]
+        lon = r["_lon"]
+        status = (r.get("status") or "").lower()
+        service_label = r.get("_service_label", "Unknown")
+        description = (r.get("description") or "")[:150]
+        date_str = (r.get("requested_datetime") or "").split("T")[0]
+        req_id = r.get("service_request_id", "N/A")
+        
+        # Truncate description for popup
+        desc_short = description[:100] + "..." if len(description) > 100 else description
+        
+        popup_html = f"""
+        <div style="font-family: sans-serif; max-width: 300px;">
+            <b>Report #{req_id}</b><br/>
+            <span style="color: #666;">{date_str}</span><br/><br/>
+            <b>Status:</b> {'🔴 Open' if status == 'open' else '🟢 Closed'}<br/>
+            <b>Category:</b> {service_label}<br/><br/>
+            <b>Description:</b><br/>
+            <i>{desc_short}</i>
+        </div>
+        """
+        
+        popup = folium.Popup(popup_html, max_width=300)
+        
+        # Color based on status
+        if status == "open":
+            icon = folium.Icon(color="red", icon="exclamation-sign", prefix="glyphicon")
+            marker = folium.Marker(
+                location=[lat, lon],
+                popup=popup,
+                icon=icon,
+                tooltip=f"Open: {service_label.split('—')[-1].strip()}"
+            )
+            marker.add_to(cluster_open)
+        else:
+            icon = folium.Icon(color="green", icon="ok-sign", prefix="glyphicon")
+            marker = folium.Marker(
+                location=[lat, lon],
+                popup=popup,
+                icon=icon,
+                tooltip=f"Closed: {service_label.split('—')[-1].strip()}"
+            )
+            marker.add_to(cluster_closed)
+    
+    # Add layer control
+    folium.LayerControl().add_to(m)
+    
+    # Add title
+    title_html = f"""
+    <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+                background: white; padding: 10px 20px; border-radius: 5px; 
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 9999;
+                font-family: sans-serif; text-align: center;">
+        <b style="font-size: 16px;">🏕️ Austin Homeless Encampment 311 Reports</b><br/>
+        <span style="font-size: 13px; color: #555;">
+            Last {days_back} days · {total:,} total · {open_count:,} open · {closed_count:,} closed
+        </span>
+    </div>
+    """
+    m.get_root().html.add_child(folium.Element(title_html))
+    
+    # Save to buffer
+    import tempfile
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as tmp:
+        tmp_path = tmp.name
+    
+    try:
+        m.save(tmp_path)
+        with open(tmp_path, 'rb') as f:
+            html_content = f.read()
+        
+        buffer = io.BytesIO(html_content)
+        buffer.seek(0)
+    finally:
+        # Clean up temp file
+        try:
+            os.unlink(tmp_path)
+        except:
+            pass
+    
+    summary = (
+        f"🏕️ *Encampment Report Map*\n"
+        f"_Last {days_back} days_\n\n"
+        f"📊 *{total:,} reports mapped*\n"
+        f"🔴 *{open_count:,} open*  ·  🟢 *{closed_count:,} closed*\n\n"
+        f"Tap markers to see details. Use layer control to toggle views."
+    )
+    
+    return buffer, summary

@@ -111,6 +111,7 @@ from homeless.homeless_bot import (
     get_encampment_stats,
     format_encampment_stats,
     format_encampment_locations,
+    generate_encampment_map,
 )
 
 # Parks maintenance service
@@ -2756,7 +2757,8 @@ async def homeless_311_command(update: Update, context: ContextTypes.DEFAULT_TYP
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("📊 Stats (30 days)", callback_data="homeless311_stats_30"),
          InlineKeyboardButton("📊 Stats (90 days)", callback_data="homeless311_stats_90")],
-        [InlineKeyboardButton("📍 Open Locations", callback_data="homeless311_locations_30")],
+        [InlineKeyboardButton("🗺️ View Map (30 days)", callback_data="homeless311_map_30"),
+         InlineKeyboardButton("📍 Open Locations", callback_data="homeless311_locations_30")],
         [InlineKeyboardButton("Change Time Window", callback_data="homeless311_time_window")],
     ])
     await update.message.reply_text(
@@ -2826,6 +2828,47 @@ async def homeless311_time_window_cb(update: Update, context: ContextTypes.DEFAU
         parse_mode="Markdown",
         reply_markup=_homeless_days_keyboard("stats"),
     )
+
+
+async def homeless311_map_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    parts = query.data.split("_")   # homeless311_map_<days>
+    try:
+        days = int(parts[-1])
+    except (ValueError, IndexError):
+        days = 30
+    
+    await query.edit_message_text(f"⏳ Generating encampment report map for last {days} days…")
+    
+    try:
+        buffer, summary = await asyncio.to_thread(generate_encampment_map, days)
+        
+        if buffer is None:
+            # Error or no data
+            await query.edit_message_text(summary)
+            return
+        
+        # Send the HTML map file
+        buffer.name = "encampment_map.html"
+        await query.message.reply_document(
+            document=buffer,
+            filename="encampment_map.html",
+            caption=summary,
+            parse_mode="Markdown",
+        )
+        
+        # Update the original message with a back button
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("📊 Back to Stats", callback_data=f"homeless311_stats_{days}")],
+        ])
+        await query.edit_message_text(
+            f"✅ Map generated! Check the HTML file above.",
+            reply_markup=keyboard,
+        )
+    except Exception as e:
+        logger.error(f"homeless311 map cb: {e}", exc_info=True)
+        await query.edit_message_text(f"❌ Error generating map: {e}")
 
 
 # =============================================================================
@@ -3552,6 +3595,7 @@ def create_application() -> Application:
     app.add_handler(CallbackQueryHandler(homeless311_stats_cb,       pattern="^homeless311_stats_"))
     app.add_handler(CallbackQueryHandler(homeless311_locations_cb,   pattern="^homeless311_locations_"))
     app.add_handler(CallbackQueryHandler(homeless311_time_window_cb, pattern="^homeless311_time_window$"))
+    app.add_handler(CallbackQueryHandler(homeless311_map_cb,         pattern="^homeless311_map_"))
 
 
     # Bicycle slash commands
