@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xclip -selection clipboard)"
+      "Bash(xclip -selection clipboard)",
+      "Bash(grep -n 'socrata\\\\|data.austintexas\\\\|SODA\\\\|$where\\\\|$q' '/home/sean/Documents/VSCODE Projects/austin311bot-unofficial/austin311_bot.py')",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('austin311_bot.py'\\).read\\(\\)\\); print\\('austin311_bot.py: OK'\\)\")",
+      "Bash(python -c \"import ast; ast.parse\\(open\\('homeless/homeless_bot.py'\\).read\\(\\)\\); print\\('homeless_bot.py: OK'\\)\")"
     ]
   }
 }

@@ -106,6 +106,13 @@ from childcare.childcare_bot import get_childcare_stats, format_childcare
 # Water conservation violations
 from waterconservation.water_conservation_bot import get_water_conservation_stats, format_water_conservation
 
+# Homeless encampment & trash 311 reports
+from homeless.homeless_bot import (
+    get_encampment_stats,
+    format_encampment_stats,
+    format_encampment_locations,
+)
+
 # Parks maintenance service
 from parks.parks_bot import (
     get_park_stats,
@@ -2732,6 +2739,96 @@ async def police_homeless_cb(update: Update, context: ContextTypes.DEFAULT_TYPE)
 
 
 # =============================================================================
+# HOMELESS ENCAMPMENT 311 REPORTS (keyword-filtered across Open311 codes)
+# =============================================================================
+
+def _homeless_days_keyboard(view: str) -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup([[
+        InlineKeyboardButton("30 days", callback_data=f"homeless311_{view}_30"),
+        InlineKeyboardButton("60 days", callback_data=f"homeless311_{view}_60"),
+        InlineKeyboardButton("90 days", callback_data=f"homeless311_{view}_90"),
+    ]])
+
+
+@rate_limited
+async def homeless_311_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Entry point for /homeless — 311 encampment reports."""
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("📊 Stats (30 days)", callback_data="homeless311_stats_30"),
+         InlineKeyboardButton("📊 Stats (90 days)", callback_data="homeless311_stats_90")],
+        [InlineKeyboardButton("📍 Open Locations", callback_data="homeless311_locations_30")],
+        [InlineKeyboardButton("Change Time Window", callback_data="homeless311_time_window")],
+    ])
+    await update.message.reply_text(
+        "🏕️ *Encampment & Homeless-Related 311 Reports*\n\n"
+        "Counts 311 complaints mentioning encampments, tents, homeless camps, "
+        "or related keywords across Parks, Right-of-Way, Debris, and Drainage "
+        "service codes.\n\n"
+        "_Note: reflects voluntary public reporting only — not a full census "
+        "of encampments._",
+        parse_mode="Markdown",
+        reply_markup=keyboard,
+    )
+
+
+async def homeless311_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    parts = query.data.split("_")   # homeless311_stats_<days>
+    try:
+        days = int(parts[-1])
+    except (ValueError, IndexError):
+        days = 30
+    await query.edit_message_text(f"⏳ Fetching encampment reports for last {days} days…")
+    try:
+        data = await asyncio.to_thread(get_encampment_stats, days)
+        msg = format_encampment_stats(data)
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("📍 Open Locations", callback_data=f"homeless311_locations_{days}")],
+            [InlineKeyboardButton("Change Time Window", callback_data="homeless311_time_window")],
+        ])
+        await query.edit_message_text(msg, parse_mode="Markdown",
+                                      reply_markup=keyboard,
+                                      disable_web_page_preview=True)
+    except Exception as e:
+        logger.error(f"homeless311 stats cb: {e}")
+        await query.edit_message_text(f"❌ Error fetching encampment data: {e}")
+
+
+async def homeless311_locations_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    parts = query.data.split("_")   # homeless311_locations_<days>
+    try:
+        days = int(parts[-1])
+    except (ValueError, IndexError):
+        days = 30
+    await query.edit_message_text(f"⏳ Fetching open encampment locations…")
+    try:
+        data = await asyncio.to_thread(get_encampment_stats, days)
+        msg = format_encampment_locations(data)
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("📊 Back to Stats", callback_data=f"homeless311_stats_{days}")],
+        ])
+        await query.edit_message_text(msg, parse_mode="Markdown",
+                                      reply_markup=keyboard,
+                                      disable_web_page_preview=True)
+    except Exception as e:
+        logger.error(f"homeless311 locations cb: {e}")
+        await query.edit_message_text(f"❌ Error fetching location data: {e}")
+
+
+async def homeless311_time_window_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text(
+        "🏕️ *Encampment Reports — Choose Time Window*",
+        parse_mode="Markdown",
+        reply_markup=_homeless_days_keyboard("stats"),
+    )
+
+
+# =============================================================================
 # HATE CRIMES DATA (APD Hate Crimes dataset t99n-5ib4)
 # =============================================================================
 
@@ -3450,6 +3547,12 @@ def create_application() -> Application:
     app.add_handler(CallbackQueryHandler(police_homeless_cb, pattern="^police_homeless$"))
     app.add_handler(CommandHandler("budget", homeless_command))
 
+    # Homeless encampment 311 reports
+    app.add_handler(CommandHandler("homeless", homeless_311_command))
+    app.add_handler(CallbackQueryHandler(homeless311_stats_cb,       pattern="^homeless311_stats_"))
+    app.add_handler(CallbackQueryHandler(homeless311_locations_cb,   pattern="^homeless311_locations_"))
+    app.add_handler(CallbackQueryHandler(homeless311_time_window_cb, pattern="^homeless311_time_window$"))
+
 
     # Bicycle slash commands
     app.add_handler(CommandHandler("animal", animal_command))
@@ -3503,6 +3606,7 @@ def create_application() -> Application:
             BotCommand("permits",          "Building permits — last 30 days by type · district"),
             BotCommand("bars",      "Bar of the month — top TABC mixed beverage sales"),
             BotCommand("childcare", "Child care licensing — Austin facilities · compliance flags"),
+            BotCommand("homeless",  "Encampment & trash 311 reports — dept burden · trends · locations"),
             BotCommand("help",      "All commands"),
         ])
 
