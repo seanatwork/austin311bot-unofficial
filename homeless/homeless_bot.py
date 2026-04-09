@@ -151,7 +151,7 @@ def _make_request(params: dict, retries: int = 0) -> list:
         return data if isinstance(data, list) else []
     except requests.exceptions.HTTPError as e:
         if e.response.status_code in {429, 500, 502, 503, 504} and retries < MAX_RETRIES:
-            delay = RETRY_DELAY * (2 ** retries)
+            delay = (10.0 * (2 ** retries)) if e.response.status_code == 429 else RETRY_DELAY * (2 ** retries)
             logger.warning(f"HTTP {e.response.status_code}, retrying in {delay:.1f}s ({retries+1}/{MAX_RETRIES})")
             time.sleep(delay)
             return _make_request(params, retries + 1)
@@ -234,7 +234,7 @@ def _fetch_code(service_code: str, days_back: int) -> list:
             break
 
         page += 1
-        time.sleep(0.5 if API_KEY else 1.0)
+        time.sleep(1.0 if API_KEY else 2.0)
 
     # Re-fetch individual records whose text fields look truncated
     for i, r in enumerate(all_records):
@@ -277,6 +277,7 @@ def fetch_encampment_reports(days_back: int = 90) -> dict:
         except Exception as e:
             logger.warning(f"Failed to fetch {code}: {e}")
             by_code[code] = {"label": label, "fetched": 0, "matched": 0, "error": str(e)}
+        time.sleep(3.0 if not API_KEY else 1.0)
 
     return {
         "records": matched_records,
@@ -513,6 +514,20 @@ def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], 
         except Exception:
             return days_back
 
+    # Pre-compute counts per bucket for dynamic title updates
+    bucket_counts = {"30": {"open": 0, "closed": 0}, "60": {"open": 0, "closed": 0}, "90": {"open": 0, "closed": 0}}
+    for r in records:
+        age = _age_days(r)
+        status = (r.get("status") or "").lower()
+        s = status if status in ("open", "closed") else "closed"
+        if age <= 30:
+            bucket_counts["30"][s] += 1
+        if age <= 60:
+            bucket_counts["60"][s] += 1
+        if age <= 90:
+            bucket_counts["90"][s] += 1
+    counts_js = str(bucket_counts).replace("'", '"')
+
     # Create map centered on Austin
     m = folium.Map(location=[30.2672, -97.7431], zoom_start=11, tiles="CartoDB positron")
 
@@ -520,6 +535,7 @@ def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], 
     # Bucket meaning: "30" = 0-30 days old, "60" = 31-60 days, "90" = 61-90 days
     # Default view: show only last-30-day layers
     fg_clusters = {}
+    fg_objects = {}  # name -> FeatureGroup (to get JS var names later)
     for status_key in ("open", "closed"):
         for bucket in ("30", "60", "90"):
             name = f"{status_key}_{bucket}"
@@ -528,6 +544,7 @@ def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], 
             cluster = MarkerCluster().add_to(fg)
             fg.add_to(m)
             fg_clusters[name] = cluster
+            fg_objects[name] = fg
 
     # Add markers to the appropriate bucket
     for r in records:
@@ -593,7 +610,12 @@ def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], 
         folium.Marker(location=[lat, lon], popup=popup, icon=icon, tooltip=tooltip).add_to(target_cluster)
 
     # Custom filter control (top right): time window + open/closed toggles
-    filter_html = """
+    map_var = m.get_name()
+    # Build a JS object mapping logical name -> actual Folium variable name
+    layer_map_js = "{" + ", ".join(
+        f'"{k}": {fg_objects[k].get_name()}' for k in fg_objects
+    ) + "}"
+    filter_html = f"""
     <div id="map-filter" style="position: absolute; top: 10px; right: 10px; z-index: 9999;
                 background: white; padding: 10px 14px; border-radius: 6px;
                 box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-family: sans-serif; font-size: 13px;">
@@ -610,55 +632,66 @@ def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], 
         </div>
     </div>
     <style>
-        .fbtn {
+        .fbtn {{
             padding: 4px 10px; border: 1px solid #ccc; border-radius: 4px;
             background: #f5f5f5; cursor: pointer; font-size: 12px; color: #444;
-        }
-        .fbtn.active { background: #2563eb; color: white; border-color: #2563eb; }
-        .fbtn:hover:not(.active) { background: #e0e7ff; }
+        }}
+        .fbtn.active {{ background: #2563eb; color: white; border-color: #2563eb; }}
+        .fbtn:hover:not(.active) {{ background: #e0e7ff; }}
     </style>
     <script>
         var currentDays = 30;
         var showOpen = true;
         var showClosed = true;
+        var layerMap = null;
+        var leafletMap = null;
 
-        function updateLayers() {
-            var map = Object.values(window).find(function(v) {
-                return v && v._leaflet_id !== undefined && v.eachLayer;
-            });
-            if (!map) return;
-            map.eachLayer(function(layer) {
-                var name = layer.options && layer.options.name;
-                if (!name || !/^(open|closed)_\\d+$/.test(name)) return;
-                var parts = name.split('_');
+        function initLayers() {{
+            layerMap = {layer_map_js};
+            leafletMap = {map_var};
+            updateLayers();
+            updateSummary();
+        }}
+
+        function updateLayers() {{
+            if (!layerMap || !leafletMap) return;
+            Object.keys(layerMap).forEach(function(key) {{
+                var parts = key.split('_');
                 var status = parts[0];
                 var bucket = parseInt(parts[1]);
                 var timeOk = bucket <= currentDays;
                 var statusOk = (status === 'open' && showOpen) || (status === 'closed' && showClosed);
-                if (timeOk && statusOk) {
-                    if (!map.hasLayer(layer)) map.addLayer(layer);
-                } else {
-                    if (map.hasLayer(layer)) map.removeLayer(layer);
-                }
-            });
-        }
+                var layer = layerMap[key];
+                if (timeOk && statusOk) {{
+                    if (!leafletMap.hasLayer(layer)) leafletMap.addLayer(layer);
+                }} else {{
+                    if (leafletMap.hasLayer(layer)) leafletMap.removeLayer(layer);
+                }}
+            }});
+        }}
 
-        function setDayFilter(days) {
+        function setDayFilter(days) {{
             currentDays = days;
-            [30, 60, 90].forEach(function(d) {
+            [30, 60, 90].forEach(function(d) {{
                 var btn = document.getElementById('btn-' + d);
                 if (btn) btn.classList.toggle('active', d === days);
-            });
+            }});
             updateLayers();
-        }
+            updateSummary();
+        }}
 
-        function toggleStatus(status) {
+        function toggleStatus(status) {{
             if (status === 'open') showOpen = !showOpen;
             else showClosed = !showClosed;
             var btn = document.getElementById('btn-' + status);
             if (btn) btn.classList.toggle('active');
             updateLayers();
-        }
+            updateSummary();
+        }}
+
+        document.addEventListener('DOMContentLoaded', function() {{
+            setTimeout(initLayers, 1000);
+        }});
     </script>
     """
     m.get_root().html.add_child(folium.Element(filter_html))
@@ -670,10 +703,20 @@ def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], 
                 box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 9999;
                 font-family: sans-serif; text-align: center; white-space: nowrap;">
         <b style="font-size: 16px;">🏕️ Austin Homeless Encampment 311 Reports</b><br/>
-        <span style="font-size: 13px; color: #555;">
-            Last {days_back} days · {total:,} total · {open_count:,} open · {closed_count:,} closed
-        </span>
+        <span id="map-summary" style="font-size: 13px; color: #555;"></span>
     </div>
+    <script>
+        var bucketCounts = {counts_js};
+        function updateSummary() {{
+            var d = String(currentDays);
+            var counts = bucketCounts[d] || {{}};
+            var o = showOpen ? (counts.open || 0) : 0;
+            var c = showClosed ? (counts.closed || 0) : 0;
+            var t = o + c;
+            document.getElementById('map-summary').textContent =
+                'Last ' + d + ' days · ' + t + ' total · ' + o + ' open · ' + c + ' closed';
+        }}
+    </script>
     """
     m.get_root().html.add_child(folium.Element(title_html))
     

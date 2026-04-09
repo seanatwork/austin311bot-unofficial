@@ -8,6 +8,8 @@ Run locally:
 Run in CI (GitHub Actions) with AUSTIN_APP_TOKEN set for higher rate limits.
 """
 from pathlib import Path
+from dotenv import load_dotenv
+load_dotenv()
 from homeless.homeless_bot import generate_encampment_map
 
 
