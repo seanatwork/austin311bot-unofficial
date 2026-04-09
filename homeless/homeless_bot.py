@@ -502,15 +502,34 @@ def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], 
     # Count by status
     open_count = sum(1 for r in records if (r.get("status") or "").lower() == "open")
     closed_count = sum(1 for r in records if (r.get("status") or "").lower() == "closed")
-    
+
+    # Bucket each record by age (days since filed)
+    now_dt = datetime.now(timezone.utc)
+
+    def _age_days(r):
+        try:
+            dt = datetime.fromisoformat(r.get("requested_datetime", "").replace("Z", "+00:00"))
+            return (now_dt - dt).days
+        except Exception:
+            return days_back
+
     # Create map centered on Austin
     m = folium.Map(location=[30.2672, -97.7431], zoom_start=11, tiles="CartoDB positron")
-    
-    # Add marker clusters for open and closed
-    cluster_open = MarkerCluster(name="🔴 Open Reports").add_to(m)
-    cluster_closed = MarkerCluster(name="🟢 Closed Reports").add_to(m)
-    
-    # Add markers
+
+    # Six FeatureGroups: open/closed × 30/60/90-day buckets
+    # Bucket meaning: "30" = 0-30 days old, "60" = 31-60 days, "90" = 61-90 days
+    # Default view: show only last-30-day layers
+    fg_clusters = {}
+    for status_key in ("open", "closed"):
+        for bucket in ("30", "60", "90"):
+            name = f"{status_key}_{bucket}"
+            show = (bucket == "30")
+            fg = folium.FeatureGroup(name=name, show=show, overlay=True)
+            cluster = MarkerCluster().add_to(fg)
+            fg.add_to(m)
+            fg_clusters[name] = cluster
+
+    # Add markers to the appropriate bucket
     for r in records:
         lat = r["_lat"]
         lon = r["_lon"]
@@ -522,6 +541,20 @@ def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], 
         updated_str = (r.get("updated_datetime") or "").split("T")[0]
         address = (r.get("address") or "").strip()
         req_id = r.get("service_request_id", "N/A")
+
+        # Determine time bucket
+        age = _age_days(r)
+        if age <= 30:
+            bucket = "30"
+        elif age <= 60:
+            bucket = "60"
+        else:
+            bucket = "90"
+
+        cluster_key = f"{status}_{bucket}"
+        if cluster_key not in fg_clusters:
+            cluster_key = f"closed_{bucket}"
+        target_cluster = fg_clusters[cluster_key]
 
         # Use description if available, fall back to status_notes
         detail_text = description or status_notes
@@ -547,38 +580,95 @@ def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], 
             <i>{detail_short if detail_short else '(no details)'}</i>
         </div>
         """
-        
+
         popup = folium.Popup(popup_html, max_width=300)
-        
-        # Color based on status
+
         if status == "open":
             icon = folium.Icon(color="red", icon="exclamation-sign", prefix="glyphicon")
-            marker = folium.Marker(
-                location=[lat, lon],
-                popup=popup,
-                icon=icon,
-                tooltip=f"Open: {service_label.split('—')[-1].strip()}"
-            )
-            marker.add_to(cluster_open)
+            tooltip = f"Open: {service_label.split('—')[-1].strip()}"
         else:
             icon = folium.Icon(color="green", icon="ok-sign", prefix="glyphicon")
-            marker = folium.Marker(
-                location=[lat, lon],
-                popup=popup,
-                icon=icon,
-                tooltip=f"Closed: {service_label.split('—')[-1].strip()}"
-            )
-            marker.add_to(cluster_closed)
-    
-    # Add layer control
-    folium.LayerControl().add_to(m)
-    
-    # Add title
+            tooltip = f"Closed: {service_label.split('—')[-1].strip()}"
+
+        folium.Marker(location=[lat, lon], popup=popup, icon=icon, tooltip=tooltip).add_to(target_cluster)
+
+    # Custom filter control (top right): time window + open/closed toggles
+    filter_html = """
+    <div id="map-filter" style="position: absolute; top: 10px; right: 10px; z-index: 9999;
+                background: white; padding: 10px 14px; border-radius: 6px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3); font-family: sans-serif; font-size: 13px;">
+        <div style="margin-bottom: 6px; font-weight: bold; color: #333;">Time window</div>
+        <div style="display: flex; gap: 4px; margin-bottom: 10px;">
+            <button id="btn-30" onclick="setDayFilter(30)" class="fbtn active">30d</button>
+            <button id="btn-60" onclick="setDayFilter(60)" class="fbtn">60d</button>
+            <button id="btn-90" onclick="setDayFilter(90)" class="fbtn">90d</button>
+        </div>
+        <div style="margin-bottom: 6px; font-weight: bold; color: #333;">Status</div>
+        <div style="display: flex; gap: 4px;">
+            <button id="btn-open" onclick="toggleStatus('open')" class="fbtn active">🔴 Open</button>
+            <button id="btn-closed" onclick="toggleStatus('closed')" class="fbtn active">🟢 Closed</button>
+        </div>
+    </div>
+    <style>
+        .fbtn {
+            padding: 4px 10px; border: 1px solid #ccc; border-radius: 4px;
+            background: #f5f5f5; cursor: pointer; font-size: 12px; color: #444;
+        }
+        .fbtn.active { background: #2563eb; color: white; border-color: #2563eb; }
+        .fbtn:hover:not(.active) { background: #e0e7ff; }
+    </style>
+    <script>
+        var currentDays = 30;
+        var showOpen = true;
+        var showClosed = true;
+
+        function updateLayers() {
+            var map = Object.values(window).find(function(v) {
+                return v && v._leaflet_id !== undefined && v.eachLayer;
+            });
+            if (!map) return;
+            map.eachLayer(function(layer) {
+                var name = layer.options && layer.options.name;
+                if (!name || !/^(open|closed)_\\d+$/.test(name)) return;
+                var parts = name.split('_');
+                var status = parts[0];
+                var bucket = parseInt(parts[1]);
+                var timeOk = bucket <= currentDays;
+                var statusOk = (status === 'open' && showOpen) || (status === 'closed' && showClosed);
+                if (timeOk && statusOk) {
+                    if (!map.hasLayer(layer)) map.addLayer(layer);
+                } else {
+                    if (map.hasLayer(layer)) map.removeLayer(layer);
+                }
+            });
+        }
+
+        function setDayFilter(days) {
+            currentDays = days;
+            [30, 60, 90].forEach(function(d) {
+                var btn = document.getElementById('btn-' + d);
+                if (btn) btn.classList.toggle('active', d === days);
+            });
+            updateLayers();
+        }
+
+        function toggleStatus(status) {
+            if (status === 'open') showOpen = !showOpen;
+            else showClosed = !showClosed;
+            var btn = document.getElementById('btn-' + status);
+            if (btn) btn.classList.toggle('active');
+            updateLayers();
+        }
+    </script>
+    """
+    m.get_root().html.add_child(folium.Element(filter_html))
+
+    # Title (centered top)
     title_html = f"""
     <div style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-                background: white; padding: 10px 20px; border-radius: 5px; 
+                background: white; padding: 10px 20px; border-radius: 5px;
                 box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 9999;
-                font-family: sans-serif; text-align: center;">
+                font-family: sans-serif; text-align: center; white-space: nowrap;">
         <b style="font-size: 16px;">🏕️ Austin Homeless Encampment 311 Reports</b><br/>
         <span style="font-size: 13px; color: #555;">
             Last {days_back} days · {total:,} total · {open_count:,} open · {closed_count:,} closed
