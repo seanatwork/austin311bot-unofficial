@@ -12,7 +12,7 @@ from homeless.homeless_bot import generate_encampment_map
 
 
 def main():
-    buf, summary = generate_encampment_map(days_back=30)
+    buf, summary = generate_encampment_map(days_back=90)
     if not buf:
         raise RuntimeError(f"Map generation failed: {summary}")
     out = Path("docs/index.html")
