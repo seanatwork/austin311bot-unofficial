@@ -523,9 +523,10 @@ def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], 
         # Truncate description for popup
         desc_short = description[:100] + "..." if len(description) > 100 else description
         
+        ticket_url = f"https://311.austintexas.gov/issues/{req_id}"
         popup_html = f"""
         <div style="font-family: sans-serif; max-width: 300px;">
-            <b>Report #{req_id}</b><br/>
+            <b><a href="{ticket_url}" target="_blank" style="color: #0066cc;">Report #{req_id}</a></b><br/>
             <span style="color: #666;">{date_str}</span><br/><br/>
             <b>Status:</b> {'🔴 Open' if status == 'open' else '🟢 Closed'}<br/>
             <b>Category:</b> {service_label}<br/><br/>
