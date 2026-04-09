@@ -69,3 +69,31 @@ Query patterns: ISO8601 dates with `Z` suffix, `per_page`/`page` pagination, `$w
 - Telegram messages over 4KB are split via `_send_chunked()` in `austin311_bot.py`.
 - All bot output is Markdown-formatted.
 - Environment variables: `TELEGRAM_BOT_TOKEN` (required), `AUSTIN_APP_TOKEN` (optional, raises Open311 rate limits), `GOOGLE_MAPS_API_KEY` (optional, for `/directory`).
+
+## Static Map Website
+
+A public encampment map is deployed at Netlify, generated from the same data as the `/homeless` Telegram command.
+
+**Files:**
+- `scripts/generate_map.py` — generates `docs/index.html` using `homeless.homeless_bot.generate_encampment_map(90)`
+- `.github/workflows/deploy-map.yml` — GitHub Actions cron (daily noon UTC) that runs the script, commits `docs/index.html`, and pushes to `main`
+- `netlify.toml` — tells Netlify to serve from `docs/`, no build command
+- `docs/index.html` — pre-generated Folium HTML map (committed to repo)
+
+**Map features:**
+- 90 days of data fetched; user can filter to 30d / 60d / 90d via buttons
+- Open / Closed status toggles
+- Title bar updates dynamically with count reflecting active filters
+- Popups show: clickable ticket link (`https://311.austintexas.gov/tickets?filter%5Bsearch%5D={id}`), address, filed/updated dates, description (up to 500 chars) falling back to resolution notes
+
+**Netlify deploy workflow (manual):**
+1. Test locally: `source .venv/bin/activate && PYTHONPATH=. python scripts/generate_map.py`
+2. Commit and push changes to GitHub
+3. GitHub Actions → "Refresh encampment map" → Run workflow (regenerates `docs/index.html`)
+4. Netlify dashboard → Deploys → Trigger deploy → Deploy site (without cache)
+
+**Notes:**
+- Netlify auto-builds are currently **stopped** to conserve build minutes; trigger manually
+- `AUSTIN_APP_TOKEN` must be set as a GitHub Actions secret for rate limit headroom
+- 429 rate limit errors during local runs are normal without the token; CI has the secret
+- `.venv/` is the working virtualenv (system Python is externally managed)
