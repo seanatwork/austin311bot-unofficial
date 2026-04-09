@@ -5,6 +5,9 @@ on:
     - cron: "0 12 * * *"  # daily at noon UTC
   workflow_dispatch:        # allow manual trigger from Actions tab
 
+permissions:
+  contents: write
+
 jobs:
   update-map:
     runs-on: ubuntu-latest
