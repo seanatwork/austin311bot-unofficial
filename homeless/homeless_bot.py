@@ -533,7 +533,7 @@ def generate_encampment_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], 
         address_line = f"<b>Address:</b> {address}<br/>" if address else ""
         updated_line = f"<span style='color: #666;'>Updated: {updated_str}</span><br/>" if updated_str and updated_str != date_str else ""
 
-        ticket_url = f"https://311.austintexas.gov/tickets/{req_id}"
+        ticket_url = f"https://311.austintexas.gov/tickets?filter%5Bsearch%5D={req_id}"
         popup_html = f"""
         <div style="font-family: sans-serif; max-width: 300px;">
             <b><a href="{ticket_url}" target="_blank" style="color: #0066cc;">Report #{req_id}</a></b><br/>
