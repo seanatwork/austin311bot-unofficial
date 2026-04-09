@@ -8,7 +8,8 @@
       "Bash(python -c \"import ast; ast.parse\\(open\\('homeless/homeless_bot.py'\\).read\\(\\)\\); print\\('OK'\\)\")",
       "Bash(curl -s \"https://311.austintexas.gov/open311/v2/requests/26-00085651.json\")",
       "Bash(python3 -m json.tool)",
-      "Bash(python3 -c ':*)"
+      "Bash(python3 -c ':*)",
+      "Bash(gh api:*)"
     ]
   }
 }
