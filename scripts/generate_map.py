@@ -1,24 +1,83 @@
 #!/usr/bin/env python3
 """
-Generate the encampment map HTML and write it to docs/index.html.
+Generate static Folium maps for 311 service categories.
 
 Run locally:
-    python scripts/generate_map.py
+    python scripts/generate_map.py bicycle
+    python scripts/generate_map.py graffiti
+    python scripts/generate_map.py homeless
 
 Run in CI (GitHub Actions) with AUSTIN_APP_TOKEN set for higher rate limits.
 """
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 load_dotenv()
-from homeless.homeless_bot import generate_encampment_map
+
+
+def generate_bicycle_map(days_back: int = 90) -> tuple:
+    """Generate bicycle infrastructure map."""
+    from bicycle.bicycle_bot import generate_bicycle_map
+    return generate_bicycle_map(days_back)
+
+
+def generate_graffiti_map(days_back: int = 90) -> tuple:
+    """Generate graffiti abatement map."""
+    from graffiti.graffiti_bot import generate_graffiti_map
+    return generate_graffiti_map(days_back)
+
+
+def generate_homeless_map(days_back: int = 90) -> tuple:
+    """Generate homeless encampment map."""
+    from homeless.homeless_bot import generate_encampment_map
+    return generate_encampment_map(days_back)
+
+
+def generate_traffic_map(days_back: int = 90) -> tuple:
+    """Generate traffic & infrastructure map."""
+    from infrastructureandtransportation.traffic_bot import generate_traffic_map
+    return generate_traffic_map(days_back)
+
+
+def generate_parking_map(days_back: int = 90) -> tuple:
+    """Generate parking enforcement map."""
+    from parking.parking_bot import generate_parking_map
+    return generate_parking_map(days_back)
+
+
+CATEGORY_MAPS = {
+    "bicycle": (generate_bicycle_map, "bicycle/index.html"),
+    "graffiti": (generate_graffiti_map, "graffiti/index.html"),
+    "homeless": (generate_homeless_map, "index.html"),
+    "traffic": (generate_traffic_map, "traffic/index.html"),
+    "parking": (generate_parking_map, "parking/index.html"),
+}
 
 
 def main():
-    buf, summary = generate_encampment_map(days_back=90)
+    if len(sys.argv) < 2:
+        print("Usage: python scripts/generate_map.py <category>")
+        print(f"Available categories: {', '.join(CATEGORY_MAPS.keys())}")
+        sys.exit(1)
+
+    category = sys.argv[1].lower()
+    if category not in CATEGORY_MAPS:
+        print(f"Unknown category: {category}")
+        print(f"Available categories: {', '.join(CATEGORY_MAPS.keys())}")
+        sys.exit(1)
+
+    generator_func, output_path = CATEGORY_MAPS[category]
+    days_back = 90
+
+    print(f"Generating {category} map (last {days_back} days)...")
+    buf, summary = generator_func(days_back)
+
     if not buf:
-        raise RuntimeError(f"Map generation failed: {summary}")
-    out = Path("docs/index.html")
-    out.parent.mkdir(exist_ok=True)
+        print(f"Map generation failed: {summary}")
+        sys.exit(1)
+
+    out = Path("docs") / output_path
+    out.parent.mkdir(parents=True, exist_ok=True)
     out.write_bytes(buf.getvalue())
     print(f"Written {out.stat().st_size:,} bytes to {out}")
     print(summary)

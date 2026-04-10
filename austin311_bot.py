@@ -380,14 +380,22 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         text = "*🐾 Animal Services*\nLoose dogs, bites, vicious animals and more."
 
     elif service == "traffic":
-        keyboard = [
-            [InlineKeyboardButton("📋 Infra Backlog", callback_data="traffic_backlog"),
-             InlineKeyboardButton("🚦 Broken Signals", callback_data="traffic_signals")],
-            [InlineKeyboardButton("🚨 Live Incidents", callback_data="traffic_live"),
-             InlineKeyboardButton("💥 Crash Stats", callback_data="traffic_crashes")],
-            [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
-        ]
-        text = "*🚦 Traffic & Infrastructure*\nPotholes, signals, street lights, sidewalks, and more."
+        keyboard = [[InlineKeyboardButton("🔙 Back", callback_data="back_to_main")]]
+        text = (
+            "🚦 *Traffic & Infrastructure Reports*\n\n"
+            "View the interactive map with all traffic and infrastructure 311 reports:\n\n"
+            "https://atxpulse.netlify.app/traffic/\n\n"
+            "The map shows:\n"
+            "• Pothole repairs\n"
+            "• Traffic signal issues\n"
+            "• Street light problems\n"
+            "• Debris in streets\n"
+            "• Sidewalk repairs\n"
+            "• Construction concerns\n\n"
+            "Filter by time (30d/60d/90d) and status (open/closed)."
+        )
+        await query.edit_message_text(text, parse_mode="Markdown", disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup(keyboard))
+        return
 
     elif service == "noise":
         keyboard = [
@@ -400,11 +408,19 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         text = "*🔊 Noise Complaints*\nNon-emergency noise, outdoor venues, fireworks."
 
     elif service == "parking":
-        keyboard = [
-            [InlineKeyboardButton("🔥 Hot Zones", callback_data="parking_hotspots")],
-            [InlineKeyboardButton("🔙 Back", callback_data="back_to_main")],
-        ]
-        text = "*🅿️ Parking Enforcement*\nCitations, hot zones, and enforcement patterns."
+        keyboard = [[InlineKeyboardButton("🔙 Back", callback_data="back_to_main")]]
+        text = (
+            "🅿️ *Parking Enforcement Reports*\n\n"
+            "View the interactive map with all parking enforcement 311 reports:\n\n"
+            "https://atxpulse.netlify.app/parking/\n\n"
+            "The map shows:\n"
+            "• All parking violation reports\n"
+            "• Open and resolved citations\n"
+            "• Location-based clustering\n\n"
+            "Filter by time (30d/60d/90d) and status (open/closed)."
+        )
+        await query.edit_message_text(text, parse_mode="Markdown", disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup(keyboard))
+        return
 
     elif service == "parks":
         keyboard = [
@@ -519,13 +535,17 @@ async def about_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def graffiti_analyze_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Analyzing graffiti data...")
-    try:
-        result = await asyncio.to_thread(analyze_graffiti_command, 90)
-        await _send_chunked(query, result)
-    except Exception as e:
-        logger.error(f"graffiti analyze failed: {e}", exc_info=True)
-        await query.edit_message_text(f"❌ Error: {e}")
+    msg = (
+        "🎨 *Graffiti Abatement Reports*\n\n"
+        "View the interactive map with all graffiti-related 311 reports:\n\n"
+        "https://atxpulse.netlify.app/graffiti/\n\n"
+        "The map shows:\n"
+        "• All graffiti abatement requests\n"
+        "• Open and resolved reports\n"
+        "• Location-based clustering\n\n"
+        "Filter by time (30d/60d/90d) and status (open/closed)."
+    )
+    await query.edit_message_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
 
 
 
@@ -533,13 +553,17 @@ async def graffiti_analyze_cb(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def graffiti_remediation_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Analyzing remediation times...")
-    try:
-        result = await asyncio.to_thread(remediation_command, 90)
-        await _send_chunked(query, result)
-    except Exception as e:
-        logger.error(f"graffiti remediation: {e}")
-        await query.edit_message_text(f"❌ Error: {e}")
+    msg = (
+        "🎨 *Graffiti Abatement Reports*\n\n"
+        "View the interactive map with all graffiti-related 311 reports:\n\n"
+        "https://atxpulse.netlify.app/graffiti/\n\n"
+        "The map shows:\n"
+        "• All graffiti abatement requests\n"
+        "• Open and resolved reports\n"
+        "• Location-based clustering\n\n"
+        "Filter by time (30d/60d/90d) and status (open/closed)."
+    )
+    await query.edit_message_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
 
 
 
@@ -565,31 +589,19 @@ async def graffiti_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 async def bicycle_recent_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Fetching recent bicycle complaints...")
-    try:
-        complaints = await asyncio.to_thread(lambda: get_recent_complaints(limit=10))
-        if not complaints:
-            await query.edit_message_text("📝 No bicycle complaints found.")
-            return
-
-        keyboard = []
-        for r in complaints:
-            req_id = r.get("service_request_id") or "N/A"
-            date = (r.get("requested_datetime") or "").split("T")[0]
-            desc = (r.get("description") or r.get("service_name") or "Bicycle complaint")
-            status = (r.get("status") or "").lower()
-            icon = "🟢" if status == "closed" else "🔴"
-            label = f"{icon} #{req_id} · {date} — {desc[:35]}"
-            keyboard.append([InlineKeyboardButton(label, callback_data=f"bicycle_ticket_{req_id}")])
-
-        await query.edit_message_text(
-            "🚴 *Recent Bicycle Complaints*\n_Tap a ticket to see the full complaint:_",
-            parse_mode="Markdown",
-            reply_markup=InlineKeyboardMarkup(keyboard),
-        )
-    except Exception as e:
-        logger.error(f"bicycle recent: {e}")
-        await query.edit_message_text(f"❌ Error: {e}")
+    msg = (
+        "🚴 *Bicycle Infrastructure Reports*\n\n"
+        "View the interactive map with all bicycle-related 311 reports:\n\n"
+        "https://atxpulse.netlify.app/bicycle/\n\n"
+        "The map shows:\n"
+        "• Bike lane issues and obstructions\n"
+        "• Debris hazards in cycling routes\n"
+        "• Construction affecting cyclists\n"
+        "• Sidewalk and crossing issues\n"
+        "• Direct bicycle complaints\n\n"
+        "Filter by time (30d/60d/90d) and status (open/closed)."
+    )
+    await query.edit_message_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
 
 
 async def bicycle_ticket_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -619,14 +631,19 @@ async def bicycle_ticket_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) 
 async def bicycle_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("⏳ Fetching bicycle statistics...")
-    try:
-        stats = await asyncio.to_thread(get_stats)
-        result = format_stats(stats)
-        await _send_chunked(query, result)
-    except Exception as e:
-        logger.error(f"bicycle stats: {e}")
-        await query.edit_message_text(f"❌ Error: {e}")
+    msg = (
+        "🚴 *Bicycle Infrastructure Reports*\n\n"
+        "View the interactive map with all bicycle-related 311 reports:\n\n"
+        "https://atxpulse.netlify.app/bicycle/\n\n"
+        "The map shows:\n"
+        "• Bike lane issues and obstructions\n"
+        "• Debris hazards in cycling routes\n"
+        "• Construction affecting cyclists\n"
+        "• Sidewalk and crossing issues\n"
+        "• Direct bicycle complaints\n\n"
+        "Filter by time (30d/60d/90d) and status (open/closed)."
+    )
+    await query.edit_message_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
 
 
 @rate_limited

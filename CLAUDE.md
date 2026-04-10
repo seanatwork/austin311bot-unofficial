@@ -40,8 +40,8 @@ Auto-deploys to Fly.io on push to `main` via `.github/workflows/deploy.yml`. The
 3. Adding command/callback handlers in the `create_application()` function
 
 **Service packages** (each is independent):
-- `graffiti/` — Open311 service code `HHSGRAFF`
-- `bicycle/` — Open311 service code `PWBICYCL`; also has a local SQLite cache (`bicycle_complaints.db`)
+- `graffiti/` — Open311 service code `HHSGRAFF`; supports analysis and a Folium-generated map (`/graffiti` → redirects to web map)
+- `bicycle/` — Open311 across 7 service codes (PWBICYCL, OBSTMIDB, SBDEBROW, ATCOCIRW, SBSIDERE, TPPECRNE, PWSIDEWL); includes keyword filtering for bicycle relevance; supports stats and a Folium-generated map (`/bicycle` → redirects to web map)
 - `restaurants/` — Socrata dataset `ecmv-9xxi` (health inspections)
 - `animalsvc/` — Open311 across 7+ service codes (loose dogs, bites, coyotes, etc.)
 - `infrastructureandtransportation/` — Open311 (potholes, signals, sidewalks)
@@ -72,24 +72,33 @@ Query patterns: ISO8601 dates with `Z` suffix, `per_page`/`page` pagination, `$w
 
 ## Static Map Website
 
-A public encampment map is deployed at Netlify, generated from the same data as the `/homeless` Telegram command.
+Public maps are deployed at Netlify, generated from the same data as Telegram commands.
+
+**Maps:**
+- `docs/index.html` — Homeless encampment map (https://atxpulse.netlify.app/)
+- `docs/bicycle/index.html` — Bicycle infrastructure map (https://atxpulse.netlify.app/bicycle/)
+- `docs/graffiti/index.html` — Graffiti abatement map (https://atxpulse.netlify.app/graffiti/)
 
 **Files:**
-- `scripts/generate_map.py` — generates `docs/index.html` using `homeless.homeless_bot.generate_encampment_map(90)`
-- `.github/workflows/deploy-map.yml` — GitHub Actions cron (daily noon UTC) that runs the script, commits `docs/index.html`, and pushes to `main`
+- `scripts/generate_map.py` — generic map generator that accepts category as CLI argument
+  - Usage: `python scripts/generate_map.py bicycle|graffiti|homeless`
+- `.github/workflows/deploy-map.yml` — GitHub Actions cron for homeless map (daily noon UTC)
+- `.github/workflows/generate-bicycle-map.yml` — GitHub Actions cron for bicycle map (daily noon UTC)
+- `.github/workflows/generate-graffiti-map.yml` — GitHub Actions cron for graffiti map (daily noon UTC)
 - `netlify.toml` — tells Netlify to serve from `docs/`, no build command
-- `docs/index.html` — pre-generated Folium HTML map (committed to repo)
+- `docs/*/index.html` — pre-generated Folium HTML maps (committed to repo)
 
-**Map features:**
+**Map features (all maps follow the same pattern):**
 - 90 days of data fetched; user can filter to 30d / 60d / 90d via buttons
 - Open / Closed status toggles
 - Title bar updates dynamically with count reflecting active filters
 - Popups show: clickable ticket link (`https://311.austintexas.gov/tickets?filter%5Bsearch%5D={id}`), address, filed/updated dates, description (up to 500 chars) falling back to resolution notes
+- Mobile-friendly viewport meta tag
 
 **Netlify deploy workflow (manual):**
-1. Test locally: `source .venv/bin/activate && PYTHONPATH=. python scripts/generate_map.py`
+1. Test locally: `source .venv/bin/activate && PYTHONPATH=. python scripts/generate_map.py <category>`
 2. Commit and push changes to GitHub
-3. GitHub Actions → "Refresh encampment map" → Run workflow (regenerates `docs/index.html`)
+3. GitHub Actions → "Refresh <category> map" → Run workflow (regenerates `docs/<category>/index.html`)
 4. Netlify dashboard → Deploys → Trigger deploy → Deploy site (without cache)
 
 **Notes:**
