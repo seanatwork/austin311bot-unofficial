@@ -75,16 +75,21 @@ Query patterns: ISO8601 dates with `Z` suffix, `per_page`/`page` pagination, `$w
 Public maps are deployed at Netlify, generated from the same data as Telegram commands.
 
 **Maps:**
-- `docs/index.html` — Homeless encampment map (https://atxpulse.netlify.app/)
+- `docs/index.html` — Landing page hub (https://atxpulse.netlify.app/)
+- `docs/homeless/index.html` — Homeless encampment map (https://atxpulse.netlify.app/homeless/)
 - `docs/bicycle/index.html` — Bicycle infrastructure map (https://atxpulse.netlify.app/bicycle/)
 - `docs/graffiti/index.html` — Graffiti abatement map (https://atxpulse.netlify.app/graffiti/)
+- `docs/traffic/index.html` — Traffic & infrastructure map (https://atxpulse.netlify.app/traffic/)
+- `docs/parking/index.html` — Parking enforcement map (https://atxpulse.netlify.app/parking/)
 
 **Files:**
 - `scripts/generate_map.py` — generic map generator that accepts category as CLI argument
-  - Usage: `python scripts/generate_map.py bicycle|graffiti|homeless`
+  - Usage: `python scripts/generate_map.py bicycle|graffiti|homeless|traffic|parking`
 - `.github/workflows/deploy-map.yml` — GitHub Actions cron for homeless map (daily noon UTC)
 - `.github/workflows/generate-bicycle-map.yml` — GitHub Actions cron for bicycle map (daily noon UTC)
 - `.github/workflows/generate-graffiti-map.yml` — GitHub Actions cron for graffiti map (daily noon UTC)
+- `.github/workflows/generate-traffic-map.yml` — GitHub Actions cron for traffic map (weekly Tuesday noon UTC)
+- `.github/workflows/generate-parking-map.yml` — GitHub Actions cron for parking map (weekly Monday noon UTC)
 - `netlify.toml` — tells Netlify to serve from `docs/`, no build command
 - `docs/*/index.html` — pre-generated Folium HTML maps (committed to repo)
 

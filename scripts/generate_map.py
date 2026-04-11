@@ -48,7 +48,7 @@ def generate_parking_map(days_back: int = 90) -> tuple:
 CATEGORY_MAPS = {
     "bicycle": (generate_bicycle_map, "bicycle/index.html"),
     "graffiti": (generate_graffiti_map, "graffiti/index.html"),
-    "homeless": (generate_homeless_map, "index.html"),
+    "homeless": (generate_homeless_map, "homeless/index.html"),
     "traffic": (generate_traffic_map, "traffic/index.html"),
     "parking": (generate_parking_map, "parking/index.html"),
 }
