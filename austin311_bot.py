@@ -111,7 +111,6 @@ from homeless.homeless_bot import (
     get_encampment_stats,
     format_encampment_stats,
     format_encampment_locations,
-    generate_encampment_map,
 )
 
 # Parks maintenance service
@@ -383,8 +382,7 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         keyboard = [[InlineKeyboardButton("🔙 Back", callback_data="back_to_main")]]
         text = (
             "🚦 *Traffic & Infrastructure Reports*\n\n"
-            "View the interactive map with all traffic and infrastructure 311 reports:\n\n"
-            "https://atxpulse.netlify.app/traffic/\n\n"
+            "https://seanatwork.github.io/austin311bot-unofficial/traffic/\n\n"
             "The map shows:\n"
             "• Pothole repairs\n"
             "• Traffic signal issues\n"
@@ -392,7 +390,7 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             "• Debris in streets\n"
             "• Sidewalk repairs\n"
             "• Construction concerns\n\n"
-            "Filter by time (30d/60d/90d) and status (open/closed)."
+            "Filter by status (open/closed)."
         )
         await query.edit_message_text(text, parse_mode="Markdown", disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup(keyboard))
         return
@@ -411,13 +409,12 @@ async def service_menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         keyboard = [[InlineKeyboardButton("🔙 Back", callback_data="back_to_main")]]
         text = (
             "🅿️ *Parking Enforcement Reports*\n\n"
-            "View the interactive map with all parking enforcement 311 reports:\n\n"
-            "https://atxpulse.netlify.app/parking/\n\n"
+            "https://seanatwork.github.io/austin311bot-unofficial/parking/\n\n"
             "The map shows:\n"
             "• All parking violation reports\n"
             "• Open and resolved citations\n"
             "• Location-based clustering\n\n"
-            "Filter by time (30d/60d/90d) and status (open/closed)."
+            "Filter by status (open/closed) and time window (30d/60d/90d)."
         )
         await query.edit_message_text(text, parse_mode="Markdown", disable_web_page_preview=True, reply_markup=InlineKeyboardMarkup(keyboard))
         return
@@ -532,50 +529,18 @@ async def about_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 @rate_limited
-async def graffiti_analyze_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-    msg = (
-        "🎨 *Graffiti Abatement Reports*\n\n"
-        "View the interactive map with all graffiti-related 311 reports:\n\n"
-        "https://atxpulse.netlify.app/graffiti/\n\n"
-        "The map shows:\n"
-        "• All graffiti abatement requests\n"
-        "• Open and resolved reports\n"
-        "• Location-based clustering\n\n"
-        "Filter by time (30d/60d/90d) and status (open/closed)."
-    )
-    await query.edit_message_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
-
-
-
-@rate_limited
-async def graffiti_remediation_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-    msg = (
-        "🎨 *Graffiti Abatement Reports*\n\n"
-        "View the interactive map with all graffiti-related 311 reports:\n\n"
-        "https://atxpulse.netlify.app/graffiti/\n\n"
-        "The map shows:\n"
-        "• All graffiti abatement requests\n"
-        "• Open and resolved reports\n"
-        "• Location-based clustering\n\n"
-        "Filter by time (30d/60d/90d) and status (open/closed)."
-    )
-    await query.edit_message_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
-
-
-
-@rate_limited
 async def graffiti_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    keyboard = [
-        [InlineKeyboardButton("📊 Analyze", callback_data="graffiti_analyze"),
-         InlineKeyboardButton("⏰ Remediation", callback_data="graffiti_remediation")],
-    ]
+    keyboard = [[InlineKeyboardButton("🗺️ Open Map", url="https://seanatwork.github.io/austin311bot-unofficial/graffiti/")]]
     await update.message.reply_text(
-        "*🎨 Graffiti Analysis*\nChoose a view:",
+        "🎨 *Graffiti Abatement Reports*\n\n"
+        "https://seanatwork.github.io/austin311bot-unofficial/graffiti/\n\n"
+        "The map shows:\n"
+        "• All graffiti abatement requests\n"
+        "• Open and resolved reports\n"
+        "• Location-based clustering\n\n"
+        "Filter by status (open/closed) and time window (30d/60d/90d).",
         parse_mode="Markdown",
+        disable_web_page_preview=True,
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
 
@@ -585,23 +550,6 @@ async def graffiti_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 # =============================================================================
 
 
-@rate_limited
-async def bicycle_recent_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-    msg = (
-        "🚴 *Bicycle Infrastructure Reports*\n\n"
-        "View the interactive map with all bicycle-related 311 reports:\n\n"
-        "https://atxpulse.netlify.app/bicycle/\n\n"
-        "The map shows:\n"
-        "• Bike lane issues and obstructions\n"
-        "• Debris hazards in cycling routes\n"
-        "• Construction affecting cyclists\n"
-        "• Sidewalk and crossing issues\n"
-        "• Direct bicycle complaints\n\n"
-        "Filter by time (30d/60d/90d) and status (open/closed)."
-    )
-    await query.edit_message_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
 
 
 async def bicycle_ticket_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -628,33 +576,21 @@ async def bicycle_ticket_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) 
         await query.edit_message_text(f"❌ Error: {e}")
 
 
-async def bicycle_stats_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-    msg = (
+@rate_limited
+async def bicycle_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    keyboard = [[InlineKeyboardButton("🗺️ Open Map", url="https://seanatwork.github.io/austin311bot-unofficial/bicycle/")]]
+    await update.message.reply_text(
         "🚴 *Bicycle Infrastructure Reports*\n\n"
-        "View the interactive map with all bicycle-related 311 reports:\n\n"
-        "https://atxpulse.netlify.app/bicycle/\n\n"
+        "https://seanatwork.github.io/austin311bot-unofficial/bicycle/\n\n"
         "The map shows:\n"
         "• Bike lane issues and obstructions\n"
-        "• Debris hazards in cycling routes\n"
+        "• Debris hazards and sweeping requests\n"
         "• Construction affecting cyclists\n"
         "• Sidewalk and crossing issues\n"
         "• Direct bicycle complaints\n\n"
-        "Filter by time (30d/60d/90d) and status (open/closed)."
-    )
-    await query.edit_message_text(msg, parse_mode="Markdown", disable_web_page_preview=True)
-
-
-@rate_limited
-async def bicycle_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    keyboard = [
-        [InlineKeyboardButton("📋 Recent", callback_data="bicycle_recent"),
-         InlineKeyboardButton("📊 Stats", callback_data="bicycle_stats")],
-    ]
-    await update.message.reply_text(
-        "*🚴 Bicycle Complaints*\nChoose a view:",
+        "Filter by status (open/closed) and time window (30d/60d/90d).",
         parse_mode="Markdown",
+        disable_web_page_preview=True,
         reply_markup=InlineKeyboardMarkup(keyboard),
     )
 
@@ -2774,7 +2710,7 @@ async def homeless_311_command(update: Update, context: ContextTypes.DEFAULT_TYP
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("📊 Stats (30 days)", callback_data="homeless311_stats_30"),
          InlineKeyboardButton("📊 Stats (90 days)", callback_data="homeless311_stats_90")],
-        [InlineKeyboardButton("🗺️ View Map (30 days)", callback_data="homeless311_map_30"),
+        [InlineKeyboardButton("🗺️ View Map", url="https://seanatwork.github.io/austin311bot-unofficial/homeless/"),
          InlineKeyboardButton("📍 Open Locations", callback_data="homeless311_locations_30")],
         [InlineKeyboardButton("Change Time Window", callback_data="homeless311_time_window")],
     ])
@@ -2847,45 +2783,6 @@ async def homeless311_time_window_cb(update: Update, context: ContextTypes.DEFAU
     )
 
 
-async def homeless311_map_cb(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    query = update.callback_query
-    await query.answer()
-    parts = query.data.split("_")   # homeless311_map_<days>
-    try:
-        days = int(parts[-1])
-    except (ValueError, IndexError):
-        days = 30
-    
-    await query.edit_message_text(f"⏳ Generating encampment report map for last {days} days…")
-    
-    try:
-        buffer, summary = await asyncio.to_thread(generate_encampment_map, days)
-        
-        if buffer is None:
-            # Error or no data
-            await query.edit_message_text(summary)
-            return
-        
-        # Send the HTML map file
-        buffer.name = "encampment_map.html"
-        await query.message.reply_document(
-            document=buffer,
-            filename="encampment_map.html",
-            caption=summary,
-            parse_mode="Markdown",
-        )
-        
-        # Update the original message with a back button
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton("📊 Back to Stats", callback_data=f"homeless311_stats_{days}")],
-        ])
-        await query.edit_message_text(
-            f"✅ Map generated! Check the HTML file above.",
-            reply_markup=keyboard,
-        )
-    except Exception as e:
-        logger.error(f"homeless311 map cb: {e}", exc_info=True)
-        await query.edit_message_text(f"❌ Error generating map: {e}")
 
 
 # =============================================================================
@@ -3537,12 +3434,8 @@ def create_application() -> Application:
     app.add_handler(CallbackQueryHandler(about_cb, pattern="^about$"))
 
     # Graffiti inline
-    app.add_handler(CallbackQueryHandler(graffiti_analyze_cb, pattern="^graffiti_analyze"))
-    app.add_handler(CallbackQueryHandler(graffiti_remediation_cb, pattern="^graffiti_remediation"))
 
     # Bicycle inline
-    app.add_handler(CallbackQueryHandler(bicycle_recent_cb, pattern="^bicycle_recent"))
-    app.add_handler(CallbackQueryHandler(bicycle_stats_cb, pattern="^bicycle_stats"))
     app.add_handler(CallbackQueryHandler(bicycle_ticket_cb, pattern="^bicycle_ticket_"))
 
     # Restaurant inline
@@ -3612,7 +3505,6 @@ def create_application() -> Application:
     app.add_handler(CallbackQueryHandler(homeless311_stats_cb,       pattern="^homeless311_stats_"))
     app.add_handler(CallbackQueryHandler(homeless311_locations_cb,   pattern="^homeless311_locations_"))
     app.add_handler(CallbackQueryHandler(homeless311_time_window_cb, pattern="^homeless311_time_window$"))
-    app.add_handler(CallbackQueryHandler(homeless311_map_cb,         pattern="^homeless311_map_"))
 
 
     # Bicycle slash commands
