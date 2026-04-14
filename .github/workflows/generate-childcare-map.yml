@@ -1,0 +1,33 @@
+name: Refresh childcare map
+
+on:
+  schedule:
+    - cron: "0 12 * * 1"  # weekly on Mondays (compliance data changes slowly)
+  workflow_dispatch:        # allow manual trigger from Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  update-map:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Generate childcare map
+        run: python scripts/generate_map.py childcare
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/childcare/index.html
+          git diff --cached --quiet || git commit -m "chore: refresh childcare map [skip ci]"
+          git push

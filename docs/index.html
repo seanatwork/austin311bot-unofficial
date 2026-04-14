@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Austin 311 Maps</title>
+  <title>ATX Pulse Maps</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -95,8 +95,8 @@
 <body>
 
   <header>
-    <h1>Austin 311</h1>
-    <p>Custom service request maps</p>
+    <h1>ATX Pulse</h1>
+    <p>Austin 311 &amp; APD data maps</p>
   </header>
 
   <div class="grid">
@@ -125,12 +125,44 @@
       <span class="label">Parking</span>
       <span class="desc">Parking enforcement reports — updated daily</span>
     </a>
+    <a class="card" href="crime/">
+      <span class="icon">🚔</span>
+      <span class="label">Crime</span>
+      <span class="desc">APD incidents by council district — updated daily</span>
+    </a>
+    <a class="card" href="noise/">
+      <span class="icon">🔊</span>
+      <span class="label">Noise</span>
+      <span class="desc">Noise complaint reports — updated daily</span>
+    </a>
+    <a class="card" href="parks/">
+      <span class="icon">🏞️</span>
+      <span class="label">Parks</span>
+      <span class="desc">Park maintenance requests — updated daily</span>
+    </a>
+    <a class="card" href="water/">
+      <span class="icon">💧</span>
+      <span class="label">Water</span>
+      <span class="desc">Water conservation violation reports — updated daily</span>
+    </a>
+    <a class="card" href="childcare/">
+      <span class="icon">🧒</span>
+      <span class="label">Child Care</span>
+      <span class="desc">Childcare facility compliance — updated weekly</span>
+    </a>
   </div>
 
   <footer>
     Data from <a href="https://311.austintexas.gov" target="_blank" rel="noopener">Austin 311</a>
+    &amp;
+    <a href="https://data.austintexas.gov/d/fdj4-gpfu" target="_blank" rel="noopener">APD Crime Reports</a>
     &nbsp;·&nbsp;
-    <a href="https://t.me/austin311bot" target="_blank" rel="noopener">Telegram bot</a>
+    <a href="https://t.me/austin311bot" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:4px;">
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12L8.32 14.617l-2.96-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.828.942z"/>
+      </svg>
+      Telegram bot
+    </a>
   </footer>
 
 </body>

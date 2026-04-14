@@ -2122,6 +2122,10 @@ async def crime_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
         keyboard = [
             [InlineKeyboardButton(
+                "🗺️ View Map",
+                url="https://seanatwork.github.io/austin311bot-unofficial/crime/"
+            )],
+            [InlineKeyboardButton(
                 "📅 Compare to 10 years ago",
                 callback_data=f"crime_compare_{start_str}_{end_str}"
             )],

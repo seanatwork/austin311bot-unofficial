@@ -72,25 +72,34 @@ Query patterns: ISO8601 dates with `Z` suffix, `per_page`/`page` pagination, `$w
 
 ## Static Map Website
 
-Public maps are deployed at Netlify, generated from the same data as Telegram commands.
+Public maps are deployed via GitHub Pages (`docs/` folder), generated from the same data as Telegram commands.
 
 **Maps:**
-- `docs/index.html` — Landing page hub (https://atxpulse.netlify.app/)
-- `docs/homeless/index.html` — Homeless encampment map (https://atxpulse.netlify.app/homeless/)
-- `docs/bicycle/index.html` — Bicycle infrastructure map (https://atxpulse.netlify.app/bicycle/)
-- `docs/graffiti/index.html` — Graffiti abatement map (https://atxpulse.netlify.app/graffiti/)
-- `docs/traffic/index.html` — Traffic & infrastructure map (https://atxpulse.netlify.app/traffic/)
-- `docs/parking/index.html` — Parking enforcement map (https://atxpulse.netlify.app/parking/)
+- `docs/index.html` — Landing page hub (https://seanatwork.github.io/austin311bot-unofficial/) — branded "ATX Pulse"
+- `docs/homeless/index.html` — Homeless encampment map (https://seanatwork.github.io/austin311bot-unofficial/homeless/)
+- `docs/bicycle/index.html` — Bicycle infrastructure map (https://seanatwork.github.io/austin311bot-unofficial/bicycle/)
+- `docs/graffiti/index.html` — Graffiti abatement map (https://seanatwork.github.io/austin311bot-unofficial/graffiti/)
+- `docs/traffic/index.html` — Traffic & infrastructure map (https://seanatwork.github.io/austin311bot-unofficial/traffic/)
+- `docs/parking/index.html` — Parking enforcement map (https://seanatwork.github.io/austin311bot-unofficial/parking/)
+- `docs/crime/index.html` — APD crime choropleth by council district (https://seanatwork.github.io/austin311bot-unofficial/crime/)
+- `docs/noise/index.html` — Noise complaint point map (https://seanatwork.github.io/austin311bot-unofficial/noise/)
+- `docs/parks/index.html` — Park maintenance point map (https://seanatwork.github.io/austin311bot-unofficial/parks/)
+- `docs/water/index.html` — Water conservation violations point map (https://seanatwork.github.io/austin311bot-unofficial/water/)
+- `docs/childcare/index.html` — Childcare facility compliance map (https://seanatwork.github.io/austin311bot-unofficial/childcare/)
 
 **Files:**
 - `scripts/generate_map.py` — generic map generator that accepts category as CLI argument
-  - Usage: `python scripts/generate_map.py bicycle|graffiti|homeless|traffic|parking`
+  - Usage: `python scripts/generate_map.py bicycle|graffiti|homeless|traffic|parking|crime`
 - `.github/workflows/deploy-map.yml` — GitHub Actions cron for homeless map (daily noon UTC)
 - `.github/workflows/generate-bicycle-map.yml` — GitHub Actions cron for bicycle map (daily noon UTC)
 - `.github/workflows/generate-graffiti-map.yml` — GitHub Actions cron for graffiti map (daily noon UTC)
 - `.github/workflows/generate-traffic-map.yml` — GitHub Actions cron for traffic map (daily noon UTC)
 - `.github/workflows/generate-parking-map.yml` — GitHub Actions cron for parking map (daily noon UTC)
-- `netlify.toml` — tells Netlify to serve from `docs/`, no build command
+- `.github/workflows/generate-crime-map.yml` — GitHub Actions cron for crime map (daily noon UTC)
+- `.github/workflows/generate-noise-map.yml` — GitHub Actions cron for noise map (daily noon UTC)
+- `.github/workflows/generate-parks-map.yml` — GitHub Actions cron for parks map (daily noon UTC)
+- `.github/workflows/generate-water-map.yml` — GitHub Actions cron for water map (daily noon UTC)
+- `.github/workflows/generate-childcare-map.yml` — GitHub Actions cron for childcare map (weekly, Mondays)
 - `docs/*/index.html` — pre-generated Folium HTML maps (committed to repo)
 
 **Map features (all maps follow the same pattern):**
@@ -100,30 +109,28 @@ Public maps are deployed at Netlify, generated from the same data as Telegram co
 - Popups show: clickable ticket link (`https://311.austintexas.gov/tickets?filter%5Bsearch%5D={id}`), address, filed/updated dates, description (up to 500 chars) falling back to resolution notes
 - Mobile-friendly viewport meta tag
 
-**Netlify deploy workflow (manual):**
+**Deploy workflow:**
 1. Test locally: `source .venv/bin/activate && PYTHONPATH=. python scripts/generate_map.py <category>`
-2. Commit and push changes to GitHub
-3. GitHub Actions → "Refresh <category> map" → Run workflow (regenerates `docs/<category>/index.html`)
-4. Netlify dashboard → Deploys → Trigger deploy → Deploy site (without cache)
+2. GitHub Actions → "Refresh <category> map" → Run workflow (regenerates `docs/<category>/index.html` and pushes)
+3. GitHub Pages serves the updated `docs/` folder automatically
 
 **Notes:**
-- Netlify auto-builds are currently **stopped** to conserve build minutes; trigger manually
 - `AUSTIN_APP_TOKEN` must be set as a GitHub Actions secret for rate limit headroom
 - 429 rate limit errors during local runs are normal without the token; CI has the secret
 - `.venv/` is the working virtualenv (system Python is externally managed)
 
-## In-Progress: Crime Choropleth Map
+## Crime Choropleth Map
 
-**Goal:** Add a crime map at `docs/crime/index.html` as a Folium choropleth colored by APD incident count per council district. Unlike the other maps (which use 311 lat/lon points), crime data has no coordinates — only `council_district`, `sector`, and `census_block_group`. A district-level choropleth is the right fit.
+Live at `docs/crime/index.html` — a Folium choropleth of APD incident counts by Austin council district.
 
-**Data sources:**
-- APD Crime Reports: Socrata `fdj4-gpfu` — fields: `crime_type`, `clearance_status`, `occ_date`, `council_district`, `location_type`, `census_block_group` (no lat/lon)
-- NIBRS Homicides: Socrata `i7fg-wrk5` — fields: `nibrs_desc`, `internal_clearance_status`, `occurred_date`, `council_district`, `zip_code`, `location_description` (no lat/lon)
-- Austin council district boundaries GeoJSON — needed for choropleth polygons; source still being identified from data.austintexas.gov
+**Implementation:**
+- `crime/crime_map.py` — `generate_crime_map()` fetches Socrata `fdj4-gpfu` grouped by `council_district` for 30/60/90-day windows; fetches district polygon GeoJSON from City of Austin ArcGIS; builds a Leaflet choropleth injected into a Folium base map
+- District boundaries GeoJSON source: `https://services.arcgis.com/0L95CJ0VTaxqcmED/ArcGIS/rest/services/Council_Districts/FeatureServer/0/query?where=1%3D1&outFields=COUNCIL_DI&f=geojson`
+- Key field for joining crime data to GeoJSON: `COUNCIL_DI` (integer 1–10) matches Socrata `council_district` string "1"–"10"
+- Color scale: YlOrRd 5-step (`#ffffb2` → `#bd0026`)
 
-**Remaining tasks:**
-1. Find working GeoJSON source for Austin council district boundaries
-2. Create `scripts/generate_crime_map.py` (or a `crime/` module) following the same pattern as existing map generators — fetches data, builds Folium choropleth, returns `io.BytesIO` HTML
-3. Wire into `scripts/generate_map.py` and add `.github/workflows/generate-crime-map.yml`
-4. Add crime card to `docs/index.html`
-5. Update `docs/index.html` landing page title/header from "Austin 311" to something data-general (e.g. "ATX Pulse") and update footer to reference both 311 and APD data sources
+**Map features (differs from 311 point maps):**
+- Choropleth polygon fill colored by incident count; no open/closed toggle (APD data has no status)
+- 30d/60d/90d buttons update polygon fill colors via `geoLayer.setStyle()`
+- Hover tooltip shows district number + count; click popup shows count + % of citywide total
+- `docs/index.html` landing page updated to "ATX Pulse" with footer referencing both 311 and APD sources

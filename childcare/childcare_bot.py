@@ -8,6 +8,10 @@ Queries HHSC Child Care Licensing datasets on data.texas.gov:
 Joins on operation_id to show Austin-specific summaries and top violators.
 """
 
+import io
+import os
+import json
+import tempfile
 import logging
 import requests
 from typing import Optional
@@ -243,3 +247,244 @@ def format_childcare(stats: dict) -> str:
 
     msg += "_Source: [HHSC Child Care Licensing](https://data.texas.gov/d/bc5r-88dy)_"
     return msg
+
+
+# =============================================================================
+# MAP GENERATOR
+# =============================================================================
+
+def _fetch_facilities_with_coords() -> list:
+    """Fetch Austin childcare facilities that have geocoded coordinates."""
+    session = _get_session()
+    results = []
+    offset = 0
+    limit = 1000
+
+    while True:
+        resp = session.get(FACILITIES_URL, params={
+            "$select": (
+                "operation_id,operation_name,operation_type,location_address,"
+                "location_address_geo,total_capacity,operation_status,"
+                "deficiency_high,deficiency_medium_high,deficiency_medium,"
+                "adverse_action,corrective_action,temporarily_closed"
+            ),
+            "$where": "city='AUSTIN'",
+            "$limit": limit,
+            "$offset": offset,
+        }, timeout=TIMEOUT)
+        resp.raise_for_status()
+        batch = resp.json()
+        if not batch:
+            break
+        for f in batch:
+            geo = f.get("location_address_geo") or {}
+            try:
+                lat = float(geo.get("latitude") or 0)
+                lon = float(geo.get("longitude") or 0)
+                if 30.0 <= lat <= 30.5 and -98.0 <= lon <= -97.5:
+                    f["_lat"] = lat
+                    f["_lon"] = lon
+                    results.append(f)
+            except (TypeError, ValueError):
+                pass
+        if len(batch) < limit:
+            break
+        offset += limit
+
+    return results
+
+
+def generate_childcare_map(days_back: int = 90) -> tuple:
+    """Generate an interactive HTML map of Austin childcare facility compliance.
+
+    Markers are colored by deficiency level. days_back is accepted for API
+    compatibility but not used (facility data is a current compliance snapshot).
+
+    Returns:
+        tuple: (BytesIO buffer with HTML content, summary message)
+    """
+    try:
+        import folium
+        from folium.plugins import MarkerCluster
+    except ImportError:
+        return None, "❌ Map generation requires 'folium'. Install: pip install folium"
+
+    facilities = _fetch_facilities_with_coords()
+    if not facilities:
+        return None, "🧒 No Austin childcare facility location data found."
+
+    total = len(facilities)
+    flagged = sum(
+        1 for f in facilities
+        if int(f.get("deficiency_high") or 0) > 0
+        or int(f.get("deficiency_medium_high") or 0) > 0
+    )
+    high_risk = sum(1 for f in facilities if int(f.get("deficiency_high") or 0) > 0)
+
+    def _deficiency_tier(f):
+        if int(f.get("deficiency_high") or 0) > 0:
+            return "high"
+        if int(f.get("deficiency_medium_high") or 0) > 0:
+            return "medium_high"
+        if int(f.get("deficiency_medium") or 0) > 0:
+            return "medium"
+        return "clean"
+
+    tier_colors = {
+        "high":        ("red",    "remove-sign"),
+        "medium_high": ("orange", "warning-sign"),
+        "medium":      ("beige",  "exclamation-sign"),
+        "clean":       ("green",  "ok-sign"),
+    }
+
+    counts_by_tier = {"high": 0, "medium_high": 0, "medium": 0, "clean": 0}
+
+    m = folium.Map(location=[30.2672, -97.7431], zoom_start=11, tiles="CartoDB positron")
+
+    fg_objects = {}
+    fg_clusters = {}
+    for tier in ("high", "medium_high", "medium", "clean"):
+        fg = folium.FeatureGroup(name=tier, show=True, overlay=True)
+        cluster = MarkerCluster().add_to(fg)
+        fg.add_to(m)
+        fg_objects[tier] = fg
+        fg_clusters[tier] = cluster
+
+    for f in facilities:
+        lat = f["_lat"]
+        lon = f["_lon"]
+        tier = _deficiency_tier(f)
+        counts_by_tier[tier] += 1
+
+        name = (f.get("operation_name") or "Unknown").strip().title()
+        op_type = (f.get("operation_type") or "").strip()
+        address = (f.get("location_address") or "").strip()
+        capacity = f.get("total_capacity") or ""
+        high = int(f.get("deficiency_high") or 0)
+        med_hi = int(f.get("deficiency_medium_high") or 0)
+        med = int(f.get("deficiency_medium") or 0)
+        adverse = (f.get("adverse_action") or "").upper() == "YES"
+        temp_closed = (f.get("temporarily_closed") or "").upper() == "YES"
+        status = (f.get("operation_status") or "").upper()
+
+        flags = []
+        if adverse:
+            flags.append("🚨 Adverse action")
+        if temp_closed:
+            flags.append("🔒 Temp closed")
+        flags_html = "<br/>".join(f"<b>{fl}</b>" for fl in flags)
+        flags_block = f"{flags_html}<br/>" if flags_html else ""
+
+        deficiency_line = ""
+        if high or med_hi or med:
+            deficiency_line = (
+                f"<b>Deficiencies:</b> "
+                f"🔴 {high} high &nbsp; 🟠 {med_hi} med-high &nbsp; 🟡 {med} medium<br/>"
+            )
+
+        capacity_line = f"<b>Capacity:</b> {capacity} children<br/>" if capacity else ""
+
+        popup_html = f"""
+        <div style="font-family:sans-serif;max-width:300px;">
+            <b style="font-size:13px;">{name}</b><br/>
+            <span style="color:#666;font-size:11px;">{op_type}</span><br/>
+            <span style="color:#888;font-size:11px;">{address}</span><br/><br/>
+            {flags_block}
+            {deficiency_line}
+            {capacity_line}
+            <span style="color:#666;font-size:11px;">Status: {'Active' if status == 'Y' else status}</span>
+        </div>
+        """
+        popup = folium.Popup(popup_html, max_width=300)
+        color, icon_name = tier_colors[tier]
+        tooltip = f"{name} — {'⚠️ ' + str(high+med_hi) + ' deficiencies' if (high or med_hi) else 'Clean'}"
+        folium.Marker(
+            location=[lat, lon],
+            popup=popup,
+            icon=folium.Icon(color=color, icon=icon_name, prefix="glyphicon"),
+            tooltip=tooltip,
+        ).add_to(fg_clusters[tier])
+
+    counts_js = json.dumps(counts_by_tier)
+    map_var = m.get_name()
+    layer_map_js = "{" + ", ".join(f'"{k}": {fg_objects[k].get_name()}' for k in fg_objects) + "}"
+
+    panel_html = f"""
+    <div id="map-panel" style="position:absolute;top:10px;left:50%;transform:translateX(-50%);
+                background:white;padding:10px 16px;border-radius:6px;
+                box-shadow:0 2px 6px rgba(0,0,0,0.3);z-index:9999;
+                font-family:sans-serif;text-align:center;min-width:340px;">
+        <b style="font-size:15px;">🧒 Austin Child Care Licensing Compliance</b><br/>
+        <span id="map-summary" style="font-size:12px;color:#555;"></span>
+        <div style="display:flex;justify-content:center;gap:4px;margin-top:7px;flex-wrap:wrap;">
+            <button id="btn-high" onclick="toggleTier('high')" class="fbtn active">🔴 High Risk</button>
+            <button id="btn-medium_high" onclick="toggleTier('medium_high')" class="fbtn active">🟠 Med-High</button>
+            <button id="btn-medium" onclick="toggleTier('medium')" class="fbtn active">🟡 Medium</button>
+            <button id="btn-clean" onclick="toggleTier('clean')" class="fbtn active">🟢 Clean</button>
+        </div>
+    </div>
+    <style>
+        .fbtn {{ padding:3px 9px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;cursor:pointer;font-size:12px;color:#444; }}
+        .fbtn.active {{ background:#2563eb;color:white;border-color:#2563eb; }}
+        .fbtn:hover:not(.active) {{ background:#e0e7ff; }}
+    </style>
+    <script>
+        var tierVisible = {{high: true, medium_high: true, medium: true, clean: true}};
+        var layerMap = null;
+        var leafletMap = null;
+        var tierCounts = {counts_js};
+
+        function updateSummary() {{
+            var shown = Object.keys(tierVisible).filter(function(t) {{ return tierVisible[t]; }});
+            var total = shown.reduce(function(s, t) {{ return s + (tierCounts[t] || 0); }}, 0);
+            document.getElementById('map-summary').textContent =
+                total + ' facilities shown \u00b7 click a marker for details';
+        }}
+
+        function initLayers() {{
+            layerMap = {layer_map_js};
+            leafletMap = {map_var};
+            updateSummary();
+        }}
+
+        function toggleTier(tier) {{
+            tierVisible[tier] = !tierVisible[tier];
+            document.getElementById('btn-' + tier).classList.toggle('active');
+            var layer = layerMap[tier];
+            if (tierVisible[tier]) {{
+                if (!leafletMap.hasLayer(layer)) leafletMap.addLayer(layer);
+            }} else {{
+                if (leafletMap.hasLayer(layer)) leafletMap.removeLayer(layer);
+            }}
+            updateSummary();
+        }}
+
+        document.addEventListener('DOMContentLoaded', function() {{
+            setTimeout(initLayers, 1000);
+        }});
+    </script>
+    """
+    m.get_root().html.add_child(folium.Element(panel_html))
+
+    with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as tmp:
+        tmp_path = tmp.name
+    try:
+        m.save(tmp_path)
+        with open(tmp_path, 'rb') as f:
+            html_content = f.read()
+        buffer = io.BytesIO(html_content)
+        buffer.seek(0)
+    finally:
+        try:
+            os.unlink(tmp_path)
+        except Exception:
+            pass
+
+    summary = (
+        f"🧒 *Child Care Licensing Compliance Map*\n"
+        f"_Current facility compliance snapshot_\n\n"
+        f"📊 *{total:,} facilities mapped*\n"
+        f"🔴 *{high_risk:,} high-risk*  ·  ⚠️ *{flagged:,} with deficiencies*\n\n"
+        f"Markers colored by deficiency level. Tap to see details."
+    )
+    return buffer, summary

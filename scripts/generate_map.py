@@ -45,12 +45,47 @@ def generate_parking_map(days_back: int = 90) -> tuple:
     return generate_parking_map(days_back)
 
 
+def generate_crime_map(days_back: int = 90) -> tuple:
+    """Generate APD crime choropleth map by council district."""
+    from crime.crime_map import generate_crime_map
+    return generate_crime_map(days_back)
+
+
+def generate_noise_map(days_back: int = 90) -> tuple:
+    """Generate noise complaints point map."""
+    from noisecomplaints.noise_bot import generate_noise_map
+    return generate_noise_map(days_back)
+
+
+def generate_parks_map(days_back: int = 90) -> tuple:
+    """Generate park maintenance point map."""
+    from parks.parks_bot import generate_parks_map
+    return generate_parks_map(days_back)
+
+
+def generate_water_map(days_back: int = 90) -> tuple:
+    """Generate water conservation violations point map."""
+    from waterconservation.water_conservation_bot import generate_water_map
+    return generate_water_map(days_back)
+
+
+def generate_childcare_map(days_back: int = 90) -> tuple:
+    """Generate childcare facility compliance map."""
+    from childcare.childcare_bot import generate_childcare_map
+    return generate_childcare_map(days_back)
+
+
 CATEGORY_MAPS = {
     "bicycle": (generate_bicycle_map, "bicycle/index.html"),
     "graffiti": (generate_graffiti_map, "graffiti/index.html"),
     "homeless": (generate_homeless_map, "homeless/index.html"),
     "traffic": (generate_traffic_map, "traffic/index.html"),
     "parking": (generate_parking_map, "parking/index.html"),
+    "crime": (generate_crime_map, "crime/index.html"),
+    "noise": (generate_noise_map, "noise/index.html"),
+    "parks": (generate_parks_map, "parks/index.html"),
+    "water": (generate_water_map, "water/index.html"),
+    "childcare": (generate_childcare_map, "childcare/index.html"),
 }
 
 
