@@ -111,3 +111,19 @@ Public maps are deployed at Netlify, generated from the same data as Telegram co
 - `AUSTIN_APP_TOKEN` must be set as a GitHub Actions secret for rate limit headroom
 - 429 rate limit errors during local runs are normal without the token; CI has the secret
 - `.venv/` is the working virtualenv (system Python is externally managed)
+
+## In-Progress: Crime Choropleth Map
+
+**Goal:** Add a crime map at `docs/crime/index.html` as a Folium choropleth colored by APD incident count per council district. Unlike the other maps (which use 311 lat/lon points), crime data has no coordinates — only `council_district`, `sector`, and `census_block_group`. A district-level choropleth is the right fit.
+
+**Data sources:**
+- APD Crime Reports: Socrata `fdj4-gpfu` — fields: `crime_type`, `clearance_status`, `occ_date`, `council_district`, `location_type`, `census_block_group` (no lat/lon)
+- NIBRS Homicides: Socrata `i7fg-wrk5` — fields: `nibrs_desc`, `internal_clearance_status`, `occurred_date`, `council_district`, `zip_code`, `location_description` (no lat/lon)
+- Austin council district boundaries GeoJSON — needed for choropleth polygons; source still being identified from data.austintexas.gov
+
+**Remaining tasks:**
+1. Find working GeoJSON source for Austin council district boundaries
+2. Create `scripts/generate_crime_map.py` (or a `crime/` module) following the same pattern as existing map generators — fetches data, builds Folium choropleth, returns `io.BytesIO` HTML
+3. Wire into `scripts/generate_map.py` and add `.github/workflows/generate-crime-map.yml`
+4. Add crime card to `docs/index.html`
+5. Update `docs/index.html` landing page title/header from "Austin 311" to something data-general (e.g. "ATX Pulse") and update footer to reference both 311 and APD data sources
