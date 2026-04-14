@@ -75,6 +75,12 @@ def generate_childcare_map(days_back: int = 90) -> tuple:
     return generate_childcare_map(days_back)
 
 
+def generate_animal_map(days_back: int = 90) -> tuple:
+    """Generate animal services point map."""
+    from animalsvc.animal_bot import generate_animal_map
+    return generate_animal_map(days_back)
+
+
 CATEGORY_MAPS = {
     "bicycle": (generate_bicycle_map, "bicycle/index.html"),
     "graffiti": (generate_graffiti_map, "graffiti/index.html"),
@@ -86,6 +92,7 @@ CATEGORY_MAPS = {
     "parks": (generate_parks_map, "parks/index.html"),
     "water": (generate_water_map, "water/index.html"),
     "childcare": (generate_childcare_map, "childcare/index.html"),
+    "animal": (generate_animal_map, "animal/index.html"),
 }
 
 
