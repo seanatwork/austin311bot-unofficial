@@ -307,6 +307,29 @@ _LABEL_COLOR = {
 }
 _DEFAULT_COLOR = ("cadetblue", "info-sign")
 
+# camelCase slugs used as layer-key segment (no underscores — split-safe)
+_TYPE_SLUGS = {
+    "Animal Bite":               "animalBite",
+    "Vicious Dog":               "viciousDog",
+    "Wildlife Exposure":         "wildlife",
+    "Loose Dog":                 "looseDog",
+    "Loose Animal (Not Dog)":    "looseAnimal",
+    "Animal Care Concern":       "animalCare",
+    "Animal Protection Request": "animalProtection",
+}
+_DEFAULT_SLUG = "other"
+
+# Ordered list for the dropdown (severity first)
+_TYPE_OPTIONS = [
+    ("animalBite",       "🔴 Animal Bite"),
+    ("viciousDog",       "🔴 Vicious Dog"),
+    ("wildlife",         "🟠 Wildlife Exposure"),
+    ("looseDog",         "🔵 Loose Dog"),
+    ("looseAnimal",      "🔵 Loose Animal (Not Dog)"),
+    ("animalCare",       "🟣 Animal Care Concern"),
+    ("animalProtection", "🟣 Animal Protection Request"),
+]
+
 
 def generate_animal_map(days_back: int = 90) -> tuple:
     """Generate an interactive HTML map of animal services complaints.
@@ -348,32 +371,39 @@ def generate_animal_map(days_back: int = 90) -> tuple:
         except Exception:
             return days_back
 
-    bucket_counts = {"30": {"open": 0, "closed": 0}, "60": {"open": 0, "closed": 0}, "90": {"open": 0, "closed": 0}}
+    # Count per type × bucket for the summary bar (matches traffic map pattern)
+    all_slugs = list(_TYPE_SLUGS.values()) + [_DEFAULT_SLUG]
+    type_bucket_counts = {
+        slug: {"30": {"open": 0, "closed": 0}, "60": {"open": 0, "closed": 0}, "90": {"open": 0, "closed": 0}}
+        for slug in all_slugs + ["all"]
+    }
     for r in records:
         age = _age_days(r)
         status = (r.get("status") or "").lower()
         s = status if status in ("open", "closed") else "closed"
-        if age <= 30:
-            bucket_counts["30"][s] += 1
-        if age <= 60:
-            bucket_counts["60"][s] += 1
-        if age <= 90:
-            bucket_counts["90"][s] += 1
-    counts_js = str(bucket_counts).replace("'", '"')
+        slug = _TYPE_SLUGS.get(r.get("_service_label", ""), _DEFAULT_SLUG)
+        for bucket_days in (30, 60, 90):
+            if age <= bucket_days:
+                b = str(bucket_days)
+                type_bucket_counts["all"][b][s] += 1
+                type_bucket_counts[slug][b][s] += 1
+    counts_js = str(type_bucket_counts).replace("'", '"')
 
     m = folium.Map(location=[30.2672, -97.7431], zoom_start=11, tiles="CartoDB positron")
 
+    # Layer key: {status}_{bucket}_{typeSlug}  — no underscores in slug so split('_') is safe
     fg_clusters = {}
     fg_objects = {}
     for status_key in ("open", "closed"):
         for bucket in ("30", "60", "90"):
-            name = f"{status_key}_{bucket}"
-            show = (bucket == "90")
-            fg = folium.FeatureGroup(name=name, show=show, overlay=True)
-            cluster = MarkerCluster().add_to(fg)
-            fg.add_to(m)
-            fg_clusters[name] = cluster
-            fg_objects[name] = fg
+            for slug in all_slugs:
+                name = f"{status_key}_{bucket}_{slug}"
+                show = (bucket == "90")
+                fg = folium.FeatureGroup(name=name, show=show, overlay=True)
+                cluster = MarkerCluster().add_to(fg)
+                fg.add_to(m)
+                fg_clusters[name] = cluster
+                fg_objects[name] = fg
 
     for r in records:
         lat = r["_lat"]
@@ -389,9 +419,10 @@ def generate_animal_map(days_back: int = 90) -> tuple:
 
         age = _age_days(r)
         bucket = "30" if age <= 30 else ("60" if age <= 60 else "90")
-        cluster_key = f"{status}_{bucket}"
+        slug = _TYPE_SLUGS.get(service_label, _DEFAULT_SLUG)
+        cluster_key = f"{status}_{bucket}_{slug}"
         if cluster_key not in fg_clusters:
-            cluster_key = f"closed_{bucket}"
+            cluster_key = f"closed_{bucket}_{slug}"
 
         address_line = f"<b>Address:</b> {address}<br/>" if address else ""
         updated_line = f"<span style='color:#666;'>Updated: {updated_str}</span><br/>" if updated_str and updated_str != date_str else ""
@@ -427,6 +458,10 @@ def generate_animal_map(days_back: int = 90) -> tuple:
             tooltip=tooltip,
         ).add_to(fg_clusters[cluster_key])
 
+    type_options_html = '<option value="all">All Types</option>\n'
+    for slug, label in _TYPE_OPTIONS:
+        type_options_html += f'<option value="{slug}">{label}</option>\n'
+
     map_var = m.get_name()
     layer_map_js = "{" + ", ".join(f'"{k}": {fg_objects[k].get_name()}' for k in fg_objects) + "}"
     panel_html = f"""
@@ -445,6 +480,16 @@ def generate_animal_map(days_back: int = 90) -> tuple:
             <button id="btn-closed" onclick="toggleStatus('closed')" class="fbtn active">🟢 Closed</button>
         </div>
     </div>
+    <div id="type-panel" style="position:absolute;top:10px;right:10px;
+                background:white;padding:8px 12px;border-radius:6px;
+                box-shadow:0 2px 6px rgba(0,0,0,0.3);z-index:9999;
+                font-family:sans-serif;">
+        <label for="type-select" style="font-size:11px;font-weight:bold;color:#444;display:block;margin-bottom:4px;">Filter by Type</label>
+        <select id="type-select" onchange="setTypeFilter(this.value)"
+                style="font-size:12px;padding:3px 6px;border:1px solid #ccc;border-radius:4px;cursor:pointer;width:100%;">
+            {type_options_html}
+        </select>
+    </div>
     <style>
         .fbtn {{ padding:3px 9px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;cursor:pointer;font-size:12px;color:#444; }}
         .fbtn.active {{ background:#2563eb;color:white;border-color:#2563eb; }}
@@ -454,13 +499,15 @@ def generate_animal_map(days_back: int = 90) -> tuple:
         var currentDays = 90;
         var showOpen = true;
         var showClosed = true;
+        var currentType = 'all';
         var layerMap = null;
         var leafletMap = null;
-        var bucketCounts = {counts_js};
+        var typeBucketCounts = {counts_js};
 
         function updateSummary() {{
             var d = String(currentDays);
-            var counts = bucketCounts[d] || {{}};
+            var catData = typeBucketCounts[currentType] || typeBucketCounts['all'];
+            var counts = catData[d] || {{}};
             var o = showOpen ? (counts.open || 0) : 0;
             var c = showClosed ? (counts.closed || 0) : 0;
             document.getElementById('map-summary').textContent =
@@ -480,10 +527,12 @@ def generate_animal_map(days_back: int = 90) -> tuple:
                 var parts = key.split('_');
                 var status = parts[0];
                 var bucket = parseInt(parts[1]);
+                var typeSlug = parts[2];
                 var timeOk = bucket <= currentDays;
                 var statusOk = (status === 'open' && showOpen) || (status === 'closed' && showClosed);
+                var typeOk = (currentType === 'all') || (typeSlug === currentType);
                 var layer = layerMap[key];
-                if (timeOk && statusOk) {{
+                if (timeOk && statusOk && typeOk) {{
                     if (!leafletMap.hasLayer(layer)) leafletMap.addLayer(layer);
                 }} else {{
                     if (leafletMap.hasLayer(layer)) leafletMap.removeLayer(layer);
@@ -505,6 +554,12 @@ def generate_animal_map(days_back: int = 90) -> tuple:
             if (status === 'open') showOpen = !showOpen;
             else showClosed = !showClosed;
             document.getElementById('btn-' + status).classList.toggle('active');
+            updateLayers();
+            updateSummary();
+        }}
+
+        function setTypeFilter(type) {{
+            currentType = type;
             updateLayers();
             updateSummary();
         }}
@@ -535,6 +590,6 @@ def generate_animal_map(days_back: int = 90) -> tuple:
         f"_Last {days_back} days_\n\n"
         f"📊 *{len(records):,} reports mapped*\n"
         f"🔴 *{open_count:,} open*  ·  🟢 *{closed_count:,} closed*\n\n"
-        f"Open markers colored by severity. Tap to see report details."
+        f"Open markers colored by severity. Use the type filter to focus on bites, loose dogs, etc."
     )
     return buffer, summary
