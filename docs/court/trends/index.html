@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ATX Pulse — Travis County Criminal Court Trends</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #panel {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #1e2230;
+      border-bottom: 1px solid #2d3348;
+      padding: 10px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #panel-title  { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+    #panel-subtitle { font-size: 12px; color: #64748b; text-align: center; }
+
+    .btn-row { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+
+    .fbtn {
+      background: #252b3b;
+      border: 1px solid #3d4868;
+      color: #94a3b8;
+      padding: 5px 13px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+      white-space: nowrap;
+    }
+    .fbtn:hover { background: #2d3453; color: #e2e8f0; }
+    .fbtn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; font-weight: 600; }
+
+    .btn-divider {
+      width: 1px;
+      background: #2d3348;
+      margin: 0 2px;
+      align-self: stretch;
+    }
+
+    #stats {
+      display: none;
+      border-bottom: 1px solid #2d3348;
+    }
+
+    .stats-inner {
+      display: flex;
+      justify-content: center;
+    }
+
+    .stat {
+      flex: 1;
+      max-width: 160px;
+      text-align: center;
+      padding: 10px 8px 9px;
+      border-right: 1px solid #2d3348;
+    }
+    .stat:last-child { border-right: none; }
+
+    .stat-value { font-size: 1.25rem; font-weight: 700; line-height: 1.1; }
+    .stat-label { font-size: 0.67rem; color: #475569; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px; }
+    .stat-sub   { font-size: 0.67rem; color: #475569; margin-top: 1px; }
+
+    #chart-wrap { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 16px; }
+
+    #loading {
+      display: flex; align-items: center; justify-content: center;
+      padding: 60px 0; color: #475569; font-size: 14px;
+    }
+
+    #chart-container {
+      display: none;
+      position: relative;
+      height: 400px;
+    }
+
+    #data-note {
+      display: none;
+      padding: 12px 14px;
+      background: #1e2230;
+      border: 1px solid #2d3348;
+      border-left: 3px solid #3b82f6;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+    #data-note strong { color: #f1f5f9; }
+
+    footer {
+      text-align: center;
+      padding: 14px 16px;
+      font-size: 0.74rem;
+      color: #475569;
+      border-top: 1px solid #1e2230;
+    }
+    footer a { color: #64748b; text-decoration: none; }
+    footer a:hover { color: #94a3b8; }
+
+    @media (max-width: 520px) {
+      .stat-value { font-size: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="panel">
+    <div id="panel-title">📊 Travis County Criminal Court Trends</div>
+    <div id="panel-subtitle">Cases filed, disposed &amp; backlog — 2018 to present</div>
+    <div class="btn-row">
+      <button class="fbtn active" id="btn-annual"   onclick="setView('annual')">Annual (2018–2025)</button>
+      <button class="fbtn"        id="btn-monthly"  onclick="setView('monthly')">Monthly (2023–2025)</button>
+      <div class="btn-divider"></div>
+      <button class="fbtn active" id="btn-both"     onclick="setCourt('both')">Both Courts</button>
+      <button class="fbtn"        id="btn-district" onclick="setCourt('District')">District</button>
+      <button class="fbtn"        id="btn-county"   onclick="setCourt('County')">County</button>
+    </div>
+  </div>
+
+  <div id="stats">
+    <div class="stats-inner">
+      <div class="stat">
+        <div class="stat-value" id="s-filed" style="color:#3b82f6;">—</div>
+        <div class="stat-label">Filed 2024</div>
+        <div class="stat-sub"  id="s-filed-yoy"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="s-disposed" style="color:#22c55e;">—</div>
+        <div class="stat-label">Disposed 2024</div>
+        <div class="stat-sub"  id="s-rate"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="s-backlog" style="color:#f59e0b;">—</div>
+        <div class="stat-label">Backlog (Dec 2025)</div>
+        <div class="stat-sub"  id="s-backlog-chg"></div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="s-trend" style="color:#e2e8f0;">—</div>
+        <div class="stat-label">Filing trend</div>
+        <div class="stat-sub">2022 → 2024</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="chart-wrap">
+    <div id="loading">Loading data from Texas OCA…</div>
+    <div id="chart-container">
+      <canvas id="myChart"></canvas>
+    </div>
+    <div id="data-note">
+      <strong>What this data covers:</strong>
+      Travis County District Courts handle felonies and Class A/B misdemeanors (serious assaults, DWI, drug trafficking, etc.).
+      County Courts at Law handle Class A/B misdemeanors and civil matters.
+      This is <em>not</em> Austin Municipal Court — those are lower-level Class C misdemeanors (traffic, parking, noise).
+      <br /><br />
+      <strong>Cases filed</strong> = new cases entering the system each period.
+      <strong>Cases disposed</strong> = cases resolved (by any means — guilty plea, dismissal, trial verdict, transfer).
+      <strong>Backlog</strong> = total cases still pending at period end. When filed &gt; disposed over time, backlog grows.
+      <br /><br />
+      Source: Texas Office of Court Administration (OCA) via data.texas.gov.
+      Data does not include disposition type — only volume.
+      Data available through December 2025; updated monthly.
+    </div>
+  </div>
+
+  <footer>
+    Data: <a href="https://data.texas.gov/d/hp5g-u8vi" target="_blank" rel="noopener">OCA Monthly Caseload 2023–2025</a>
+    &nbsp;+&nbsp;
+    <a href="https://data.texas.gov/d/bxc4-y9ux" target="_blank" rel="noopener">OCA Annual Caseload 2018–2022</a>
+    &nbsp;·&nbsp;
+    <a href="../">← Court Charges</a>
+    &nbsp;·&nbsp;
+    <a href="../../">← ATX Pulse</a>
+  </footer>
+
+  <script>
+    // ── Cache ──────────────────────────────────────────────────────────────────
+    const CACHE_TTL = 86_400_000; // 24 hours
+
+    function getCached(key) {
+      try {
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
+        const { data, fetched } = JSON.parse(raw);
+        return Date.now() - fetched < CACHE_TTL ? data : null;
+      } catch { return null; }
+    }
+
+    function setCached(key, data) {
+      try { localStorage.setItem(key, JSON.stringify({ data, fetched: Date.now() })); }
+      catch { /* ignore quota errors */ }
+    }
+
+    // ── Fetch ──────────────────────────────────────────────────────────────────
+    async function socrata(baseUrl, params, cacheKey) {
+      const cached = getCached(cacheKey);
+      if (cached) return cached;
+      const url = new URL(baseUrl);
+      for (const [k, v] of Object.entries(params)) url.searchParams.set(k, v);
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setCached(cacheKey, data);
+      return data;
+    }
+
+    async function loadAll() {
+      return Promise.all([
+        socrata('https://data.texas.gov/resource/bxc4-y9ux.json',
+          { '$where': "county='Travis'", '$order': 'court,year ASC', '$limit': '50' },
+          'travis_annual_v1'),
+        socrata('https://data.texas.gov/resource/hp5g-u8vi.json',
+          { '$where': "county='Travis'", '$order': 'court,date ASC', '$limit': '200' },
+          'travis_monthly_v1')
+      ]);
+    }
+
+    // ── State ──────────────────────────────────────────────────────────────────
+    let viewMode   = 'annual';
+    let courtFilter = 'both';
+    let chartInstance = null;
+    let annualRows = null;
+    let monthlyRows = null;
+
+    // ── Colors ─────────────────────────────────────────────────────────────────
+    const C = {
+      District: {
+        filed:   '#3b82f6',
+        disposed:'#22c55e',
+        backlog: '#f59e0b'
+      },
+      County: {
+        filed:   '#a855f7',
+        disposed:'#14b8a6',
+        backlog: '#f97316'
+      }
+    };
+
+    // ── Data processing ────────────────────────────────────────────────────────
+
+    // Sum monthly rows for a given court type by calendar year
+    function aggregateMonthlyToAnnual(rows, courtType) {
+      const byYear = {};
+      for (const r of rows.filter(r => r.court === courtType)) {
+        const y = new Date(r.date).getFullYear();
+        if (!byYear[y]) byYear[y] = { filed: 0, disposed: 0, pending: 0 };
+        byYear[y].filed    += int(r.cases_added);
+        byYear[y].disposed += int(r.cases_disposed);
+        byYear[y].pending   = int(r.pending_end); // take last seen
+      }
+      return byYear;
+    }
+
+    function buildAnnualSeries(courtType) {
+      const monthlyAgg = aggregateMonthlyToAnnual(monthlyRows, courtType);
+
+      // Collect all years
+      const annualMap = {};
+      for (const r of annualRows.filter(r => r.court === courtType)) {
+        const y = new Date(r.year).getFullYear();
+        annualMap[y] = { filed: int(r.cases_added), disposed: int(r.cases_disposed), pending: int(r.pending_end) };
+      }
+
+      const allYears = [...new Set([
+        ...Object.keys(annualMap),
+        ...Object.keys(monthlyAgg)
+      ])].map(Number).sort();
+
+      return {
+        labels: allYears.map(String),
+        filed:   allYears.map(y => (annualMap[y] ?? monthlyAgg[y])?.filed    ?? null),
+        disposed:allYears.map(y => (annualMap[y] ?? monthlyAgg[y])?.disposed ?? null),
+        backlog: allYears.map(y => (annualMap[y] ?? monthlyAgg[y])?.pending  ?? null)
+      };
+    }
+
+    function buildMonthlySeries(courtType) {
+      const rows = monthlyRows
+        .filter(r => r.court === courtType)
+        .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      return {
+        labels:  rows.map(r => fmtMonth(r.date)),
+        filed:   rows.map(r => int(r.cases_added)),
+        disposed:rows.map(r => int(r.cases_disposed)),
+        backlog: rows.map(r => int(r.pending_end))
+      };
+    }
+
+    // ── Stats ──────────────────────────────────────────────────────────────────
+    function updateStats() {
+      const courts = courtFilter === 'both' ? ['District', 'County'] : [courtFilter];
+
+      // Sum across selected courts
+      function sumYear(year, field) {
+        let total = 0;
+        for (const ct of courts) {
+          const agg = aggregateMonthlyToAnnual(monthlyRows, ct);
+          total += agg[year]?.[field] ?? 0;
+        }
+        return total;
+      }
+
+      // For backlog, take latest monthly pending_end
+      function latestBacklog() {
+        let total = 0;
+        for (const ct of courts) {
+          const ctRows = monthlyRows
+            .filter(r => r.court === ct)
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
+          total += ctRows.length ? int(ctRows[0].pending_end) : 0;
+        }
+        return total;
+      }
+
+      function annualSum(year, field) {
+        let total = 0;
+        for (const ct of courts) {
+          const r = annualRows.find(r => r.court === ct && new Date(r.year).getFullYear() === year);
+          if (r) total += int(r[field]);
+        }
+        return total;
+      }
+
+      const filed24 = sumYear(2024, 'filed');
+      const disp24  = sumYear(2024, 'disposed');
+      const filed23 = sumYear(2023, 'filed');
+
+      // For 2022 comparison, use annual dataset
+      const filed22 = annualSum(2022, 'cases_added');
+
+      const backlog = latestBacklog();
+      const backlog22 = courts.reduce((s, ct) => {
+        const r = annualRows.find(r => r.court === ct && new Date(r.year).getFullYear() === 2022);
+        return s + (r ? int(r.pending_end) : 0);
+      }, 0);
+
+      const rate = filed24 > 0 ? Math.round(disp24 / filed24 * 100) : 0;
+      const yoy  = filed23 > 0 ? Math.round((filed24 - filed23) / filed23 * 100) : 0;
+      const trend = filed22 > 0 ? Math.round((filed24 - filed22) / filed22 * 100) : 0;
+
+      el('s-filed').textContent      = fmt(filed24);
+      el('s-filed-yoy').textContent  = yoy >= 0 ? `▲ ${yoy}% vs 2023` : `▼ ${Math.abs(yoy)}% vs 2023`;
+      el('s-filed-yoy').style.color  = yoy > 10 ? '#ef4444' : yoy > 0 ? '#f59e0b' : '#22c55e';
+
+      el('s-disposed').textContent   = fmt(disp24);
+      el('s-rate').textContent       = `${rate}% disposal rate`;
+      el('s-rate').style.color       = rate >= 100 ? '#22c55e' : rate >= 85 ? '#f59e0b' : '#ef4444';
+
+      el('s-backlog').textContent    = fmt(backlog);
+      const bchg = backlog22 > 0 ? Math.round((backlog - backlog22) / backlog22 * 100) : 0;
+      el('s-backlog-chg').textContent = bchg >= 0 ? `▲ ${bchg}% since 2022` : `▼ ${Math.abs(bchg)}% since 2022`;
+      el('s-backlog-chg').style.color = bchg > 15 ? '#ef4444' : bchg > 0 ? '#f59e0b' : '#22c55e';
+
+      el('s-trend').textContent      = trend >= 0 ? `▲ ${trend}%` : `▼ ${Math.abs(trend)}%`;
+      el('s-trend').style.color      = trend > 20 ? '#ef4444' : trend > 5 ? '#f59e0b' : '#22c55e';
+
+      el('stats').style.display = 'block';
+    }
+
+    // ── Chart ──────────────────────────────────────────────────────────────────
+    function makeDataset(label, data, color, dash) {
+      return {
+        label,
+        data,
+        borderColor: color,
+        backgroundColor: 'transparent',
+        borderWidth: dash ? 1.5 : 2,
+        borderDash: dash || [],
+        pointRadius: data.length > 30 ? 2 : 4,
+        pointHoverRadius: 5,
+        tension: 0.25
+      };
+    }
+
+    function renderChart() {
+      if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+      const courts = courtFilter === 'both' ? ['District', 'County'] : [courtFilter];
+      const datasets = [];
+      let labels = null;
+
+      for (const ct of courts) {
+        const s = viewMode === 'annual' ? buildAnnualSeries(ct) : buildMonthlySeries(ct);
+        if (!labels) labels = s.labels;
+        const pfx = courts.length > 1 ? ct + ' — ' : '';
+        datasets.push(
+          makeDataset(pfx + 'Filed',    s.filed,    C[ct].filed,    null),
+          makeDataset(pfx + 'Disposed', s.disposed, C[ct].disposed, [5, 3]),
+          makeDataset(pfx + 'Backlog',  s.backlog,  C[ct].backlog,  [2, 3])
+        );
+      }
+
+      el('chart-container').style.display = 'block';
+      el('loading').style.display = 'none';
+      el('data-note').style.display = 'block';
+
+      chartInstance = new Chart(el('myChart'), {
+        type: 'line',
+        data: { labels, datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          scales: {
+            x: {
+              ticks: {
+                color: '#64748b',
+                font: { size: 11 },
+                maxRotation: viewMode === 'monthly' ? 45 : 0,
+                autoSkip: viewMode === 'monthly',
+                maxTicksLimit: viewMode === 'monthly' ? 18 : 10
+              },
+              grid: { color: '#1e2230' },
+              border: { color: '#2d3348' }
+            },
+            y: {
+              ticks: { color: '#64748b', font: { size: 11 } },
+              grid: { color: '#2d3348' },
+              border: { color: '#2d3348' }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              align: 'start',
+              labels: { color: '#94a3b8', font: { size: 12 }, boxWidth: 14, padding: 14,
+                usePointStyle: true, pointStyle: 'line' }
+            },
+            tooltip: {
+              backgroundColor: '#1e2230',
+              borderColor: '#2d3348',
+              borderWidth: 1,
+              titleColor: '#f1f5f9',
+              bodyColor: '#94a3b8',
+              padding: 10,
+              callbacks: {
+                label(ctx) {
+                  return ` ${ctx.dataset.label}: ${ctx.parsed.y?.toLocaleString() ?? '—'}`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      updateStats();
+    }
+
+    // ── Controls ───────────────────────────────────────────────────────────────
+    function setView(v) {
+      viewMode = v;
+      el('btn-annual').classList.toggle('active',  v === 'annual');
+      el('btn-monthly').classList.toggle('active', v === 'monthly');
+      el('panel-subtitle').textContent = v === 'annual'
+        ? 'Annual caseload totals — 2018 to 2025'
+        : 'Monthly caseload — Jan 2023 to Dec 2025';
+      renderChart();
+    }
+
+    function setCourt(c) {
+      courtFilter = c;
+      el('btn-both').classList.toggle('active',     c === 'both');
+      el('btn-district').classList.toggle('active', c === 'District');
+      el('btn-county').classList.toggle('active',   c === 'County');
+      renderChart();
+    }
+
+    // ── Helpers ────────────────────────────────────────────────────────────────
+    function el(id) { return document.getElementById(id); }
+    function int(v) { return parseInt(v, 10) || 0; }
+    function fmt(n) { return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n.toLocaleString(); }
+    function fmtMonth(iso) {
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+    }
+
+    // ── Init ───────────────────────────────────────────────────────────────────
+    (async () => {
+      try {
+        [annualRows, monthlyRows] = await loadAll();
+        renderChart();
+      } catch (err) {
+        el('loading').textContent = 'Error loading data: ' + err.message;
+      }
+    })();
+  </script>
+
+</body>
+</html>
