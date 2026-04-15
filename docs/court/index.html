@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>ATX Pulse — Court Caseloads</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #0f1117;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #panel {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #1e2230;
+      border-bottom: 1px solid #2d3348;
+      padding: 10px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #panel-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #f1f5f9;
+    }
+
+    #panel-subtitle {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .fbtn {
+      background: #252b3b;
+      border: 1px solid #3d4868;
+      color: #94a3b8;
+      padding: 5px 14px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+      white-space: nowrap;
+    }
+
+    .fbtn:hover { background: #2d3453; color: #e2e8f0; }
+    .fbtn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; font-weight: 600; }
+
+    #stats {
+      display: none;
+      justify-content: center;
+      gap: 0;
+      border-bottom: 1px solid #2d3348;
+    }
+
+    .stat {
+      flex: 1;
+      max-width: 160px;
+      text-align: center;
+      padding: 12px 8px 10px;
+      border-right: 1px solid #2d3348;
+    }
+
+    .stat:last-child { border-right: none; }
+
+    .stat-value {
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      line-height: 1.1;
+    }
+
+    .stat-label {
+      font-size: 0.68rem;
+      color: #475569;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 3px;
+    }
+
+    #chart-wrap {
+      flex: 1;
+      padding: 16px 16px 4px;
+      overflow: hidden;
+    }
+
+    #chart-container {
+      display: none;
+      position: relative;
+    }
+
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 0;
+      color: #475569;
+      font-size: 14px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 14px 16px;
+      font-size: 0.74rem;
+      color: #475569;
+      border-top: 1px solid #1e2230;
+    }
+
+    footer a { color: #64748b; text-decoration: none; }
+    footer a:hover { color: #94a3b8; }
+
+    @media (max-width: 480px) {
+      .stat-value { font-size: 1.1rem; }
+      .stat-label { font-size: 0.62rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="panel">
+    <div id="panel-title">⚖️ Austin Court Caseloads</div>
+    <div id="panel-subtitle">Top charges by case outcome</div>
+    <div class="btn-row">
+      <button class="fbtn active" id="btn-municipal" onclick="switchDataset('municipal')">
+        ⚖️ Municipal Court FY2026
+      </button>
+      <button class="fbtn" id="btn-dacc" onclick="switchDataset('dacc')">
+        🏛️ Downtown Community Court FY2025
+      </button>
+    </div>
+  </div>
+
+  <div id="stats">
+    <div class="stat">
+      <div class="stat-value" id="stat-total">—</div>
+      <div class="stat-label">Total Cases</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="stat-term" style="color:#22c55e;">—</div>
+      <div class="stat-label">Closed (TERM)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="stat-in" style="color:#f59e0b;">—</div>
+      <div class="stat-label">Pending (IN)</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="stat-act" style="color:#3b82f6;">—</div>
+      <div class="stat-label">Active (ACT)</div>
+    </div>
+  </div>
+
+  <div id="chart-wrap">
+    <div id="loading">Loading data from Socrata…</div>
+    <div id="chart-container">
+      <canvas id="myChart"></canvas>
+    </div>
+  </div>
+
+  <footer>
+    Data: <a id="source-link" href="https://data.austintexas.gov/d/tuwa-vk6q" target="_blank" rel="noopener">Austin Municipal Court Caseload FY2026</a>
+    &nbsp;·&nbsp;
+    <a href="../">← ATX Pulse</a>
+  </footer>
+
+  <script>
+    const DATASETS = {
+      municipal: {
+        id: 'tuwa-vk6q',
+        chargeField: 'offense_charge_description',
+        subtitle: 'Top charges by case outcome — Oct 2025 to present',
+        sourceUrl: 'https://data.austintexas.gov/d/tuwa-vk6q',
+        sourceLabel: 'Austin Municipal Court Caseload FY2026'
+      },
+      dacc: {
+        id: 'emdh-pf9u',
+        chargeField: 'charges_description',
+        subtitle: 'Top charges by case outcome — FY2025 full year',
+        sourceUrl: 'https://data.austintexas.gov/d/emdh-pf9u',
+        sourceLabel: 'Downtown Community Court Caseload FY2025'
+      }
+    };
+
+    // Statuses in display order, with colors
+    const STATUSES = [
+      { key: 'TERM', label: 'Closed (TERM)', bg: 'rgba(34,197,94,0.75)',  border: 'rgba(34,197,94,1)'  },
+      { key: 'IN',   label: 'Pending (IN)',  bg: 'rgba(245,158,11,0.75)', border: 'rgba(245,158,11,1)' },
+      { key: 'ACT',  label: 'Active (ACT)',  bg: 'rgba(59,130,246,0.75)', border: 'rgba(59,130,246,1)' },
+      { key: 'OTH',  label: 'Other',         bg: 'rgba(100,116,139,0.6)', border: 'rgba(100,116,139,1)' }
+    ];
+
+    const TOP_N = 15;
+    let currentDataset = 'municipal';
+    let chartInstance = null;
+    const cache = {};
+
+    function normalizeStatus(raw) {
+      if (!raw) return 'OTH';
+      const s = raw.trim().toUpperCase();
+      if (s === 'TERM') return 'TERM';
+      if (s === 'IN')   return 'IN';
+      if (s === 'ACT')  return 'ACT';
+      return 'OTH';
+    }
+
+    async function fetchData(dsKey) {
+      if (cache[dsKey]) return cache[dsKey];
+      const ds = DATASETS[dsKey];
+      const url =
+        `https://data.austintexas.gov/resource/${ds.id}.json` +
+        `?$select=${encodeURIComponent(ds.chargeField + ',case_closed,count(*) as cnt')}` +
+        `&$group=${encodeURIComponent(ds.chargeField + ',case_closed')}` +
+        `&$limit=1000`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const rows = await res.json();
+      cache[dsKey] = rows;
+      return rows;
+    }
+
+    function processData(rows, chargeField) {
+      // Accumulate counts by charge × status
+      const chargeMap = {};
+      let grandTERM = 0, grandIN = 0, grandACT = 0, grandOTH = 0;
+
+      for (const row of rows) {
+        const charge = (row[chargeField] || 'Unknown').trim();
+        const status = normalizeStatus(row.case_closed);
+        const cnt = parseInt(row.cnt, 10) || 0;
+
+        if (!chargeMap[charge]) chargeMap[charge] = { TERM: 0, IN: 0, ACT: 0, OTH: 0 };
+        chargeMap[charge][status] += cnt;
+
+        if (status === 'TERM') grandTERM += cnt;
+        else if (status === 'IN') grandIN += cnt;
+        else if (status === 'ACT') grandACT += cnt;
+        else grandOTH += cnt;
+      }
+
+      const grandTotal = grandTERM + grandIN + grandACT + grandOTH;
+
+      // Sort by total, take top N, reverse so highest is at the top of the chart
+      const topItems = Object.entries(chargeMap)
+        .map(([charge, counts]) => ({
+          charge,
+          total: counts.TERM + counts.IN + counts.ACT + counts.OTH,
+          ...counts
+        }))
+        .sort((a, b) => b.total - a.total)
+        .slice(0, TOP_N)
+        .reverse();
+
+      return { topItems, grandTotal, grandTERM, grandIN, grandACT, grandOTH };
+    }
+
+    function formatNum(n) {
+      return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n.toLocaleString();
+    }
+
+    function pct(n, total) {
+      return total > 0 ? Math.round(n / total * 100) + '%' : '—';
+    }
+
+    function truncate(s, n = 46) {
+      return s.length > n ? s.slice(0, n - 1) + '…' : s;
+    }
+
+    function renderChart(dsKey, processed) {
+      const ds = DATASETS[dsKey];
+      const { topItems, grandTotal, grandTERM, grandIN, grandACT } = processed;
+
+      // Update panel and footer
+      document.getElementById('panel-subtitle').textContent = ds.subtitle;
+      document.getElementById('source-link').href = ds.sourceUrl;
+      document.getElementById('source-link').textContent = ds.sourceLabel;
+
+      // Update stats
+      document.getElementById('stat-total').textContent = formatNum(grandTotal);
+      document.getElementById('stat-term').textContent = pct(grandTERM, grandTotal);
+      document.getElementById('stat-in').textContent   = pct(grandIN,   grandTotal);
+      document.getElementById('stat-act').textContent  = pct(grandACT,  grandTotal);
+      document.getElementById('stats').style.display   = 'flex';
+
+      // Show chart container, hide loader
+      document.getElementById('loading').style.display = 'none';
+      const container = document.getElementById('chart-container');
+      container.style.display = 'block';
+
+      // Size the canvas based on item count
+      const barH = 36;
+      const chartH = topItems.length * barH + 80;
+      container.style.height = chartH + 'px';
+
+      // Destroy previous chart
+      if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
+
+      const labels = topItems.map(d => truncate(d.charge));
+
+      // Only include statuses that have any data across the top items
+      const activeStatuses = STATUSES.filter(s =>
+        topItems.some(d => d[s.key] > 0)
+      );
+
+      chartInstance = new Chart(document.getElementById('myChart'), {
+        type: 'bar',
+        data: {
+          labels,
+          datasets: activeStatuses.map(s => ({
+            label: s.label,
+            data: topItems.map(d => d[s.key]),
+            backgroundColor: s.bg,
+            borderColor: s.border,
+            borderWidth: 1,
+            borderSkipped: false,
+          }))
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              stacked: true,
+              ticks: { color: '#64748b', font: { size: 11 } },
+              grid: { color: '#2d3348' },
+              border: { color: '#2d3348' }
+            },
+            y: {
+              stacked: true,
+              ticks: {
+                color: '#94a3b8',
+                font: { size: 11 },
+                autoSkip: false
+              },
+              grid: { display: false },
+              border: { color: '#2d3348' }
+            }
+          },
+          plugins: {
+            legend: {
+              position: 'top',
+              align: 'start',
+              labels: {
+                color: '#94a3b8',
+                font: { size: 12 },
+                boxWidth: 14,
+                padding: 16
+              }
+            },
+            tooltip: {
+              callbacks: {
+                title(items) {
+                  return topItems[items[0].dataIndex]?.charge || '';
+                },
+                afterBody(items) {
+                  const d = topItems[items[0].dataIndex];
+                  if (!d) return [];
+                  return ['', 'Total: ' + d.total.toLocaleString()];
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    async function switchDataset(dsKey) {
+      if (dsKey === currentDataset && chartInstance) return;
+      currentDataset = dsKey;
+
+      document.getElementById('btn-municipal').classList.toggle('active', dsKey === 'municipal');
+      document.getElementById('btn-dacc').classList.toggle('active', dsKey === 'dacc');
+
+      document.getElementById('loading').style.display = 'flex';
+      document.getElementById('loading').textContent = 'Loading data from Socrata…';
+      document.getElementById('chart-container').style.display = 'none';
+      document.getElementById('stats').style.display = 'none';
+
+      try {
+        const ds = DATASETS[dsKey];
+        const rows = await fetchData(dsKey);
+        const processed = processData(rows, ds.chargeField);
+        renderChart(dsKey, processed);
+      } catch (err) {
+        document.getElementById('loading').textContent = 'Error loading data: ' + err.message;
+      }
+    }
+
+    switchDataset('municipal');
+  </script>
+
+</body>
+</html>
