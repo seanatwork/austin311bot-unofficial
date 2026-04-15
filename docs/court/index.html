@@ -30,16 +30,8 @@
       gap: 6px;
     }
 
-    #panel-title {
-      font-size: 15px;
-      font-weight: 700;
-      color: #f1f5f9;
-    }
-
-    #panel-subtitle {
-      font-size: 12px;
-      color: #64748b;
-    }
+    #panel-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+    #panel-subtitle { font-size: 12px; color: #64748b; text-align: center; }
 
     .btn-row {
       display: flex;
@@ -52,7 +44,7 @@
       background: #252b3b;
       border: 1px solid #3d4868;
       color: #94a3b8;
-      padding: 5px 14px;
+      padding: 5px 13px;
       border-radius: 4px;
       font-size: 12px;
       cursor: pointer;
@@ -62,6 +54,7 @@
 
     .fbtn:hover { background: #2d3453; color: #e2e8f0; }
     .fbtn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; font-weight: 600; }
+    .fbtn.active-amber { background: #b45309; border-color: #b45309; color: #fff; font-weight: 600; }
 
     #stats {
       display: none;
@@ -74,21 +67,20 @@
       flex: 1;
       max-width: 160px;
       text-align: center;
-      padding: 12px 8px 10px;
+      padding: 10px 8px 9px;
       border-right: 1px solid #2d3348;
     }
 
     .stat:last-child { border-right: none; }
 
     .stat-value {
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       font-weight: 700;
-      color: #f1f5f9;
       line-height: 1.1;
     }
 
     .stat-label {
-      font-size: 0.68rem;
+      font-size: 0.67rem;
       color: #475569;
       text-transform: uppercase;
       letter-spacing: 0.06em;
@@ -98,7 +90,6 @@
     #chart-wrap {
       flex: 1;
       padding: 16px 16px 4px;
-      overflow: hidden;
     }
 
     #chart-container {
@@ -115,6 +106,48 @@
       font-size: 14px;
     }
 
+    /* Data gap note — shown for caseload views */
+    #data-note {
+      display: none;
+      margin-top: 20px;
+      padding: 12px 14px;
+      background: #1e2230;
+      border: 1px solid #2d3348;
+      border-left: 3px solid #f59e0b;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    #data-note strong { color: #f1f5f9; }
+    #data-note .note-btn {
+      background: none;
+      border: none;
+      color: #3b82f6;
+      cursor: pointer;
+      font-size: inherit;
+      text-decoration: underline;
+      padding: 0;
+    }
+    #data-note .note-btn:hover { color: #60a5fa; }
+
+    /* Prop B info note — shown for disposition view */
+    #propb-note {
+      display: none;
+      margin-top: 20px;
+      padding: 12px 14px;
+      background: #1e2230;
+      border: 1px solid #2d3348;
+      border-left: 3px solid #22c55e;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      line-height: 1.6;
+    }
+
+    #propb-note strong { color: #f1f5f9; }
+
     footer {
       text-align: center;
       padding: 14px 16px;
@@ -126,9 +159,9 @@
     footer a { color: #64748b; text-decoration: none; }
     footer a:hover { color: #94a3b8; }
 
-    @media (max-width: 480px) {
-      .stat-value { font-size: 1.1rem; }
-      .stat-label { font-size: 0.62rem; }
+    @media (max-width: 520px) {
+      .stat-value { font-size: 1.05rem; }
+      .stat-label { font-size: 0.61rem; }
     }
   </style>
 </head>
@@ -136,7 +169,7 @@
 
   <div id="panel">
     <div id="panel-title">⚖️ Austin Court Caseloads</div>
-    <div id="panel-subtitle">Top charges by case outcome</div>
+    <div id="panel-subtitle">Case pipeline status by charge type</div>
     <div class="btn-row">
       <button class="fbtn active" id="btn-municipal" onclick="switchDataset('municipal')">
         ⚖️ Municipal Court FY2026
@@ -144,25 +177,28 @@
       <button class="fbtn" id="btn-dacc" onclick="switchDataset('dacc')">
         🏛️ Downtown Community Court FY2025
       </button>
+      <button class="fbtn" id="btn-propb" onclick="switchDataset('propb')">
+        ⛺ Prop B — Actual Outcomes
+      </button>
     </div>
   </div>
 
   <div id="stats">
     <div class="stat">
-      <div class="stat-value" id="stat-total">—</div>
+      <div class="stat-value" id="stat-total" style="color:#f1f5f9;">—</div>
       <div class="stat-label">Total Cases</div>
     </div>
     <div class="stat">
-      <div class="stat-value" id="stat-term" style="color:#22c55e;">—</div>
-      <div class="stat-label">Closed (TERM)</div>
+      <div class="stat-value" id="stat-s1">—</div>
+      <div class="stat-label" id="stat-l1">—</div>
     </div>
     <div class="stat">
-      <div class="stat-value" id="stat-in" style="color:#f59e0b;">—</div>
-      <div class="stat-label">Pending (IN)</div>
+      <div class="stat-value" id="stat-s2">—</div>
+      <div class="stat-label" id="stat-l2">—</div>
     </div>
     <div class="stat">
-      <div class="stat-value" id="stat-act" style="color:#3b82f6;">—</div>
-      <div class="stat-label">Active (ACT)</div>
+      <div class="stat-value" id="stat-s3">—</div>
+      <div class="stat-label" id="stat-l3">—</div>
     </div>
   </div>
 
@@ -170,6 +206,27 @@
     <div id="loading">Loading data from Socrata…</div>
     <div id="chart-container">
       <canvas id="myChart"></canvas>
+    </div>
+
+    <div id="data-note">
+      <strong>What TERM / ACT / IN actually mean:</strong>
+      These are workflow pipeline statuses — not verdicts.
+      <strong>TERM</strong> (Terminated) = case closed, but the dataset doesn't record <em>how</em> it closed (guilty plea, dismissal, acquittal, etc.).
+      <strong>ACT</strong> (Active) = open, in progress.
+      <strong>IN</strong> (Inactive) = open but dormant — stalled, unserved warrant, or awaiting action. Despite the name, "Inactive" does <em>not</em> mean closed.
+      <br /><br />
+      Austin does not publish conviction or dismissal data for general court caseloads.
+      The <button class="note-btn" onclick="switchDataset('propb')">⛺ Prop B tab</button>
+      is the only charge category on this portal where full disposition data is available.
+    </div>
+
+    <div id="propb-note">
+      <strong>About this data:</strong>
+      This dataset covers Proposition B (camping ban) offenses filed at Austin Municipal Court and Downtown Community Court — it is the <em>only</em> charge type on data.austintexas.gov where actual verdict/dismissal data is published.
+      Charge types reflect multiple ordinances: "Camping in a Public Area" (city code), "Camping – State Law" (Tex. Penal Code §48.05, added 2023), and "Sitting, Lying Down, Sleeping Outdoors."
+      <br /><br />
+      <strong>~68% of records show no disposition yet</strong> — those cases remain open or the outcome hasn't been recorded.
+      The resolved subset (~640 cases) is what drives the Convicted / Dismissed breakdown shown above.
     </div>
   </div>
 
@@ -180,29 +237,55 @@
   </footer>
 
   <script>
+    // ── Dataset definitions ────────────────────────────────────────────────────
+
     const DATASETS = {
       municipal: {
         id: 'tuwa-vk6q',
         chargeField: 'offense_charge_description',
-        subtitle: 'Top charges by case outcome — Oct 2025 to present',
+        statusField: 'case_closed',
+        subtitle: 'Case pipeline status by charge type — Oct 2025 to present',
         sourceUrl: 'https://data.austintexas.gov/d/tuwa-vk6q',
-        sourceLabel: 'Austin Municipal Court Caseload FY2026'
+        sourceLabel: 'Austin Municipal Court Caseload FY2026',
+        mode: 'caseload'
       },
       dacc: {
         id: 'emdh-pf9u',
         chargeField: 'charges_description',
-        subtitle: 'Top charges by case outcome — FY2025 full year',
+        statusField: 'case_closed',
+        subtitle: 'Case pipeline status by charge type — FY2025 full year',
         sourceUrl: 'https://data.austintexas.gov/d/emdh-pf9u',
-        sourceLabel: 'Downtown Community Court Caseload FY2025'
+        sourceLabel: 'Downtown Community Court Caseload FY2025',
+        mode: 'caseload'
+      },
+      propb: {
+        id: 'qc59-phn7',
+        chargeField: 'charge_description',
+        statusField: 'disposition',
+        subtitle: 'Actual case dispositions — Prop B camping ban offenses, all years',
+        sourceUrl: 'https://data.austintexas.gov/d/qc59-phn7',
+        sourceLabel: 'Proposition B Camping Ban Offenses',
+        mode: 'disposition'
       }
     };
 
-    // Statuses in display order, with colors
-    const STATUSES = [
-      { key: 'TERM', label: 'Closed (TERM)', bg: 'rgba(34,197,94,0.75)',  border: 'rgba(34,197,94,1)'  },
-      { key: 'IN',   label: 'Pending (IN)',  bg: 'rgba(245,158,11,0.75)', border: 'rgba(245,158,11,1)' },
-      { key: 'ACT',  label: 'Active (ACT)',  bg: 'rgba(59,130,246,0.75)', border: 'rgba(59,130,246,1)' },
-      { key: 'OTH',  label: 'Other',         bg: 'rgba(100,116,139,0.6)', border: 'rgba(100,116,139,1)' }
+    // ── Status/disposition definitions ─────────────────────────────────────────
+
+    // For caseload mode: TERM/ACT/IN
+    const CASELOAD_STATUSES = [
+      { key: 'TERM', label: 'Closed — TERM',       bg: 'rgba(34,197,94,0.75)',  border: 'rgba(34,197,94,1)' },
+      { key: 'ACT',  label: 'Open — Active (ACT)',  bg: 'rgba(59,130,246,0.75)', border: 'rgba(59,130,246,1)' },
+      { key: 'IN',   label: 'Open — Inactive (IN)', bg: 'rgba(245,158,11,0.75)', border: 'rgba(245,158,11,1)' },
+      { key: 'OTH',  label: 'Other',                bg: 'rgba(100,116,139,0.6)', border: 'rgba(100,116,139,1)' }
+    ];
+
+    // For disposition mode: convicted/dismissed/etc.
+    const DISPOSITION_STATUSES = [
+      { key: 'CONV', label: 'Convicted',   bg: 'rgba(239,68,68,0.8)',   border: 'rgba(239,68,68,1)' },
+      { key: 'DISM', label: 'Dismissed',   bg: 'rgba(34,197,94,0.75)',  border: 'rgba(34,197,94,1)' },
+      { key: 'ACQ',  label: 'Acquitted',   bg: 'rgba(16,185,129,0.85)', border: 'rgba(16,185,129,1)' },
+      { key: 'XFER', label: 'Transferred', bg: 'rgba(139,92,246,0.7)',  border: 'rgba(139,92,246,1)' },
+      { key: 'PEND', label: 'Pending',     bg: 'rgba(245,158,11,0.75)', border: 'rgba(245,158,11,1)' }
     ];
 
     const TOP_N = 15;
@@ -210,22 +293,38 @@
     let chartInstance = null;
     const cache = {};
 
-    function normalizeStatus(raw) {
+    // ── Normalizers ────────────────────────────────────────────────────────────
+
+    function normalizeCaseStatus(raw) {
       if (!raw) return 'OTH';
       const s = raw.trim().toUpperCase();
-      if (s === 'TERM') return 'TERM';
-      if (s === 'IN')   return 'IN';
+      if (s === 'TERM' || s === 'TERMA') return 'TERM';
       if (s === 'ACT')  return 'ACT';
+      if (s === 'IN')   return 'IN';
       return 'OTH';
     }
+
+    function normalizeDisposition(raw) {
+      if (!raw || raw.trim() === '') return 'PEND';
+      const s = raw.trim().toLowerCase();
+      if (s === 'conviction')            return 'CONV';
+      if (s === 'acquittal')             return 'ACQ';
+      if (s.startsWith('dismissed'))     return 'DISM';
+      if (s.startsWith('transferred'))   return 'XFER';
+      return 'PEND';
+    }
+
+    // ── Fetch ──────────────────────────────────────────────────────────────────
 
     async function fetchData(dsKey) {
       if (cache[dsKey]) return cache[dsKey];
       const ds = DATASETS[dsKey];
+      const sel = `${ds.chargeField},${ds.statusField},count(*) as cnt`;
+      const grp = `${ds.chargeField},${ds.statusField}`;
       const url =
         `https://data.austintexas.gov/resource/${ds.id}.json` +
-        `?$select=${encodeURIComponent(ds.chargeField + ',case_closed,count(*) as cnt')}` +
-        `&$group=${encodeURIComponent(ds.chargeField + ',case_closed')}` +
+        `?$select=${encodeURIComponent(sel)}` +
+        `&$group=${encodeURIComponent(grp)}` +
         `&$limit=1000`;
       const res = await fetch(url);
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -234,88 +333,118 @@
       return rows;
     }
 
-    function processData(rows, chargeField) {
-      // Accumulate counts by charge × status
+    // ── Process ────────────────────────────────────────────────────────────────
+
+    function processCaseloadData(rows, chargeField) {
       const chargeMap = {};
-      let grandTERM = 0, grandIN = 0, grandACT = 0, grandOTH = 0;
+      let grandTERM = 0, grandACT = 0, grandIN = 0, grandOTH = 0;
 
       for (const row of rows) {
         const charge = (row[chargeField] || 'Unknown').trim();
-        const status = normalizeStatus(row.case_closed);
+        const status = normalizeCaseStatus(row.case_closed);
         const cnt = parseInt(row.cnt, 10) || 0;
 
-        if (!chargeMap[charge]) chargeMap[charge] = { TERM: 0, IN: 0, ACT: 0, OTH: 0 };
+        if (!chargeMap[charge]) chargeMap[charge] = { TERM: 0, ACT: 0, IN: 0, OTH: 0 };
         chargeMap[charge][status] += cnt;
 
         if (status === 'TERM') grandTERM += cnt;
-        else if (status === 'IN') grandIN += cnt;
         else if (status === 'ACT') grandACT += cnt;
+        else if (status === 'IN')  grandIN  += cnt;
         else grandOTH += cnt;
       }
 
-      const grandTotal = grandTERM + grandIN + grandACT + grandOTH;
-
-      // Sort by total, take top N, reverse so highest is at the top of the chart
+      const grandTotal = grandTERM + grandACT + grandIN + grandOTH;
       const topItems = Object.entries(chargeMap)
-        .map(([charge, counts]) => ({
-          charge,
-          total: counts.TERM + counts.IN + counts.ACT + counts.OTH,
-          ...counts
-        }))
+        .map(([charge, c]) => ({ charge, total: c.TERM + c.ACT + c.IN + c.OTH, ...c }))
         .sort((a, b) => b.total - a.total)
         .slice(0, TOP_N)
         .reverse();
 
-      return { topItems, grandTotal, grandTERM, grandIN, grandACT, grandOTH };
+      return { topItems, grandTotal, grandTERM, grandACT, grandIN, grandOTH };
     }
 
-    function formatNum(n) {
-      return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n.toLocaleString();
+    function processDispositionData(rows, chargeField) {
+      const chargeMap = {};
+      let grandCONV = 0, grandDISM = 0, grandACQ = 0, grandXFER = 0, grandPEND = 0;
+
+      for (const row of rows) {
+        const charge = (row[chargeField] || 'Unknown').trim();
+        const dispo = normalizeDisposition(row.disposition);
+        const cnt = parseInt(row.cnt, 10) || 0;
+
+        if (!chargeMap[charge]) chargeMap[charge] = { CONV: 0, DISM: 0, ACQ: 0, XFER: 0, PEND: 0 };
+        chargeMap[charge][dispo] += cnt;
+
+        if (dispo === 'CONV') grandCONV += cnt;
+        else if (dispo === 'DISM') grandDISM += cnt;
+        else if (dispo === 'ACQ')  grandACQ  += cnt;
+        else if (dispo === 'XFER') grandXFER += cnt;
+        else grandPEND += cnt;
+      }
+
+      const grandTotal = grandCONV + grandDISM + grandACQ + grandXFER + grandPEND;
+      // Show all charge types for Prop B (only ~7), sorted by total
+      const topItems = Object.entries(chargeMap)
+        .map(([charge, c]) => ({ charge, total: c.CONV + c.DISM + c.ACQ + c.XFER + c.PEND, ...c }))
+        .sort((a, b) => b.total - a.total)
+        .reverse();
+
+      return { topItems, grandTotal, grandCONV, grandDISM, grandACQ, grandXFER, grandPEND };
     }
 
-    function pct(n, total) {
-      return total > 0 ? Math.round(n / total * 100) + '%' : '—';
+    // ── Stats row ──────────────────────────────────────────────────────────────
+
+    function updateStats(mode, processed) {
+      document.getElementById('stat-total').textContent = formatNum(processed.grandTotal);
+
+      if (mode === 'caseload') {
+        const { grandTERM, grandACT, grandIN, grandTotal } = processed;
+        setStatCell(1, pct(grandTERM, grandTotal), 'Closed — TERM',         '#22c55e');
+        setStatCell(2, pct(grandACT,  grandTotal), 'Open — Active (ACT)',   '#3b82f6');
+        setStatCell(3, pct(grandIN,   grandTotal), 'Open — Inactive (IN)',  '#f59e0b');
+      } else {
+        const { grandCONV, grandDISM, grandPEND, grandTotal } = processed;
+        setStatCell(1, pct(grandCONV, grandTotal), 'Convicted',  '#ef4444');
+        setStatCell(2, pct(grandDISM, grandTotal), 'Dismissed',  '#22c55e');
+        setStatCell(3, pct(grandPEND, grandTotal), 'Pending',    '#f59e0b');
+      }
+
+      document.getElementById('stats').style.display = 'flex';
     }
 
-    function truncate(s, n = 46) {
-      return s.length > n ? s.slice(0, n - 1) + '…' : s;
+    function setStatCell(n, value, label, color) {
+      document.getElementById('stat-s' + n).textContent = value;
+      document.getElementById('stat-s' + n).style.color = color;
+      document.getElementById('stat-l' + n).textContent = label;
     }
+
+    // ── Chart ──────────────────────────────────────────────────────────────────
 
     function renderChart(dsKey, processed) {
       const ds = DATASETS[dsKey];
-      const { topItems, grandTotal, grandTERM, grandIN, grandACT } = processed;
+      const { topItems } = processed;
+      const statuses = ds.mode === 'caseload' ? CASELOAD_STATUSES : DISPOSITION_STATUSES;
 
-      // Update panel and footer
       document.getElementById('panel-subtitle').textContent = ds.subtitle;
       document.getElementById('source-link').href = ds.sourceUrl;
       document.getElementById('source-link').textContent = ds.sourceLabel;
 
-      // Update stats
-      document.getElementById('stat-total').textContent = formatNum(grandTotal);
-      document.getElementById('stat-term').textContent = pct(grandTERM, grandTotal);
-      document.getElementById('stat-in').textContent   = pct(grandIN,   grandTotal);
-      document.getElementById('stat-act').textContent  = pct(grandACT,  grandTotal);
-      document.getElementById('stats').style.display   = 'flex';
+      updateStats(ds.mode, processed);
 
-      // Show chart container, hide loader
+      // Notes
+      document.getElementById('data-note').style.display  = ds.mode === 'caseload'    ? 'block' : 'none';
+      document.getElementById('propb-note').style.display = ds.mode === 'disposition' ? 'block' : 'none';
+
+      // Size canvas
       document.getElementById('loading').style.display = 'none';
       const container = document.getElementById('chart-container');
       container.style.display = 'block';
+      container.style.height = (topItems.length * 38 + 80) + 'px';
 
-      // Size the canvas based on item count
-      const barH = 36;
-      const chartH = topItems.length * barH + 80;
-      container.style.height = chartH + 'px';
-
-      // Destroy previous chart
       if (chartInstance) { chartInstance.destroy(); chartInstance = null; }
 
       const labels = topItems.map(d => truncate(d.charge));
-
-      // Only include statuses that have any data across the top items
-      const activeStatuses = STATUSES.filter(s =>
-        topItems.some(d => d[s.key] > 0)
-      );
+      const activeStatuses = statuses.filter(s => topItems.some(d => d[s.key] > 0));
 
       chartInstance = new Chart(document.getElementById('myChart'), {
         type: 'bar',
@@ -327,7 +456,7 @@
             backgroundColor: s.bg,
             borderColor: s.border,
             borderWidth: 1,
-            borderSkipped: false,
+            borderSkipped: false
           }))
         },
         options: {
@@ -343,11 +472,7 @@
             },
             y: {
               stacked: true,
-              ticks: {
-                color: '#94a3b8',
-                font: { size: 11 },
-                autoSkip: false
-              },
+              ticks: { color: '#94a3b8', font: { size: 11 }, autoSkip: false },
               grid: { display: false },
               border: { color: '#2d3348' }
             }
@@ -356,22 +481,14 @@
             legend: {
               position: 'top',
               align: 'start',
-              labels: {
-                color: '#94a3b8',
-                font: { size: 12 },
-                boxWidth: 14,
-                padding: 16
-              }
+              labels: { color: '#94a3b8', font: { size: 12 }, boxWidth: 14, padding: 16 }
             },
             tooltip: {
               callbacks: {
-                title(items) {
-                  return topItems[items[0].dataIndex]?.charge || '';
-                },
+                title(items) { return topItems[items[0].dataIndex]?.charge || ''; },
                 afterBody(items) {
                   const d = topItems[items[0].dataIndex];
-                  if (!d) return [];
-                  return ['', 'Total: ' + d.total.toLocaleString()];
+                  return d ? ['', 'Total: ' + d.total.toLocaleString()] : [];
                 }
               }
             }
@@ -380,22 +497,46 @@
       });
     }
 
+    // ── Helpers ────────────────────────────────────────────────────────────────
+
+    function formatNum(n) {
+      return n >= 1000 ? (n / 1000).toFixed(1) + 'k' : n.toLocaleString();
+    }
+
+    function pct(n, total) {
+      return total > 0 ? Math.round(n / total * 100) + '%' : '—';
+    }
+
+    function truncate(s, n = 46) {
+      return s.length > n ? s.slice(0, n - 1) + '…' : s;
+    }
+
+    // ── Switch ─────────────────────────────────────────────────────────────────
+
     async function switchDataset(dsKey) {
       if (dsKey === currentDataset && chartInstance) return;
       currentDataset = dsKey;
 
-      document.getElementById('btn-municipal').classList.toggle('active', dsKey === 'municipal');
-      document.getElementById('btn-dacc').classList.toggle('active', dsKey === 'dacc');
+      ['municipal', 'dacc', 'propb'].forEach(k => {
+        const btn = document.getElementById('btn-' + k);
+        btn.classList.remove('active', 'active-amber');
+      });
+      const activeClass = dsKey === 'propb' ? 'active-amber' : 'active';
+      document.getElementById('btn-' + dsKey).classList.add(activeClass);
 
       document.getElementById('loading').style.display = 'flex';
       document.getElementById('loading').textContent = 'Loading data from Socrata…';
       document.getElementById('chart-container').style.display = 'none';
       document.getElementById('stats').style.display = 'none';
+      document.getElementById('data-note').style.display = 'none';
+      document.getElementById('propb-note').style.display = 'none';
 
       try {
         const ds = DATASETS[dsKey];
         const rows = await fetchData(dsKey);
-        const processed = processData(rows, ds.chargeField);
+        const processed = ds.mode === 'caseload'
+          ? processCaseloadData(rows, ds.chargeField)
+          : processDispositionData(rows, ds.chargeField);
         renderChart(dsKey, processed);
       } catch (err) {
         document.getElementById('loading').textContent = 'Error loading data: ' + err.message;
