@@ -32,4 +32,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/bicycle/index.html
           git diff --cached --quiet || git commit -m "chore: refresh bicycle map [skip ci]"
+          git pull --rebase origin main
           git push

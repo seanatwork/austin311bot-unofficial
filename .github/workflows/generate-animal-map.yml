@@ -32,4 +32,5 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs/animal/index.html
           git diff --cached --quiet || git commit -m "chore: refresh animal map [skip ci]"
+          git pull --rebase origin main
           git push
