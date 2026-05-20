@@ -116,6 +116,8 @@ _OG_PAGES = {
                     "Austin court cases by charge type, demographics, and FY2022–2026 trends. Live data."),
     "crashes":     ("Austin 311 — Live Crash Map",
                     "Live APD crash reports — fatal, injury, and minor crashes across Austin updated continuously."),
+    "911":         ("Austin 311 — 911 Response Time Trends",
+                    "APD dispatch response times across all years, priorities, and council districts. Updated quarterly."),
     "crime":       ("Austin 311 — APD Crime by District",
                     "30/60/90-day APD incident counts by Austin council district."),
     "crime/hatecrime": ("Austin 311 — Hate Crime Incidents",

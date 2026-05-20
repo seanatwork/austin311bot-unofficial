@@ -4,40 +4,110 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Austin 911 Response Time Trends</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Austin 911 — Response Time Trends" />
+  <meta property="og:description" content="APD dispatch response times across all years, priorities, and council districts. Updated quarterly." />
+  <meta property="og:url" content="https://austin311.com/911/" />
+  <meta property="og:image" content="https://austin311.com/og-default.png" />
+  <meta property="og:site_name" content="Austin 311" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Austin 911 — Response Time Trends" />
+  <meta name="twitter:description" content="APD dispatch response times across all years, priorities, and council districts. Updated quarterly." />
+  <meta name="twitter:image" content="https://austin311.com/og-default.png" />
+  <meta name="description" content="APD dispatch response times across all years, priorities, and council districts. Updated quarterly." />
   <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
   <script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6"></script>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #f5f5f5;
+      --bg-card:     #ffffff;
+      --bg-card-hover: #f1f5f9;
+      --border:      #e2e8f0;
+      --border-hover:#94a3b8;
+      --text:        #333333;
+      --text-head:   #0f172a;
+      --text-sub:    #64748b;
+      --text-label:  #444444;
+      --accent:      #1565c0;
+      --accent-light:#e3f2fd;
+    }
+
+    html.dark {
+      --bg:          #0f1117;
+      --bg-card:     #1e2230;
+      --bg-card-hover:#252b3b;
+      --border:      #2d3348;
+      --border-hover:#4a5568;
+      --text:        #e2e8f0;
+      --text-head:   #f8fafc;
+      --text-sub:    #64748b;
+      --text-label:  #cbd5e1;
+      --accent:      #60a5fa;
+      --accent-light:#1e3a5f;
+    }
+
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #f5f5f5;
-      color: #333;
+      background: var(--bg);
+      color: var(--text);
       padding: 20px;
+      transition: background 0.2s, color 0.2s;
     }
+
     .container { max-width: 1400px; margin: 0 auto; }
-    h1 { font-size: 1.8rem; margin-bottom: 4px; }
-    .subtitle { color: #666; margin-bottom: 24px; }
+
+    /* nav */
+    .top-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+    .back-link {
+      font-size: 0.85rem;
+      color: var(--text-sub);
+      text-decoration: none;
+    }
+    .back-link:hover { color: var(--text); }
+
+    #theme-toggle {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.75rem;
+      color: var(--text-sub);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    #theme-toggle:hover { color: var(--text); border-color: var(--border-hover); }
+
+    h1 { font-size: 1.8rem; margin-bottom: 4px; color: var(--text-head); }
+    .subtitle { color: var(--text-sub); margin-bottom: 20px; font-size: 0.9rem; }
 
     .stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
     .stat-card {
-      background: white;
-      border-radius: 8px;
-      padding: 16px 24px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
       flex: 1;
-      min-width: 160px;
+      min-width: 140px;
     }
-    .stat-card .label { font-size: 0.85rem; color: #666; }
-    .stat-card .value { font-size: 1.8rem; font-weight: 700; margin-top: 4px; }
+    .stat-card .label { font-size: 0.82rem; color: var(--text-sub); }
+    .stat-card .value { font-size: 1.7rem; font-weight: 700; margin-top: 4px; color: var(--text-head); line-height: 1.1; }
+    .stat-card .note  { font-size: 0.7rem; color: var(--text-sub); margin-top: 2px; }
 
     .chart-container {
-      background: white;
-      border-radius: 8px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
       padding: 20px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       margin-bottom: 24px;
     }
-    .chart-container h2 { font-size: 1.1rem; margin-bottom: 16px; color: #444; }
+    .chart-container h2 { font-size: 1rem; margin-bottom: 14px; color: var(--text-label); }
 
     .filters {
       display: flex;
@@ -45,56 +115,70 @@
       margin-bottom: 24px;
       flex-wrap: wrap;
       align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 18px;
     }
-    .filters label { font-weight: 600; font-size: 0.9rem; }
+    .filters label { font-weight: 600; font-size: 0.85rem; color: var(--text-label); }
     .filters select {
-      padding: 6px 12px;
+      padding: 6px 10px;
       border-radius: 6px;
-      border: 1px solid #ccc;
-      background: white;
-      font-size: 0.9rem;
+      border: 1px solid var(--border);
+      background: var(--bg);
+      color: var(--text);
+      font-size: 0.85rem;
     }
+    .filters select:focus { outline: none; border-color: var(--accent); }
 
-    .loading { text-align: center; padding: 60px; color: #888; }
-    .error { color: #d32f2f; padding: 20px; background: #ffebee; border-radius: 8px; margin-bottom: 16px; }
     .info-box {
-      background: #e3f2fd;
+      background: var(--accent-light);
       border-radius: 8px;
-      padding: 16px 20px;
-      margin-bottom: 24px;
-      font-size: 0.9rem;
-      line-height: 1.5;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text);
     }
-    .info-box strong { color: #1565c0; }
+    .info-box strong { color: var(--accent); }
+
+    .loading { text-align: center; padding: 60px; color: var(--text-sub); font-size: 1rem; }
+    .error   { color: #d32f2f; padding: 16px; background: #ffebee; border-radius: 8px; margin-bottom: 16px; }
+    html.dark .error { background: #3b1111; color: #f87171; }
+
     .chart-row { display: flex; gap: 24px; flex-wrap: wrap; }
-    .chart-row .chart-container { flex: 1; min-width: 350px; }
-    .plot-surface { margin: 0 auto; }
+    .chart-row .chart-container { flex: 1; min-width: 340px; }
+
+    /* force Plot SVG text to use the page text color */
+    .chart-container svg text { fill: var(--text) !important; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Austin 911 Response Time Trends</h1>
-    <p class="subtitle">Analyzing response times across years, priorities, and districts</p>
 
-    <div id="loading" class="loading">Loading dispatch data from Austin Open Data Portal...</div>
-    <div id="error" class="error" style="display:none"></div>
+    <div class="top-nav">
+      <a class="back-link" href="/">← Austin 311</a>
+      <button id="theme-toggle" aria-label="Toggle dark mode">🌙 Dark</button>
+    </div>
+
+    <h1>Austin 911 Response Time Trends</h1>
+    <p class="subtitle">APD dispatch response times across years, priorities, and council districts — updated quarterly</p>
+
+    <div id="loading" class="loading">Loading 911 dispatch data…</div>
+    <div id="error"   class="error"   style="display:none"></div>
 
     <div id="content" style="display:none">
       <div id="info" class="info-box"></div>
 
       <div class="filters">
         <label for="yearFilter">Year:</label>
-        <select id="yearFilter">
-          <option value="all">All Years</option>
-        </select>
+        <select id="yearFilter"><option value="all">All Years</option></select>
+
         <label for="priorityFilter">Priority:</label>
-        <select id="priorityFilter">
-          <option value="all">All Priorities</option>
-        </select>
+        <select id="priorityFilter"><option value="all">All Priorities</option></select>
+
         <label for="districtFilter">Council District:</label>
-        <select id="districtFilter">
-          <option value="all">All Districts</option>
-        </select>
+        <select id="districtFilter"><option value="all">All Districts</option></select>
       </div>
 
       <div class="stats" id="stats"></div>
@@ -132,527 +216,415 @@
         </div>
       </div>
     </div>
+
   </div>
 
   <script>
-    const APP_TOKEN = "7PXoLT3dM8b42C9cxsiwJ7qC7";
-    const DATASET_ID = "22de-7rzg";
+    // ── theme toggle (same pattern as homepage) ─────────────────────────────
+    const themeBtn  = document.getElementById("theme-toggle");
+    const htmlEl    = document.documentElement;
+    if (localStorage.getItem("theme") === "dark") {
+      htmlEl.classList.add("dark");
+      themeBtn.textContent = "☀️ Light";
+    }
+    themeBtn.addEventListener("click", () => {
+      const isDark = htmlEl.classList.toggle("dark");
+      themeBtn.textContent = isDark ? "☀️ Light" : "🌙 Dark";
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    });
 
-    // All data, loaded once
-    let allData = [];
-    let rawLoadedCount = 0;
-    // Filtered data, recomputed on filter change
-    let filteredData = [];
+    // ── state ───────────────────────────────────────────────────────────────
+    let DATA = null;
+    const filters = { year: "all", priority: "all", district: "all" };
 
-    // ========== DATA LOADING (with pagination) ==========
-    async function loadAllData() {
-      // First, get the total count
-      const countUrl = `https://data.austintexas.gov/api/id/${DATASET_ID}.json?$select=COUNT(*)`;
-      const countResp = await fetch(countUrl, {
-        headers: { "X-App-Token": APP_TOKEN }
-      });
-      const countResult = await countResp.json();
-      const totalRecords = countResult[0]?.COUNT || 0;
-      console.log(`Total records in dataset: ${totalRecords}`);
-
-      // We'll pull in chunks using SoQL offset/limit
-      // Limit to a reasonable max for browser (e.g. 100,000) — the dataset may be huge
-      const MAX_RECORDS = 50000;
-      const CHUNK_SIZE = 5000;
-      const recordsToFetch = Math.min(totalRecords, MAX_RECORDS);
-
-      let allRows = [];
-      const fields = [
-        "incident_number",
-        "incident_type",
-        "priority_level",
-        "response_datetime",
-        "first_unit_arrived_datetime",
-        "call_closed_datetime",
-        "council_district",
-        "mental_health_flag",
-        "initial_problem_category"
-      ];
-
-      for (let offset = 0; offset < recordsToFetch; offset += CHUNK_SIZE) {
-        const limit = Math.min(CHUNK_SIZE, recordsToFetch - offset);
-        const url = `https://data.austintexas.gov/resource/${DATASET_ID}.json?` +
-          `$select=${fields.join(",")}&$order=response_datetime%20DESC&$limit=${limit}&$offset=${offset}`;
-
-        // Retry up to 3 times with backoff
-        let rows = null;
-        for (let attempt = 0; attempt < 3; attempt++) {
-          console.log(`Fetching rows ${offset} to ${offset + limit} (attempt ${attempt + 1})...`);
-          try {
-            const resp = await fetch(url, {
-              headers: { "X-App-Token": APP_TOKEN }
-            });
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            rows = await resp.json();
-            break; // success
-          } catch (err) {
-            console.warn(`Attempt ${attempt + 1} failed: ${err.message}`);
-            if (attempt < 2) {
-              const delay = (attempt + 1) * 1000; // 1s, 2s backoff
-              await new Promise(r => setTimeout(r, delay));
-            } else {
-              console.error(`Skipping chunk at offset ${offset} after 3 failed attempts`);
-            }
-          }
-        }
-
-        if (rows) {
-          allRows = allRows.concat(rows);
-        }
-
-        // Small delay between chunks to avoid rate limiting
-        if (offset + CHUNK_SIZE < recordsToFetch) {
-          await new Promise(r => setTimeout(r, 500));
-        }
-
-        // Update loading message
-        document.getElementById("loading").textContent =
-          `Loading dispatch data... ${allRows.length.toLocaleString()} records loaded`;
-      }
-
-      console.log(`Loaded ${allRows.length} records total (raw from API)`);
-      rawLoadedCount = allRows.length;
-      return { data: allRows, totalRecords };
+    // ── data loading ────────────────────────────────────────────────────────
+    async function loadData() {
+      const resp = await fetch("data.json");
+      if (!resp.ok) throw new Error(`HTTP ${resp.status} loading data.json`);
+      return resp.json();
     }
 
-    // ========== DATA PROCESSING ==========
-    function processData(rawData) {
-      console.log(`Raw records from API: ${rawData.length}`);
-      const processed = rawData
-        .map(d => {
-          const responseTime = d.response_datetime ? new Date(d.response_datetime) : null;
-          const arrivalTime = d.first_unit_arrived_datetime ? new Date(d.first_unit_arrived_datetime) : null;
-          let responseMinutes = null;
-          if (responseTime && arrivalTime && !isNaN(responseTime) && !isNaN(arrivalTime)) {
-            responseMinutes = (arrivalTime - responseTime) / (1000 * 60);
-          }
-          return {
-            ...d,
-            responseDate: responseTime,
-            arrivalDate: arrivalTime,
-            responseMinutes,
-            year: responseTime ? responseTime.getFullYear() : null,
-            month: responseTime ? responseTime.getMonth() : null,
-            priority: d.priority_level || "Unknown",
-            district: d.council_district || "Unknown",
-            mentalHealth: (d.mental_health_flag === "Yes" || d.mental_health_flag === "Y") ? "Yes" : "No"
-          };
-        })
-        .filter(d => d.responseMinutes !== null && d.responseMinutes > 0 && d.responseMinutes < 1440); // remove outliers > 24h
-      console.log(`After filtering: ${processed.length} records with valid response times (${rawData.length - processed.length} filtered out)`);
-      return processed;
-    }
-
-    // ========== FILTERING ==========
-    function applyFilters() {
-      const yearVal = document.getElementById("yearFilter").value;
-      const priorityVal = document.getElementById("priorityFilter").value;
-      const districtVal = document.getElementById("districtFilter").value;
-
-      filteredData = allData.filter(d => {
-        if (yearVal !== "all" && d.year !== parseInt(yearVal)) return false;
-        if (priorityVal !== "all" && d.priority !== priorityVal) return false;
-        if (districtVal !== "all" && d.district !== districtVal) return false;
+    // ── filtering ───────────────────────────────────────────────────────────
+    function getFiltered() {
+      return DATA.monthly_data.filter(row => {
+        if (filters.year     !== "all" && !row.m.startsWith(filters.year + "-")) return false;
+        if (filters.priority !== "all" && row.p !== filters.priority)            return false;
+        if (filters.district !== "all" && row.d !== filters.district)            return false;
         return true;
       });
-
-      renderAll();
     }
 
-    // ========== RENDER ==========
-    function renderInfoBox(data, totalRecords, rawLoaded) {
-      const dates = data.map(d => d.responseDate).filter(d => d);
-      const minDate = new Date(Math.min(...dates));
-      const maxDate = new Date(Math.max(...dates));
-
-      document.getElementById("info").innerHTML = `
-        <strong>Loaded:</strong> ${rawLoaded.toLocaleString()} records sampled |
-        <strong>Valid:</strong> ${data.length.toLocaleString()} with response times |
-        <strong>Date Range:</strong> ${minDate.toLocaleDateString()} — ${maxDate.toLocaleDateString()}
-      `;
+    // ── aggregation helpers ─────────────────────────────────────────────────
+    function aggByMonth(rows) {
+      const map = {};
+      for (const row of rows) {
+        if (!map[row.m]) map[row.m] = { n: 0, s: 0, tc: 0 };
+        map[row.m].tc += row.tc;
+        map[row.m].n  += (row.n  || 0);
+        map[row.m].s  += (row.s  || 0);
+      }
+      return Object.entries(map)
+        .map(([m, d]) => ({
+          month:      new Date(m + "-02"),   // mid-month avoids UTC rollover
+          monthStr:   m,
+          avgMinutes: d.n > 0 ? d.s / d.n : null,
+          count:      d.tc,
+        }))
+        .sort((a, b) => a.month - b.month);
     }
 
-    function renderStats(data) {
-      const avg = d3.mean(data, d => d.responseMinutes);
-      const median = d3.median(data, d => d.responseMinutes);
-      const p95 = d3.quantile(data.map(d => d.responseMinutes).sort((a,b) => a-b), 0.95);
-      const mhCount = data.filter(d => d.mentalHealth === "Yes").length;
-      const districts = new Set(data.map(d => d.district));
+    function aggByPriority(rows) {
+      const map = {};
+      for (const row of rows) {
+        if (!map[row.p]) map[row.p] = { n: 0, s: 0, tc: 0 };
+        map[row.p].tc += row.tc;
+        map[row.p].n  += (row.n || 0);
+        map[row.p].s  += (row.s || 0);
+      }
+      return Object.entries(map)
+        .map(([p, d]) => ({
+          priority:   p,
+          avgMinutes: d.n > 0 ? d.s / d.n : null,
+          count:      d.tc,
+        }))
+        .sort((a, b) => a.priority.localeCompare(b.priority));
+    }
+
+    function aggByDistrict(rows) {
+      const map = {};
+      for (const row of rows) {
+        if (!map[row.d]) map[row.d] = { n: 0, s: 0, tc: 0 };
+        map[row.d].tc += row.tc;
+        map[row.d].n  += (row.n || 0);
+        map[row.d].s  += (row.s || 0);
+      }
+      return Object.entries(map)
+        .map(([d, v]) => ({
+          district:   d,
+          avgMinutes: v.n > 0 ? v.s / v.n : null,
+          count:      v.tc,
+        }))
+        .sort((a, b) => b.count - a.count);
+    }
+
+    // ── stats card ──────────────────────────────────────────────────────────
+    function renderStats(filtered) {
+      const totalTC = filtered.reduce((a, r) => a + r.tc, 0);
+      const totalN  = filtered.reduce((a, r) => a + (r.n || 0), 0);
+      const totalS  = filtered.reduce((a, r) => a + (r.s || 0), 0);
+      const totalMH = filtered.reduce((a, r) => a + (r.mh || 0), 0);
+      const uniqueDistricts = new Set(filtered.map(r => r.d).filter(d => d !== "Unknown")).size;
+      const avgMin = totalN > 0 ? (totalS / totalN).toFixed(1) : "—";
+
+      // Use priority-specific percentiles when a priority filter is set
+      const pStats = (filters.priority !== "all" && DATA.meta.priority_stats[filters.priority])
+        ? DATA.meta.priority_stats[filters.priority]
+        : { median: DATA.meta.overall_median_minutes, p95: DATA.meta.overall_p95_minutes };
+      const noteLabel = filters.priority !== "all" ? `(${filters.priority})` : "(all-time)";
 
       document.getElementById("stats").innerHTML = `
         <div class="stat-card">
-          <div class="label">Dispatches (filtered)</div>
-          <div class="value">${data.length.toLocaleString()}</div>
+          <div class="label">Dispatches</div>
+          <div class="value">${totalTC.toLocaleString()}</div>
         </div>
         <div class="stat-card">
-          <div class="label">Avg Response Time</div>
-          <div class="value">${avg ? avg.toFixed(1) : "—"} <span style="font-size:0.9rem;color:#888">min</span></div>
+          <div class="label">Avg Response</div>
+          <div class="value">${avgMin}<span style="font-size:0.85rem;font-weight:400;color:var(--text-sub)"> min</span></div>
         </div>
         <div class="stat-card">
           <div class="label">Median Response</div>
-          <div class="value">${median ? median.toFixed(1) : "—"} <span style="font-size:0.9rem;color:#888">min</span></div>
+          <div class="value">${pStats.median ?? "—"}<span style="font-size:0.85rem;font-weight:400;color:var(--text-sub)"> min</span></div>
+          <div class="note">${noteLabel}</div>
         </div>
         <div class="stat-card">
           <div class="label">95th Percentile</div>
-          <div class="value">${p95 ? p95.toFixed(1) : "—"} <span style="font-size:0.9rem;color:#888">min</span></div>
+          <div class="value">${pStats.p95 ?? "—"}<span style="font-size:0.85rem;font-weight:400;color:var(--text-sub)"> min</span></div>
+          <div class="note">${noteLabel}</div>
         </div>
         <div class="stat-card">
           <div class="label">Mental Health Calls</div>
-          <div class="value">${mhCount.toLocaleString()}</div>
+          <div class="value">${totalMH.toLocaleString()}</div>
         </div>
         <div class="stat-card">
           <div class="label">Council Districts</div>
-          <div class="value">${districts.size}</div>
+          <div class="value">${uniqueDistricts}</div>
         </div>
       `;
     }
 
-    function renderTrendChart(data) {
-      const container = document.getElementById("chart-trend");
-      container.innerHTML = "";
+    // ── chart helpers ───────────────────────────────────────────────────────
+    function isDark() { return htmlEl.classList.contains("dark"); }
 
-      // Group by year-month
-      const grouped = d3.group(data, d => `${d.year}-${String(d.month + 1).padStart(2, "0")}`);
-      const monthly = Array.from(grouped, ([key, values]) => {
-        const [y, m] = key.split("-");
-        return {
-          month: new Date(parseInt(y), parseInt(m) - 1),
-          avgResponse: d3.mean(values, d => d.responseMinutes),
-          count: values.length
-        };
-      }).sort((a, b) => a.month - b.month);
+    function plotStyle() {
+      return { background: "transparent", fontSize: 12, color: isDark() ? "#e2e8f0" : "#333" };
+    }
 
-      if (monthly.length === 0) {
-        container.textContent = "No data for selected filters.";
-        return;
-      }
+    function noData(id) {
+      document.getElementById(id).textContent = "No data for selected filters.";
+    }
 
-      const plot = Plot.plot({
-        style: { background: "transparent", fontSize: 12 },
-        marginLeft: 60,
+    // ── trend chart ─────────────────────────────────────────────────────────
+    function renderTrendChart(monthlyAgg) {
+      const el = document.getElementById("chart-trend");
+      el.innerHTML = "";
+      const data = monthlyAgg.filter(d => d.avgMinutes !== null);
+      if (!data.length) return noData("chart-trend");
+
+      el.appendChild(Plot.plot({
+        style: plotStyle(),
+        marginLeft: 55,
         marks: [
-          Plot.line(monthly, {
-            x: "month",
-            y: "avgResponse",
-            stroke: "#1565c0",
-            strokeWidth: 2,
-            tip: true
+          Plot.line(data, {
+            x: "month", y: "avgMinutes",
+            stroke: "#1565c0", strokeWidth: 2, tip: true,
+            title: d => `${d.monthStr}: ${d.avgMinutes.toFixed(1)} min avg (${d.count.toLocaleString()} calls)`,
           }),
-          Plot.dot(monthly, {
-            x: "month",
-            y: "avgResponse",
-            fill: "#1565c0",
-            r: 3
-          }),
-          Plot.ruleY([0])
+          Plot.dot(data, { x: "month", y: "avgMinutes", fill: "#1565c0", r: 3 }),
+          Plot.ruleY([0]),
         ],
         x: { label: "Month", tickFormat: d3.timeFormat("%b %Y") },
-        y: { label: "Avg Response Time (min)", grid: true }
-      });
-      container.appendChild(plot);
-    }
-
-    function renderPriorityChart(data) {
-      const container = document.getElementById("chart-priority");
-      container.innerHTML = "";
-
-      const priorityLabels = {
-        "Priority 0": "Life Threat",
-        "Priority 1": "Emergency",
-        "Priority 2": "Urgent",
-        "Priority 3": "Routine",
-        "Priority 4": "Non-Emergency",
-        "Priority 5": "Info/Service"
-      };
-
-      const grouped = d3.group(data, d => d.priority);
-      const priorityData = Array.from(grouped, ([key, values]) => ({
-        priority: key,
-        label: priorityLabels[key] || key,
-        avgResponse: d3.mean(values, d => d.responseMinutes),
-        count: values.length
-      })).sort((a, b) => a.priority.localeCompare(b.priority));
-
-      if (priorityData.length === 0) {
-        container.textContent = "No data for selected filters.";
-        return;
-      }
-
-      const plot = Plot.plot({
-        style: { background: "transparent", fontSize: 12 },
-        marginLeft: 60,
-        marks: [
-          Plot.barY(priorityData, {
-            x: "label",
-            y: "avgResponse",
-            fill: "priority",
-            tip: true,
-            title: d => `${d.priority}: ${d.avgResponse.toFixed(1)} min avg (${d.count.toLocaleString()} calls)`
-          }),
-          Plot.ruleY([0])
-        ],
-        x: { label: "Call Type" },
-        y: { label: "Avg Response Time (min)", grid: true },
-        color: { scheme: "turbo" }
-      });
-      container.appendChild(plot);
-    }
-
-    function renderDistrictChart(data) {
-      const container = document.getElementById("chart-district");
-      container.innerHTML = "";
-
-      const grouped = d3.group(data, d => d.district);
-      const districtData = Array.from(grouped, ([key, values]) => ({
-        district: key,
-        avgResponse: d3.mean(values, d => d.responseMinutes),
-        count: values.length
-      })).sort((a, b) => b.avgResponse - a.avgResponse);
-
-      if (districtData.length === 0) {
-        container.textContent = "No data for selected filters.";
-        return;
-      }
-
-      const plot = Plot.plot({
-        style: { background: "transparent", fontSize: 12 },
-        marginLeft: 60,
-        marks: [
-          Plot.barY(districtData, {
-            x: "district",
-            y: "avgResponse",
-            fill: "avgResponse",
-            tip: true,
-            sort: { x: "-y" }
-          }),
-          Plot.ruleY([0])
-        ],
-        x: { label: "Council District", tickRotate: 0 },
-        y: { label: "Avg Response Time (min)", grid: true },
-        color: { scheme: "RdYlBu", reverse: true }
-      });
-      container.appendChild(plot);
-    }
-
-    function renderDistributionChart(data) {
-      const container = document.getElementById("chart-distribution");
-      container.innerHTML = "";
-
-      const bins = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 25, 30, 40, 60, 120, Infinity];
-      const labels = ["0-2", "2-4", "4-6", "6-8", "8-10", "10-12", "12-14", "14-16", "16-18", "18-20", "20-25", "25-30", "30-40", "40-60", "60-120", "120+"];
-
-      const counts = new Array(bins.length - 1).fill(0);
-      data.forEach(d => {
-        const m = d.responseMinutes;
-        for (let i = 0; i < bins.length - 1; i++) {
-          if (m >= bins[i] && m < bins[i + 1]) {
-            counts[i]++;
-            break;
-          }
-        }
-      });
-
-      const histData = labels.map((label, i) => ({
-        range: label,
-        count: counts[i],
-        pct: ((counts[i] / data.length) * 100).toFixed(1)
+        y: { label: "Avg Response (min)", grid: true },
       }));
+    }
 
-      if (histData.length === 0) {
-        container.textContent = "No data for selected filters.";
-        return;
-      }
+    // ── priority chart ──────────────────────────────────────────────────────
+    function renderPriorityChart(priorityAgg) {
+      const el = document.getElementById("chart-priority");
+      el.innerHTML = "";
+      const data = priorityAgg.filter(d => d.avgMinutes !== null);
+      if (!data.length) return noData("chart-priority");
 
-      const plot = Plot.plot({
-        style: { background: "transparent", fontSize: 12 },
-        marginLeft: 60,
-        marginBottom: 60,
+      el.appendChild(Plot.plot({
+        style: plotStyle(),
+        marginLeft: 55,
         marks: [
-          Plot.barY(histData, {
-            x: "range",
-            y: "count",
-            fill: "#1565c0",
-            tip: true,
-            title: d => `${d.range} min: ${d.count.toLocaleString()} (${d.pct}%)`
+          Plot.barY(data, {
+            x: "priority", y: "avgMinutes", fill: "priority", tip: true,
+            title: d => `${d.priority}: ${d.avgMinutes.toFixed(1)} min avg (${d.count.toLocaleString()} calls)`,
           }),
-          Plot.ruleY([0])
+          Plot.ruleY([0]),
+        ],
+        x: { label: "Priority Level" },
+        y: { label: "Avg Response (min)", grid: true },
+        color: { scheme: "turbo" },
+      }));
+    }
+
+    // ── district chart ──────────────────────────────────────────────────────
+    function renderDistrictChart(districtAgg) {
+      const el = document.getElementById("chart-district");
+      el.innerHTML = "";
+      const data = districtAgg.filter(d => d.avgMinutes !== null && d.district !== "Unknown");
+      if (!data.length) return noData("chart-district");
+
+      el.appendChild(Plot.plot({
+        style: plotStyle(),
+        marginLeft: 55,
+        marks: [
+          Plot.barY(data, {
+            x: "district", y: "avgMinutes", fill: "avgMinutes", tip: true,
+            sort: { x: "-y" },
+            title: d => `District ${d.district}: ${d.avgMinutes.toFixed(1)} min avg (${d.count.toLocaleString()} calls)`,
+          }),
+          Plot.ruleY([0]),
+        ],
+        x: { label: "Council District" },
+        y: { label: "Avg Response (min)", grid: true },
+        color: { scheme: "RdYlBu", reverse: true },
+      }));
+    }
+
+    // ── distribution chart ──────────────────────────────────────────────────
+    // Uses pre-computed buckets from data.json; filtered by priority if set.
+    function renderDistributionChart() {
+      const el = document.getElementById("chart-distribution");
+      el.innerHTML = "";
+
+      const key = (filters.priority !== "all" && DATA.distribution[filters.priority])
+        ? filters.priority
+        : "all";
+      const buckets = DATA.distribution[key];
+      if (!buckets) return noData("chart-distribution");
+
+      const total = buckets.reduce((a, b) => a + b.n, 0);
+      const data  = buckets.map(b => ({ ...b, pct: total > 0 ? (b.n / total * 100).toFixed(1) : "0.0" }));
+
+      const titleNote = key === "all" ? "all priorities" : key;
+
+      el.appendChild(Plot.plot({
+        style: plotStyle(),
+        marginLeft: 55,
+        marginBottom: 55,
+        caption: `Showing distribution for ${titleNote}${filters.year !== "all" ? "" : " (all years)"}`,
+        marks: [
+          Plot.barY(data, {
+            x: "label", y: "n", fill: "#1565c0", tip: true,
+            title: d => `${d.label} min: ${d.n.toLocaleString()} (${d.pct}%)`,
+          }),
+          Plot.ruleY([0]),
         ],
         x: { label: "Response Time (minutes)", tickRotate: -30 },
-        y: { label: "Number of Calls", grid: true }
-      });
-      container.appendChild(plot);
+        y: { label: "Number of Calls", grid: true },
+      }));
     }
 
-    function renderHourChart(data) {
-      const container = document.getElementById("chart-hour");
-      container.innerHTML = "";
-
-      const hourCounts = new Array(24).fill(0);
-      data.forEach(d => {
-        if (d.responseDate) {
-          const hour = d.responseDate.getHours();
-          hourCounts[hour]++;
-        }
-      });
-
-      const hourData = hourCounts.map((count, i) => ({
-        hour: i,
-        label: `${i}:00`,
-        count,
-        ampm: i < 12 ? `${i}am` : i === 12 ? "12pm" : `${i - 12}pm`
+    // ── hour chart ──────────────────────────────────────────────────────────
+    // Pre-computed overall; not affected by filters (by design).
+    function renderHourChart() {
+      const el = document.getElementById("chart-hour");
+      el.innerHTML = "";
+      const data = DATA.by_hour.map(d => ({
+        hour:  d.h,
+        count: d.n,
+        label: d.h === 0 ? "12am" : d.h < 12 ? `${d.h}am` : d.h === 12 ? "12pm" : `${d.h - 12}pm`,
       }));
 
-      const plot = Plot.plot({
-        style: { background: "transparent", fontSize: 12 },
-        marginLeft: 60,
+      el.appendChild(Plot.plot({
+        style: plotStyle(),
+        marginLeft: 55,
         marks: [
-          Plot.barY(hourData, {
-            x: "hour",
-            y: "count",
-            fill: "count",
-            tip: true,
-            title: d => `${d.ampm}: ${d.count.toLocaleString()} calls`
+          Plot.barY(data, {
+            x: "hour", y: "count", fill: "count", tip: true,
+            title: d => `${d.label}: ${d.count.toLocaleString()} calls`,
           }),
-          Plot.ruleY([0])
+          Plot.ruleY([0]),
         ],
         x: { label: "Hour of Day", tickFormat: d => `${d}:00`, tickRotate: -45 },
-        y: { label: "Number of Calls", grid: true },
-        color: { scheme: "blues" }
-      });
-      container.appendChild(plot);
+        y: { label: "Number of Calls (all-time)", grid: true },
+        color: { scheme: "blues" },
+      }));
     }
 
-    function renderIncidentChart(data) {
-      const container = document.getElementById("chart-incidents");
-      container.innerHTML = "";
+    // ── incident type chart ─────────────────────────────────────────────────
+    function renderIncidentChart() {
+      const el = document.getElementById("chart-incidents");
+      el.innerHTML = "";
+      const data = DATA.top_incident_types.map(d => ({
+        type:        d.type,
+        count:       d.n,
+        avgResponse: d.n > 0 ? d.s / d.n : 0,
+      }));
+      if (!data.length) return noData("chart-incidents");
 
-      const grouped = d3.group(data, d => d.incident_type || "Unknown");
-      const incidentData = Array.from(grouped, ([key, values]) => ({
-        type: key,
-        count: values.length,
-        avgResponse: d3.mean(values, d => d.responseMinutes)
-      })).sort((a, b) => b.count - a.count).slice(0, 10);
-
-      if (incidentData.length === 0) {
-        container.textContent = "No data for selected filters.";
-        return;
-      }
-
-      const plot = Plot.plot({
-        style: { background: "transparent", fontSize: 11 },
-        marginLeft: 180,
-        height: 300,
+      el.appendChild(Plot.plot({
+        style: { ...plotStyle(), fontSize: 11 },
+        marginLeft: 175,
+        height: 320,
         marks: [
-          Plot.barX(incidentData, {
-            y: "type",
-            x: "count",
-            fill: "avgResponse",
-            tip: true,
+          Plot.barX(data, {
+            y: "type", x: "count", fill: "avgResponse", tip: true,
+            sort: { y: "-x" },
             title: d => `${d.type}: ${d.count.toLocaleString()} calls (avg ${d.avgResponse.toFixed(1)} min)`,
-            sort: { y: "-x" }
           }),
-          Plot.text(incidentData, {
-            y: "type",
-            x: "count",
+          Plot.text(data, {
+            y: "type", x: "count",
             text: d => d.count.toLocaleString(),
-            dx: -6,
-            textAnchor: "end",
-            fontSize: 11,
-            fill: "white",
-            fontWeight: "bold"
+            dx: -6, textAnchor: "end",
+            fontSize: 11, fill: "white", fontWeight: "bold",
+            sort: { y: "-x" },
           }),
-          Plot.ruleX([0])
+          Plot.ruleX([0]),
         ],
-        x: { label: "Number of Calls", grid: true },
+        x: { label: "Number of Calls (all-time)", grid: true },
         y: { label: null },
-        color: { scheme: "Reds", label: "Avg Response (min)" }
-      });
-      container.appendChild(plot);
+        color: { scheme: "Reds", label: "Avg Response (min)" },
+      }));
     }
 
+    // ── render all ──────────────────────────────────────────────────────────
     function renderAll() {
-      renderInfoBox(filteredData, allData.length, rawLoadedCount);
-      renderStats(filteredData);
-      renderTrendChart(filteredData);
-      renderPriorityChart(filteredData);
-      renderDistrictChart(filteredData);
-      renderDistributionChart(filteredData);
-      renderHourChart(filteredData);
-      renderIncidentChart(filteredData);
+      const filtered     = getFiltered();
+      const monthlyAgg   = aggByMonth(filtered);
+      const priorityAgg  = aggByPriority(filtered);
+      const districtAgg  = aggByDistrict(filtered);
+
+      renderStats(filtered);
+      renderTrendChart(monthlyAgg);
+      renderPriorityChart(priorityAgg);
+      renderDistrictChart(districtAgg);
+      renderDistributionChart();
+      renderHourChart();
+      renderIncidentChart();
     }
 
-    // ========== POPULATE FILTERS ==========
-    function populateFilters(data) {
-      const yearSet = new Set(data.map(d => d.year).filter(y => y));
-      const years = Array.from(yearSet).sort();
-      const yearSelect = document.getElementById("yearFilter");
+    // ── populate filter dropdowns ───────────────────────────────────────────
+    function populateFilters() {
+      const rows = DATA.monthly_data;
+
+      const years = [...new Set(rows.map(r => r.m.slice(0, 4)))].sort();
+      const yearSel = document.getElementById("yearFilter");
       years.forEach(y => {
         const opt = document.createElement("option");
-        opt.value = y;
-        opt.textContent = y;
-        yearSelect.appendChild(opt);
+        opt.value = y; opt.textContent = y;
+        yearSel.appendChild(opt);
       });
 
-      const prioritySet = new Set(data.map(d => d.priority));
-      const priorities = Array.from(prioritySet).sort((a, b) => {
-        const anum = parseInt(a);
-        const bnum = parseInt(b);
-        if (!isNaN(anum) && !isNaN(bnum)) return anum - bnum;
-        return a.localeCompare(b);
+      const priorities = [...new Set(rows.map(r => r.p))].sort((a, b) => {
+        const an = parseInt(a), bn = parseInt(b);
+        return (!isNaN(an) && !isNaN(bn)) ? an - bn : a.localeCompare(b);
       });
-      const prioritySelect = document.getElementById("priorityFilter");
+      const priSel = document.getElementById("priorityFilter");
       priorities.forEach(p => {
         const opt = document.createElement("option");
-        opt.value = p;
-        opt.textContent = p;
-        prioritySelect.appendChild(opt);
+        opt.value = p; opt.textContent = p;
+        priSel.appendChild(opt);
       });
 
-      const districtSet = new Set(data.map(d => d.district).filter(d => d !== "Unknown"));
-      const districts = Array.from(districtSet).sort((a, b) => {
-        const anum = parseInt(a);
-        const bnum = parseInt(b);
-        if (!isNaN(anum) && !isNaN(bnum)) return anum - bnum;
-        return a.localeCompare(b);
-      });
-      const districtSelect = document.getElementById("districtFilter");
+      const districts = [...new Set(rows.map(r => r.d).filter(d => d !== "Unknown"))]
+        .sort((a, b) => {
+          const an = parseInt(a), bn = parseInt(b);
+          return (!isNaN(an) && !isNaN(bn)) ? an - bn : a.localeCompare(b);
+        });
+      const distSel = document.getElementById("districtFilter");
       districts.forEach(d => {
         const opt = document.createElement("option");
-        opt.value = d;
-        opt.textContent = d;
-        districtSelect.appendChild(opt);
+        opt.value = d; opt.textContent = `District ${d}`;
+        distSel.appendChild(opt);
       });
     }
 
-    // ========== INIT ==========
+    // ── info box ────────────────────────────────────────────────────────────
+    function renderInfoBox() {
+      const m = DATA.meta;
+      const genDate = new Date(m.generated_at).toLocaleDateString("en-US", {
+        year: "numeric", month: "long", day: "numeric",
+      });
+      document.getElementById("info").innerHTML =
+        `<strong>${m.total_records.toLocaleString()}</strong> dispatch records loaded &nbsp;·&nbsp; ` +
+        `<strong>${m.date_range.earliest}</strong> → <strong>${m.date_range.latest}</strong> &nbsp;·&nbsp; ` +
+        `Overall avg <strong>${m.overall_avg_minutes} min</strong>, ` +
+        `median <strong>${m.overall_median_minutes} min</strong>, ` +
+        `p95 <strong>${m.overall_p95_minutes} min</strong> &nbsp;·&nbsp; ` +
+        `Updated ${genDate}`;
+    }
+
+    // ── init ────────────────────────────────────────────────────────────────
     async function init() {
       try {
-        const result = await loadAllData();
-        const rawData = result.data;
+        DATA = await loadData();
 
-        allData = processData(rawData);
-        if (allData.length === 0) throw new Error("No records with valid response times found.");
+        populateFilters();
+        renderInfoBox();
+
+        document.getElementById("yearFilter").addEventListener("change", e => {
+          filters.year = e.target.value; renderAll();
+        });
+        document.getElementById("priorityFilter").addEventListener("change", e => {
+          filters.priority = e.target.value; renderAll();
+        });
+        document.getElementById("districtFilter").addEventListener("change", e => {
+          filters.district = e.target.value; renderAll();
+        });
 
         document.getElementById("loading").style.display = "none";
         document.getElementById("content").style.display = "block";
+        renderAll();
 
-        populateFilters(allData);
-        // Set up filter event listeners
-        document.getElementById("yearFilter").addEventListener("change", applyFilters);
-        document.getElementById("priorityFilter").addEventListener("change", applyFilters);
-        document.getElementById("districtFilter").addEventListener("change", applyFilters);
-
-        applyFilters();
       } catch (err) {
         document.getElementById("loading").style.display = "none";
-        const errorEl = document.getElementById("error");
-        errorEl.style.display = "block";
-        errorEl.textContent = `Error: ${err.message}`;
+        const errEl = document.getElementById("error");
+        errEl.style.display = "block";
+        errEl.textContent = `Error loading data: ${err.message}. Run scripts/generate_911_data.py to generate data.json.`;
         console.error(err);
       }
     }
