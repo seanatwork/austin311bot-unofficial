@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Austin 911 Response Time Trends</title>
+  <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@observablehq/plot@0.6"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      padding: 20px;
+    }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; margin-bottom: 4px; }
+    .subtitle { color: #666; margin-bottom: 24px; }
+
+    .stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      flex: 1;
+      min-width: 160px;
+    }
+    .stat-card .label { font-size: 0.85rem; color: #666; }
+    .stat-card .value { font-size: 1.8rem; font-weight: 700; margin-top: 4px; }
+
+    .chart-container {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      margin-bottom: 24px;
+    }
+    .chart-container h2 { font-size: 1.1rem; margin-bottom: 16px; color: #444; }
+
+    .filters {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filters label { font-weight: 600; font-size: 0.9rem; }
+    .filters select {
+      padding: 6px 12px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      background: white;
+      font-size: 0.9rem;
+    }
+
+    .loading { text-align: center; padding: 60px; color: #888; }
+    .error { color: #d32f2f; padding: 20px; background: #ffebee; border-radius: 8px; margin-bottom: 16px; }
+    .info-box {
+      background: #e3f2fd;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+    .info-box strong { color: #1565c0; }
+    .chart-row { display: flex; gap: 24px; flex-wrap: wrap; }
+    .chart-row .chart-container { flex: 1; min-width: 350px; }
+    .plot-surface { margin: 0 auto; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Austin 911 Response Time Trends</h1>
+    <p class="subtitle">Analyzing response times across years, priorities, and districts</p>
+
+    <div id="loading" class="loading">Loading dispatch data from Austin Open Data Portal...</div>
+    <div id="error" class="error" style="display:none"></div>
+
+    <div id="content" style="display:none">
+      <div id="info" class="info-box"></div>
+
+      <div class="filters">
+        <label for="yearFilter">Year:</label>
+        <select id="yearFilter">
+          <option value="all">All Years</option>
+        </select>
+        <label for="priorityFilter">Priority:</label>
+        <select id="priorityFilter">
+          <option value="all">All Priorities</option>
+        </select>
+        <label for="districtFilter">Council District:</label>
+        <select id="districtFilter">
+          <option value="all">All Districts</option>
+        </select>
+      </div>
+
+      <div class="stats" id="stats"></div>
+
+      <div class="chart-row">
+        <div class="chart-container">
+          <h2>Avg Response Time by Month</h2>
+          <div id="chart-trend"></div>
+        </div>
+        <div class="chart-container">
+          <h2>Response Time by Priority</h2>
+          <div id="chart-priority"></div>
+        </div>
+      </div>
+
+      <div class="chart-row">
+        <div class="chart-container">
+          <h2>Response Time by Council District</h2>
+          <div id="chart-district"></div>
+        </div>
+        <div class="chart-container">
+          <h2>Response Time Distribution</h2>
+          <div id="chart-distribution"></div>
+        </div>
+      </div>
+
+      <div class="chart-row">
+        <div class="chart-container">
+          <h2>Calls by Hour of Day</h2>
+          <div id="chart-hour"></div>
+        </div>
+        <div class="chart-container">
+          <h2>Top Incident Types</h2>
+          <div id="chart-incidents"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const APP_TOKEN = "7PXoLT3dM8b42C9cxsiwJ7qC7";
+    const DATASET_ID = "22de-7rzg";
+
+    // All data, loaded once
+    let allData = [];
+    let rawLoadedCount = 0;
+    // Filtered data, recomputed on filter change
+    let filteredData = [];
+
+    // ========== DATA LOADING (with pagination) ==========
+    async function loadAllData() {
+      // First, get the total count
+      const countUrl = `https://data.austintexas.gov/api/id/${DATASET_ID}.json?$select=COUNT(*)`;
+      const countResp = await fetch(countUrl, {
+        headers: { "X-App-Token": APP_TOKEN }
+      });
+      const countResult = await countResp.json();
+      const totalRecords = countResult[0]?.COUNT || 0;
+      console.log(`Total records in dataset: ${totalRecords}`);
+
+      // We'll pull in chunks using SoQL offset/limit
+      // Limit to a reasonable max for browser (e.g. 100,000) — the dataset may be huge
+      const MAX_RECORDS = 50000;
+      const CHUNK_SIZE = 5000;
+      const recordsToFetch = Math.min(totalRecords, MAX_RECORDS);
+
+      let allRows = [];
+      const fields = [
+        "incident_number",
+        "incident_type",
+        "priority_level",
+        "response_datetime",
+        "first_unit_arrived_datetime",
+        "call_closed_datetime",
+        "council_district",
+        "mental_health_flag",
+        "initial_problem_category"
+      ];
+
+      for (let offset = 0; offset < recordsToFetch; offset += CHUNK_SIZE) {
+        const limit = Math.min(CHUNK_SIZE, recordsToFetch - offset);
+        const url = `https://data.austintexas.gov/resource/${DATASET_ID}.json?` +
+          `$select=${fields.join(",")}&$order=response_datetime%20DESC&$limit=${limit}&$offset=${offset}`;
+
+        // Retry up to 3 times with backoff
+        let rows = null;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          console.log(`Fetching rows ${offset} to ${offset + limit} (attempt ${attempt + 1})...`);
+          try {
+            const resp = await fetch(url, {
+              headers: { "X-App-Token": APP_TOKEN }
+            });
+            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+            rows = await resp.json();
+            break; // success
+          } catch (err) {
+            console.warn(`Attempt ${attempt + 1} failed: ${err.message}`);
+            if (attempt < 2) {
+              const delay = (attempt + 1) * 1000; // 1s, 2s backoff
+              await new Promise(r => setTimeout(r, delay));
+            } else {
+              console.error(`Skipping chunk at offset ${offset} after 3 failed attempts`);
+            }
+          }
+        }
+
+        if (rows) {
+          allRows = allRows.concat(rows);
+        }
+
+        // Small delay between chunks to avoid rate limiting
+        if (offset + CHUNK_SIZE < recordsToFetch) {
+          await new Promise(r => setTimeout(r, 500));
+        }
+
+        // Update loading message
+        document.getElementById("loading").textContent =
+          `Loading dispatch data... ${allRows.length.toLocaleString()} records loaded`;
+      }
+
+      console.log(`Loaded ${allRows.length} records total (raw from API)`);
+      rawLoadedCount = allRows.length;
+      return { data: allRows, totalRecords };
+    }
+
+    // ========== DATA PROCESSING ==========
+    function processData(rawData) {
+      console.log(`Raw records from API: ${rawData.length}`);
+      const processed = rawData
+        .map(d => {
+          const responseTime = d.response_datetime ? new Date(d.response_datetime) : null;
+          const arrivalTime = d.first_unit_arrived_datetime ? new Date(d.first_unit_arrived_datetime) : null;
+          let responseMinutes = null;
+          if (responseTime && arrivalTime && !isNaN(responseTime) && !isNaN(arrivalTime)) {
+            responseMinutes = (arrivalTime - responseTime) / (1000 * 60);
+          }
+          return {
+            ...d,
+            responseDate: responseTime,
+            arrivalDate: arrivalTime,
+            responseMinutes,
+            year: responseTime ? responseTime.getFullYear() : null,
+            month: responseTime ? responseTime.getMonth() : null,
+            priority: d.priority_level || "Unknown",
+            district: d.council_district || "Unknown",
+            mentalHealth: (d.mental_health_flag === "Yes" || d.mental_health_flag === "Y") ? "Yes" : "No"
+          };
+        })
+        .filter(d => d.responseMinutes !== null && d.responseMinutes > 0 && d.responseMinutes < 1440); // remove outliers > 24h
+      console.log(`After filtering: ${processed.length} records with valid response times (${rawData.length - processed.length} filtered out)`);
+      return processed;
+    }
+
+    // ========== FILTERING ==========
+    function applyFilters() {
+      const yearVal = document.getElementById("yearFilter").value;
+      const priorityVal = document.getElementById("priorityFilter").value;
+      const districtVal = document.getElementById("districtFilter").value;
+
+      filteredData = allData.filter(d => {
+        if (yearVal !== "all" && d.year !== parseInt(yearVal)) return false;
+        if (priorityVal !== "all" && d.priority !== priorityVal) return false;
+        if (districtVal !== "all" && d.district !== districtVal) return false;
+        return true;
+      });
+
+      renderAll();
+    }
+
+    // ========== RENDER ==========
+    function renderInfoBox(data, totalRecords, rawLoaded) {
+      const dates = data.map(d => d.responseDate).filter(d => d);
+      const minDate = new Date(Math.min(...dates));
+      const maxDate = new Date(Math.max(...dates));
+
+      document.getElementById("info").innerHTML = `
+        <strong>Loaded:</strong> ${rawLoaded.toLocaleString()} records sampled |
+        <strong>Valid:</strong> ${data.length.toLocaleString()} with response times |
+        <strong>Date Range:</strong> ${minDate.toLocaleDateString()} — ${maxDate.toLocaleDateString()}
+      `;
+    }
+
+    function renderStats(data) {
+      const avg = d3.mean(data, d => d.responseMinutes);
+      const median = d3.median(data, d => d.responseMinutes);
+      const p95 = d3.quantile(data.map(d => d.responseMinutes).sort((a,b) => a-b), 0.95);
+      const mhCount = data.filter(d => d.mentalHealth === "Yes").length;
+      const districts = new Set(data.map(d => d.district));
+
+      document.getElementById("stats").innerHTML = `
+        <div class="stat-card">
+          <div class="label">Dispatches (filtered)</div>
+          <div class="value">${data.length.toLocaleString()}</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Avg Response Time</div>
+          <div class="value">${avg ? avg.toFixed(1) : "—"} <span style="font-size:0.9rem;color:#888">min</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Median Response</div>
+          <div class="value">${median ? median.toFixed(1) : "—"} <span style="font-size:0.9rem;color:#888">min</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="label">95th Percentile</div>
+          <div class="value">${p95 ? p95.toFixed(1) : "—"} <span style="font-size:0.9rem;color:#888">min</span></div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Mental Health Calls</div>
+          <div class="value">${mhCount.toLocaleString()}</div>
+        </div>
+        <div class="stat-card">
+          <div class="label">Council Districts</div>
+          <div class="value">${districts.size}</div>
+        </div>
+      `;
+    }
+
+    function renderTrendChart(data) {
+      const container = document.getElementById("chart-trend");
+      container.innerHTML = "";
+
+      // Group by year-month
+      const grouped = d3.group(data, d => `${d.year}-${String(d.month + 1).padStart(2, "0")}`);
+      const monthly = Array.from(grouped, ([key, values]) => {
+        const [y, m] = key.split("-");
+        return {
+          month: new Date(parseInt(y), parseInt(m) - 1),
+          avgResponse: d3.mean(values, d => d.responseMinutes),
+          count: values.length
+        };
+      }).sort((a, b) => a.month - b.month);
+
+      if (monthly.length === 0) {
+        container.textContent = "No data for selected filters.";
+        return;
+      }
+
+      const plot = Plot.plot({
+        style: { background: "transparent", fontSize: 12 },
+        marginLeft: 60,
+        marks: [
+          Plot.line(monthly, {
+            x: "month",
+            y: "avgResponse",
+            stroke: "#1565c0",
+            strokeWidth: 2,
+            tip: true
+          }),
+          Plot.dot(monthly, {
+            x: "month",
+            y: "avgResponse",
+            fill: "#1565c0",
+            r: 3
+          }),
+          Plot.ruleY([0])
+        ],
+        x: { label: "Month", tickFormat: d3.timeFormat("%b %Y") },
+        y: { label: "Avg Response Time (min)", grid: true }
+      });
+      container.appendChild(plot);
+    }
+
+    function renderPriorityChart(data) {
+      const container = document.getElementById("chart-priority");
+      container.innerHTML = "";
+
+      const priorityLabels = {
+        "Priority 0": "Life Threat",
+        "Priority 1": "Emergency",
+        "Priority 2": "Urgent",
+        "Priority 3": "Routine",
+        "Priority 4": "Non-Emergency",
+        "Priority 5": "Info/Service"
+      };
+
+      const grouped = d3.group(data, d => d.priority);
+      const priorityData = Array.from(grouped, ([key, values]) => ({
+        priority: key,
+        label: priorityLabels[key] || key,
+        avgResponse: d3.mean(values, d => d.responseMinutes),
+        count: values.length
+      })).sort((a, b) => a.priority.localeCompare(b.priority));
+
+      if (priorityData.length === 0) {
+        container.textContent = "No data for selected filters.";
+        return;
+      }
+
+      const plot = Plot.plot({
+        style: { background: "transparent", fontSize: 12 },
+        marginLeft: 60,
+        marks: [
+          Plot.barY(priorityData, {
+            x: "label",
+            y: "avgResponse",
+            fill: "priority",
+            tip: true,
+            title: d => `${d.priority}: ${d.avgResponse.toFixed(1)} min avg (${d.count.toLocaleString()} calls)`
+          }),
+          Plot.ruleY([0])
+        ],
+        x: { label: "Call Type" },
+        y: { label: "Avg Response Time (min)", grid: true },
+        color: { scheme: "turbo" }
+      });
+      container.appendChild(plot);
+    }
+
+    function renderDistrictChart(data) {
+      const container = document.getElementById("chart-district");
+      container.innerHTML = "";
+
+      const grouped = d3.group(data, d => d.district);
+      const districtData = Array.from(grouped, ([key, values]) => ({
+        district: key,
+        avgResponse: d3.mean(values, d => d.responseMinutes),
+        count: values.length
+      })).sort((a, b) => b.avgResponse - a.avgResponse);
+
+      if (districtData.length === 0) {
+        container.textContent = "No data for selected filters.";
+        return;
+      }
+
+      const plot = Plot.plot({
+        style: { background: "transparent", fontSize: 12 },
+        marginLeft: 60,
+        marks: [
+          Plot.barY(districtData, {
+            x: "district",
+            y: "avgResponse",
+            fill: "avgResponse",
+            tip: true,
+            sort: { x: "-y" }
+          }),
+          Plot.ruleY([0])
+        ],
+        x: { label: "Council District", tickRotate: 0 },
+        y: { label: "Avg Response Time (min)", grid: true },
+        color: { scheme: "RdYlBu", reverse: true }
+      });
+      container.appendChild(plot);
+    }
+
+    function renderDistributionChart(data) {
+      const container = document.getElementById("chart-distribution");
+      container.innerHTML = "";
+
+      const bins = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 25, 30, 40, 60, 120, Infinity];
+      const labels = ["0-2", "2-4", "4-6", "6-8", "8-10", "10-12", "12-14", "14-16", "16-18", "18-20", "20-25", "25-30", "30-40", "40-60", "60-120", "120+"];
+
+      const counts = new Array(bins.length - 1).fill(0);
+      data.forEach(d => {
+        const m = d.responseMinutes;
+        for (let i = 0; i < bins.length - 1; i++) {
+          if (m >= bins[i] && m < bins[i + 1]) {
+            counts[i]++;
+            break;
+          }
+        }
+      });
+
+      const histData = labels.map((label, i) => ({
+        range: label,
+        count: counts[i],
+        pct: ((counts[i] / data.length) * 100).toFixed(1)
+      }));
+
+      if (histData.length === 0) {
+        container.textContent = "No data for selected filters.";
+        return;
+      }
+
+      const plot = Plot.plot({
+        style: { background: "transparent", fontSize: 12 },
+        marginLeft: 60,
+        marginBottom: 60,
+        marks: [
+          Plot.barY(histData, {
+            x: "range",
+            y: "count",
+            fill: "#1565c0",
+            tip: true,
+            title: d => `${d.range} min: ${d.count.toLocaleString()} (${d.pct}%)`
+          }),
+          Plot.ruleY([0])
+        ],
+        x: { label: "Response Time (minutes)", tickRotate: -30 },
+        y: { label: "Number of Calls", grid: true }
+      });
+      container.appendChild(plot);
+    }
+
+    function renderHourChart(data) {
+      const container = document.getElementById("chart-hour");
+      container.innerHTML = "";
+
+      const hourCounts = new Array(24).fill(0);
+      data.forEach(d => {
+        if (d.responseDate) {
+          const hour = d.responseDate.getHours();
+          hourCounts[hour]++;
+        }
+      });
+
+      const hourData = hourCounts.map((count, i) => ({
+        hour: i,
+        label: `${i}:00`,
+        count,
+        ampm: i < 12 ? `${i}am` : i === 12 ? "12pm" : `${i - 12}pm`
+      }));
+
+      const plot = Plot.plot({
+        style: { background: "transparent", fontSize: 12 },
+        marginLeft: 60,
+        marks: [
+          Plot.barY(hourData, {
+            x: "hour",
+            y: "count",
+            fill: "count",
+            tip: true,
+            title: d => `${d.ampm}: ${d.count.toLocaleString()} calls`
+          }),
+          Plot.ruleY([0])
+        ],
+        x: { label: "Hour of Day", tickFormat: d => `${d}:00`, tickRotate: -45 },
+        y: { label: "Number of Calls", grid: true },
+        color: { scheme: "blues" }
+      });
+      container.appendChild(plot);
+    }
+
+    function renderIncidentChart(data) {
+      const container = document.getElementById("chart-incidents");
+      container.innerHTML = "";
+
+      const grouped = d3.group(data, d => d.incident_type || "Unknown");
+      const incidentData = Array.from(grouped, ([key, values]) => ({
+        type: key,
+        count: values.length,
+        avgResponse: d3.mean(values, d => d.responseMinutes)
+      })).sort((a, b) => b.count - a.count).slice(0, 10);
+
+      if (incidentData.length === 0) {
+        container.textContent = "No data for selected filters.";
+        return;
+      }
+
+      const plot = Plot.plot({
+        style: { background: "transparent", fontSize: 11 },
+        marginLeft: 180,
+        height: 300,
+        marks: [
+          Plot.barX(incidentData, {
+            y: "type",
+            x: "count",
+            fill: "avgResponse",
+            tip: true,
+            title: d => `${d.type}: ${d.count.toLocaleString()} calls (avg ${d.avgResponse.toFixed(1)} min)`,
+            sort: { y: "-x" }
+          }),
+          Plot.text(incidentData, {
+            y: "type",
+            x: "count",
+            text: d => d.count.toLocaleString(),
+            dx: -6,
+            textAnchor: "end",
+            fontSize: 11,
+            fill: "white",
+            fontWeight: "bold"
+          }),
+          Plot.ruleX([0])
+        ],
+        x: { label: "Number of Calls", grid: true },
+        y: { label: null },
+        color: { scheme: "Reds", label: "Avg Response (min)" }
+      });
+      container.appendChild(plot);
+    }
+
+    function renderAll() {
+      renderInfoBox(filteredData, allData.length, rawLoadedCount);
+      renderStats(filteredData);
+      renderTrendChart(filteredData);
+      renderPriorityChart(filteredData);
+      renderDistrictChart(filteredData);
+      renderDistributionChart(filteredData);
+      renderHourChart(filteredData);
+      renderIncidentChart(filteredData);
+    }
+
+    // ========== POPULATE FILTERS ==========
+    function populateFilters(data) {
+      const yearSet = new Set(data.map(d => d.year).filter(y => y));
+      const years = Array.from(yearSet).sort();
+      const yearSelect = document.getElementById("yearFilter");
+      years.forEach(y => {
+        const opt = document.createElement("option");
+        opt.value = y;
+        opt.textContent = y;
+        yearSelect.appendChild(opt);
+      });
+
+      const prioritySet = new Set(data.map(d => d.priority));
+      const priorities = Array.from(prioritySet).sort((a, b) => {
+        const anum = parseInt(a);
+        const bnum = parseInt(b);
+        if (!isNaN(anum) && !isNaN(bnum)) return anum - bnum;
+        return a.localeCompare(b);
+      });
+      const prioritySelect = document.getElementById("priorityFilter");
+      priorities.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p;
+        opt.textContent = p;
+        prioritySelect.appendChild(opt);
+      });
+
+      const districtSet = new Set(data.map(d => d.district).filter(d => d !== "Unknown"));
+      const districts = Array.from(districtSet).sort((a, b) => {
+        const anum = parseInt(a);
+        const bnum = parseInt(b);
+        if (!isNaN(anum) && !isNaN(bnum)) return anum - bnum;
+        return a.localeCompare(b);
+      });
+      const districtSelect = document.getElementById("districtFilter");
+      districts.forEach(d => {
+        const opt = document.createElement("option");
+        opt.value = d;
+        opt.textContent = d;
+        districtSelect.appendChild(opt);
+      });
+    }
+
+    // ========== INIT ==========
+    async function init() {
+      try {
+        const result = await loadAllData();
+        const rawData = result.data;
+
+        allData = processData(rawData);
+        if (allData.length === 0) throw new Error("No records with valid response times found.");
+
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("content").style.display = "block";
+
+        populateFilters(allData);
+        // Set up filter event listeners
+        document.getElementById("yearFilter").addEventListener("change", applyFilters);
+        document.getElementById("priorityFilter").addEventListener("change", applyFilters);
+        document.getElementById("districtFilter").addEventListener("change", applyFilters);
+
+        applyFilters();
+      } catch (err) {
+        document.getElementById("loading").style.display = "none";
+        const errorEl = document.getElementById("error");
+        errorEl.style.display = "block";
+        errorEl.textContent = `Error: ${err.message}`;
+        console.error(err);
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
