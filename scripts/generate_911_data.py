@@ -27,11 +27,13 @@ OUT = Path("docs/911/data.json")
 
 FIELDS = ",".join([
     "response_datetime",
-    "first_unit_arrived_datetime",
+    "response_time",
+    "response_day_of_week",
     "priority_level",
     "council_district",
+    "sector",
     "mental_health_flag",
-    "incident_type",
+    "final_problem_category",
 ])
 
 CHUNK_SIZE = 5000
@@ -40,6 +42,8 @@ RETRYABLE_CODES = {423, 429, 500, 502, 503, 504}
 INTER_CHUNK_DELAY = 1.0
 
 # Distribution bins match the dashboard's current histogram buckets (minutes)
+DOW_ORDER = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+
 DIST_BINS = [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 25, 30, 40, 60, 120]
 DIST_LABELS = [
     "0–2", "2–4", "4–6", "6–8", "8–10", "10–12", "12–14", "14–16",
@@ -150,14 +154,16 @@ def _parse_dt(s: str) -> datetime | None:
 
 
 def _response_minutes(row: dict) -> float | None:
-    dispatched = _parse_dt(row.get("response_datetime", ""))
-    arrived = _parse_dt(row.get("first_unit_arrived_datetime", ""))
-    if not dispatched or not arrived:
+    rt = row.get("response_time")
+    if not rt:
         return None
-    delta = (arrived - dispatched).total_seconds() / 60.0
-    if delta <= 0 or delta > 1440:
+    try:
+        minutes = float(rt) / 60.0
+    except (ValueError, TypeError):
         return None
-    return delta
+    if minutes <= 0 or minutes > 1440:
+        return None
+    return minutes
 
 
 def _dist_bucket(minutes: float) -> int:
@@ -173,6 +179,8 @@ def aggregate(rows: list[dict]) -> dict:
     monthly: dict[tuple, dict] = defaultdict(lambda: {"tc": 0, "n": 0, "s": 0.0, "mh": 0})
 
     by_hour: dict[int, dict] = defaultdict(lambda: {"n": 0, "s": 0.0})
+    by_dow: dict[str, dict] = defaultdict(lambda: {"n": 0, "s": 0.0})
+    by_sector: dict[str, dict] = defaultdict(lambda: {"n": 0, "s": 0.0})
 
     # distribution per priority and overall
     dist: dict[str, list] = defaultdict(lambda: [0] * len(DIST_LABELS))
@@ -194,13 +202,13 @@ def aggregate(rows: list[dict]) -> dict:
 
         month = dispatched.strftime("%Y-%m")
         hour = dispatched.hour
+        dow = (row.get("response_day_of_week") or "").strip()[:3]
         priority = (row.get("priority_level") or "Unknown").strip()
         district = (row.get("council_district") or "Unknown").strip()
-        is_mh = (row.get("mental_health_flag") or "").strip().upper() in {"YES", "Y", "TRUE", "1"}
+        sector = (row.get("sector") or "Unknown").strip()
+        is_mh = (row.get("mental_health_flag") or "").strip() == "Mental Health Incident"
 
-        inc_type = (row.get("incident_type") or "Unknown").strip()
-        if inc_type.startswith("Dispatched - "):
-            inc_type = inc_type[len("Dispatched - "):]
+        inc_type = (row.get("final_problem_category") or "Unknown").strip()
 
         if earliest is None or dispatched < earliest:
             earliest = dispatched
@@ -213,6 +221,10 @@ def aggregate(rows: list[dict]) -> dict:
             monthly[key]["mh"] += 1
 
         by_hour[hour]["n"] += 1
+        if dow:
+            by_dow[dow]["n"] += 1
+        if sector != "Unknown":
+            by_sector[sector]["n"] += 1
         inc_types[inc_type]["n"] += 1
 
         minutes = _response_minutes(row)
@@ -220,6 +232,10 @@ def aggregate(rows: list[dict]) -> dict:
             monthly[key]["n"] += 1
             monthly[key]["s"] += minutes
             by_hour[hour]["s"] += minutes
+            if dow:
+                by_dow[dow]["s"] += minutes
+            if sector != "Unknown":
+                by_sector[sector]["s"] += minutes
             inc_types[inc_type]["s"] += minutes
             dist[priority][_dist_bucket(minutes)] += 1
             dist_all[_dist_bucket(minutes)] += 1
@@ -242,6 +258,18 @@ def aggregate(rows: list[dict]) -> dict:
     for h in range(24):
         d = by_hour.get(h, {"n": 0, "s": 0.0})
         hour_data.append({"h": h, "n": d["n"], "s": round(d["s"], 2)})
+
+    # by_dow (Mon–Sun order)
+    dow_data = [
+        {"dow": d, "n": by_dow[d]["n"], "s": round(by_dow[d]["s"], 2)}
+        for d in DOW_ORDER if d in by_dow
+    ]
+
+    # by_sector (APD patrol sectors, sorted alphabetically)
+    sector_data = sorted(
+        [{"sector": s, "n": d["n"], "s": round(d["s"], 2)} for s, d in by_sector.items()],
+        key=lambda x: x["sector"],
+    )
 
     # distribution per priority + overall
     dist_out: dict[str, list] = {
@@ -292,6 +320,8 @@ def aggregate(rows: list[dict]) -> dict:
         },
         "monthly_data": monthly_data,
         "by_hour": hour_data,
+        "by_dow": dow_data,
+        "by_sector": sector_data,
         "distribution": dist_out,
         "top_incident_types": top_types,
     }

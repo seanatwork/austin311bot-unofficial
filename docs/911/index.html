@@ -211,6 +211,17 @@
           <div id="chart-hour"></div>
         </div>
         <div class="chart-container">
+          <h2>Calls by Day of Week</h2>
+          <div id="chart-dow"></div>
+        </div>
+      </div>
+
+      <div class="chart-row">
+        <div class="chart-container">
+          <h2>Response Time by APD Sector</h2>
+          <div id="chart-sector"></div>
+        </div>
+        <div class="chart-container">
           <h2>Top Incident Types</h2>
           <div id="chart-incidents"></div>
         </div>
@@ -236,6 +247,14 @@
     // ── state ───────────────────────────────────────────────────────────────
     let DATA = null;
     const filters = { year: "all", priority: "all", district: "all" };
+
+    const PRIORITY_LABELS = {
+      "Priority 0": "P0 · Immediate",
+      "Priority 1": "P1 · Emergency",
+      "Priority 2": "P2 · Urgent",
+      "Priority 3": "P3 · Routine",
+    };
+    function priorityLabel(p) { return PRIORITY_LABELS[p] || p; }
 
     // ── data loading ────────────────────────────────────────────────────────
     async function loadData() {
@@ -320,7 +339,7 @@
       const pStats = (filters.priority !== "all" && DATA.meta.priority_stats[filters.priority])
         ? DATA.meta.priority_stats[filters.priority]
         : { median: DATA.meta.overall_median_minutes, p95: DATA.meta.overall_p95_minutes };
-      const noteLabel = filters.priority !== "all" ? `(${filters.priority})` : "(all-time)";
+      const noteLabel = filters.priority !== "all" ? `(${priorityLabel(filters.priority)})` : "(all-time)";
 
       document.getElementById("stats").innerHTML = `
         <div class="stat-card">
@@ -391,7 +410,9 @@
     function renderPriorityChart(priorityAgg) {
       const el = document.getElementById("chart-priority");
       el.innerHTML = "";
-      const data = priorityAgg.filter(d => d.avgMinutes !== null);
+      const data = priorityAgg
+        .filter(d => d.avgMinutes !== null)
+        .map(d => ({ ...d, label: priorityLabel(d.priority) }));
       if (!data.length) return noData("chart-priority");
 
       el.appendChild(Plot.plot({
@@ -399,12 +420,12 @@
         marginLeft: 55,
         marks: [
           Plot.barY(data, {
-            x: "priority", y: "avgMinutes", fill: "priority", tip: true,
-            title: d => `${d.priority}: ${d.avgMinutes.toFixed(1)} min avg (${d.count.toLocaleString()} calls)`,
+            x: "label", y: "avgMinutes", fill: "label", tip: true,
+            title: d => `${d.label}: ${d.avgMinutes.toFixed(1)} min avg (${d.count.toLocaleString()} calls)`,
           }),
           Plot.ruleY([0]),
         ],
-        x: { label: "Priority Level" },
+        x: { label: null },
         y: { label: "Avg Response (min)", grid: true },
         color: { scheme: "turbo" },
       }));
@@ -495,6 +516,62 @@
       }));
     }
 
+    // ── day-of-week chart ───────────────────────────────────────────────────
+    function renderDowChart() {
+      const el = document.getElementById("chart-dow");
+      el.innerHTML = "";
+      if (!DATA.by_dow || !DATA.by_dow.length) return noData("chart-dow");
+
+      const data = DATA.by_dow.map(d => ({
+        dow:    d.dow,
+        count:  d.n,
+        avgMin: d.n > 0 ? d.s / d.n : 0,
+      }));
+
+      el.appendChild(Plot.plot({
+        style: plotStyle(),
+        marginLeft: 55,
+        marks: [
+          Plot.barY(data, {
+            x: "dow", y: "count", fill: "count", tip: true,
+            title: d => `${d.dow}: ${d.count.toLocaleString()} calls (avg ${d.avgMin.toFixed(1)} min)`,
+          }),
+          Plot.ruleY([0]),
+        ],
+        x: { label: "Day of Week" },
+        y: { label: "Number of Calls (all-time)", grid: true },
+        color: { scheme: "blues" },
+      }));
+    }
+
+    // ── sector chart ────────────────────────────────────────────────────────
+    function renderSectorChart() {
+      const el = document.getElementById("chart-sector");
+      el.innerHTML = "";
+      if (!DATA.by_sector || !DATA.by_sector.length) return noData("chart-sector");
+
+      const data = DATA.by_sector
+        .filter(d => d.n > 0)
+        .map(d => ({ sector: d.sector, avgMin: d.n > 0 ? d.s / d.n : 0, count: d.n }));
+      if (!data.length) return noData("chart-sector");
+
+      el.appendChild(Plot.plot({
+        style: plotStyle(),
+        marginLeft: 80,
+        marks: [
+          Plot.barX(data, {
+            y: "sector", x: "avgMin", fill: "avgMin", tip: true,
+            sort: { y: "-x" },
+            title: d => `${d.sector}: ${d.avgMin.toFixed(1)} min avg (${d.count.toLocaleString()} calls)`,
+          }),
+          Plot.ruleX([0]),
+        ],
+        x: { label: "Avg Response Time (min)", grid: true },
+        y: { label: null },
+        color: { scheme: "RdYlBu", reverse: true },
+      }));
+    }
+
     // ── incident type chart ─────────────────────────────────────────────────
     function renderIncidentChart() {
       const el = document.getElementById("chart-incidents");
@@ -544,6 +621,8 @@
       renderDistrictChart(districtAgg);
       renderDistributionChart();
       renderHourChart();
+      renderDowChart();
+      renderSectorChart();
       renderIncidentChart();
     }
 
@@ -566,7 +645,7 @@
       const priSel = document.getElementById("priorityFilter");
       priorities.forEach(p => {
         const opt = document.createElement("option");
-        opt.value = p; opt.textContent = p;
+        opt.value = p; opt.textContent = priorityLabel(p);
         priSel.appendChild(opt);
       });
 
