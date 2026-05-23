@@ -680,39 +680,43 @@ def _load_funny_descriptions() -> Optional[dict]:
 
     all_candidates = []
     total_fetched = 0
+    PAGES_PER_CODE = 5  # 500 records per code
 
     for code, category in _FUNNY_CODES:
-        records = _fetch_open311({
-            "service_code": code,
-            "per_page": 100,
-            "page": 1,
-        })
-        if not records:
-            logger.info(f"  {code}: 0 records")
-            continue
-
-        total_fetched += len(records)
+        code_records = 0
         code_hits = 0
+        for page in range(1, PAGES_PER_CODE + 1):
+            records = _fetch_open311({
+                "service_code": code,
+                "per_page": 100,
+                "page": page,
+            })
+            if not records:
+                break
+            code_records += len(records)
 
-        for r in records:
-            desc = r.get("description", "") or ""
-            notes = r.get("status_notes", "") or ""
+            for r in records:
+                desc = r.get("description", "") or ""
+                notes = r.get("status_notes", "") or ""
+                text = desc.strip() if len(desc.strip()) > len(notes.strip()) else notes.strip()
 
-            text = desc.strip() if len(desc.strip()) > len(notes.strip()) else notes.strip()
+                if _is_funny_description(text):
+                    all_candidates.append({
+                        "text": _censor(text)[:300],
+                        "category": category,
+                        "code": code,
+                        "address": (r.get("address") or "").strip(),
+                        "date": (r.get("requested_datetime") or "")[:10],
+                        "id": r.get("service_request_id", ""),
+                    })
+                    code_hits += 1
 
-            if _is_funny_description(text):
-                all_candidates.append({
-                    "text": _censor(text)[:300],
-                    "category": category,
-                    "code": code,
-                    "address": (r.get("address") or "").strip(),
-                    "date": (r.get("requested_datetime") or "")[:10],
-                    "id": r.get("service_request_id", ""),
-                })
-                code_hits += 1
+            if len(records) < 100:
+                break
+            time.sleep(0.5)
 
-        logger.info(f"  {code} ({category}): {len(records)} rec, {code_hits} funny")
-
+        total_fetched += code_records
+        logger.info(f"  {code} ({category}): {code_records} rec, {code_hits} funny")
         time.sleep(0.5)
 
     if not all_candidates:
@@ -727,21 +731,31 @@ def _load_funny_descriptions() -> Optional[dict]:
             seen_texts.add(key)
             unique.append(d)
 
-    # Shuffle for variety, then take top 40
+    # Pick a smaller, varied set for the front-page ticker (cap 40),
+    # but keep the full deduped pool for the hub-and-spoke /funny page.
     import random
-    random.shuffle(unique)
-    top = unique[:40]
+    full = list(unique)
+    random.shuffle(full)
+    ticker = full[:40]
+    ticker.sort(key=lambda x: x["category"])
 
-    # Sort by category for display grouping
-    top.sort(key=lambda x: x["category"])
+    # All items, sorted by category then date desc — used by docs/funny/.
+    all_sorted = sorted(
+        unique,
+        key=lambda x: (x["category"], x.get("date", "")),
+        reverse=False,
+    )
+    all_sorted.sort(key=lambda x: x.get("date", ""), reverse=True)
+    all_sorted.sort(key=lambda x: x["category"])
 
     result = {
         "totalFetched": total_fetched,
         "totalCandidates": len(all_candidates),
-        "selected": len(top),
-        "items": top,
+        "selected": len(ticker),
+        "items": ticker,
+        "allItems": all_sorted,
     }
-    logger.info(f"  ✓ Funniest Descriptions: {total_fetched} fetched, {len(all_candidates)} candidates, {len(top)} selected")
+    logger.info(f"  ✓ Funniest Descriptions: {total_fetched} fetched, {len(all_candidates)} candidates, {len(ticker)} in ticker, {len(all_sorted)} total unique")
     return result
 
 
