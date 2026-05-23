@@ -107,6 +107,26 @@
     }
     #theme-toggle:hover { color: var(--text); border-color: var(--border-hover); }
 
+    #zen-toggle {
+      position: fixed;
+      top: 14px;
+      right: 90px;
+      z-index: 200;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.75rem;
+      color: var(--text-desc);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      user-select: none;
+    }
+    #zen-toggle:hover { color: var(--text); border-color: var(--border-hover); }
+    #zen-toggle.zen-active { background: var(--bg-panel); border-color: var(--border-hover); color: var(--text); }
+
+    .zen-hide { display: none !important; }
+
     header {
       text-align: center;
       margin-bottom: 1rem;
@@ -504,6 +524,7 @@
 </head>
 <body>
 
+  <button id="zen-toggle" aria-label="Toggle zen mode">🧘 Zen</button>
   <button id="theme-toggle" aria-label="Toggle dark mode">🌙 Dark</button>
 
   <header>
@@ -561,7 +582,7 @@
     <div class="ticker-sub" id="ticker-sub">Loading…</div>
   </div>
 
-  <div class="grid">
+  <div class="grid" id="main-grid">
     <div class="card-group">
       <a class="card" href="homeless/">
         <span class="icon">🏕️</span>
@@ -764,6 +785,26 @@
     const dark = localStorage.getItem("theme") === "dark";
 
     if (dark) { html.classList.add("dark"); btn.textContent = "☀️ Light"; }
+
+    // ── Zen mode ──────────────────────────────────────────────────────────────
+    const ZEN_TARGETS = ["main-grid", "more-btn", "more-grid"].map(id => document.getElementById(id));
+    const zenFooter = document.querySelector("footer");
+    const zenBtn = document.getElementById("zen-toggle");
+
+    function applyZen(on) {
+      ZEN_TARGETS.forEach(el => { if (el) el.classList.toggle("zen-hide", on); });
+      if (zenFooter) zenFooter.classList.toggle("zen-hide", on);
+      zenBtn.classList.toggle("zen-active", on);
+      zenBtn.textContent = on ? "🧘 Exit Zen" : "🧘 Zen";
+    }
+
+    if (localStorage.getItem("zen") === "on") applyZen(true);
+
+    zenBtn.addEventListener("click", () => {
+      const nowOn = !zenBtn.classList.contains("zen-active");
+      localStorage.setItem("zen", nowOn ? "on" : "off");
+      applyZen(nowOn);
+    });
 
     btn.addEventListener("click", () => {
       const isDark = html.classList.toggle("dark");
