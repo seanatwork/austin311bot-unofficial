@@ -38,49 +38,49 @@ jobs:
         run: pip install -e .
 
       - name: Generate graffiti trends
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'graffiti')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'graffiti')
         run: python scripts/generate_map.py graffiti-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate noise trends
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'noise')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'noise')
         run: python scripts/generate_map.py noise-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate homeless trends
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'homeless')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'homeless')
         run: python scripts/generate_map.py homeless-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate parking trends
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'parking')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'parking')
         run: python scripts/generate_map.py parking-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate parks trends
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'parks')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'parks')
         run: python scripts/generate_map.py parks-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate animal trends
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'animal')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'animal')
         run: python scripts/generate_map.py animal-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate storm trends
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'storm')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'storm')
         run: python scripts/generate_map.py storm-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate dead animal trends
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'dead-animal')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'dead-animal')
         run: python scripts/generate_map.py dead-animal-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
