@@ -344,6 +344,7 @@
     .ticker-card { grid-column: 1 / -1; }
     .ticker-content {
       min-height: 100px;
+      min-width: 0;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -357,6 +358,8 @@
       padding: 0 4px;
       transition: opacity 0.3s ease;
       position: relative;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
     .ticker-quote::before {
       content: "\201C";
@@ -397,6 +400,9 @@
     }
     .ticker-addr {
       color: var(--text-sub);
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      min-width: 0;
     }
     .ticker-addr::before {
       content: "\2022";
