@@ -82,6 +82,14 @@
     footer a:hover { color: var(--text); }
     @media (max-width: 520px) { .stat-value { font-size: 1rem; } .chart-container { height: 260px; } }
   </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TS158R7XSN');
+</script>
 </head>
 <body>
 
@@ -90,7 +98,7 @@
   <div id="panel">
     <div id="panel-title">🐾 Austin Animal Services Trends</div>
     <div id="panel-subtitle">Animal complaint &amp; incident reports — last 12 months</div>
-    <div id="last-ran">Last ran: 2026-05-07 10:14 AM CDT</div>
+    <div id="last-ran">Last ran: 2026-05-23 03:51 AM CDT</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Animal Map</a>
       <a class="fbtn" href="../../">Austin 311 Home</a>
@@ -100,18 +108,18 @@
   <div id="stats">
     <div class="stats-inner">
       <div class="stat">
-        <div class="stat-value" style="color:#3b82f6;">390</div>
+        <div class="stat-value" style="color:#3b82f6;">700</div>
         <div class="stat-label">Total reports</div>
         <div class="stat-sub">last 12 months</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#22c55e;">30</div>
+        <div class="stat-value" style="color:#22c55e;">233</div>
         <div class="stat-label">Avg / month</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#ef4444;">27%</div>
+        <div class="stat-value" style="color:#ef4444;">13%</div>
         <div class="stat-label">Still open</div>
-        <div class="stat-sub">104 unresolved</div>
+        <div class="stat-sub">90 unresolved</div>
       </div>
     </div>
   </div>
@@ -138,7 +146,7 @@
   </footer>
 
   <script>
-    const DATA = {"months": ["Jan 2025", "Feb 2025", "Mar 2025", "Apr 2025", "May 2025", "Jun 2025", "Jul 2025", "Aug 2025", "Sep 2025", "Oct 2025", "Nov 2025", "Dec 2025", "Jan 2026"], "monthlyCounts": [30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30, 30], "monthlyOpenCounts": [8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8], "rollingAvg": [null, null, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0, 30.0], "types": [{"name": "Loose Dog", "count": 65}, {"name": "Animal Bite", "count": 65}, {"name": "Vicious Dog", "count": 52}, {"name": "Animal Care Concern", "count": 52}, {"name": "Wildlife Exposure", "count": 52}, {"name": "Loose Animal (Not Dog)", "count": 52}, {"name": "Animal Protection Request", "count": 52}]};
+    const DATA = {"months": ["Feb 2026", "Mar 2026", "Apr 2026"], "monthlyCounts": [9, 99, 592], "monthlyOpenCounts": [0, 0, 90], "rollingAvg": [null, null, 233.3], "types": [{"name": "Loose Dog", "count": 100}, {"name": "Animal Protection Request", "count": 100}, {"name": "Animal Bite", "count": 100}, {"name": "Animal Care Concern", "count": 100}, {"name": "Wildlife Exposure", "count": 100}, {"name": "Vicious Dog", "count": 100}, {"name": "Loose Animal (Not Dog)", "count": 100}]};
 
     const isDark = document.documentElement.classList.contains("dark");
     const gridColor  = isDark ? "#252b3b" : "#e8ecf0";
