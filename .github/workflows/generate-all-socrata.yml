@@ -28,37 +28,37 @@ jobs:
         run: pip install -e .
 
       - name: Generate crime map
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'crime')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'crime')
         run: python scripts/generate_map.py crime
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate crime trends
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'crime-trends')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'crime-trends')
         run: python scripts/generate_map.py crime-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate water map
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'water')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'water')
         run: python scripts/generate_map.py water
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate childcare map
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'childcare')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'childcare')
         run: python scripts/generate_map.py childcare
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate budget page
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'budget')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'budget')
         run: python scripts/generate_map.py budget
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate hate crime page
-        if: github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'hate-crime')
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'hate-crime')
         run: python scripts/generate_map.py hate-crime
 
       - name: Generate court data cache
