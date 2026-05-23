@@ -790,12 +790,10 @@
 
     // ── Zen mode ──────────────────────────────────────────────────────────────
     const ZEN_TARGETS = ["main-grid", "more-btn", "more-grid"].map(id => document.getElementById(id));
-    const zenFooter = document.querySelector("footer");
     const zenBtn = document.getElementById("zen-toggle");
 
     function applyZen(on) {
       ZEN_TARGETS.forEach(el => { if (el) el.classList.toggle("zen-hide", on); });
-      if (zenFooter) zenFooter.classList.toggle("zen-hide", on);
       zenBtn.classList.toggle("zen-active", on);
       zenBtn.textContent = on ? "🧘 Exit Zen" : "🧘 Zen";
     }
