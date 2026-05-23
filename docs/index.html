@@ -341,7 +341,7 @@
     #more-grid[hidden] { display: none; }
 
     /* ── descriptions ticker ── */
-    .ticker-card { grid-column: 1 / -1; }
+    .ticker-card { grid-column: 1 / -1; position: relative; }
     .ticker-content {
       min-height: 100px;
       min-width: 0;
@@ -417,28 +417,33 @@
       margin-right: 6px;
       color: var(--text-muted);
     }
-    .ticker-nav {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
+    .ticker-nav { display: contents; }
+    .ticker-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: var(--bar-bg);
+      border: none;
+      color: var(--text-color, inherit);
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: 600;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin-top: 6px;
-    }
-    .ticker-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 50%;
-      background: var(--bar-bg);
       transition: background 0.2s, transform 0.15s;
-      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      z-index: 2;
     }
-    .ticker-dot:hover {
-      transform: scale(1.4);
-    }
-    .ticker-dot.active {
+    #ticker-prev { left: 10px; }
+    #ticker-next { right: 10px; }
+    .ticker-arrow:hover {
       background: var(--bar-fill);
-      transform: scale(1.3);
+      transform: translateY(-50%) scale(1.1);
     }
     .ticker-count {
       font-size: 0.7rem;
@@ -583,12 +588,15 @@
           <span class="ticker-count" id="ticker-count"></span>
         </div>
 
-        <div class="ticker-nav" id="ticker-nav"></div>
+        <div class="ticker-nav" id="ticker-nav">
+          <button class="ticker-arrow" id="ticker-prev" aria-label="Previous">&lt;</button>
+          <button class="ticker-arrow" id="ticker-next" aria-label="Next">&gt;</button>
+        </div>
       </div>
     </div>
     <div class="ticker-sub" id="ticker-sub">Loading…</div>
     <div style="text-align:center;margin-top:0.5rem;">
-      <a href="funny/" style="font-size:0.85rem;color:var(--text-desc);text-decoration:none;border-bottom:1px dashed var(--border);">Browse all complaints by category →</a>
+      <a href="complaints/" style="font-size:0.85rem;color:var(--text-desc);text-decoration:none;border-bottom:1px dashed var(--border);">Browse all complaints by category →</a>
     </div>
   </div>
 
@@ -907,18 +915,11 @@
       var tickerAddress = document.getElementById("ticker-address");
       var tickerDate = document.getElementById("ticker-date");
       var tickerCount = document.getElementById("ticker-count");
-      var tickerNav = document.getElementById("ticker-nav");
       var tickerSub = document.getElementById("ticker-sub");
+      var tickerPrev = document.getElementById("ticker-prev");
+      var tickerNext = document.getElementById("ticker-next");
 
       tickerSub.textContent = "Sampled from " + d.totalFetched.toLocaleString() + " recent 311 requests";
-
-      // Build dots
-      var dotsHtml = "";
-      for (var i = 0; i < items.length; i++) {
-        dotsHtml += '<div class="ticker-dot" data-index="' + i + '"></div>';
-      }
-      tickerNav.innerHTML = dotsHtml;
-      var dots = tickerNav.querySelectorAll(".ticker-dot");
 
       var timer = null;
       var paused = false;
@@ -944,10 +945,6 @@
         tickerAddress.textContent = item.address || '';
         tickerDate.textContent = item.date || '';
         tickerCount.textContent = (index + 1) + ' / ' + items.length;
-
-        for (var i = 0; i < dots.length; i++) {
-          dots[i].classList.toggle("active", i === index);
-        }
       }
 
       function nextItem() {
@@ -992,15 +989,12 @@
         resetTimers();
       });
 
-      for (var i = 0; i < dots.length; i++) {
-        (function(idx) {
-          dots[idx].addEventListener("click", function() {
-            currentIndex = idx;
-            showItem(currentIndex);
-            resetTimers();
-          });
-        })(i);
-      }
+      tickerPrev.addEventListener("click", function() { prevItem(); });
+      tickerNext.addEventListener("click", function() {
+        currentIndex = (currentIndex + 1) % items.length;
+        showItem(currentIndex);
+        resetTimers();
+      });
 
       document.addEventListener("keydown", function(e) {
         if (e.key === "ArrowLeft") { prevItem(); }

@@ -732,14 +732,14 @@ def _load_funny_descriptions() -> Optional[dict]:
             unique.append(d)
 
     # Pick a smaller, varied set for the front-page ticker (cap 40),
-    # but keep the full deduped pool for the hub-and-spoke /funny page.
+    # but keep the full deduped pool for the hub-and-spoke /complaints page.
     import random
     full = list(unique)
     random.shuffle(full)
     ticker = full[:40]
     ticker.sort(key=lambda x: x["category"])
 
-    # All items, sorted by category then date desc — used by docs/funny/.
+    # All items, sorted by category then date desc — used by docs/complaints/.
     all_sorted = sorted(
         unique,
         key=lambda x: (x["category"], x.get("date", "")),
