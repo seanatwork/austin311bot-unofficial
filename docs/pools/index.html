@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Austin 311 — Pools & Splash Pads</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Austin 311 — Pool & Splash Pad Schedule" />
+  <meta property="og:description" content="Every Austin city pool and splash pad on a map with current status, hours, and contact info — live from Austin Parks & Recreation." />
+  <meta property="og:url" content="https://austin311.com/pools/" />
+  <meta property="og:image" content="https://austin311.com/og-default.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Austin 311" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Austin 311 — Pool & Splash Pad Schedule" />
+  <meta name="twitter:description" content="Every Austin city pool and splash pad with current status, hours, and contact info." />
+  <meta name="twitter:image" content="https://austin311.com/og-default.png" />
+  <meta name="description" content="Every Austin city pool and splash pad on a map with current status, hours, and contact info — live from Austin Parks & Recreation." />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TS158R7XSN');
+  </script>
+  <script>if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark");</script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8fafc; --bg-panel: #ffffff; --bg-card: #f1f5f9;
+      --border: #e2e8f0; --text: #1e293b; --text-head: #0f172a;
+      --text-sub: #64748b; --text-muted: #94a3b8;
+      --btn-bg: #e2e8f0; --btn-border: #cbd5e1; --btn-color: #475569;
+      --btn-hover-bg: #dbeafe; --btn-hover-color: #1e293b;
+      --sidebar-bg: #ffffff; --sidebar-border: #e2e8f0;
+      --item-bg: #f8fafc; --item-border: #e2e8f0;
+      --closed-bg: #f1f5f9;
+    }
+    html.dark {
+      --bg: #0f1117; --bg-panel: #1e2230; --bg-card: #161a24;
+      --border: #2d3348; --text: #e2e8f0; --text-head: #f1f5f9;
+      --text-sub: #94a3b8; --text-muted: #475569;
+      --btn-bg: #252b3b; --btn-border: #3d4868; --btn-color: #94a3b8;
+      --btn-hover-bg: #2d3453; --btn-hover-color: #e2e8f0;
+      --sidebar-bg: #1e2230; --sidebar-border: #2d3348;
+      --item-bg: #161a24; --item-border: #2d3348;
+      --closed-bg: #181c28;
+    }
+
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text);
+      display: flex; flex-direction: column;
+    }
+
+    #panel {
+      flex-shrink: 0; background: var(--bg-panel); border-bottom: 1px solid var(--border);
+      padding: 8px 16px 10px; display: flex; flex-direction: column; align-items: center; gap: 5px;
+      z-index: 500;
+    }
+    #panel-title { font-size: 15px; font-weight: 700; color: var(--text-head); }
+    #panel-summary { font-size: 12px; color: var(--text-sub); }
+    .btn-row { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+    .fbtn {
+      background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--btn-color);
+      padding: 4px 11px; border-radius: 4px; font-size: 12px; cursor: pointer;
+      transition: background 0.12s, color 0.12s; white-space: nowrap;
+    }
+    .fbtn:hover { background: var(--btn-hover-bg); color: var(--btn-hover-color); }
+    .fbtn.active { background: #2563eb; border-color: #2563eb; color: #fff; font-weight: 600; }
+    .swatch { display: inline-block; width: 8px; height: 8px; border-radius: 50%; vertical-align: middle; margin-right: 4px; }
+
+    #theme-toggle {
+      position: fixed; top: 10px; right: 12px; z-index: 1000;
+      background: var(--bg-panel); border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 9px; font-size: 11px; color: var(--text-sub); cursor: pointer;
+    }
+
+    #content { flex: 1; display: flex; overflow: hidden; min-height: 0; position: relative; }
+    #map { flex: 1; min-width: 0; }
+
+    #sidebar {
+      width: 300px; flex-shrink: 0;
+      background: var(--sidebar-bg); border-left: 1px solid var(--sidebar-border);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    #sidebar-header {
+      padding: 10px 12px 8px; border-bottom: 1px solid var(--border);
+      font-size: 12px; font-weight: 700; color: var(--text-head); flex-shrink: 0;
+    }
+    #sidebar-list { flex: 1; overflow-y: auto; padding: 6px 8px; }
+
+    .pool-item {
+      background: var(--item-bg); border: 1px solid var(--item-border);
+      border-radius: 6px; padding: 8px 10px; margin-bottom: 6px;
+      font-size: 11px; cursor: pointer; transition: border-color 0.12s;
+    }
+    .pool-item:hover { border-color: #3b82f6 !important; }
+    .pool-item.closed { opacity: 0.65; background: var(--closed-bg); }
+
+    .pool-name { font-weight: 700; color: var(--text-head); margin-bottom: 3px; line-height: 1.3; font-size: 12px; }
+    .pool-meta { color: var(--text-sub); font-size: 10px; margin-bottom: 3px; }
+    .pool-hours { color: var(--text); font-size: 10px; }
+    .pool-hours b { color: var(--text-head); }
+    .badge {
+      display: inline-block; padding: 1px 6px; border-radius: 3px;
+      font-size: 10px; font-weight: 700; color: #fff;
+    }
+    .badge-open   { background: #16a34a; }
+    .badge-closed { background: #94a3b8; }
+    .badge-other  { background: #f59e0b; }
+
+    #legend { padding: 8px 12px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .legend-row { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-sub); margin-bottom: 3px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    @media (max-width: 640px) {
+      html, body { overflow: auto; }
+      #content { flex-direction: column; overflow: visible; }
+      #map { height: 55vh; flex: none; }
+      #sidebar { width: 100%; border-left: none; border-top: 1px solid var(--sidebar-border); max-height: none; overflow: visible; }
+      #sidebar-list { overflow: visible; max-height: none; }
+      #theme-toggle { top: 6px; right: 8px; }
+    }
+
+    html.dark .leaflet-popup-content-wrapper,
+    html.dark .leaflet-popup-tip { background: #1e2230; color: #e2e8f0; }
+    html.dark .leaflet-popup-content-wrapper a { color: #60a5fa; }
+  </style>
+</head>
+<body>
+
+  <button id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+
+  <div id="panel">
+    <div id="panel-title">🏊 Austin Pools &amp; Splash Pads</div>
+    <div id="panel-summary">Loading…</div>
+    <div class="btn-row" id="type-btns">
+      <button class="fbtn active" data-type="Regional"     onclick="toggleType(this)"><span class="swatch" style="background:#2563eb;"></span>Regional</button>
+      <button class="fbtn active" data-type="Neighborhood" onclick="toggleType(this)"><span class="swatch" style="background:#16a34a;"></span>Neighborhood</button>
+      <button class="fbtn active" data-type="Community"    onclick="toggleType(this)"><span class="swatch" style="background:#7c3aed;"></span>Community</button>
+      <button class="fbtn active" data-type="Splash Pad"   onclick="toggleType(this)"><span class="swatch" style="background:#06b6d4;"></span>Splash Pad</button>
+      <button class="fbtn active" data-type="Wading"       onclick="toggleType(this)"><span class="swatch" style="background:#f59e0b;"></span>Wading</button>
+    </div>
+    <div class="btn-row" id="status-btns">
+      <button class="fbtn active" data-status="open"   onclick="toggleStatus(this)">🟢 Open</button>
+      <button class="fbtn active" data-status="closed" onclick="toggleStatus(this)">⚪ Closed</button>
+      <span style="margin:0 4px;color:var(--border);">|</span>
+      <button class="fbtn" onclick="location.href='../'">🏠 Home</button>
+    </div>
+  </div>
+
+  <div id="content">
+    <div id="map"></div>
+    <div id="sidebar">
+      <div id="sidebar-header">📋 Pools (sorted by status, then name)</div>
+      <div id="sidebar-list"><p style="padding:12px;color:var(--text-muted);font-size:12px;">Loading…</p></div>
+      <div id="legend">
+        <div class="legend-row"><div class="legend-dot" style="background:#2563eb;"></div> Regional pool (full-service)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#16a34a;"></div> Neighborhood pool</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#7c3aed;"></div> Community pool</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#06b6d4;"></div> Splash pad</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#f59e0b;"></div> Wading pool</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
+          Source: <a href="https://data.austintexas.gov/d/xaxa-886r" target="_blank" rel="noopener" style="color:var(--text-sub);">Austin Parks &amp; Recreation Pool Schedule</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const isDark = document.documentElement.classList.contains("dark");
+    const tBtn = document.getElementById("theme-toggle");
+    if (tBtn) tBtn.textContent = isDark ? "☀️ Light" : "🌙 Dark";
+    function toggleTheme() {
+      const dark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("theme", dark ? "dark" : "light");
+      location.reload();
+    }
+
+    const TILES_LIGHT = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+    const TILES_DARK  = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    const TILES_ATTR  = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>';
+
+    const TYPE_META = {
+      "Regional":     { color: "#2563eb", radius: 9 },
+      "Community":    { color: "#7c3aed", radius: 7 },
+      "Neighborhood": { color: "#16a34a", radius: 6 },
+      "Splash Pad":   { color: "#06b6d4", radius: 5 },
+      "Wading":       { color: "#f59e0b", radius: 5 },
+    };
+    function typeMeta(t) { return TYPE_META[t] || { color: "#94a3b8", radius: 5 }; }
+
+    const map = L.map("map", { center: [30.2672, -97.7431], zoom: 11 });
+    L.tileLayer(isDark ? TILES_DARK : TILES_LIGHT, { attribution: TILES_ATTR, maxZoom: 19 }).addTo(map);
+
+    let allPools     = [];
+    const activeTypes  = new Set(Object.keys(TYPE_META));
+    const activeStatus = new Set(["open", "closed"]);
+    const layer = L.layerGroup().addTo(map);
+    const markersByName = new Map();
+
+    function statusKey(s) {
+      const v = (s || "").toLowerCase();
+      if (v === "open")   return "open";
+      if (v === "closed") return "closed";
+      return "open";   // 1 special "Operated by Pease Park Conservancy" entry — treat as open
+    }
+
+    function parseAddress(loc) {
+      if (!loc) return "";
+      if (loc.human_address) {
+        try {
+          const a = typeof loc.human_address === "string" ? JSON.parse(loc.human_address) : loc.human_address;
+          return [a.address, a.city, a.state].filter(Boolean).join(", ");
+        } catch { return ""; }
+      }
+      return "";
+    }
+
+    function fmtDate(d) {
+      if (!d) return "";
+      try {
+        return new Date(d).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+      } catch { return d; }
+    }
+
+    function popupHtml(p) {
+      const meta = typeMeta(p.pool_type);
+      const addr = parseAddress(p.location_1);
+      const lat = parseFloat(p.location_1 && p.location_1.latitude);
+      const lon = parseFloat(p.location_1 && p.location_1.longitude);
+      const directions = (lat && lon) ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}` : "";
+      const websiteUrl = p.website && p.website.url;
+      const sk = statusKey(p.status);
+      const statusBadge =
+        sk === "open"   ? `<span class="badge badge-open">🟢 Open</span>` :
+        sk === "closed" ? `<span class="badge badge-closed">⚪ Closed</span>` :
+                          `<span class="badge badge-other">${p.status || "—"}</span>`;
+      const dateNote = sk === "closed" && p.open_date
+        ? `<div style="color:#666;font-size:11px;margin-top:3px;">Reopens ${fmtDate(p.open_date)}</div>`
+        : (sk === "open" && p.open_date
+            ? `<div style="color:#666;font-size:11px;margin-top:3px;">Open since ${fmtDate(p.open_date)}</div>`
+            : "");
+      return `<div style="font-family:sans-serif;font-size:12px;max-width:260px;line-height:1.5;">
+        <b style="font-size:13px;color:${meta.color};">${p.pool_name || "Unnamed"}</b>
+        <span style="color:var(--text-sub);font-size:11px;"> · ${p.pool_type || ""}</span><br/>
+        ${addr ? `<span style="color:#666;font-size:11px;">${addr}</span><br/>` : ""}
+        <div style="margin:5px 0;">${statusBadge}</div>
+        ${dateNote}
+        <div style="margin-top:5px;"><b>Weekdays:</b> ${p.weekday || "—"}</div>
+        <div><b>Weekends:</b> ${p.weekend || "—"}</div>
+        ${p.closure_days && p.closure_days !== "None" ? `<div style="color:#a00;"><b>Closed:</b> ${p.closure_days}</div>` : ""}
+        ${p.phone ? `<div style="margin-top:4px;">📞 <a href="tel:${p.phone}">${p.phone}</a></div>` : ""}
+        <div style="margin-top:5px;display:flex;gap:8px;flex-wrap:wrap;">
+          ${websiteUrl ? `<a href="${websiteUrl}" target="_blank" rel="noopener">🔗 Website</a>` : ""}
+          ${directions ? `<a href="${directions}" target="_blank" rel="noopener">🗺️ Directions</a>` : ""}
+        </div>
+      </div>`;
+    }
+
+    function isShown(p) {
+      return activeTypes.has(p.pool_type) && activeStatus.has(statusKey(p.status));
+    }
+
+    function renderMap() {
+      layer.clearLayers();
+      markersByName.clear();
+      const shown = allPools.filter(isShown);
+
+      shown.forEach(p => {
+        const lat = parseFloat(p.location_1 && p.location_1.latitude);
+        const lon = parseFloat(p.location_1 && p.location_1.longitude);
+        if (!lat || !lon) return;
+        const meta = typeMeta(p.pool_type);
+        const sk = statusKey(p.status);
+        const m = L.circleMarker([lat, lon], {
+          radius: meta.radius,
+          fillColor: meta.color,
+          color: isDark ? "#1e2230" : "#fff",
+          weight: 1.5,
+          fillOpacity: sk === "closed" ? 0.4 : 0.9,
+        }).bindPopup(popupHtml(p), { maxWidth: 280 });
+        layer.addLayer(m);
+        markersByName.set(p.pool_name, m);
+      });
+
+      const openCount   = shown.filter(p => statusKey(p.status) === "open").length;
+      const closedCount = shown.filter(p => statusKey(p.status) === "closed").length;
+      document.getElementById("panel-summary").textContent =
+        `${shown.length} shown · ${openCount} open · ${closedCount} closed (of ${allPools.length} total)`;
+
+      renderSidebar(shown);
+    }
+
+    function renderSidebar(shown) {
+      // sort: open first, then by name
+      const sorted = shown.slice().sort((a, b) => {
+        const aOpen = statusKey(a.status) === "open" ? 0 : 1;
+        const bOpen = statusKey(b.status) === "open" ? 0 : 1;
+        if (aOpen !== bOpen) return aOpen - bOpen;
+        return (a.pool_name || "").localeCompare(b.pool_name || "");
+      });
+      const list = document.getElementById("sidebar-list");
+      if (!sorted.length) {
+        list.innerHTML = `<p style="padding:12px;color:var(--text-muted);font-size:12px;">No pools match the current filters.</p>`;
+        return;
+      }
+      list.innerHTML = sorted.map(p => {
+        const sk = statusKey(p.status);
+        const meta = typeMeta(p.pool_type);
+        const badge =
+          sk === "open"   ? `<span class="badge badge-open">Open</span>` :
+          sk === "closed" ? `<span class="badge badge-closed">Closed</span>` :
+                            `<span class="badge badge-other">Other</span>`;
+        const hours = (sk === "open" && p.weekday && !/closed/i.test(p.weekday))
+          ? `<b>Weekday:</b> ${p.weekday} · <b>Weekend:</b> ${p.weekend}`
+          : (p.open_date ? `Reopens ${fmtDate(p.open_date)}` : (p.weekday || ""));
+        return `<div class="pool-item ${sk}" onclick="focusPool('${(p.pool_name || '').replace(/'/g, "\\'")}')">
+          <div class="pool-name"><span class="swatch" style="background:${meta.color};"></span>${p.pool_name || "Unnamed"}</div>
+          <div class="pool-meta">${p.pool_type || ""} ${badge}</div>
+          <div class="pool-hours">${hours}</div>
+        </div>`;
+      }).join("");
+    }
+
+    function focusPool(name) {
+      const p = allPools.find(x => x.pool_name === name);
+      if (!p) return;
+      const lat = parseFloat(p.location_1 && p.location_1.latitude);
+      const lon = parseFloat(p.location_1 && p.location_1.longitude);
+      if (!lat || !lon) return;
+      map.setView([lat, lon], 15);
+      const m = markersByName.get(name);
+      if (m) m.openPopup();
+    }
+
+    function toggleType(btn) {
+      const t = btn.dataset.type;
+      if (activeTypes.has(t)) activeTypes.delete(t); else activeTypes.add(t);
+      btn.classList.toggle("active");
+      renderMap();
+    }
+
+    function toggleStatus(btn) {
+      const s = btn.dataset.status;
+      if (activeStatus.has(s)) activeStatus.delete(s); else activeStatus.add(s);
+      btn.classList.toggle("active");
+      renderMap();
+    }
+
+    async function loadData() {
+      try {
+        const url = "https://data.austintexas.gov/resource/xaxa-886r.json?$limit=200";
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        allPools = await res.json();
+        renderMap();
+      } catch (err) {
+        document.getElementById("panel-summary").textContent = "Error: " + err.message;
+        document.getElementById("sidebar-list").innerHTML =
+          `<p style="padding:12px;color:#ef4444;font-size:12px;">Failed to load: ${err.message}</p>`;
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Austin 311 — Fire Trends</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Austin 311 — Fire Incident Trends" />
+  <meta property="og:description" content="Austin Fire Department incident trends — monthly volume, seasonal patterns, fire types, priority and council-district breakdowns from 2023 to today." />
+  <meta property="og:url" content="https://austin311.com/fire/trends/" />
+  <meta property="og:image" content="https://austin311.com/og-default.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Austin 311" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Austin 311 — Fire Incident Trends" />
+  <meta name="twitter:description" content="Austin Fire Department incident trends from 2023 to today." />
+  <meta name="twitter:image" content="https://austin311.com/og-default.png" />
+  <meta name="description" content="Austin Fire Department incident trends — monthly volume, seasonal patterns, fire types, priority and council-district breakdowns from 2023 to today." />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TS158R7XSN');
+  </script>
+  <script>if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark");</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #f8fafc; --bg-panel: #f1f5f9; --bg-card: #ffffff;
+      --border: #e2e8f0; --text: #1e293b; --text-head: #0f172a;
+      --text-sub: #64748b; --text-muted: #94a3b8;
+      --btn-bg: #e2e8f0; --btn-border: #cbd5e1; --btn-color: #475569;
+    }
+    html.dark {
+      --bg: #0f1117; --bg-panel: #1e2230; --bg-card: #161a24;
+      --border: #2d3348; --text: #e2e8f0; --text-head: #f1f5f9;
+      --text-sub: #94a3b8; --text-muted: #475569;
+      --btn-bg: #252b3b; --btn-border: #3d4868; --btn-color: #94a3b8;
+    }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
+    #panel { position: sticky; top: 0; z-index: 100; background: var(--bg-panel); border-bottom: 1px solid var(--border); padding: 10px 16px 12px; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    #panel-title { font-size: 16px; font-weight: 700; color: var(--text-head); }
+    #panel-sub { font-size: 12px; color: var(--text-sub); text-align: center; max-width: 760px; }
+    .btn-row { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+    .fbtn { background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--btn-color); padding: 4px 11px; border-radius: 4px; font-size: 12px; cursor: pointer; text-decoration: none; }
+    .fbtn:hover { background: #dbeafe; color: #1e293b; }
+    #theme-toggle { position: fixed; top: 10px; right: 12px; z-index: 200; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 4px 9px; font-size: 11px; color: var(--text-sub); cursor: pointer; }
+
+    #stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 0; max-width: 1100px; width: 100%; margin: 14px auto 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; }
+    .stat { flex: 1; min-width: 120px; text-align: center; padding: 12px 8px; border-right: 1px solid var(--border); }
+    .stat:last-child { border-right: none; }
+    .stat-value { font-size: 1.3rem; font-weight: 700; line-height: 1.1; }
+    .stat-label { font-size: 0.67rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 3px; }
+    .stat-sub { font-size: 0.67rem; color: var(--text-muted); margin-top: 1px; }
+
+    #chart-wrap { flex: 1; padding: 16px; display: flex; flex-direction: column; gap: 18px; max-width: 1100px; width: 100%; margin: 0 auto; }
+    .chart-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
+    .chart-title { font-size: 14px; font-weight: 700; color: var(--text-head); margin-bottom: 2px; }
+    .chart-note { font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }
+    .chart-container { position: relative; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    @media (max-width: 720px) { .grid2 { grid-template-columns: 1fr; } }
+    footer { text-align: center; font-size: 11px; color: var(--text-muted); padding: 14px; }
+    footer a { color: var(--text-sub); }
+  </style>
+</head>
+<body>
+  <button id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+
+  <div id="panel">
+    <div id="panel-title">🚒 Austin Fire Incident Trends</div>
+    <div id="panel-sub">Official AFD fire records (2023–2025) extended with the real-time feed (2026 onward, fire calls only). Updates automatically.</div>
+    <div class="btn-row">
+      <a class="fbtn" href="../">🗺️ Live Fire Map</a>
+      <a class="fbtn" href="../../">🏠 Austin 311 Home</a>
+    </div>
+  </div>
+
+  <div id="stats">
+    <div class="stat"><div class="stat-value" id="s-total" style="color:#dc2626;">…</div><div class="stat-label">Total fires</div><div class="stat-sub" id="s-total-sub">2023–present</div></div>
+    <div class="stat"><div class="stat-value" id="s-avg" style="color:#ea580c;">…</div><div class="stat-label">Avg / month</div></div>
+    <div class="stat"><div class="stat-value" id="s-peak" style="color:#f59e0b;font-size:1rem;">…</div><div class="stat-label">Peak month</div></div>
+    <div class="stat"><div class="stat-value" id="s-type" style="color:#2563eb;font-size:1rem;">…</div><div class="stat-label">Top fire type</div></div>
+    <div class="stat"><div class="stat-value" id="s-district" style="color:#7c3aed;">…</div><div class="stat-label">Top district</div><div class="stat-sub">2023–2025</div></div>
+  </div>
+
+  <div id="chart-wrap">
+    <div class="chart-block">
+      <div class="chart-title">Monthly fire incidents</div>
+      <div class="chart-note">Blue = official AFD records (2023–2025) · Orange = real-time feed, fire calls only (2026→). The seam is a methodology change, not a real spike/drop.</div>
+      <div class="chart-container" style="height:300px;"><canvas id="monthlyChart"></canvas></div>
+    </div>
+
+    <div class="chart-block">
+      <div class="chart-title">Seasonal pattern — year over year</div>
+      <div class="chart-note">Fires by month, one line per year. Summer grass/trash fires drive the warm-season peak. Note: the 2026 line comes from the real-time feed, whose fire counts run higher than the official AFD records — read it for shape, not for a year-over-year level comparison.</div>
+      <div class="chart-container" style="height:300px;"><canvas id="seasonalChart"></canvas></div>
+    </div>
+
+    <div class="grid2">
+      <div class="chart-block">
+        <div class="chart-title">By fire type</div>
+        <div class="chart-note">2023–2025 official records</div>
+        <div class="chart-container" style="height:360px;"><canvas id="typeChart"></canvas></div>
+      </div>
+      <div class="chart-block">
+        <div class="chart-title">By council district</div>
+        <div class="chart-note">2023–2025 official records</div>
+        <div class="chart-container" style="height:360px;"><canvas id="districtChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="chart-block">
+      <div class="chart-title">By response priority</div>
+      <div class="chart-note">2023–2025 official records · per the AFD data dictionary, the number is the priority level and the letter is the incident type (F = Fire, G = General)</div>
+      <div class="chart-container" style="height:240px;"><canvas id="priorityChart"></canvas></div>
+    </div>
+  </div>
+
+  <footer>
+    Sources:
+    <a href="https://data.austintexas.gov/d/v5hh-nyr8" target="_blank" rel="noopener">AFD Fire Incidents 2023–2025</a> ·
+    <a href="https://data.austintexas.gov/d/wpu4-x69d" target="_blank" rel="noopener">Real-Time Fire Incidents</a>
+  </footer>
+
+  <script>
+    const isDark = document.documentElement.classList.contains("dark");
+    const tBtn = document.getElementById("theme-toggle");
+    if (tBtn) tBtn.textContent = isDark ? "☀️ Light" : "🌙 Dark";
+    function toggleTheme() {
+      const dark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("theme", dark ? "dark" : "light");
+      location.reload();
+    }
+
+    const V5  = "https://data.austintexas.gov/resource/v5hh-nyr8.json";  // AFD 2023-2025 (fires only)
+    const WPU = "https://data.austintexas.gov/resource/wpu4-x69d.json";  // real-time (all types)
+    const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+    // Canonical AFD fire-type codes — used to filter the all-types live feed down to fires.
+    const FIRE_CODES = new Set(["TRASH","GRASS","AUTO","ELEC","BOX","BOXS","DUMP","BOXL",
+      "BBQ","BRSHL","BOXMID","BRUSH","BOXHI","PKG","FIRE","BOXMAR"]);
+    function leadingCode(s) { const m = (s || "").match(/^[A-Z0-9]+/); return m ? m[0] : ""; }
+    function isFire(issue) { return FIRE_CODES.has(leadingCode(issue)); }
+
+    const txt = () => getComputedStyle(document.body).getPropertyValue("--text-sub").trim() || "#64748b";
+    const gridC = () => isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.06)";
+
+    async function getJSON(url) {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    }
+
+    function parseYM(s) { return { y: +s.slice(0, 4), m: +s.slice(5, 7) - 1 }; }
+    function ymLabel(y, m) { return MONTHS[m] + " " + y; }
+
+    async function load() {
+      const cd = encodeURIComponent;
+      const [afdMonthly, liveMonthly, afdType, afdDist, afdPri] = await Promise.all([
+        getJSON(`${V5}?$select=date_trunc_ym(incdate) as ym, count(*) as n&$group=ym&$order=ym&$limit=1000`),
+        getJSON(`${WPU}?$where=${cd("published_date >= '2026-01-01'")}&$select=date_trunc_ym(to_floating_timestamp(published_date, 'America/Chicago')) as ym, issue_reported, count(*) as n&$group=ym,issue_reported&$limit=10000`),
+        getJSON(`${V5}?$select=problem, count(*) as n&$group=problem&$order=n DESC&$limit=30`),
+        getJSON(`${V5}?$select=council_district, count(*) as n&$group=council_district&$order=n DESC&$limit=30`),
+        getJSON(`${V5}?$select=prioritydescription, count(*) as n&$group=prioritydescription&$order=n DESC&$limit=20`),
+      ]);
+
+      // ── stitch the continuous monthly series ───────────────────────────────
+      const monthly = new Map();   // (y*12+m) -> { y, m, afd, live }
+      function bump(y, m, field, n) {
+        const k = y * 12 + m;
+        if (!monthly.has(k)) monthly.set(k, { y, m, afd: 0, live: 0 });
+        monthly.get(k)[field] += n;
+      }
+      afdMonthly.forEach(r => {
+        const { y, m } = parseYM(r.ym);
+        if (y <= 2025) bump(y, m, "afd", +r.n);          // official record owns <= 2025
+      });
+      liveMonthly.forEach(r => {
+        const { y, m } = parseYM(r.ym);
+        if (y >= 2026 && isFire(r.issue_reported)) bump(y, m, "live", +r.n);  // live feed owns >= 2026
+      });
+
+      const keys = [...monthly.keys()].sort((a, b) => a - b);
+      const labels = keys.map(k => ymLabel(monthly.get(k).y, monthly.get(k).m));
+      const afdSeries  = keys.map(k => monthly.get(k).afd  || null);
+      const liveSeries = keys.map(k => monthly.get(k).live || null);
+      const totals     = keys.map(k => (monthly.get(k).afd || 0) + (monthly.get(k).live || 0));
+
+      // ── headline stats ─────────────────────────────────────────────────────
+      const grand = totals.reduce((a, b) => a + b, 0);
+      const avg = Math.round(grand / totals.length);
+      let peakI = 0; totals.forEach((v, i) => { if (v > totals[peakI]) peakI = i; });
+      document.getElementById("s-total").textContent = grand.toLocaleString();
+      document.getElementById("s-avg").textContent = avg.toLocaleString();
+      document.getElementById("s-peak").textContent = labels[peakI] + " (" + totals[peakI].toLocaleString() + ")";
+      const topType = afdType[0] ? cleanType(afdType[0].problem) : "—";
+      document.getElementById("s-type").textContent = topType;
+      const topDist = afdDist.find(r => r.council_district && r.council_district !== "-");
+      document.getElementById("s-district").textContent = topDist ? "District " + topDist.council_district : "—";
+
+      // ── seasonal (year over year) ────────────────────────────────────────────
+      const byYear = {};   // year -> [12]
+      keys.forEach(k => {
+        const e = monthly.get(k);
+        (byYear[e.y] = byYear[e.y] || Array(12).fill(null))[e.m] = (e.afd || 0) + (e.live || 0);
+      });
+      const yrColors = { 2023: "#94a3b8", 2024: "#f59e0b", 2025: "#ea580c", 2026: "#dc2626" };
+      const seasonalSets = Object.keys(byYear).sort().map(y => ({
+        label: y + (y === "2026" ? " (live)" : ""),
+        data: byYear[y],
+        borderColor: yrColors[y] || "#3b82f6",
+        backgroundColor: "transparent",
+        borderWidth: y === "2026" ? 3 : 2,
+        borderDash: y === "2026" ? [] : [],
+        tension: 0.3, pointRadius: 2,
+      }));
+
+      drawCharts(labels, afdSeries, liveSeries, seasonalSets, afdType, afdDist, afdPri);
+    }
+
+    function cleanType(s) {
+      return (s || "").replace(/^[A-Z0-9]+\s*-?\s*/, "").trim() || s;
+    }
+
+    // Per the AFD data dictionary: the number is the priority level, the letter
+    // is the incident type (F = Fire, G = General).
+    const PRI_TYPE = { F: "Fire", G: "General" };
+    function priorityLabel(code) {
+      const m = (code || "").match(/^(\d+)\s*([A-Z]?)/);
+      if (!m) return code || "—";
+      const t = PRI_TYPE[m[2]] || (m[2] || "");
+      return "Priority " + m[1] + (t ? " (" + t + ")" : "");
+    }
+
+    function drawCharts(labels, afdSeries, liveSeries, seasonalSets, afdType, afdDist, afdPri) {
+      Chart.defaults.color = txt();
+      Chart.defaults.font.size = 11;
+      const grid = { color: gridC() };
+
+      // monthly
+      new Chart(document.getElementById("monthlyChart"), {
+        type: "line",
+        data: { labels, datasets: [
+          { label: "Official AFD records", data: afdSeries, borderColor: "#2563eb", backgroundColor: "rgba(37,99,235,0.12)", fill: true, tension: 0.3, pointRadius: 2, spanGaps: false },
+          { label: "Real-time feed (fire calls)", data: liveSeries, borderColor: "#ea580c", backgroundColor: "rgba(234,88,12,0.12)", fill: true, tension: 0.3, pointRadius: 2, spanGaps: false },
+        ]},
+        options: { responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: "bottom" } },
+          scales: { x: { grid, ticks: { maxTicksLimit: 14 } }, y: { grid, beginAtZero: true } } }
+      });
+
+      // seasonal
+      new Chart(document.getElementById("seasonalChart"), {
+        type: "line",
+        data: { labels: MONTHS, datasets: seasonalSets },
+        options: { responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { position: "bottom" } },
+          scales: { x: { grid }, y: { grid, beginAtZero: true } } }
+      });
+
+      // type (horizontal bar, top 12)
+      const t = afdType.slice(0, 12);
+      new Chart(document.getElementById("typeChart"), {
+        type: "bar",
+        data: { labels: t.map(r => cleanType(r.problem)), datasets: [{ data: t.map(r => +r.n), backgroundColor: "#dc2626", borderRadius: 3 }] },
+        options: { indexAxis: "y", responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } }, scales: { x: { grid, beginAtZero: true }, y: { grid: { display: false } } } }
+      });
+
+      // district (bar, sorted 1..10 then Unknown)
+      const dist = afdDist.slice().sort((a, b) => {
+        const av = a.council_district === "-" ? 99 : +a.council_district;
+        const bv = b.council_district === "-" ? 99 : +b.council_district;
+        return av - bv;
+      });
+      new Chart(document.getElementById("districtChart"), {
+        type: "bar",
+        data: { labels: dist.map(r => r.council_district === "-" ? "Unknown" : "D" + r.council_district), datasets: [{ data: dist.map(r => +r.n), backgroundColor: "#7c3aed", borderRadius: 3 }] },
+        options: { responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { grid, beginAtZero: true } } }
+      });
+
+      // priority (doughnut)
+      const pColors = ["#dc2626", "#ea580c", "#f59e0b", "#2563eb", "#7c3aed", "#94a3b8"];
+      new Chart(document.getElementById("priorityChart"), {
+        type: "doughnut",
+        data: { labels: afdPri.map(r => priorityLabel(r.prioritydescription)), datasets: [{ data: afdPri.map(r => +r.n), backgroundColor: pColors }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: "right" } } }
+      });
+    }
+
+    load().catch(err => {
+      document.getElementById("panel-sub").textContent = "Failed to load data: " + err.message;
+    });
+  </script>
+</body>
+</html>

@@ -531,9 +531,7 @@ Socrata: `$where` SoQL filtering, `$group`/`$select` aggregation.
 
 ## Static Map Website
 
-Public maps are deployed via GitHub Pages (`docs/` folder), generated from the same data as Telegram commands.
-
-**⚠️ Two-repo split (as of 2026-04-18 consolidation):** this `austin311bot/` folder inside `All-Telegram-Bots` is now the authoritative source for code, but GitHub Pages + the map-refresh workflows still live in the original `seanatwork/austin311bot-unofficial` repo. After any edit that affects map output (generator, `*_bot.py` modules, `scripts/generate_map.py`), run `bash sync-to-unofficial.sh` to push to the old repo and kick off its workflows. Pure-Telegram edits don't need this.
+Public maps are deployed via GitHub Pages (`docs/` folder), generated from the same data as Telegram commands. This repo is the single source of truth — edits to map output (generators, `*_bot.py` modules, `scripts/generate_map.py`) deploy directly via this repo's workflows on push to `main`.
 
 **Maps:**
 - `docs/index.html` — Landing page hub (https://austin311.com/)

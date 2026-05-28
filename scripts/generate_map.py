@@ -207,6 +207,12 @@ def generate_tree_map(days_back: int = 90) -> tuple:
     return generate_tree_map(days_back)
 
 
+def generate_cameras_map(days_back: int = 90) -> tuple:
+    """Generate live traffic cameras map."""
+    from trafficcameras.cameras_bot import generate_cameras_map
+    return generate_cameras_map(days_back)
+
+
 def generate_nearby_page(days_back: int = 180) -> tuple:
     """Generate "311 Near You" dynamic map page with embedded request data."""
     import io
@@ -248,6 +254,7 @@ CATEGORY_MAPS = {
     "nearby": (generate_nearby_page, "nearby/index.html"),
     "storm": (generate_storm_map, "storm/index.html"),
     "trees": (generate_tree_map, "trees/index.html"),
+    "cameras": (generate_cameras_map, "cameras/index.html"),
 }
 
 

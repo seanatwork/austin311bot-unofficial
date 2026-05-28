@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Austin 311 — Live Fire & Rescue Incidents</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Austin 311 — Live Fire & Rescue Incidents" />
+  <meta property="og:description" content="Real-time Austin Fire Department incidents — structure fires, rescues, alarms and hazmat calls across Austin & Travis County, updated every few minutes." />
+  <meta property="og:url" content="https://austin311.com/fire/" />
+  <meta property="og:image" content="https://austin311.com/og-default.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Austin 311" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Austin 311 — Live Fire & Rescue Incidents" />
+  <meta name="twitter:description" content="Real-time Austin Fire Department incidents across Austin & Travis County, updated every few minutes." />
+  <meta name="twitter:image" content="https://austin311.com/og-default.png" />
+  <meta name="description" content="Real-time Austin Fire Department incidents — structure fires, rescues, alarms and hazmat calls across Austin & Travis County, updated every few minutes." />
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TS158R7XSN');
+  </script>
+  <script>if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark");</script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+  <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8fafc; --bg-panel: #ffffff; --bg-card: #f1f5f9;
+      --border: #e2e8f0; --text: #1e293b; --text-head: #0f172a;
+      --text-sub: #64748b; --text-muted: #94a3b8;
+      --btn-bg: #e2e8f0; --btn-border: #cbd5e1; --btn-color: #475569;
+      --btn-hover-bg: #dbeafe; --btn-hover-color: #1e293b;
+      --sidebar-bg: #ffffff; --sidebar-border: #e2e8f0;
+      --item-bg: #f8fafc; --item-border: #e2e8f0;
+      --fire-bg: #fff1f2; --fire-border: #fca5a5;
+      --rescue-bg: #fff7ed; --rescue-border: #fdba74;
+      --alarm-bg: #eff6ff; --alarm-border: #93c5fd;
+      --hazmat-bg: #faf5ff; --hazmat-border: #d8b4fe;
+    }
+    html.dark {
+      --bg: #0f1117; --bg-panel: #1e2230; --bg-card: #161a24;
+      --border: #2d3348; --text: #e2e8f0; --text-head: #f1f5f9;
+      --text-sub: #64748b; --text-muted: #475569;
+      --btn-bg: #252b3b; --btn-border: #3d4868; --btn-color: #94a3b8;
+      --btn-hover-bg: #2d3453; --btn-hover-color: #e2e8f0;
+      --sidebar-bg: #1e2230; --sidebar-border: #2d3348;
+      --item-bg: #161a24; --item-border: #2d3348;
+      --fire-bg: #2d1a1a; --fire-border: #7f1d1d;
+      --rescue-bg: #2d1f0e; --rescue-border: #7c2d12;
+      --alarm-bg: #1a2535; --alarm-border: #1e3a5f;
+      --hazmat-bg: #241a35; --hazmat-border: #4c1d95;
+    }
+
+    html, body { width: 100%; height: 100%; overflow: hidden; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg); color: var(--text);
+      display: flex; flex-direction: column;
+    }
+
+    #panel {
+      flex-shrink: 0;
+      background: var(--bg-panel); border-bottom: 1px solid var(--border);
+      padding: 8px 16px 10px;
+      display: flex; flex-direction: column; align-items: center; gap: 5px;
+      z-index: 500;
+    }
+    #panel-title { font-size: 15px; font-weight: 700; color: var(--text-head); }
+    #panel-summary { font-size: 12px; color: var(--text-sub); }
+    .btn-row { display: flex; gap: 4px; flex-wrap: wrap; justify-content: center; }
+    .fbtn {
+      background: var(--btn-bg); border: 1px solid var(--btn-border); color: var(--btn-color);
+      padding: 4px 11px; border-radius: 4px; font-size: 12px; cursor: pointer;
+      transition: background 0.12s, color 0.12s; white-space: nowrap;
+    }
+    .fbtn:hover { background: var(--btn-hover-bg); color: var(--btn-hover-color); }
+    .fbtn.active { background: #2563eb; border-color: #2563eb; color: #fff; font-weight: 600; }
+
+    #theme-toggle {
+      position: fixed; top: 10px; right: 12px; z-index: 1000;
+      background: var(--bg-panel); border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 9px; font-size: 11px; color: var(--text-sub); cursor: pointer;
+    }
+
+    #content { flex: 1; display: flex; overflow: hidden; min-height: 0; position: relative; }
+    #map { flex: 1; min-width: 0; }
+
+    #update-banner {
+      position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+      z-index: 600; display: none; cursor: pointer;
+      background: #dc2626; color: #fff; font-size: 12px; font-weight: 700;
+      padding: 7px 15px; border-radius: 20px; border: none;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.35);
+    }
+    #update-banner:hover { background: #b91c1c; }
+    #update-banner .dismiss { margin-left: 8px; opacity: 0.8; font-weight: 400; }
+
+    #sidebar {
+      width: 280px; flex-shrink: 0;
+      background: var(--sidebar-bg); border-left: 1px solid var(--sidebar-border);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    #sidebar-header {
+      padding: 10px 12px 8px; border-bottom: 1px solid var(--border);
+      font-size: 12px; font-weight: 700; color: var(--text-head); flex-shrink: 0;
+    }
+    #sidebar-list { flex: 1; overflow-y: auto; padding: 6px 8px; }
+
+    .inc-item {
+      background: var(--item-bg); border: 1px solid var(--item-border);
+      border-radius: 6px; padding: 8px 10px; margin-bottom: 6px;
+      font-size: 11px; cursor: pointer; transition: border-color 0.12s;
+    }
+    .inc-item:hover  { border-color: #3b82f6 !important; }
+    .inc-item.fire   { border-left: 3px solid #dc2626; background: var(--fire-bg);   border-color: var(--fire-border); }
+    .inc-item.rescue { border-left: 3px solid #ea580c; background: var(--rescue-bg); border-color: var(--rescue-border); }
+    .inc-item.alarm  { border-left: 3px solid #2563eb; background: var(--alarm-bg);  border-color: var(--alarm-border); }
+    .inc-item.hazmat { border-left: 3px solid #7c3aed; background: var(--hazmat-bg); border-color: var(--hazmat-border); }
+
+    .inc-time { color: var(--text-muted); font-size: 10px; margin-bottom: 2px; }
+    .inc-addr { font-weight: 600; color: var(--text-head); margin-bottom: 2px; line-height: 1.3; }
+    .inc-type { color: var(--text-sub); margin-bottom: 3px; }
+    .inc-badge {
+      display: inline-block; padding: 1px 6px; border-radius: 3px;
+      font-size: 10px; font-weight: 700; color: #fff;
+    }
+    .badge-fire   { background: #dc2626; }
+    .badge-rescue { background: #ea580c; }
+    .badge-alarm  { background: #2563eb; }
+    .badge-hazmat { background: #7c3aed; }
+    .badge-active { background: #dc2626; animation: pulse 1.3s infinite; margin-left: 4px; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    #legend { padding: 8px 12px; border-top: 1px solid var(--border); flex-shrink: 0; }
+    .legend-row { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-sub); margin-bottom: 3px; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    @media (max-width: 640px) {
+      html, body { overflow: auto; }
+      #content { flex-direction: column; overflow: visible; }
+      #map { height: 55vh; flex: none; }
+      #sidebar { width: 100%; border-left: none; border-top: 1px solid var(--sidebar-border); max-height: none; overflow: visible; }
+      #sidebar-list { overflow: visible; max-height: none; }
+      #theme-toggle { top: 6px; right: 8px; }
+    }
+
+    html.dark .leaflet-popup-content-wrapper,
+    html.dark .leaflet-popup-tip { background: #1e2230; color: #e2e8f0; }
+    html.dark .leaflet-popup-content-wrapper a { color: #60a5fa; }
+  </style>
+</head>
+<body>
+
+  <button id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+
+  <div id="panel">
+    <div id="panel-title">🚒 Austin Fire &amp; Rescue — Live Incidents</div>
+    <div id="panel-summary">Loading…</div>
+    <div class="btn-row" id="day-btns">
+      <button class="fbtn active" id="btn-30" onclick="setDays(30)">30d</button>
+      <button class="fbtn" id="btn-60" onclick="setDays(60)">60d</button>
+      <button class="fbtn" id="btn-90" onclick="setDays(90)">90d</button>
+    </div>
+    <div class="btn-row" id="cat-btns">
+      <button class="fbtn active" id="cat-fire"   onclick="toggleCat('fire')">🔥 Fire</button>
+      <button class="fbtn active" id="cat-rescue" onclick="toggleCat('rescue')">🚑 Rescue</button>
+      <button class="fbtn active" id="cat-alarm"  onclick="toggleCat('alarm')">🔔 Alarm</button>
+      <button class="fbtn active" id="cat-hazmat" onclick="toggleCat('hazmat')">☣️ Hazmat</button>
+      <span style="margin:0 4px;color:var(--border);">|</span>
+      <button class="fbtn" onclick="location.href='trends/'">📈 Trends</button>
+      <button class="fbtn" onclick="location.href='../'">🏠 Home</button>
+    </div>
+  </div>
+
+  <div id="content">
+    <div id="map"></div>
+    <button id="update-banner" type="button">
+      <span id="update-text"></span><span class="dismiss" onclick="dismissUpdate(event)">✕</span>
+    </button>
+    <div id="sidebar">
+      <div id="sidebar-header">🕐 10 Most Recent Incidents</div>
+      <div id="sidebar-list"><p style="padding:12px;color:var(--text-muted);font-size:12px;">Loading…</p></div>
+      <div id="legend">
+        <div class="legend-row"><div class="legend-dot" style="background:#dc2626;"></div> Fire (structure, vehicle, grass, electrical…)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#ea580c;"></div> Rescue / medical / extrication</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#2563eb;"></div> Alarm (fire / CO)</div>
+        <div class="legend-row"><div class="legend-dot" style="background:#7c3aed;"></div> Hazmat / odor / smoke / spill</div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
+          Source: <a href="https://data.austintexas.gov/d/wpu4-x69d" target="_blank" rel="noopener" style="color:var(--text-sub);">Austin Real-Time Fire Incidents (CTECC)</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const isDark    = document.documentElement.classList.contains("dark");
+    const toggleBtn = document.getElementById("theme-toggle");
+    if (toggleBtn) toggleBtn.textContent = isDark ? "☀️ Light" : "🌙 Dark";
+    function toggleTheme() {
+      const dark = document.documentElement.classList.toggle("dark");
+      localStorage.setItem("theme", dark ? "dark" : "light");
+      location.reload();
+    }
+
+    const TILES_LIGHT = "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+    const TILES_DARK  = "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    const TILES_ATTR  = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>';
+
+    const DATA_URL      = "https://data.austintexas.gov/resource/wpu4-x69d.json";
+    const REFRESH_MS    = 60000;   // re-fetch the feed every 60s (city updates ~every 5 min)
+
+    const map = L.map("map", { center: [30.2672, -97.7431], zoom: 11 });
+    L.tileLayer(isDark ? TILES_DARK : TILES_LIGHT, { attribution: TILES_ATTR, maxZoom: 19 }).addTo(map);
+
+    let allRecords     = [];
+    let pendingRecords = null;   // fetched-but-not-yet-applied data (opt-in update)
+    let currentDays    = 30;
+    let clusterLayer   = null;
+    let markersByIdx   = new Map();
+    const activeCats   = { fire: true, rescue: true, alarm: true, hazmat: true };
+
+    const CAT_META = {
+      fire:   { color: "#dc2626", radius: 8, label: "Fire",   badge: "🔥 Fire" },
+      rescue: { color: "#ea580c", radius: 7, label: "Rescue", badge: "🚑 Rescue" },
+      alarm:  { color: "#2563eb", radius: 5, label: "Alarm",  badge: "🔔 Alarm" },
+      hazmat: { color: "#7c3aed", radius: 5, label: "Hazmat", badge: "☣️ Hazmat" },
+    };
+
+    function categoryOf(r) {
+      const t = (r.issue_reported || "").toLowerCase();
+      if (t.includes("alarm") || t.includes("carbon monoxide") || /\bco\b/.test(t)) return "alarm";
+      if (t.includes("fire")) return "fire";
+      if (t.includes("rescue") || t.includes("injury") || t.includes("medical") ||
+          t.includes("entrap") || t.includes("extric") || t.includes("drown") ||
+          t.includes("collapse") || t.includes("fall")) return "rescue";
+      return "hazmat";
+    }
+
+    function formatTs(ts) {
+      if (!ts) return "Unknown time";
+      try {
+        const d = new Date(ts.replace(".000", ""));
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" }) +
+               " " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
+      } catch { return ts.split("T")[0]; }
+    }
+
+    function titleCase(s) {
+      // Strip the "CODE - " prefix the feed uses, then title-case the description.
+      const cleaned = s.replace(/^[A-Z0-9]+\s*-\s*/, "").trim() || s;
+      return cleaned.replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+    }
+
+    function cutoffISO(days) {
+      const d = new Date();
+      d.setDate(d.getDate() - days);
+      return d.toISOString().split("T")[0] + "T00:00:00";
+    }
+
+    function isActive(r) {
+      return (r.traffic_report_status || "").toUpperCase() === "ACTIVE";
+    }
+
+    function filteredRecords() {
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - currentDays);
+      return allRecords.filter(r => {
+        const ts = r.published_date;
+        if (!ts || new Date(ts) < cutoff) return false;
+        return activeCats[categoryOf(r)] !== false;
+      });
+    }
+
+    function popupHtml(r) {
+      const cat   = categoryOf(r);
+      const meta  = CAT_META[cat];
+      const addr  = r.address || "Unknown location";
+      const ts    = formatTs(r.published_date);
+      const type  = titleCase(r.issue_reported || "Incident");
+      const active = isActive(r);
+      return `<div style="font-family:sans-serif;font-size:12px;max-width:250px;line-height:1.5;">
+        <b style="font-size:13px;">${addr}</b><br/>
+        <span style="color:#888;font-size:11px;">${ts}</span><br/>
+        <div style="margin:5px 0;">
+          <span style="background:${meta.color};color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;">${meta.badge}</span>
+          ${active ? `<span style="background:#dc2626;color:#fff;padding:1px 6px;border-radius:3px;font-size:10px;font-weight:700;margin-left:4px;">🔴 ACTIVE NOW</span>` : ""}
+        </div>
+        <b>Type:</b> ${type}<br/>
+        <b>Agency:</b> ${r.agency || "Austin Fire"}<br/>
+      </div>`;
+    }
+
+    function renderMap() {
+      if (clusterLayer) { map.removeLayer(clusterLayer); clusterLayer = null; }
+      markersByIdx.clear();
+
+      const filtered = filteredRecords();
+      clusterLayer = L.markerClusterGroup({ maxClusterRadius: 40, disableClusteringAtZoom: 15 });
+
+      filtered.forEach((r, i) => {
+        const lat = parseFloat(r.latitude);
+        const lng = parseFloat(r.longitude);
+        if (!lat || !lng || lat < 29 || lat > 31) return;
+        const cat  = categoryOf(r);
+        const meta = CAT_META[cat];
+        const m = L.circleMarker([lat, lng], {
+          radius: isActive(r) ? meta.radius + 3 : meta.radius,
+          fillColor: meta.color,
+          color: isActive(r) ? "#fde047" : (isDark ? "#1e2230" : "#fff"),
+          weight: isActive(r) ? 3 : 1.5,
+          fillOpacity: 0.85,
+        }).bindPopup(popupHtml(r), { maxWidth: 280 });
+        clusterLayer.addLayer(m);
+        markersByIdx.set(i, m);
+      });
+
+      map.addLayer(clusterLayer);
+
+      const counts = { fire: 0, rescue: 0, alarm: 0, hazmat: 0 };
+      filtered.forEach(r => counts[categoryOf(r)]++);
+      const activeNow = filtered.filter(isActive).length;
+      const updated = new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", second: "2-digit" });
+      document.getElementById("panel-summary").textContent =
+        `Last ${currentDays} days · ${filtered.length.toLocaleString()} incidents · ` +
+        `${counts.fire} fire · ${counts.rescue} rescue · ${counts.alarm} alarm · ${counts.hazmat} hazmat` +
+        (activeNow ? ` · 🔴 ${activeNow} active now` : "") +
+        ` · updated ${updated}`;
+
+      renderSidebar(filtered);
+    }
+
+    function renderSidebar(filtered) {
+      const top10 = filtered.slice(0, 10);
+      const list = document.getElementById("sidebar-list");
+      if (!top10.length) {
+        list.innerHTML = `<p style="padding:12px;color:var(--text-muted);font-size:12px;">No incidents match the current filters.</p>`;
+        return;
+      }
+      list.innerHTML = top10.map((r, i) => {
+        const cat  = categoryOf(r);
+        const meta = CAT_META[cat];
+        const addr = r.address || "Unknown";
+        const ts   = formatTs(r.published_date);
+        const type = titleCase(r.issue_reported || "Incident");
+        const activeBadge = isActive(r) ? `<span class="inc-badge badge-active">🔴 Active</span>` : "";
+        return `<div class="inc-item ${cat}" onclick="focusIncident(${i})">
+          <div class="inc-time">${ts}</div>
+          <div class="inc-addr">${addr}</div>
+          <div class="inc-type">${type}</div>
+          <span class="inc-badge badge-${cat}">${meta.badge}</span>${activeBadge}
+        </div>`;
+      }).join("");
+    }
+
+    function focusIncident(idx) {
+      const filtered = filteredRecords();
+      const r = filtered[idx];
+      if (!r) return;
+      const lat = parseFloat(r.latitude);
+      const lng = parseFloat(r.longitude);
+      if (!lat || !lng) return;
+      map.setView([lat, lng], 16);
+      const m = markersByIdx.get(idx);
+      if (m) m.openPopup();
+    }
+
+    function setDays(days) {
+      currentDays = days;
+      [30, 60, 90].forEach(d => {
+        document.getElementById("btn-" + d).classList.toggle("active", d === days);
+      });
+      renderMap();
+    }
+
+    function toggleCat(cat) {
+      activeCats[cat] = !activeCats[cat];
+      document.getElementById("cat-" + cat).classList.toggle("active");
+      renderMap();
+    }
+
+    async function fetchRecords() {
+      const url = DATA_URL + "?$where=" + encodeURIComponent(`published_date >= '${cutoffISO(90)}'`) +
+        "&$order=published_date%20DESC&$limit=10000" +
+        "&$select=traffic_report_id,issue_reported,address,latitude,longitude,published_date,agency,traffic_report_status";
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res.json();
+    }
+
+    // Initial (and post-update) render.
+    async function loadData() {
+      try {
+        allRecords = await fetchRecords();
+        renderMap();
+      } catch (err) {
+        document.getElementById("panel-summary").textContent = "Error: " + err.message;
+        document.getElementById("sidebar-list").innerHTML =
+          `<p style="padding:12px;color:#ef4444;font-size:12px;">Failed to load: ${err.message}</p>`;
+      }
+    }
+
+    // Background poll: fetch quietly, never touch the map. If genuinely new
+    // incidents have appeared since what's on screen, offer an opt-in update.
+    async function pollForUpdates() {
+      let data;
+      try { data = await fetchRecords(); } catch { return; }  // keep showing current data on error
+      const shownIds = new Set(allRecords.map(r => r.traffic_report_id));
+      const newCount = data.reduce((n, r) => n + (shownIds.has(r.traffic_report_id) ? 0 : 1), 0);
+      if (newCount > 0) {
+        pendingRecords = data;
+        showUpdateBanner(newCount);
+      }
+    }
+
+    function showUpdateBanner(n) {
+      document.getElementById("update-text").textContent =
+        `🔄 ${n} new incident${n === 1 ? "" : "s"} — tap to update`;
+      document.getElementById("update-banner").style.display = "block";
+    }
+
+    function hideUpdateBanner() {
+      document.getElementById("update-banner").style.display = "none";
+    }
+
+    function applyUpdate() {
+      if (pendingRecords) {
+        allRecords = pendingRecords;
+        pendingRecords = null;
+        renderMap();
+      }
+      hideUpdateBanner();
+    }
+
+    function dismissUpdate(e) {
+      e.stopPropagation();   // don't trigger applyUpdate on the parent button
+      hideUpdateBanner();    // keep pendingRecords; banner re-appears on next poll if still new
+    }
+
+    document.getElementById("update-banner").addEventListener("click", applyUpdate);
+
+    loadData();
+    setInterval(pollForUpdates, REFRESH_MS);
+  </script>
+</body>
+</html>
