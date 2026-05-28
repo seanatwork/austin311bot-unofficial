@@ -33,6 +33,7 @@ wheels/
 
 # Claude Code
 .claude/settings.local.json
+.claude/worktrees/
 
 # Local notes and scratch files
 brainstorm.md
@@ -46,17 +47,25 @@ deepseek.md
 GEMINI.md
 hatecrimes.md
 addressneighborhoodfeature.md
+handoff.md
+service_codes.txt
 *_session.md
 *.js.bak
 home/
 tmp/
 data/
+# One-off test scripts
+test_911_api.py
+test_api.html
+scripts/test_api_limit.py
+scripts/update_plan.py
 # LibreOffice lock files
 .~lock.*
 
 # IDE
 .idea/
 .vscode/
+.codeium/
 *.swp
 *.swo
 *~
