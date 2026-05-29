@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 
 SOCRATA_URL = "https://data.austintexas.gov/resource/b4k4-adkb.json"
 TIMEOUT = 45
-REFRESH_SECONDS = 3  # how often an open camera popup re-fetches its image
+REFRESH_SECONDS = 30  # how often an open camera popup re-fetches its image
 
 # status key -> (label, folium color, font-awesome icon, is_live)
 STATUS_META = {

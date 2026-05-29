@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Austin 311 — Animal Shelter</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Austin 311 — Animal Shelter Intakes &amp; Outcomes" />
+  <meta property="og:description" content="Austin Animal Center historical data: live-release rate, intake &amp; outcome trends, and lost &amp; found pet search. 2013–2025." />
+  <meta property="og:url" content="https://austin311.com/shelter/" />
+  <meta property="og:image" content="https://austin311.com/og-default.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Austin 311" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Austin 311 — Animal Shelter Intakes &amp; Outcomes" />
+  <meta name="twitter:description" content="Austin Animal Center historical data: live-release rate, intake &amp; outcome trends, and lost &amp; found pet search." />
+  <meta name="twitter:image" content="https://austin311.com/og-default.png" />
+  <meta name="description" content="Austin Animal Center historical data: live-release rate, intake &amp; outcome trends, and lost &amp; found pet search. 2013–2025." />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark");</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f8fafc; --bg-panel: #f1f5f9;
+      --border: #e2e8f0; --text: #1e293b; --text-head: #0f172a;
+      --text-sub: #64748b; --text-muted: #94a3b8;
+      --btn-bg: #e2e8f0; --btn-border: #cbd5e1; --btn-color: #475569;
+      --btn-hover-bg: #d1dae3; --btn-hover-color: #1e293b;
+      --note-bg: #f1f5f9; --note-text: #475569; --note-strong: #1e293b;
+      --card-bg: #ffffff;
+    }
+    html.dark {
+      --bg: #0f1117; --bg-panel: #1e2230;
+      --border: #2d3348; --text: #e2e8f0; --text-head: #f1f5f9;
+      --text-sub: #64748b; --text-muted: #475569;
+      --btn-bg: #252b3b; --btn-border: #3d4868; --btn-color: #94a3b8;
+      --btn-hover-bg: #2d3453; --btn-hover-color: #e2e8f0;
+      --note-bg: #1e2230; --note-text: #94a3b8; --note-strong: #f1f5f9;
+      --card-bg: #1a1d2b;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    #panel {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--bg-panel);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #panel-title { font-size: 15px; font-weight: 700; color: var(--text-head); }
+    #panel-subtitle { font-size: 12px; color: var(--text-sub); text-align: center; }
+
+    .btn-row {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .fbtn {
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      color: var(--btn-color);
+      padding: 5px 13px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+      white-space: nowrap;
+    }
+    .fbtn:hover { background: var(--btn-hover-bg); color: var(--btn-hover-color); }
+    .fbtn.active { background: #3b82f6; border-color: #3b82f6; color: #fff; font-weight: 600; }
+    .fbtn.active-amber { background: #b45309; border-color: #b45309; color: #fff; font-weight: 600; }
+
+    #theme-toggle {
+      position: fixed; top: 10px; right: 12px; z-index: 200;
+      background: var(--bg-panel); border: 1px solid var(--border);
+      border-radius: 6px; padding: 4px 9px; font-size: 11px; color: var(--text-sub); cursor: pointer;
+    }
+
+    #stats {
+      display: none;
+      justify-content: center;
+      gap: 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat {
+      flex: 1;
+      max-width: 180px;
+      text-align: center;
+      padding: 10px 8px 9px;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-value { font-size: 1.3rem; font-weight: 700; line-height: 1.1; }
+    .stat-label {
+      font-size: 0.67rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-top: 3px;
+    }
+
+    #chart-wrap { flex: 1; padding: 16px 16px 4px; }
+
+    #chart-container { display: none; position: relative; }
+    #chart-container-doughnut { display: none; position: relative; margin-top: 20px; }
+
+    #loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 0;
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .note-box {
+      display: none;
+      margin-top: 20px;
+      padding: 12px 14px;
+      background: var(--note-bg);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.8rem;
+      color: var(--note-text);
+      line-height: 1.6;
+    }
+    .note-box strong { color: var(--note-strong); }
+    .note-box.amber { border-left: 3px solid #f59e0b; }
+    .note-box.green  { border-left: 3px solid #22c55e; }
+    .note-box.blue   { border-left: 3px solid #3b82f6; }
+
+    /* ---- Lost & Found search ---- */
+    #search-panel { display: none; padding: 16px; }
+    .search-row {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;
+    }
+    .search-row input, .search-row select {
+      padding: 6px 10px; border: 1px solid var(--border); border-radius: 4px;
+      background: var(--card-bg); color: var(--text); font-size: 13px;
+      flex: 1; min-width: 120px;
+    }
+    .search-row button {
+      padding: 6px 16px; background: #3b82f6; color: #fff; border: none;
+      border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 600;
+    }
+    .search-row button:hover { background: #2563eb; }
+    #search-results { display: none; }
+    .result-card {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 6px; padding: 10px 12px; margin-bottom: 8px;
+      font-size: 13px; line-height: 1.5;
+    }
+    .result-card .animal-type {
+      display: inline-block; padding: 1px 6px; border-radius: 3px;
+      font-size: 11px; font-weight: 600; margin-right: 4px;
+    }
+    .type-dog { background: #dbeafe; color: #1e40af; }
+    .type-cat { background: #fce7f3; color: #9d174d; }
+    .type-other { background: #e5e7eb; color: #374151; }
+
+    .chart-row {
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+    .chart-half {
+      flex: 1; min-width: 280px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 14px 16px;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--bg-panel);
+    }
+    footer a { color: var(--text-sub); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+
+    @media (max-width: 520px) {
+      .stat-value { font-size: 1.05rem; }
+      .stat-label { font-size: 0.61rem; }
+      .chart-row { flex-direction: column; }
+    }
+  </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TS158R7XSN');
+</script>
+</head>
+<body>
+
+  <button id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
+
+  <div id="panel">
+    <div id="panel-title">🐾 Austin Animal Center</div>
+    <div id="panel-subtitle">Intakes, outcomes &amp; live-release rate — 2013–<span id="data-end-date">…</span></div>
+    <div class="btn-row">
+      <button class="fbtn active" id="btn-overview" onclick="switchView('overview')">
+        📊 Overview
+      </button>
+      <button class="fbtn" id="btn-lostfound" onclick="switchView('lostfound')">
+        🔍 Lost &amp; Found
+      </button>
+    </div>
+  </div>
+
+  <div id="stats">
+    <div class="stat">
+      <div class="stat-value" id="stat-total" style="color:#3b82f6;">—</div>
+      <div class="stat-label">Total Intakes</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="stat-s1">—</div>
+      <div class="stat-label" id="stat-l1">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="stat-s2">—</div>
+      <div class="stat-label" id="stat-l2">—</div>
+    </div>
+    <div class="stat">
+      <div class="stat-value" id="stat-s3">—</div>
+      <div class="stat-label" id="stat-l3">—</div>
+    </div>
+  </div>
+
+  <div id="chart-wrap">
+    <div id="loading">Loading shelter data…</div>
+
+    <!-- Overview charts -->
+    <div id="chart-container">
+      <div class="chart-row">
+        <div class="chart-half"><canvas id="intakeChart"></canvas></div>
+        <div class="chart-half"><canvas id="outcomeChart"></canvas></div>
+      </div>
+    </div>
+    <div id="chart-container-doughnut">
+      <div class="chart-row">
+        <div class="chart-half"><canvas id="intakeTypeChart"></canvas></div>
+        <div class="chart-half"><canvas id="conditionChart"></canvas></div>
+      </div>
+    </div>
+
+    <div id="note-overview" class="note-box blue"></div>
+
+    <!-- Lost & Found search -->
+    <div id="search-panel">
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:10px;text-align:center;">⚠️ This dataset is historical — no new data is being added. Last entry: <span id="lf-last-date">…</span>.</p>
+      <div class="search-row">
+        <select id="lf-animal-type">
+          <option value="">All types</option>
+          <option value="Dog">Dog</option>
+          <option value="Cat">Cat</option>
+          <option value="Other">Other</option>
+        </select>
+        <input type="text" id="lf-breed" placeholder="Breed (e.g. Pit Bull)" />
+        <input type="text" id="lf-color" placeholder="Color (e.g. Black)" />
+        <input type="text" id="lf-location" placeholder="Location (e.g. Riverside)" />
+        <button onclick="searchLostFound()">Search</button>
+      </div>
+      <div id="search-results"></div>
+      <div id="search-loading" style="display:none; text-align:center; padding:20px; color:var(--text-muted);">Searching Austin Animal Center records…</div>
+    </div>
+    <div id="note-lostfound" class="note-box amber" style="display:none;"></div>
+  </div>
+
+  <footer>
+    Data: <a href="https://data.austintexas.gov/Health-and-Community-Services/Austin-Animal-Center-Intakes/wter-evkm" target="_blank">Intakes</a> ·
+    <a href="https://data.austintexas.gov/Health-and-Community-Services/Austin-Animal-Center-Outcomes/9t4d-g238" target="_blank">Outcomes</a> ·
+    <a href="https://adopt.adopets.com/shelter/austin-animal-center" target="_blank">Austin Animal Center</a> ·
+    <a href="/">← Austin 311</a>
+    <br/><span id="data-note">Last updated: —</span>
+  </footer>
+
+<script>
+// ── Globals ────────────────────────────────────────────────────────
+var cache = {};
+var currentView = 'overview';
+var chartInst = null;
+var chartInst2 = null;
+var chartInst3 = null;
+
+var SOCRATA = "https://data.austintexas.gov/resource";
+var INTAKES_DS = "wter-evkm";
+var OUTCOMES_DS = "9t4d-g238";
+
+var MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+
+// ── Theme ──────────────────────────────────────────────────────────
+function toggleTheme() {
+  var html = document.documentElement;
+  var isDark = html.classList.toggle("dark");
+  localStorage.setItem("theme", isDark ? "dark" : "light");
+  document.getElementById("theme-toggle").textContent = isDark ? "☀️ Light" : "🌙 Dark";
+}
+
+(function initTheme() {
+  var isDark = document.documentElement.classList.contains("dark");
+  document.getElementById("theme-toggle").textContent = isDark ? "☀️ Light" : "🌙 Dark";
+})();
+
+// ── Data loading ───────────────────────────────────────────────────
+function loadCache() {
+  return fetch("data.json")
+    .then(function(r) { return r.json(); })
+    .then(function(json) {
+      cache = json.cache;
+      document.getElementById("data-note").textContent =
+        "Last updated: " + (json.generatedAt || "—").replace("T"," ").slice(0,16) + " UTC";
+      // Update subtitle end date
+      var latestDate = cache.latestIntakeDate || "";
+      var endStr = latestDate.slice(0,7) || "present";
+      document.getElementById("data-end-date").textContent = endStr;
+      switchView("overview");
+    })
+    .catch(function(e) {
+      console.error("Failed to load data.json:", e);
+      document.getElementById("loading").textContent =
+        "⚠️ Could not load cached data. Check back soon.";
+    });
+}
+
+// ── Socrata fetch ──────────────────────────────────────────────────
+function fetchSocrata(dataset, params) {
+  var url = SOCRATA + "/" + dataset + ".json";
+  var qs = Object.keys(params).map(function(k) {
+    return encodeURIComponent("$" + k) + "=" + encodeURIComponent(params[k]);
+  }).join("&");
+  return fetch(url + "?" + qs)
+    .then(function(r) { return r.json(); });
+}
+
+// ── View switching ─────────────────────────────────────────────────
+function destroyCharts() {
+  if (chartInst) { chartInst.destroy(); chartInst = null; }
+  if (chartInst2) { chartInst2.destroy(); chartInst2 = null; }
+  if (chartInst3) { chartInst3.destroy(); chartInst3 = null; }
+}
+
+function hideAll() {
+  document.getElementById("chart-container").style.display = "none";
+  document.getElementById("chart-container-doughnut").style.display = "none";
+  document.getElementById("search-panel").style.display = "none";
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("search-results").style.display = "none";
+  ["overview","lostfound"].forEach(function(v) {
+    var n = document.getElementById("note-" + v);
+    if (n) n.style.display = "none";
+  });
+  destroyCharts();
+}
+
+function activateBtn(view) {
+  ["overview","lostfound"].forEach(function(v) {
+    var b = document.getElementById("btn-" + v);
+    b.classList.remove("active","active-amber");
+  });
+  var b = document.getElementById("btn-" + view);
+  var cls = view === "lostfound" ? "active-amber" : "active";
+  b.classList.add(cls);
+}
+
+function switchView(view) {
+  currentView = view;
+  hideAll();
+  activateBtn(view);
+  document.getElementById("stats").style.display = "flex";
+  document.getElementById("loading").style.display = "none";
+
+  if (view === "overview") {
+    renderOverview();
+  } else if (view === "lostfound") {
+    document.getElementById("search-panel").style.display = "block";
+    document.getElementById("note-lostfound").style.display = "block";
+    updateLostFoundNote();
+    document.getElementById("stats").style.display = "none";
+    // Set the last-date in the historical notice
+    var latest = cache.latestIntakeDate || "";
+    document.getElementById("lf-last-date").textContent = latest.slice(0,10) || "unknown";
+  }
+}
+
+// ── Stat helpers ───────────────────────────────────────────────────
+function fmtNum(n) { return n.toLocaleString(); }
+function fmtPct(n, total) { return total ? Math.round(n / total * 100) + "%" : "—"; }
+
+function monthLabel(ym) {
+  var parts = ym.split("-");
+  if (parts.length === 2) {
+    return MONTHS[parseInt(parts[1]) - 1] + " " + parts[0];
+  }
+  return ym;
+}
+
+// ── OVERVIEW ───────────────────────────────────────────────────────
+function renderOverview() {
+  var totals = cache.totals || {};
+  var liveRate = totals.total_outcomes ? Math.round(totals.total_live_outcomes / totals.total_outcomes * 100) : 0;
+
+  document.getElementById("stat-total").textContent = fmtNum(totals.total_intakes || 0);
+  document.getElementById("stat-l1").textContent = "Live-Release Rate";
+  document.getElementById("stat-s1").textContent = liveRate + "%";
+  document.getElementById("stat-s1").style.color = liveRate >= 90 ? "#16a34a" : liveRate >= 80 ? "#f59e0b" : "#dc2626";
+  document.getElementById("stat-l2").textContent = "Stray Intakes";
+  document.getElementById("stat-s2").textContent = fmtPct(parseInt(getIntakeTypeCount("Stray")), totals.total_intakes);
+  document.getElementById("stat-s2").style.color = "#3b82f6";
+  document.getElementById("stat-l3").textContent = "Total Outcomes";
+  document.getElementById("stat-s3").textContent = fmtNum(totals.total_outcomes || 0);
+  document.getElementById("stat-s3").style.color = "#3b82f6";
+
+  // Monthly intake line chart
+  var mi = cache.monthlyIntakes || [];
+  var months = [], dogs = [], cats = [], others = [];
+  var byMonth = {};
+  mi.forEach(function(r) {
+    var m = r.month;
+    if (!byMonth[m]) byMonth[m] = {};
+    byMonth[m][r.animal_type] = parseInt(r.cnt) || 0;
+  });
+  var sortedMonths = Object.keys(byMonth).sort();
+  // Only show last 36 months for readability
+  sortedMonths = sortedMonths.slice(-36);
+  sortedMonths.forEach(function(m) {
+    months.push(monthLabel(m));
+    dogs.push(byMonth[m]["Dog"] || 0);
+    cats.push(byMonth[m]["Cat"] || 0);
+    others.push((byMonth[m]["Other"]||0) + (byMonth[m]["Bird"]||0) + (byMonth[m]["Livestock"]||0));
+  });
+
+  document.getElementById("chart-container").style.display = "block";
+  var ctx = document.getElementById("intakeChart").getContext("2d");
+  chartInst = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: months,
+      datasets: [
+        { label: "Dogs", data: dogs, borderColor: "#3b82f6", backgroundColor: "rgba(59,130,246,0.1)", tension: 0.3, fill: true },
+        { label: "Cats", data: cats, borderColor: "#ec4899", backgroundColor: "rgba(236,72,153,0.1)", tension: 0.3, fill: true },
+        { label: "Other", data: others, borderColor: "#6b7280", backgroundColor: "rgba(107,114,128,0.1)", tension: 0.3, fill: true },
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: "Monthly Intakes by Animal Type", color: getComputedStyle(document.body).getPropertyValue("--text-head") },
+      },
+      scales: {
+        x: { ticks: { maxTicksLimit: 12, color: getComputedStyle(document.body).getPropertyValue("--text-sub") } },
+        y: { title: { display: true, text: "Count" } }
+      }
+    }
+  });
+
+  // Monthly outcome stacked bar
+  var mo = cache.monthlyOutcomes || [];
+  var outByMonth = {};
+  var outTypes = ["Adoption","Transfer","Return to Owner","Euthanasia","Died","Disposal"];
+  mo.forEach(function(r) {
+    var m = r.month;
+    if (!outByMonth[m]) outByMonth[m] = {};
+    outByMonth[m][r.outcome_type] = parseInt(r.cnt) || 0;
+  });
+  var outMonthsSorted = Object.keys(outByMonth).sort().slice(-36);
+  var outLabels = outMonthsSorted.map(monthLabel);
+  var outColors = { "Adoption": "#16a34a", "Transfer": "#3b82f6", "Return to Owner": "#f59e0b",
+                    "Euthanasia": "#dc2626", "Died": "#6b7280", "Disposal": "#94a3b8" };
+  var outDatasets = outTypes.map(function(t) {
+    return {
+      label: t,
+      data: outMonthsSorted.map(function(m) { return outByMonth[m][t] || 0; }),
+      backgroundColor: outColors[t] || "#94a3b8",
+    };
+  });
+
+  var ctx2 = document.getElementById("outcomeChart").getContext("2d");
+  chartInst2 = new Chart(ctx2, {
+    type: "bar",
+    data: { labels: outLabels, datasets: outDatasets },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: "Monthly Outcomes by Type", color: getComputedStyle(document.body).getPropertyValue("--text-head") },
+      },
+      scales: {
+        x: { stacked: true, ticks: { maxTicksLimit: 12, color: getComputedStyle(document.body).getPropertyValue("--text-sub") } },
+        y: { stacked: true, title: { display: true, text: "Count" } }
+      }
+    }
+  });
+
+  // Doughnut charts
+  document.getElementById("chart-container-doughnut").style.display = "block";
+  renderIntakeTypeDoughnut();
+  renderConditionDoughnut();
+
+  // Note
+  var note = document.getElementById("note-overview");
+  note.style.display = "block";
+  var latestIntake = cache.latestIntakeDate || "unknown";
+  var liveOutcomes = totals.total_live_outcomes || 0;
+  note.innerHTML = "<strong>Live-release rate:</strong> " + liveRate + "% of all outcomes (" +
+    fmtNum(liveOutcomes) + " of " + fmtNum(totals.total_outcomes) + ") were adoption, return-to-owner, or transfer. " +
+    "Data spans October 2013 through " + (latestIntake.slice(0,7) || "present") + ". " +
+    "<br/><strong>Stray animals</strong> account for the majority of intakes. " +
+    "See the <a href='https://www.austintexas.gov/austin-animal-center' target='_blank'>Austin Animal Center</a> for real-time availability.";
+}
+
+function getIntakeTypeCount(type) {
+  var types = cache.intakeTypes || [];
+  for (var i = 0; i < types.length; i++) {
+    if (types[i].intake_type === type) return types[i].cnt;
+  }
+  return 0;
+}
+
+function renderIntakeTypeDoughnut() {
+  var types = cache.intakeTypes || [];
+  var labels = types.map(function(t) { return t.intake_type; });
+  var data = types.map(function(t) { return parseInt(t.cnt); });
+  var colors = ["#3b82f6","#f59e0b","#8b5cf6","#10b981","#ef4444","#6b7280"];
+
+  var ctx = document.getElementById("intakeTypeChart").getContext("2d");
+  chartInst3 = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: labels,
+      datasets: [{ data: data, backgroundColor: colors.slice(0, labels.length) }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: "Intake Types", color: getComputedStyle(document.body).getPropertyValue("--text-head") },
+      }
+    }
+  });
+}
+
+function renderConditionDoughnut() {
+  var conditions = cache.intakeConditions || [];
+  var labels = conditions.map(function(c) { return c.intake_condition; });
+  var data = conditions.map(function(c) { return parseInt(c.cnt); });
+  var colors = ["#22c55e","#f59e0b","#ef4444","#8b5cf6","#3b82f6","#6b7280"];
+
+  var ctx = document.getElementById("conditionChart").getContext("2d");
+  if (chartInst3) chartInst3.destroy();
+  // We need a separate instance — use a temp approach
+  var existing = Chart.getChart("conditionChart");
+  if (existing) existing.destroy();
+  new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: labels,
+      datasets: [{ data: data, backgroundColor: colors.slice(0, labels.length) }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        title: { display: true, text: "Intake Condition", color: getComputedStyle(document.body).getPropertyValue("--text-head") },
+      }
+    }
+  });
+}
+
+// ── LOST & FOUND ───────────────────────────────────────────────────
+function searchLostFound() {
+  var animalType = document.getElementById("lf-animal-type").value;
+  var breed = document.getElementById("lf-breed").value.trim();
+  var color = document.getElementById("lf-color").value.trim();
+  var location = document.getElementById("lf-location").value.trim();
+
+  var whereParts = [];
+  if (animalType) whereParts.push("animal_type = '" + animalType.replace(/'/g,"''") + "'");
+  if (breed) whereParts.push("lower(breed) like '%" + breed.toLowerCase().replace(/'/g,"''") + "%'");
+  if (color) whereParts.push("lower(color) like '%" + color.toLowerCase().replace(/'/g,"''") + "%'");
+  if (location) whereParts.push("lower(found_location) like '%" + location.toLowerCase().replace(/'/g,"''") + "%'");
+
+  var params = {
+    select: "animal_id, name, animal_type, breed, color, sex_upon_intake, age_upon_intake, datetime, intake_type, intake_condition, found_location",
+    order: "datetime DESC",
+    limit: 50,
+  };
+  if (whereParts.length > 0) params.where = whereParts.join(" AND ");
+
+  document.getElementById("search-results").style.display = "none";
+  document.getElementById("search-loading").style.display = "block";
+
+  fetchSocrata(INTAKES_DS, params).then(function(rows) {
+    document.getElementById("search-loading").style.display = "none";
+    var container = document.getElementById("search-results");
+    container.style.display = "block";
+
+    if (!rows || rows.length === 0) {
+      container.innerHTML = "<div style='text-align:center;padding:30px;color:var(--text-muted);'>No animals found matching your search. Try broader terms.</div>";
+      return;
+    }
+
+    var html = "<p style='font-size:13px;color:var(--text-sub);margin-bottom:10px;'>" +
+      rows.length + " result" + (rows.length > 1 ? "s" : "") + " — most recent first</p>";
+
+    rows.forEach(function(r) {
+      var typeClass = r.animal_type === "Dog" ? "type-dog" : r.animal_type === "Cat" ? "type-cat" : "type-other";
+      var name = r.name || "Unnamed";
+      var date = (r.datetime || "").slice(0,10);
+      var location = r.found_location || "Unknown";
+      var breed = r.breed || "Unknown";
+      var color = r.color || "";
+      var sex = r.sex_upon_intake || "";
+      var age = r.age_upon_intake || "";
+      var condition = r.intake_condition || "";
+
+      html += "<div class='result-card'>" +
+        "<span class='animal-type " + typeClass + "'>" + r.animal_type + "</span>" +
+        "<strong>" + name + "</strong> · " + breed +
+        (color ? " · " + color : "") +
+        "<br/><span style='color:var(--text-sub);font-size:12px;'>" +
+        "📅 " + date + " · " + sex + (age ? " · " + age : "") +
+        (condition ? " · " + condition : "") +
+        "<br/>📍 " + location +
+        "<br/>ID: " + r.animal_id + " · Type: " + (r.intake_type || "Unknown") +
+        "</span></div>";
+    });
+
+    container.innerHTML = html;
+    updateLostFoundNote();
+  }).catch(function(e) {
+    document.getElementById("search-loading").style.display = "none";
+    document.getElementById("search-results").style.display = "block";
+    document.getElementById("search-results").innerHTML =
+      "<div style='text-align:center;padding:30px;color:#dc2626;'>⚠️ Search failed. Please try again.</div>";
+  });
+}
+
+function updateLostFoundNote() {
+  var note = document.getElementById("note-lostfound");
+  note.innerHTML = "<strong>🔍 Looking for your lost pet?</strong> " +
+    "Search Austin Animal Center intake records by breed, color, animal type, or location. " +
+    "If you recognize your pet, contact the shelter directly at <strong>(512) 974-2000</strong>. " +
+    "Data from <a href='https://data.austintexas.gov/Health-and-Community-Services/Austin-Animal-Center-Intakes/wter-evkm' target='_blank'>AAC Intakes</a>.";
+}
+
+// ── Startup ────────────────────────────────────────────────────────
+loadCache();
+</script>
+</body>
+</html>

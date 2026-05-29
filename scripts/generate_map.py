@@ -213,6 +213,18 @@ def generate_cameras_map(days_back: int = 90) -> tuple:
     return generate_cameras_map(days_back)
 
 
+def generate_shelter_page(days_back: int = 365) -> tuple:
+    """Generate Animal Center shelter data cache (non-map dashboard)."""
+    import io
+    from scripts.generate_shelter_data import main as shelter_main, OUT as SHELTER_OUT
+    try:
+        shelter_main()
+        buf = io.BytesIO(SHELTER_OUT.read_bytes())
+        return buf, "Shelter data generated successfully"
+    except Exception as e:
+        return None, f"Shelter data generation failed: {e}"
+
+
 def generate_nearby_page(days_back: int = 180) -> tuple:
     """Generate "311 Near You" dynamic map page with embedded request data."""
     import io
@@ -255,6 +267,7 @@ CATEGORY_MAPS = {
     "storm": (generate_storm_map, "storm/index.html"),
     "trees": (generate_tree_map, "trees/index.html"),
     "cameras": (generate_cameras_map, "cameras/index.html"),
+    "shelter": (generate_shelter_page, "shelter/data.json"),
 }
 
 
