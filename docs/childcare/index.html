@@ -30,7 +30,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_f197b6c47a73388a0086847f249d0541 {
+                #map_605aec5b1c65d90db0134dfedf76da40 {
                     position: relative;
                     width: 100.0%;
                     height: 100.0%;
@@ -83,7 +83,7 @@
                 box-shadow:0 2px 6px rgba(0,0,0,0.3);z-index:9999;
                 font-family:sans-serif;text-align:center;min-width:340px;">
         <b style="font-size:15px;">🧒 Austin Child Care Licensing Compliance</b><br/>
-        <span style="font-size: 11px; color: #888;">Last ran: 2026-06-04 11:53 AM CDT</span><br/>
+        <span style="font-size: 11px; color: #888;">Last ran: 2026-06-05 11:29 AM CDT</span><br/>
         <span id="map-summary" style="font-size:12px;color:#555;"></span>
         <div style="display:flex;justify-content:center;gap:4px;margin-top:7px;flex-wrap:wrap;">
             <button id="btn-high" onclick="toggleTier('high')" class="fbtn active">🔴 High Risk</button>
@@ -101,7 +101,7 @@
         var tierVisible = {high: true, medium_high: true, medium: true, clean: true};
         var layerMap = null;
         var leafletMap = null;
-        var tierCounts = {"high": 4, "medium_high": 1, "medium": 2, "clean": 10};
+        var tierCounts = {"high": 3, "medium_high": 1, "medium": 2, "clean": 10};
 
         function updateSummary() {
             var shown = Object.keys(tierVisible).filter(function(t) { return tierVisible[t]; });
@@ -111,8 +111,8 @@
         }
 
         function initLayers() {
-            layerMap = {"high": feature_group_f2ffdaef95b39b3d1b8b1cb2de9a6a03, "medium_high": feature_group_3205c7c1727161f4679776084b1addd4, "medium": feature_group_fae3a41ea533ca53e1015e22cf9f0d4e, "clean": feature_group_9de5ed2a78204014211e5f7c3a4d425e};
-            leafletMap = map_f197b6c47a73388a0086847f249d0541;
+            layerMap = {"high": feature_group_04c487d3a888a1055bd6573841c6e506, "medium_high": feature_group_860d86cfa00645fa88ac1b2a0461ec3f, "medium": feature_group_7494cc720467710df82b5dc1827886b7, "clean": feature_group_1cc659268a5d96b74e1721569f9fa5b3};
+            leafletMap = map_605aec5b1c65d90db0134dfedf76da40;
             updateSummary();
         }
 
@@ -134,14 +134,14 @@
     </script>
     
     
-            <div class="folium-map" id="map_f197b6c47a73388a0086847f249d0541" ></div>
+            <div class="folium-map" id="map_605aec5b1c65d90db0134dfedf76da40" ></div>
         
 </body>
 <script>
     
     
-            var map_f197b6c47a73388a0086847f249d0541 = L.map(
-                "map_f197b6c47a73388a0086847f249d0541",
+            var map_605aec5b1c65d90db0134dfedf76da40 = L.map(
+                "map_605aec5b1c65d90db0134dfedf76da40",
                 {
                     center: [30.2672, -97.7431],
                     crs: L.CRS.EPSG3857,
@@ -158,7 +158,7 @@
 
         
     
-            var tile_layer_056307029521030209508f55775bf0a4 = L.tileLayer(
+            var tile_layer_292f1c71b594b7f4d302e8093ca3fb29 = L.tileLayer(
                 "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",
                 {
   "minZoom": 0,
@@ -175,77 +175,29 @@
             );
         
     
-            tile_layer_056307029521030209508f55775bf0a4.addTo(map_f197b6c47a73388a0086847f249d0541);
+            tile_layer_292f1c71b594b7f4d302e8093ca3fb29.addTo(map_605aec5b1c65d90db0134dfedf76da40);
         
     
-            var feature_group_f2ffdaef95b39b3d1b8b1cb2de9a6a03 = L.featureGroup(
+            var feature_group_04c487d3a888a1055bd6573841c6e506 = L.featureGroup(
                 {
 }
             );
         
     
-            var marker_cluster_f44a7cfe22640368c4a84e2ecc3c69b3 = L.markerClusterGroup(
+            var marker_cluster_f3595bb840eb87b0246d57e62c829ef9 = L.markerClusterGroup(
                 {
 }
             );
         
     
-            var marker_07efe205691b1d0e0be5d21ccf370953 = L.marker(
-                [30.44679, -97.83152],
-                {
-}
-            ).addTo(marker_cluster_f44a7cfe22640368c4a84e2ecc3c69b3);
-        
-    
-            var icon_9b42a1ac3ab3aca97a9782e304995911 = L.AwesomeMarkers.icon(
-                {
-  "markerColor": "red",
-  "iconColor": "white",
-  "icon": "remove-sign",
-  "prefix": "glyphicon",
-  "extraClasses": "fa-rotate-0",
-}
-            );
-        
-    
-        var popup_a89b39bef5ba0bf01f74738e97fb4e6a = L.popup({
-  "maxWidth": 300,
-});
-
-        
-            
-                var html_8d5a6b1313c0368cf8bad17c7693aa54 = $(`<div id="html_8d5a6b1313c0368cf8bad17c7693aa54" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Bright Kids Child Development Center</b><br/>             <span style="color:#666;font-size:11px;">Licensed Center</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.44679,-97.83152" target="_blank" style="color:#888;">10713 N FM 620 STE 101 AUSTIN TX- 78726 1700</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 1 high &nbsp; 🟠 2 med-high &nbsp; 🟡 0 medium<br/>             <b>Capacity:</b> 76 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_a89b39bef5ba0bf01f74738e97fb4e6a.setContent(html_8d5a6b1313c0368cf8bad17c7693aa54);
-            
-        
-
-        marker_07efe205691b1d0e0be5d21ccf370953.bindPopup(popup_a89b39bef5ba0bf01f74738e97fb4e6a)
-        ;
-
-        
-    
-    
-            marker_07efe205691b1d0e0be5d21ccf370953.bindTooltip(
-                `<div>
-                     Bright Kids Child Development Center — ⚠️ 3 deficiencies
-                 </div>`,
-                {
-  "sticky": true,
-}
-            );
-        
-    
-                marker_07efe205691b1d0e0be5d21ccf370953.setIcon(icon_9b42a1ac3ab3aca97a9782e304995911);
-            
-    
-            var marker_0bf680236c237b1267660a158a0bff6d = L.marker(
+            var marker_45a432fb8355f629a048b0a6e6b3a214 = L.marker(
                 [30.358242989, -97.695455019],
                 {
 }
-            ).addTo(marker_cluster_f44a7cfe22640368c4a84e2ecc3c69b3);
+            ).addTo(marker_cluster_f3595bb840eb87b0246d57e62c829ef9);
         
     
-            var icon_1d1e53f280c1a05d3bedaf20b7e36171 = L.AwesomeMarkers.icon(
+            var icon_430b6b90b60fe6412b9d19f553f593c0 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "red",
   "iconColor": "white",
@@ -256,24 +208,24 @@
             );
         
     
-        var popup_725a5140e05c64dd367f36d7135508cd = L.popup({
+        var popup_05b7ded8ab70035b89ac1b49d19ae2d5 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_8c56d7e920db22651485a3cf1d583c5f = $(`<div id="html_8c56d7e920db22651485a3cf1d583c5f" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Claudia Lopez</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.358242989,-97.695455019" target="_blank" style="color:#888;">103 W FAWNRIDGE DR  AUSTIN TX- 78753 5017</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 1 high &nbsp; 🟠 0 med-high &nbsp; 🟡 0 medium<br/>             <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_725a5140e05c64dd367f36d7135508cd.setContent(html_8c56d7e920db22651485a3cf1d583c5f);
+                var html_08c2b7564038f2b9f99ccd958269fd23 = $(`<div id="html_08c2b7564038f2b9f99ccd958269fd23" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Claudia Lopez</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.358242989,-97.695455019" target="_blank" style="color:#888;">103 W FAWNRIDGE DR  AUSTIN TX- 78753 5017</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 1 high &nbsp; 🟠 0 med-high &nbsp; 🟡 0 medium<br/>             <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_05b7ded8ab70035b89ac1b49d19ae2d5.setContent(html_08c2b7564038f2b9f99ccd958269fd23);
             
         
 
-        marker_0bf680236c237b1267660a158a0bff6d.bindPopup(popup_725a5140e05c64dd367f36d7135508cd)
+        marker_45a432fb8355f629a048b0a6e6b3a214.bindPopup(popup_05b7ded8ab70035b89ac1b49d19ae2d5)
         ;
 
         
     
     
-            marker_0bf680236c237b1267660a158a0bff6d.bindTooltip(
+            marker_45a432fb8355f629a048b0a6e6b3a214.bindTooltip(
                 `<div>
                      Claudia Lopez — ⚠️ 1 deficiencies
                  </div>`,
@@ -283,17 +235,17 @@
             );
         
     
-                marker_0bf680236c237b1267660a158a0bff6d.setIcon(icon_1d1e53f280c1a05d3bedaf20b7e36171);
+                marker_45a432fb8355f629a048b0a6e6b3a214.setIcon(icon_430b6b90b60fe6412b9d19f553f593c0);
             
     
-            var marker_ef90580360d05ec991888ba24a713233 = L.marker(
+            var marker_e791a597d656edf92b9c3280b85b355b = L.marker(
                 [30.364333992, -97.687836037],
                 {
 }
-            ).addTo(marker_cluster_f44a7cfe22640368c4a84e2ecc3c69b3);
+            ).addTo(marker_cluster_f3595bb840eb87b0246d57e62c829ef9);
         
     
-            var icon_b2dd6fe885e563a2e35458575afb58d0 = L.AwesomeMarkers.icon(
+            var icon_d7c43cd8b20c247bdf8a2aaa123d4b1d = L.AwesomeMarkers.icon(
                 {
   "markerColor": "red",
   "iconColor": "white",
@@ -304,24 +256,24 @@
             );
         
     
-        var popup_b086cf15eab7d614534760b66ac8bba2 = L.popup({
+        var popup_09705a185112057fd1281db3819a5eed = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_1c557b410f9368294cb53ff488831d17 = $(`<div id="html_1c557b410f9368294cb53ff488831d17" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Zenaida Govea Villanueva</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.364333992,-97.687836037" target="_blank" style="color:#888;">9807 ORIOLE DR  AUSTIN TX- 78753 4223</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 1 high &nbsp; 🟠 0 med-high &nbsp; 🟡 0 medium<br/>             <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_b086cf15eab7d614534760b66ac8bba2.setContent(html_1c557b410f9368294cb53ff488831d17);
+                var html_6dfb70221242c4a998e8de3ccc58e121 = $(`<div id="html_6dfb70221242c4a998e8de3ccc58e121" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Zenaida Govea Villanueva</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.364333992,-97.687836037" target="_blank" style="color:#888;">9807 ORIOLE DR  AUSTIN TX- 78753 4223</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 1 high &nbsp; 🟠 0 med-high &nbsp; 🟡 0 medium<br/>             <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_09705a185112057fd1281db3819a5eed.setContent(html_6dfb70221242c4a998e8de3ccc58e121);
             
         
 
-        marker_ef90580360d05ec991888ba24a713233.bindPopup(popup_b086cf15eab7d614534760b66ac8bba2)
+        marker_e791a597d656edf92b9c3280b85b355b.bindPopup(popup_09705a185112057fd1281db3819a5eed)
         ;
 
         
     
     
-            marker_ef90580360d05ec991888ba24a713233.bindTooltip(
+            marker_e791a597d656edf92b9c3280b85b355b.bindTooltip(
                 `<div>
                      Zenaida Govea Villanueva — ⚠️ 1 deficiencies
                  </div>`,
@@ -331,17 +283,17 @@
             );
         
     
-                marker_ef90580360d05ec991888ba24a713233.setIcon(icon_b2dd6fe885e563a2e35458575afb58d0);
+                marker_e791a597d656edf92b9c3280b85b355b.setIcon(icon_d7c43cd8b20c247bdf8a2aaa123d4b1d);
             
     
-            var marker_57206c85bfc3a3231d0b6443f951357c = L.marker(
+            var marker_d70d8275323864584b242f7a4442cb0e = L.marker(
                 [30.378362993, -97.66121704],
                 {
 }
-            ).addTo(marker_cluster_f44a7cfe22640368c4a84e2ecc3c69b3);
+            ).addTo(marker_cluster_f3595bb840eb87b0246d57e62c829ef9);
         
     
-            var icon_738b035716cee86683f5771c4b2277b1 = L.AwesomeMarkers.icon(
+            var icon_180804d95d2fef9f254d3e620b1896ba = L.AwesomeMarkers.icon(
                 {
   "markerColor": "red",
   "iconColor": "white",
@@ -352,24 +304,24 @@
             );
         
     
-        var popup_b2a4acc1c7bf62e7630af39b4768e6b5 = L.popup({
+        var popup_87273084929a29f7603c2fe2e7adf817 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_0c7d72143650642fa7e374ff7bcbb9a3 = $(`<div id="html_0c7d72143650642fa7e374ff7bcbb9a3" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Germaine  Hodge</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.378362993,-97.66121704" target="_blank" style="color:#888;">1413 BYERS LN  AUSTIN TX- 78753 6895</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 1 high &nbsp; 🟠 1 med-high &nbsp; 🟡 0 medium<br/>             <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_b2a4acc1c7bf62e7630af39b4768e6b5.setContent(html_0c7d72143650642fa7e374ff7bcbb9a3);
+                var html_6700e0e1c9d9e9e6d247dbeaa192aced = $(`<div id="html_6700e0e1c9d9e9e6d247dbeaa192aced" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Germaine  Hodge</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.378362993,-97.66121704" target="_blank" style="color:#888;">1413 BYERS LN  AUSTIN TX- 78753 6895</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 1 high &nbsp; 🟠 1 med-high &nbsp; 🟡 0 medium<br/>             <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_87273084929a29f7603c2fe2e7adf817.setContent(html_6700e0e1c9d9e9e6d247dbeaa192aced);
             
         
 
-        marker_57206c85bfc3a3231d0b6443f951357c.bindPopup(popup_b2a4acc1c7bf62e7630af39b4768e6b5)
+        marker_d70d8275323864584b242f7a4442cb0e.bindPopup(popup_87273084929a29f7603c2fe2e7adf817)
         ;
 
         
     
     
-            marker_57206c85bfc3a3231d0b6443f951357c.bindTooltip(
+            marker_d70d8275323864584b242f7a4442cb0e.bindTooltip(
                 `<div>
                      Germaine  Hodge — ⚠️ 2 deficiencies
                  </div>`,
@@ -379,35 +331,35 @@
             );
         
     
-                marker_57206c85bfc3a3231d0b6443f951357c.setIcon(icon_738b035716cee86683f5771c4b2277b1);
+                marker_d70d8275323864584b242f7a4442cb0e.setIcon(icon_180804d95d2fef9f254d3e620b1896ba);
             
     
-            marker_cluster_f44a7cfe22640368c4a84e2ecc3c69b3.addTo(feature_group_f2ffdaef95b39b3d1b8b1cb2de9a6a03);
+            marker_cluster_f3595bb840eb87b0246d57e62c829ef9.addTo(feature_group_04c487d3a888a1055bd6573841c6e506);
         
     
-            feature_group_f2ffdaef95b39b3d1b8b1cb2de9a6a03.addTo(map_f197b6c47a73388a0086847f249d0541);
+            feature_group_04c487d3a888a1055bd6573841c6e506.addTo(map_605aec5b1c65d90db0134dfedf76da40);
         
     
-            var feature_group_3205c7c1727161f4679776084b1addd4 = L.featureGroup(
+            var feature_group_860d86cfa00645fa88ac1b2a0461ec3f = L.featureGroup(
                 {
 }
             );
         
     
-            var marker_cluster_d3073a1376561e5b74042545023ffc13 = L.markerClusterGroup(
+            var marker_cluster_86a1e9e392d640530822f8207b02addb = L.markerClusterGroup(
                 {
 }
             );
         
     
-            var marker_d0214f636b92f169ef28df8ee616fff8 = L.marker(
+            var marker_0f6816e38395cb2768e98693872d0911 = L.marker(
                 [30.41431, -97.78165],
                 {
 }
-            ).addTo(marker_cluster_d3073a1376561e5b74042545023ffc13);
+            ).addTo(marker_cluster_86a1e9e392d640530822f8207b02addb);
         
     
-            var icon_9542c299d3d295232956f5673c506ce3 = L.AwesomeMarkers.icon(
+            var icon_8a3e54fbd9596925fe6b6336f899a6c4 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "orange",
   "iconColor": "white",
@@ -418,24 +370,24 @@
             );
         
     
-        var popup_b7c7e62ba9a9446e98c4564d4b84fffa = L.popup({
+        var popup_2bd45c1851457a41f9d55d29f07bbcac = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_70e988455f93751d107ef52d37770c86 = $(`<div id="html_70e988455f93751d107ef52d37770c86" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Laurel Mountain Ymca</b><br/>             <span style="color:#666;font-size:11px;">Licensed Center</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.41431,-97.78165" target="_blank" style="color:#888;">10111 D K RANCH RD  AUSTIN TX- 78759 6402</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 0 high &nbsp; 🟠 1 med-high &nbsp; 🟡 0 medium<br/>             <b>Capacity:</b> 110 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_b7c7e62ba9a9446e98c4564d4b84fffa.setContent(html_70e988455f93751d107ef52d37770c86);
+                var html_29219afc60e6ef12e2336ceab02e4527 = $(`<div id="html_29219afc60e6ef12e2336ceab02e4527" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Laurel Mountain Ymca</b><br/>             <span style="color:#666;font-size:11px;">Licensed Center</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.41431,-97.78165" target="_blank" style="color:#888;">10111 D K RANCH RD  AUSTIN TX- 78759 6402</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 0 high &nbsp; 🟠 1 med-high &nbsp; 🟡 0 medium<br/>             <b>Capacity:</b> 110 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_2bd45c1851457a41f9d55d29f07bbcac.setContent(html_29219afc60e6ef12e2336ceab02e4527);
             
         
 
-        marker_d0214f636b92f169ef28df8ee616fff8.bindPopup(popup_b7c7e62ba9a9446e98c4564d4b84fffa)
+        marker_0f6816e38395cb2768e98693872d0911.bindPopup(popup_2bd45c1851457a41f9d55d29f07bbcac)
         ;
 
         
     
     
-            marker_d0214f636b92f169ef28df8ee616fff8.bindTooltip(
+            marker_0f6816e38395cb2768e98693872d0911.bindTooltip(
                 `<div>
                      Laurel Mountain Ymca — ⚠️ 1 deficiencies
                  </div>`,
@@ -445,35 +397,35 @@
             );
         
     
-                marker_d0214f636b92f169ef28df8ee616fff8.setIcon(icon_9542c299d3d295232956f5673c506ce3);
+                marker_0f6816e38395cb2768e98693872d0911.setIcon(icon_8a3e54fbd9596925fe6b6336f899a6c4);
             
     
-            marker_cluster_d3073a1376561e5b74042545023ffc13.addTo(feature_group_3205c7c1727161f4679776084b1addd4);
+            marker_cluster_86a1e9e392d640530822f8207b02addb.addTo(feature_group_860d86cfa00645fa88ac1b2a0461ec3f);
         
     
-            feature_group_3205c7c1727161f4679776084b1addd4.addTo(map_f197b6c47a73388a0086847f249d0541);
+            feature_group_860d86cfa00645fa88ac1b2a0461ec3f.addTo(map_605aec5b1c65d90db0134dfedf76da40);
         
     
-            var feature_group_fae3a41ea533ca53e1015e22cf9f0d4e = L.featureGroup(
+            var feature_group_7494cc720467710df82b5dc1827886b7 = L.featureGroup(
                 {
 }
             );
         
     
-            var marker_cluster_f53a84fcaaf9a4330301dbc0a94fa435 = L.markerClusterGroup(
+            var marker_cluster_52e54cc5107da016c9e2088ca328e138 = L.markerClusterGroup(
                 {
 }
             );
         
     
-            var marker_55bb9f2e1f70e78c500a44caa126f946 = L.marker(
+            var marker_bcaa3d3b75e4bfcf2cadab58392e546b = L.marker(
                 [30.23147, -97.86031],
                 {
 }
-            ).addTo(marker_cluster_f53a84fcaaf9a4330301dbc0a94fa435);
+            ).addTo(marker_cluster_52e54cc5107da016c9e2088ca328e138);
         
     
-            var icon_d559e4b46271d66cbe3de60f9b378606 = L.AwesomeMarkers.icon(
+            var icon_bcf2efe68b09b188a95450e83678482b = L.AwesomeMarkers.icon(
                 {
   "markerColor": "beige",
   "iconColor": "white",
@@ -484,24 +436,24 @@
             );
         
     
-        var popup_7523d076f754708f7d38dec0ebcf79a7 = L.popup({
+        var popup_51edcfdc515417587f8c1c147355b863 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_91371bc8090c3cdc2f075b7082aead2a = $(`<div id="html_91371bc8090c3cdc2f075b7082aead2a" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Presbyterian Children'S Homes & Services</b><br/>             <span style="color:#666;font-size:11px;">Child Placing Agency</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.23147,-97.86031" target="_blank" style="color:#888;">5920 W. WILLIAM CANNON DRIVE BLDG.3 STE.100 AUSTIN TX- 78749</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 0 high &nbsp; 🟠 0 med-high &nbsp; 🟡 1 medium<br/>                          <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_7523d076f754708f7d38dec0ebcf79a7.setContent(html_91371bc8090c3cdc2f075b7082aead2a);
+                var html_77900cce679887249ea15245d66000d2 = $(`<div id="html_77900cce679887249ea15245d66000d2" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Presbyterian Children'S Homes & Services</b><br/>             <span style="color:#666;font-size:11px;">Child Placing Agency</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.23147,-97.86031" target="_blank" style="color:#888;">5920 W. WILLIAM CANNON DRIVE BLDG.3 STE.100 AUSTIN TX- 78749</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 0 high &nbsp; 🟠 0 med-high &nbsp; 🟡 1 medium<br/>                          <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_51edcfdc515417587f8c1c147355b863.setContent(html_77900cce679887249ea15245d66000d2);
             
         
 
-        marker_55bb9f2e1f70e78c500a44caa126f946.bindPopup(popup_7523d076f754708f7d38dec0ebcf79a7)
+        marker_bcaa3d3b75e4bfcf2cadab58392e546b.bindPopup(popup_51edcfdc515417587f8c1c147355b863)
         ;
 
         
     
     
-            marker_55bb9f2e1f70e78c500a44caa126f946.bindTooltip(
+            marker_bcaa3d3b75e4bfcf2cadab58392e546b.bindTooltip(
                 `<div>
                      Presbyterian Children'S Homes & Services — Clean
                  </div>`,
@@ -511,17 +463,17 @@
             );
         
     
-                marker_55bb9f2e1f70e78c500a44caa126f946.setIcon(icon_d559e4b46271d66cbe3de60f9b378606);
+                marker_bcaa3d3b75e4bfcf2cadab58392e546b.setIcon(icon_bcf2efe68b09b188a95450e83678482b);
             
     
-            var marker_75ef541e689c8db0efa7a26c6432f7b6 = L.marker(
+            var marker_630e57a4098ab8208b5cb1213d2c8b53 = L.marker(
                 [30.163900014, -97.744712028],
                 {
 }
-            ).addTo(marker_cluster_f53a84fcaaf9a4330301dbc0a94fa435);
+            ).addTo(marker_cluster_52e54cc5107da016c9e2088ca328e138);
         
     
-            var icon_a5eca7e2ead4c4abb0387bdc822b3d1f = L.AwesomeMarkers.icon(
+            var icon_ed8b6cf388c33a4b8e4632d7a1009992 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "beige",
   "iconColor": "white",
@@ -532,24 +484,24 @@
             );
         
     
-        var popup_b0325bbf2afba02aca27b6c337120119 = L.popup({
+        var popup_509d7b6d6c73cb0f52f49b580e86b80c = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_3ec912991b0e8019a34f18eb424cf86a = $(`<div id="html_3ec912991b0e8019a34f18eb424cf86a" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Maria Rodriguez</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.163900014,-97.744712028" target="_blank" style="color:#888;">6203 TARA DR  AUSTIN TX- 78744 7136</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 0 high &nbsp; 🟠 0 med-high &nbsp; 🟡 1 medium<br/>             <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_b0325bbf2afba02aca27b6c337120119.setContent(html_3ec912991b0e8019a34f18eb424cf86a);
+                var html_1f6e8724997e01e72cc8aca3e5b7dd38 = $(`<div id="html_1f6e8724997e01e72cc8aca3e5b7dd38" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Maria Rodriguez</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.163900014,-97.744712028" target="_blank" style="color:#888;">6203 TARA DR  AUSTIN TX- 78744 7136</a></span><br/><br/>                          <b>Deficiencies:</b> 🔴 0 high &nbsp; 🟠 0 med-high &nbsp; 🟡 1 medium<br/>             <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_509d7b6d6c73cb0f52f49b580e86b80c.setContent(html_1f6e8724997e01e72cc8aca3e5b7dd38);
             
         
 
-        marker_75ef541e689c8db0efa7a26c6432f7b6.bindPopup(popup_b0325bbf2afba02aca27b6c337120119)
+        marker_630e57a4098ab8208b5cb1213d2c8b53.bindPopup(popup_509d7b6d6c73cb0f52f49b580e86b80c)
         ;
 
         
     
     
-            marker_75ef541e689c8db0efa7a26c6432f7b6.bindTooltip(
+            marker_630e57a4098ab8208b5cb1213d2c8b53.bindTooltip(
                 `<div>
                      Maria Rodriguez — Clean
                  </div>`,
@@ -559,35 +511,35 @@
             );
         
     
-                marker_75ef541e689c8db0efa7a26c6432f7b6.setIcon(icon_a5eca7e2ead4c4abb0387bdc822b3d1f);
+                marker_630e57a4098ab8208b5cb1213d2c8b53.setIcon(icon_ed8b6cf388c33a4b8e4632d7a1009992);
             
     
-            marker_cluster_f53a84fcaaf9a4330301dbc0a94fa435.addTo(feature_group_fae3a41ea533ca53e1015e22cf9f0d4e);
+            marker_cluster_52e54cc5107da016c9e2088ca328e138.addTo(feature_group_7494cc720467710df82b5dc1827886b7);
         
     
-            feature_group_fae3a41ea533ca53e1015e22cf9f0d4e.addTo(map_f197b6c47a73388a0086847f249d0541);
+            feature_group_7494cc720467710df82b5dc1827886b7.addTo(map_605aec5b1c65d90db0134dfedf76da40);
         
     
-            var feature_group_9de5ed2a78204014211e5f7c3a4d425e = L.featureGroup(
+            var feature_group_1cc659268a5d96b74e1721569f9fa5b3 = L.featureGroup(
                 {
 }
             );
         
     
-            var marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8 = L.markerClusterGroup(
+            var marker_cluster_77ded84dfe6957b058d66c161da343d0 = L.markerClusterGroup(
                 {
 }
             );
         
     
-            var marker_abf5d0efd7ea1b8c9c0d1039e2cee3c6 = L.marker(
+            var marker_3b763271a72d533dcdb4938708cf4564 = L.marker(
                 [30.447764984, -97.671558968],
                 {
 }
-            ).addTo(marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8);
+            ).addTo(marker_cluster_77ded84dfe6957b058d66c161da343d0);
         
     
-            var icon_7f32e3c3a56c057da155be426e8c0503 = L.AwesomeMarkers.icon(
+            var icon_2f3c2093f96f27537afcf22696b9d78b = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -598,24 +550,24 @@
             );
         
     
-        var popup_b39357f9e2fb78305ba18bb7a2a57c5e = L.popup({
+        var popup_2843c4b048300258cf32461b17c86782 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_1eb32e04cf547b7a2e6b4c8a772269c1 = $(`<div id="html_1eb32e04cf547b7a2e6b4c8a772269c1" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Angela D Green</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.447764984,-97.671558968" target="_blank" style="color:#888;">2007 TASMANIAN TIGER TRCE  AUSTIN TX- 78728 4764</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_b39357f9e2fb78305ba18bb7a2a57c5e.setContent(html_1eb32e04cf547b7a2e6b4c8a772269c1);
+                var html_43135ca6a1463d701a8b5e29dca79496 = $(`<div id="html_43135ca6a1463d701a8b5e29dca79496" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Angela D Green</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.447764984,-97.671558968" target="_blank" style="color:#888;">2007 TASMANIAN TIGER TRCE  AUSTIN TX- 78728 4764</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_2843c4b048300258cf32461b17c86782.setContent(html_43135ca6a1463d701a8b5e29dca79496);
             
         
 
-        marker_abf5d0efd7ea1b8c9c0d1039e2cee3c6.bindPopup(popup_b39357f9e2fb78305ba18bb7a2a57c5e)
+        marker_3b763271a72d533dcdb4938708cf4564.bindPopup(popup_2843c4b048300258cf32461b17c86782)
         ;
 
         
     
     
-            marker_abf5d0efd7ea1b8c9c0d1039e2cee3c6.bindTooltip(
+            marker_3b763271a72d533dcdb4938708cf4564.bindTooltip(
                 `<div>
                      Angela D Green — Clean
                  </div>`,
@@ -625,17 +577,17 @@
             );
         
     
-                marker_abf5d0efd7ea1b8c9c0d1039e2cee3c6.setIcon(icon_7f32e3c3a56c057da155be426e8c0503);
+                marker_3b763271a72d533dcdb4938708cf4564.setIcon(icon_2f3c2093f96f27537afcf22696b9d78b);
             
     
-            var marker_d24bcf7ee5c7e876c253da58b8a939f0 = L.marker(
+            var marker_3a2c9fe53b4efeb2aedf52e08b647ea1 = L.marker(
                 [30.464981999, -97.687712991],
                 {
 }
-            ).addTo(marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8);
+            ).addTo(marker_cluster_77ded84dfe6957b058d66c161da343d0);
         
     
-            var icon_ae7d14d906080658858a186c5a886fa4 = L.AwesomeMarkers.icon(
+            var icon_5ee0df141cecf57373ac2d6fe72de601 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -646,24 +598,24 @@
             );
         
     
-        var popup_551b22db9d35064308981e6888d608e5 = L.popup({
+        var popup_08dbc97aef903ab79a2fb2322c8e4b07 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_a592caea857d355d1f13a4f36381abd4 = $(`<div id="html_a592caea857d355d1f13a4f36381abd4" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Karunarani Pulakhandam</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.464981999,-97.687712991" target="_blank" style="color:#888;">305 ESPRESSO DR  AUSTIN TX- 78728 1411</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_551b22db9d35064308981e6888d608e5.setContent(html_a592caea857d355d1f13a4f36381abd4);
+                var html_4d0448d7f350809311b87bfcd6db0540 = $(`<div id="html_4d0448d7f350809311b87bfcd6db0540" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Karunarani Pulakhandam</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.464981999,-97.687712991" target="_blank" style="color:#888;">305 ESPRESSO DR  AUSTIN TX- 78728 1411</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_08dbc97aef903ab79a2fb2322c8e4b07.setContent(html_4d0448d7f350809311b87bfcd6db0540);
             
         
 
-        marker_d24bcf7ee5c7e876c253da58b8a939f0.bindPopup(popup_551b22db9d35064308981e6888d608e5)
+        marker_3a2c9fe53b4efeb2aedf52e08b647ea1.bindPopup(popup_08dbc97aef903ab79a2fb2322c8e4b07)
         ;
 
         
     
     
-            marker_d24bcf7ee5c7e876c253da58b8a939f0.bindTooltip(
+            marker_3a2c9fe53b4efeb2aedf52e08b647ea1.bindTooltip(
                 `<div>
                      Karunarani Pulakhandam — Clean
                  </div>`,
@@ -673,17 +625,17 @@
             );
         
     
-                marker_d24bcf7ee5c7e876c253da58b8a939f0.setIcon(icon_ae7d14d906080658858a186c5a886fa4);
+                marker_3a2c9fe53b4efeb2aedf52e08b647ea1.setIcon(icon_5ee0df141cecf57373ac2d6fe72de601);
             
     
-            var marker_2075947c908718f57588c9ccd5500f19 = L.marker(
+            var marker_f103d6b03e4749b2cba307bf9a716133 = L.marker(
                 [30.259730984, -97.701105009],
                 {
 }
-            ).addTo(marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8);
+            ).addTo(marker_cluster_77ded84dfe6957b058d66c161da343d0);
         
     
-            var icon_21e4fe1c16e88bf9b2eee10b8c471af2 = L.AwesomeMarkers.icon(
+            var icon_f109c1ddca3b0edf17d5f77e4975b03a = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -694,24 +646,24 @@
             );
         
     
-        var popup_f369c0c76fb09232afd9448490441db3 = L.popup({
+        var popup_89059f4407b613ba029f4f476f6431fd = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_5d52948077df16e3f1b46e002cd53527 = $(`<div id="html_5d52948077df16e3f1b46e002cd53527" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Anita  Martinez</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.259730984,-97.701105009" target="_blank" style="color:#888;">819 GUNTER ST  AUSTIN TX- 78702 4020</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_f369c0c76fb09232afd9448490441db3.setContent(html_5d52948077df16e3f1b46e002cd53527);
+                var html_58d78ef7aa3780ebf0da1029b1812482 = $(`<div id="html_58d78ef7aa3780ebf0da1029b1812482" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Anita  Martinez</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.259730984,-97.701105009" target="_blank" style="color:#888;">819 GUNTER ST  AUSTIN TX- 78702 4020</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_89059f4407b613ba029f4f476f6431fd.setContent(html_58d78ef7aa3780ebf0da1029b1812482);
             
         
 
-        marker_2075947c908718f57588c9ccd5500f19.bindPopup(popup_f369c0c76fb09232afd9448490441db3)
+        marker_f103d6b03e4749b2cba307bf9a716133.bindPopup(popup_89059f4407b613ba029f4f476f6431fd)
         ;
 
         
     
     
-            marker_2075947c908718f57588c9ccd5500f19.bindTooltip(
+            marker_f103d6b03e4749b2cba307bf9a716133.bindTooltip(
                 `<div>
                      Anita  Martinez — Clean
                  </div>`,
@@ -721,17 +673,17 @@
             );
         
     
-                marker_2075947c908718f57588c9ccd5500f19.setIcon(icon_21e4fe1c16e88bf9b2eee10b8c471af2);
+                marker_f103d6b03e4749b2cba307bf9a716133.setIcon(icon_f109c1ddca3b0edf17d5f77e4975b03a);
             
     
-            var marker_cf22ef723b3d348cabfe9ad2a766dfbe = L.marker(
+            var marker_20b6eac060231976bf51ab068bf1407e = L.marker(
                 [30.490239524, -97.751375305],
                 {
 }
-            ).addTo(marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8);
+            ).addTo(marker_cluster_77ded84dfe6957b058d66c161da343d0);
         
     
-            var icon_85f70bafa69e23fd5ce27251c4a60441 = L.AwesomeMarkers.icon(
+            var icon_5e7af39c6d8f4d9b01f03e835ac88f47 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -742,24 +694,24 @@
             );
         
     
-        var popup_6ec08f117c92b04f044f89eb52a260f9 = L.popup({
+        var popup_aa74f30b952ccfc9c539e468cfb48c57 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_4cc168f927dd5396665c024bb26d6738 = $(`<div id="html_4cc168f927dd5396665c024bb26d6738" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Roshan   Kapadia</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.490239524,-97.751375305" target="_blank" style="color:#888;">14200 MCCOY LOOP 11  AUSTIN TX- 78717</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_6ec08f117c92b04f044f89eb52a260f9.setContent(html_4cc168f927dd5396665c024bb26d6738);
+                var html_f666071cc48804e429b8596b5deed400 = $(`<div id="html_f666071cc48804e429b8596b5deed400" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Roshan   Kapadia</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.490239524,-97.751375305" target="_blank" style="color:#888;">14200 MCCOY LOOP 11  AUSTIN TX- 78717</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_aa74f30b952ccfc9c539e468cfb48c57.setContent(html_f666071cc48804e429b8596b5deed400);
             
         
 
-        marker_cf22ef723b3d348cabfe9ad2a766dfbe.bindPopup(popup_6ec08f117c92b04f044f89eb52a260f9)
+        marker_20b6eac060231976bf51ab068bf1407e.bindPopup(popup_aa74f30b952ccfc9c539e468cfb48c57)
         ;
 
         
     
     
-            marker_cf22ef723b3d348cabfe9ad2a766dfbe.bindTooltip(
+            marker_20b6eac060231976bf51ab068bf1407e.bindTooltip(
                 `<div>
                      Roshan   Kapadia — Clean
                  </div>`,
@@ -769,17 +721,17 @@
             );
         
     
-                marker_cf22ef723b3d348cabfe9ad2a766dfbe.setIcon(icon_85f70bafa69e23fd5ce27251c4a60441);
+                marker_20b6eac060231976bf51ab068bf1407e.setIcon(icon_5e7af39c6d8f4d9b01f03e835ac88f47);
             
     
-            var marker_58d930fc7edb0d2a6ca1513409ff41f0 = L.marker(
+            var marker_4fdc8a62327f8bb16370879068a65f52 = L.marker(
                 [30.211827988, -97.812114012],
                 {
 }
-            ).addTo(marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8);
+            ).addTo(marker_cluster_77ded84dfe6957b058d66c161da343d0);
         
     
-            var icon_6a33eebe599c59ed0c4090b635f23c7c = L.AwesomeMarkers.icon(
+            var icon_fd2fa27affd3c3a714cc92891142d9c5 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -790,24 +742,24 @@
             );
         
     
-        var popup_09a78e824de277b17a3b896db14b2940 = L.popup({
+        var popup_9306fdfd43dc36ac65ba080eb3da7624 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_fd976d83612b27b71aa66275592bf6a9 = $(`<div id="html_fd976d83612b27b71aa66275592bf6a9" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Jordin Rivera</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.211827988,-97.812114012" target="_blank" style="color:#888;">2608 COCKBURN DR  AUSTIN TX- 78745 4341</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_09a78e824de277b17a3b896db14b2940.setContent(html_fd976d83612b27b71aa66275592bf6a9);
+                var html_5da1a942f962a7405fc14aca5b2e27f1 = $(`<div id="html_5da1a942f962a7405fc14aca5b2e27f1" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Jordin Rivera</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.211827988,-97.812114012" target="_blank" style="color:#888;">2608 COCKBURN DR  AUSTIN TX- 78745 4341</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_9306fdfd43dc36ac65ba080eb3da7624.setContent(html_5da1a942f962a7405fc14aca5b2e27f1);
             
         
 
-        marker_58d930fc7edb0d2a6ca1513409ff41f0.bindPopup(popup_09a78e824de277b17a3b896db14b2940)
+        marker_4fdc8a62327f8bb16370879068a65f52.bindPopup(popup_9306fdfd43dc36ac65ba080eb3da7624)
         ;
 
         
     
     
-            marker_58d930fc7edb0d2a6ca1513409ff41f0.bindTooltip(
+            marker_4fdc8a62327f8bb16370879068a65f52.bindTooltip(
                 `<div>
                      Jordin Rivera — Clean
                  </div>`,
@@ -817,17 +769,17 @@
             );
         
     
-                marker_58d930fc7edb0d2a6ca1513409ff41f0.setIcon(icon_6a33eebe599c59ed0c4090b635f23c7c);
+                marker_4fdc8a62327f8bb16370879068a65f52.setIcon(icon_fd2fa27affd3c3a714cc92891142d9c5);
             
     
-            var marker_5c4a6b54a580b01d7d7d2d16ec471ac9 = L.marker(
+            var marker_45f933f2976ab0226459bf49f1762f1a = L.marker(
                 [30.190232014, -97.740041966],
                 {
 }
-            ).addTo(marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8);
+            ).addTo(marker_cluster_77ded84dfe6957b058d66c161da343d0);
         
     
-            var icon_1ddc15cae2079747f5617ae745f06495 = L.AwesomeMarkers.icon(
+            var icon_cc721088a5665b527d09a369f9c043db = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -838,24 +790,24 @@
             );
         
     
-        var popup_39abe60e293f024b3ace688c56c24b07 = L.popup({
+        var popup_1ab60de824cdebe24ff67ee234de4e15 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_476f7c16a7c4c89b402732a4d06dc786 = $(`<div id="html_476f7c16a7c4c89b402732a4d06dc786" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Kathleen Croaff</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.190232014,-97.740041966" target="_blank" style="color:#888;">5804 NEEDLE NOOK CT  AUSTIN TX- 78744 4423</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_39abe60e293f024b3ace688c56c24b07.setContent(html_476f7c16a7c4c89b402732a4d06dc786);
+                var html_14eaf50d5475489c01ec45da391bcc2a = $(`<div id="html_14eaf50d5475489c01ec45da391bcc2a" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Kathleen Croaff</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.190232014,-97.740041966" target="_blank" style="color:#888;">5804 NEEDLE NOOK CT  AUSTIN TX- 78744 4423</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_1ab60de824cdebe24ff67ee234de4e15.setContent(html_14eaf50d5475489c01ec45da391bcc2a);
             
         
 
-        marker_5c4a6b54a580b01d7d7d2d16ec471ac9.bindPopup(popup_39abe60e293f024b3ace688c56c24b07)
+        marker_45f933f2976ab0226459bf49f1762f1a.bindPopup(popup_1ab60de824cdebe24ff67ee234de4e15)
         ;
 
         
     
     
-            marker_5c4a6b54a580b01d7d7d2d16ec471ac9.bindTooltip(
+            marker_45f933f2976ab0226459bf49f1762f1a.bindTooltip(
                 `<div>
                      Kathleen Croaff — Clean
                  </div>`,
@@ -865,17 +817,17 @@
             );
         
     
-                marker_5c4a6b54a580b01d7d7d2d16ec471ac9.setIcon(icon_1ddc15cae2079747f5617ae745f06495);
+                marker_45f933f2976ab0226459bf49f1762f1a.setIcon(icon_cc721088a5665b527d09a369f9c043db);
             
     
-            var marker_414fbaf1faef646c64d342c6e47c62c4 = L.marker(
+            var marker_8c2a7c9fefb183d8644e2cdcc6e9d092 = L.marker(
                 [30.374979009, -97.698491028],
                 {
 }
-            ).addTo(marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8);
+            ).addTo(marker_cluster_77ded84dfe6957b058d66c161da343d0);
         
     
-            var icon_d37ed0e36c69c78a1a9bbf58fd135beb = L.AwesomeMarkers.icon(
+            var icon_1438ce587e799af35ee3896607d45c22 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -886,24 +838,24 @@
             );
         
     
-        var popup_c632b54d1f31ad30fed5c50bc9efd957 = L.popup({
+        var popup_d1cab7668b8aa94c1df36ab5fe89fdeb = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_4a96bde9cef66a1c44f76e67bda5e946 = $(`<div id="html_4a96bde9cef66a1c44f76e67bda5e946" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Ana Terry Lopez</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.374979009,-97.698491028" target="_blank" style="color:#888;">1104 RED CLIFF DR  AUSTIN TX- 78758 5127</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_c632b54d1f31ad30fed5c50bc9efd957.setContent(html_4a96bde9cef66a1c44f76e67bda5e946);
+                var html_86800f63403e7303935d7adecdc87fe2 = $(`<div id="html_86800f63403e7303935d7adecdc87fe2" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Ana Terry Lopez</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.374979009,-97.698491028" target="_blank" style="color:#888;">1104 RED CLIFF DR  AUSTIN TX- 78758 5127</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_d1cab7668b8aa94c1df36ab5fe89fdeb.setContent(html_86800f63403e7303935d7adecdc87fe2);
             
         
 
-        marker_414fbaf1faef646c64d342c6e47c62c4.bindPopup(popup_c632b54d1f31ad30fed5c50bc9efd957)
+        marker_8c2a7c9fefb183d8644e2cdcc6e9d092.bindPopup(popup_d1cab7668b8aa94c1df36ab5fe89fdeb)
         ;
 
         
     
     
-            marker_414fbaf1faef646c64d342c6e47c62c4.bindTooltip(
+            marker_8c2a7c9fefb183d8644e2cdcc6e9d092.bindTooltip(
                 `<div>
                      Ana Terry Lopez — Clean
                  </div>`,
@@ -913,17 +865,17 @@
             );
         
     
-                marker_414fbaf1faef646c64d342c6e47c62c4.setIcon(icon_d37ed0e36c69c78a1a9bbf58fd135beb);
+                marker_8c2a7c9fefb183d8644e2cdcc6e9d092.setIcon(icon_1438ce587e799af35ee3896607d45c22);
             
     
-            var marker_9ebced59cbbbde08ca78eb7b1c5b6030 = L.marker(
+            var marker_207491f914944c5e0e87539deb550bf5 = L.marker(
                 [30.302234986, -97.639158972],
                 {
 }
-            ).addTo(marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8);
+            ).addTo(marker_cluster_77ded84dfe6957b058d66c161da343d0);
         
     
-            var icon_95a4633ce1f503882ecbe120c52225de = L.AwesomeMarkers.icon(
+            var icon_149da31cea277f4434e9931b731d3b6e = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -934,24 +886,24 @@
             );
         
     
-        var popup_08e8f298ad457a029fe88647a7b28676 = L.popup({
+        var popup_69ec8e5cd78d72df6be33df84a4c8375 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_bc1b163be1371c3c561a811137033763 = $(`<div id="html_bc1b163be1371c3c561a811137033763" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Lasonia Knight</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.302234986,-97.639158972" target="_blank" style="color:#888;">7100 SIEPEL DR  AUSTIN TX- 78724 3675</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_08e8f298ad457a029fe88647a7b28676.setContent(html_bc1b163be1371c3c561a811137033763);
+                var html_5e178a44e4ab66c60a355f01b8ca41c0 = $(`<div id="html_5e178a44e4ab66c60a355f01b8ca41c0" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Lasonia Knight</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.302234986,-97.639158972" target="_blank" style="color:#888;">7100 SIEPEL DR  AUSTIN TX- 78724 3675</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_69ec8e5cd78d72df6be33df84a4c8375.setContent(html_5e178a44e4ab66c60a355f01b8ca41c0);
             
         
 
-        marker_9ebced59cbbbde08ca78eb7b1c5b6030.bindPopup(popup_08e8f298ad457a029fe88647a7b28676)
+        marker_207491f914944c5e0e87539deb550bf5.bindPopup(popup_69ec8e5cd78d72df6be33df84a4c8375)
         ;
 
         
     
     
-            marker_9ebced59cbbbde08ca78eb7b1c5b6030.bindTooltip(
+            marker_207491f914944c5e0e87539deb550bf5.bindTooltip(
                 `<div>
                      Lasonia Knight — Clean
                  </div>`,
@@ -961,17 +913,17 @@
             );
         
     
-                marker_9ebced59cbbbde08ca78eb7b1c5b6030.setIcon(icon_95a4633ce1f503882ecbe120c52225de);
+                marker_207491f914944c5e0e87539deb550bf5.setIcon(icon_149da31cea277f4434e9931b731d3b6e);
             
     
-            var marker_e01c06ed4b3b01a44fec09999ce6778f = L.marker(
+            var marker_da9fca8a34138f14197afd2df21eb930 = L.marker(
                 [30.483026561, -97.793173677],
                 {
 }
-            ).addTo(marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8);
+            ).addTo(marker_cluster_77ded84dfe6957b058d66c161da343d0);
         
     
-            var icon_b5095dbea6cf6262c73c4ecdbcf50027 = L.AwesomeMarkers.icon(
+            var icon_38a7cae87d97e8cbd0746be47192791d = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -982,24 +934,24 @@
             );
         
     
-        var popup_3fcaa9cd1d30be9dd10575e0995c8737 = L.popup({
+        var popup_ad497f5666316f9542b048cef64dd768 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_8fa561cdec900ee645a7ec90d011799c = $(`<div id="html_8fa561cdec900ee645a7ec90d011799c" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Divya Chedimala</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.483026561,-97.793173677" target="_blank" style="color:#888;">10800 LAKELINE BLVD APT 13201 AUSTIN TX- 78717 1106</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_3fcaa9cd1d30be9dd10575e0995c8737.setContent(html_8fa561cdec900ee645a7ec90d011799c);
+                var html_523d16aabe251892b1f69448382dee00 = $(`<div id="html_523d16aabe251892b1f69448382dee00" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Divya Chedimala</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.483026561,-97.793173677" target="_blank" style="color:#888;">10800 LAKELINE BLVD APT 13201 AUSTIN TX- 78717 1106</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_ad497f5666316f9542b048cef64dd768.setContent(html_523d16aabe251892b1f69448382dee00);
             
         
 
-        marker_e01c06ed4b3b01a44fec09999ce6778f.bindPopup(popup_3fcaa9cd1d30be9dd10575e0995c8737)
+        marker_da9fca8a34138f14197afd2df21eb930.bindPopup(popup_ad497f5666316f9542b048cef64dd768)
         ;
 
         
     
     
-            marker_e01c06ed4b3b01a44fec09999ce6778f.bindTooltip(
+            marker_da9fca8a34138f14197afd2df21eb930.bindTooltip(
                 `<div>
                      Divya Chedimala — Clean
                  </div>`,
@@ -1009,17 +961,17 @@
             );
         
     
-                marker_e01c06ed4b3b01a44fec09999ce6778f.setIcon(icon_b5095dbea6cf6262c73c4ecdbcf50027);
+                marker_da9fca8a34138f14197afd2df21eb930.setIcon(icon_38a7cae87d97e8cbd0746be47192791d);
             
     
-            var marker_576bfb9d9c0d522089f6c69775921217 = L.marker(
+            var marker_edd76a384623e281201ba8189a566af1 = L.marker(
                 [30.324440994, -97.718320013],
                 {
 }
-            ).addTo(marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8);
+            ).addTo(marker_cluster_77ded84dfe6957b058d66c161da343d0);
         
     
-            var icon_7203e5aff85dba4cb02804cd72186d54 = L.AwesomeMarkers.icon(
+            var icon_397567615944c72d47b66d983a7ec2b3 = L.AwesomeMarkers.icon(
                 {
   "markerColor": "green",
   "iconColor": "white",
@@ -1030,24 +982,24 @@
             );
         
     
-        var popup_a90c859690c5d321bac757ed00d66bf6 = L.popup({
+        var popup_40103671147787588feb768ec32795d1 = L.popup({
   "maxWidth": 300,
 });
 
         
             
-                var html_c3563e66f03296d0bb8f483974222e4b = $(`<div id="html_c3563e66f03296d0bb8f483974222e4b" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Julia Moen</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.324440994,-97.718320013" target="_blank" style="color:#888;">5809 AVENUE F  AUSTIN TX- 78752 4507</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
-                popup_a90c859690c5d321bac757ed00d66bf6.setContent(html_c3563e66f03296d0bb8f483974222e4b);
+                var html_dc19050eaf97521729b504e70da234ad = $(`<div id="html_dc19050eaf97521729b504e70da234ad" style="width: 100.0%; height: 100.0%;">         <div style="font-family:sans-serif;max-width:300px;">             <b style="font-size:13px;">Julia Moen</b><br/>             <span style="color:#666;font-size:11px;">Listed Family Home</span><br/>             <span style="color:#888;font-size:11px;"><a href="https://www.google.com/maps/search/?api=1&query=30.324440994,-97.718320013" target="_blank" style="color:#888;">5809 AVENUE F  AUSTIN TX- 78752 4507</a></span><br/><br/>                                       <b>Capacity:</b> 3 children<br/>             <span style="color:#666;font-size:11px;">Status: Active</span>         </div>         </div>`)[0];
+                popup_40103671147787588feb768ec32795d1.setContent(html_dc19050eaf97521729b504e70da234ad);
             
         
 
-        marker_576bfb9d9c0d522089f6c69775921217.bindPopup(popup_a90c859690c5d321bac757ed00d66bf6)
+        marker_edd76a384623e281201ba8189a566af1.bindPopup(popup_40103671147787588feb768ec32795d1)
         ;
 
         
     
     
-            marker_576bfb9d9c0d522089f6c69775921217.bindTooltip(
+            marker_edd76a384623e281201ba8189a566af1.bindTooltip(
                 `<div>
                      Julia Moen — Clean
                  </div>`,
@@ -1057,13 +1009,13 @@
             );
         
     
-                marker_576bfb9d9c0d522089f6c69775921217.setIcon(icon_7203e5aff85dba4cb02804cd72186d54);
+                marker_edd76a384623e281201ba8189a566af1.setIcon(icon_397567615944c72d47b66d983a7ec2b3);
             
     
-            marker_cluster_b444e0bf43f171b7f8fa8ab09e502ab8.addTo(feature_group_9de5ed2a78204014211e5f7c3a4d425e);
+            marker_cluster_77ded84dfe6957b058d66c161da343d0.addTo(feature_group_1cc659268a5d96b74e1721569f9fa5b3);
         
     
-            feature_group_9de5ed2a78204014211e5f7c3a4d425e.addTo(map_f197b6c47a73388a0086847f249d0541);
+            feature_group_1cc659268a5d96b74e1721569f9fa5b3.addTo(map_605aec5b1c65d90db0134dfedf76da40);
         
 </script>
 </html>
