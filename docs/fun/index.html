@@ -158,6 +158,7 @@
   <header>
     <h1>🎉 Fun Data</h1>
     <p>The lighter side of Austin open data</p>
+    <p id="last-updated" style="margin-top:0.6rem;font-size:0.75rem;color:var(--text-muted);"></p>
   </header>
 
   <nav class="nav">
@@ -281,6 +282,14 @@
         const res = await fetch("data.json");
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
+        if (data.updated) {
+          var d = new Date(data.updated);
+          document.getElementById("last-updated").textContent =
+            "Last updated: " + d.toLocaleDateString("en-US", {
+              year: "numeric", month: "long", day: "numeric",
+              hour: "2-digit", minute: "2-digit", timeZoneName: "short"
+            });
+        }
         if (data.bars) renderBars(data.bars);
         if (data.coyotes) renderCoyotes(data.coyotes);
         if (data.graffiti) renderGraffiti(data.graffiti);

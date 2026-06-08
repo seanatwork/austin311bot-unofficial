@@ -268,7 +268,7 @@
         var chips = document.querySelectorAll(".chip");
         chips.forEach(function (c) { c.classList.toggle("active", c.dataset.value === value); });
 
-        var items = value === "__all__" ? ALL : ALL.filter(function (i) { return i.category === value; });
+        var items = value === "__all__" ? ALL.slice().sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); }) : ALL.filter(function (i) { return i.category === value; });
         document.getElementById("spoke-title").textContent = value === "__all__" ? "All categories" : value;
         document.getElementById("spoke-meta").textContent = items.length + (items.length === 1 ? " complaint" : " complaints");
         renderList(items);
