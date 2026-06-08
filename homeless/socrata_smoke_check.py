@@ -189,6 +189,12 @@ def is_encampment_report_client_side(record: dict, field_mapping: dict) -> bool:
         if _word_in(kw, status_text):
             return True
     
+    # Fallback for asterisk-formatted HSO mentions like "Homeless* *Strategy* *Office"
+    # Strip asterisks and recheck in case the city used asterisks as word separators.
+    normalized_status = status_text.replace("*", " ")
+    if "homeless strategy" in normalized_status:
+        return True
+    
     # Trash/debris only counts when "homeless" also appears as a whole word
     has_trash = any(_word_in(kw, full_text) for kw in TRASH_KEYWORDS)
     has_homeless = _word_in("homeless", full_text)
@@ -251,6 +257,9 @@ def build_soql_query(field_mapping: dict, days_back: int = 7) -> dict:
         keyword_filters.extend([
             f"contains(upper({notes_field}), 'HOMELESS STRATEGY')",
             f"contains(upper({notes_field}), 'HSO')",
+            # Catch asterisk variants like "Homeless* *Strategy* *Office" where
+            # asterisks break the contiguous "HOMELESS STRATEGY" substring match
+            f"(contains(upper({notes_field}), 'HOMELESS') AND contains(upper({notes_field}), 'STRATEGY'))",
         ])
     
     if keyword_filters:

@@ -161,6 +161,13 @@ def _is_encampment_report(record: dict) -> bool:
         if _word_in(kw, status_text):
             return True
 
+    # Fallback for asterisk-formatted HSO mentions like "Homeless* *Strategy* *Office"
+    # The city sometimes writes status_notes with asterisks between words, which
+    # breaks the word-boundary regex in _word_in(). Strip asterisks and recheck.
+    normalized_status = status_text.replace("*", " ")
+    if "homeless strategy" in normalized_status:
+        return True
+
     # Trash/debris only counts when "homeless" also appears as a whole word
     has_trash = any(_word_in(kw, full_text) for kw in TRASH_KEYWORDS)
     has_homeless = _word_in("homeless", full_text)
