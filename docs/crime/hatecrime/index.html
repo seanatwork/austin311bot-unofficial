@@ -76,7 +76,7 @@
   <div id="panel">
     <div id="panel-title">⚠️ APD Hate Crime Incidents</div>
     <div id="panel-subtitle">Austin Police Department — 2017 to present</div>
-    <div id="last-ran">Last ran: 2026-06-09 11:31 AM CDT</div>
+    <div id="last-ran">Last ran: 2026-06-10 11:57 AM CDT</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Crime Map</a>
       <a class="fbtn" href="../trends/">← Crime Trends</a>
@@ -87,7 +87,7 @@
   <div id="stats">
     <div class="stats-inner">
       <div class="stat">
-        <div class="stat-value" style="color:#ef4444;">307</div>
+        <div class="stat-value" style="color:#ef4444;">311</div>
         <div class="stat-label">Total incidents</div>
         <div class="stat-sub">2017–2026</div>
       </div>
@@ -96,11 +96,11 @@
         <div class="stat-label">Avg per year</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#22c55e;">5</div>
+        <div class="stat-value" style="color:#22c55e;">9</div>
         <div class="stat-label">2026 incidents</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#3b82f6;font-size:0.95rem;">+140%</div>
+        <div class="stat-value" style="color:#3b82f6;font-size:0.95rem;">+148%</div>
         <div class="stat-label">3-yr growth</div>
       </div>
       <div class="stat">
@@ -119,7 +119,7 @@
 
     <div class="chart-block">
       <div class="chart-title">📈 Yearly trend — hate crimes in Austin</div>
-      <div class="chart-sub">2017 to present · +140% growth (3-year avg comparison)</div>
+      <div class="chart-sub">2017 to present · +148% growth (3-year avg comparison)</div>
       <div class="chart-container" style="height:300px;"><canvas id="yearlyChart"></canvas></div>
     </div>
 
@@ -157,7 +157,7 @@
   </footer>
 
   <script>
-    const DATA = {"years": ["2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026"], "yearlyCounts": [17, 20, 11, 24, 26, 43, 51, 60, 50, 5], "biasData": [{"name": "Anti-Black", "count": 75, "color": "#1a1a2e"}, {"name": "Anti-Gay (Male)", "count": 61, "color": "#e91e63"}, {"name": "Anti-Jewish", "count": 44, "color": "#1565c0"}, {"name": "Anti-Hispanic", "count": 24, "color": "#ff6f00"}, {"name": "Anti-LGBTQ+ (Mixed)", "count": 22, "color": "#ad1457"}, {"name": "Anti-White", "count": 15, "color": "#78909c"}, {"name": "Anti-Transgender", "count": 15, "color": "#9c27b0"}, {"name": "Anti-Multiple Biases", "count": 11, "color": "#37474f"}, {"name": "Anti-Muslim", "count": 10, "color": "#2e7d32"}, {"name": "Anti-Asian", "count": 9, "color": "#00838f"}, {"name": "Anti-Religion (Other)", "count": 6, "color": "#4a148c"}, {"name": "Anti-Lesbian", "count": 3, "color": "#f06292"}, {"name": "Anti-Arab", "count": 3, "color": "#558b2f"}, {"name": "Anti-Female", "count": 2, "color": "#c62828"}, {"name": "Anti-Disability", "count": 2, "color": "#6a1b9a"}, {"name": "Anti-Other Race/Ethnicity", "count": 2, "color": "#546e7a"}, {"name": "Anti-Bisexual", "count": 1, "color": "#ce93d8"}, {"name": "Anti-White/Anti-Hispanic or Latino", "count": 1, "color": "#94a3b8"}, {"name": "Anti-Multi Races, Group", "count": 1, "color": "#94a3b8"}], "offenseData": [{"name": "Criminal Mischief", "count": 59}, {"name": "Assault", "count": 55}, {"name": "Harassment", "count": 28}, {"name": "Assault With Injury", "count": 28}, {"name": "Terroristic Threat", "count": 27}, {"name": "Aggravated Assault", "count": 27}, {"name": "Assault By Threat", "count": 14}, {"name": "Simple Assault", "count": 8}, {"name": "Theft", "count": 8}, {"name": "Intimidation", "count": 7}, {"name": "Robbery", "count": 6}, {"name": "Graffiti", "count": 5}, {"name": "Assault By Contact", "count": 5}, {"name": "Bomb Threat", "count": 4}, {"name": "Murder", "count": 4}], "locationData": [{"name": "Residence/Home", "count": 76}, {"name": "Hwy/Road/Alley/Street/Sidewalk", "count": 41}, {"name": "Parking/Drop Lot/Garage", "count": 21}, {"name": "Bar/Nightclub", "count": 20}, {"name": "Streets/Highway/Road/Alley", "count": 20}, {"name": "Church/Synagogue/Temple/Mosque", "count": 18}, {"name": "Commercial/Office Building", "count": 11}, {"name": "Park/Playground", "count": 8}, {"name": "Air/Bus/Train Terminal", "count": 7}, {"name": "Convenience Store", "count": 7}, {"name": "Highway/Road/Alley/Street/Sidewalk", "count": 6}, {"name": "Restaurant", "count": 5}, {"name": "Parking Lot/Garage", "count": 5}, {"name": "School-Elementary/Secondary", "count": 5}, {"name": "Other/Unknown", "count": 5}], "offenderData": [{"name": "Unknown", "count": 84}, {"name": "White/Non-Hispanic", "count": 75}, {"name": "White/Hispanic", "count": 44}, {"name": "Black or African American/Non-Hispanic", "count": 21}, {"name": "White/Unknown", "count": 19}, {"name": "Black/Non-Hispanic", "count": 17}, {"name": "White/NotHispanic", "count": 10}, {"name": "White/Not Hispanic", "count": 9}, {"name": "Asian/Non-Hispanic", "count": 5}, {"name": "White/Hispanic or Latino", "count": 5}, {"name": "Group of Multiple Races", "count": 3}, {"name": "Black/Unknown", "count": 3}, {"name": "White/Hispanic (2) White/NonHispanic (2)", "count": 1}, {"name": "Black or African American/Not Hispanic", "count": 1}, {"name": "White/Non-Hispanic/Hispanic", "count": 1}, {"name": "White/Hispanic & Non-Hispanic", "count": 1}, {"name": "White & Asian/Hispanic & Non-Hispanic", "count": 1}, {"name": "Asian/NotHispanic", "count": 1}, {"name": "White/Black/Non-Hispanic", "count": 1}, {"name": "Unknown/Hispanic", "count": 1}, {"name": "Black/Not Hispanic", "count": 1}, {"name": "White/Hispanic (3)", "count": 1}, {"name": "Black/NotHispanic", "count": 1}, {"name": "Black and White/Non-Hispanic", "count": 1}]};
+    const DATA = {"years": ["2017", "2018", "2019", "2020", "2021", "2022", "2023", "2024", "2025", "2026"], "yearlyCounts": [17, 20, 11, 24, 26, 43, 51, 60, 50, 9], "biasData": [{"name": "Anti-Black", "count": 75, "color": "#1a1a2e"}, {"name": "Anti-Gay (Male)", "count": 62, "color": "#e91e63"}, {"name": "Anti-Jewish", "count": 44, "color": "#1565c0"}, {"name": "Anti-Hispanic", "count": 24, "color": "#ff6f00"}, {"name": "Anti-LGBTQ+ (Mixed)", "count": 23, "color": "#ad1457"}, {"name": "Anti-White", "count": 15, "color": "#78909c"}, {"name": "Anti-Transgender", "count": 15, "color": "#9c27b0"}, {"name": "Anti-Muslim", "count": 11, "color": "#2e7d32"}, {"name": "Anti-Multiple Biases", "count": 11, "color": "#37474f"}, {"name": "Anti-Asian", "count": 9, "color": "#00838f"}, {"name": "Anti-Religion (Other)", "count": 6, "color": "#4a148c"}, {"name": "Anti-Arab", "count": 4, "color": "#558b2f"}, {"name": "Anti-Lesbian", "count": 3, "color": "#f06292"}, {"name": "Anti-Female", "count": 2, "color": "#c62828"}, {"name": "Anti-Disability", "count": 2, "color": "#6a1b9a"}, {"name": "Anti-Other Race/Ethnicity", "count": 2, "color": "#546e7a"}, {"name": "Anti-Bisexual", "count": 1, "color": "#ce93d8"}, {"name": "Anti-White/Anti-Hispanic or Latino", "count": 1, "color": "#94a3b8"}, {"name": "Anti-Multi Races, Group", "count": 1, "color": "#94a3b8"}], "offenseData": [{"name": "Criminal Mischief", "count": 59}, {"name": "Assault", "count": 55}, {"name": "Harassment", "count": 30}, {"name": "Assault With Injury", "count": 28}, {"name": "Terroristic Threat", "count": 28}, {"name": "Aggravated Assault", "count": 27}, {"name": "Assault By Threat", "count": 14}, {"name": "Simple Assault", "count": 8}, {"name": "Theft", "count": 8}, {"name": "Intimidation", "count": 7}, {"name": "Robbery", "count": 6}, {"name": "Assault By Contact", "count": 5}, {"name": "Graffiti", "count": 5}, {"name": "Bomb Threat", "count": 4}, {"name": "Murder", "count": 4}], "locationData": [{"name": "Residence/Home", "count": 77}, {"name": "Hwy/Road/Alley/Street/Sidewalk", "count": 42}, {"name": "Parking/Drop Lot/Garage", "count": 21}, {"name": "Bar/Nightclub", "count": 20}, {"name": "Streets/Highway/Road/Alley", "count": 20}, {"name": "Church/Synagogue/Temple/Mosque", "count": 18}, {"name": "Commercial/Office Building", "count": 11}, {"name": "Park/Playground", "count": 8}, {"name": "Air/Bus/Train Terminal", "count": 7}, {"name": "Convenience Store", "count": 7}, {"name": "Highway/Road/Alley/Street/Sidewalk", "count": 6}, {"name": "Restaurant", "count": 6}, {"name": "Parking Lot/Garage", "count": 5}, {"name": "School-Elementary/Secondary", "count": 5}, {"name": "Other/Unknown", "count": 5}], "offenderData": [{"name": "Unknown", "count": 85}, {"name": "White/Non-Hispanic", "count": 77}, {"name": "White/Hispanic", "count": 44}, {"name": "Black or African American/Non-Hispanic", "count": 21}, {"name": "White/Unknown", "count": 19}, {"name": "Black/Non-Hispanic", "count": 18}, {"name": "White/NotHispanic", "count": 10}, {"name": "White/Not Hispanic", "count": 9}, {"name": "Asian/Non-Hispanic", "count": 5}, {"name": "White/Hispanic or Latino", "count": 5}, {"name": "Group of Multiple Races", "count": 3}, {"name": "Black/Unknown", "count": 3}, {"name": "White/Hispanic (2) White/NonHispanic (2)", "count": 1}, {"name": "Black or African American/Not Hispanic", "count": 1}, {"name": "White/Non-Hispanic/Hispanic", "count": 1}, {"name": "White/Hispanic & Non-Hispanic", "count": 1}, {"name": "White & Asian/Hispanic & Non-Hispanic", "count": 1}, {"name": "Asian/NotHispanic", "count": 1}, {"name": "White/Black/Non-Hispanic", "count": 1}, {"name": "Unknown/Hispanic", "count": 1}, {"name": "Black/Not Hispanic", "count": 1}, {"name": "White/Hispanic (3)", "count": 1}, {"name": "Black/NotHispanic", "count": 1}, {"name": "Black and White/Non-Hispanic", "count": 1}]};
 
     const isDark   = document.documentElement.classList.contains("dark");
     const grid     = isDark ? "#252b3b" : "#e8ecf0";
