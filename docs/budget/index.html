@@ -192,7 +192,7 @@
   <div id="panel">
     <div id="panel-title">💰 Austin General Fund — FY2026</div>
     <div id="panel-subtitle">Adopted budget by department · actuals through Q2 (Oct 2025–Mar 2026)</div>
-    <div id="last-updated">Updated: 2026-06-12</div>
+    <div id="last-updated">Updated: 2026-06-13</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Austin 311 Home</a>
     </div>
@@ -201,19 +201,19 @@
   <div id="stats">
     <div class="stats-inner">
       <div class="stat">
-        <div class="stat-value" style="color:#60a5fa;">$1.41B</div>
+        <div class="stat-value" style="color:#60a5fa;">$1.56B</div>
         <div class="stat-label">Total adopted</div>
         <div class="stat-sub">FY2026 General Fund</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#f87171;">62.7%</div>
+        <div class="stat-value" style="color:#f87171;">64.5%</div>
         <div class="stat-label">Public safety</div>
         <div class="stat-sub">Police + Fire + EMS</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#fbbf24;">58.5%</div>
+        <div class="stat-value" style="color:#fbbf24;">59.3%</div>
         <div class="stat-label">Spent through Q2</div>
-        <div class="stat-sub">$825M of $1.41B</div>
+        <div class="stat-sub">$925M of $1.56B</div>
       </div>
     </div>
   </div>
@@ -311,39 +311,39 @@
     const DEPTS = [
       {
             "name": "Police (APD)",
-            "budget": 372556518.0,
-            "spent": 233007956.94,
+            "budget": 678161982.0,
+            "spent": 419839256.94,
             "color": "#ef4444"
       },
       {
             "name": "Fire",
-            "budget": 267657893.0,
-            "spent": 171936216.56,
+            "budget": 270470129.0,
+            "spent": 175601671.02,
             "color": "#f97316"
       },
       {
-            "name": "EMS",
-            "budget": 244228264.0,
-            "spent": 142738392.17,
-            "color": "#f59e0b"
-      },
-      {
             "name": "Parks & Recreation",
-            "budget": 132226395.8,
-            "spent": 71319694.53,
+            "budget": 139357050.2,
+            "spent": 75765946.83,
             "color": "#22c55e"
       },
       {
             "name": "Public Library",
-            "budget": 79796440.0,
-            "spent": 47368676.62,
+            "budget": 80248550.0,
+            "spent": 47416430.4,
             "color": "#10b981"
       },
       {
             "name": "Public Health",
-            "budget": 64115632.0,
-            "spent": 36636438.19,
+            "budget": 66561276.0,
+            "spent": 38159335.93,
             "color": "#06b6d4"
+      },
+      {
+            "name": "EMS",
+            "budget": 57932244.0,
+            "spent": 39933671.09,
+            "color": "#f59e0b"
       },
       {
             "name": "Nondepartmental",
@@ -352,16 +352,22 @@
             "color": "#64748b"
       },
       {
+            "name": "Municipal Court",
+            "budget": 42881034.0,
+            "spent": 23253240.43,
+            "color": "#6366f1"
+      },
+      {
             "name": "Social Services (Homeless)",
             "budget": 38705288.0,
             "spent": 10537512.88,
             "color": "#8b5cf6"
       },
       {
-            "name": "Municipal Court",
-            "budget": 36480182.0,
-            "spent": 19763126.83,
-            "color": "#6366f1"
+            "name": "Animal Services",
+            "budget": 25789345.0,
+            "spent": 14359630.01,
+            "color": "#22c55e"
       },
       {
             "name": "Social Services (Health)",
@@ -370,40 +376,34 @@
             "color": "#a78bfa"
       },
       {
-            "name": "Animal Services",
-            "budget": 24425749.0,
-            "spent": 13617967.45,
-            "color": "#22c55e"
-      },
-      {
             "name": "Forensic Science",
-            "budget": 13239573.0,
-            "spent": 7927585.35,
+            "budget": 18658859.0,
+            "spent": 8149809.73,
             "color": "#6366f1"
       },
       {
+            "name": "Arts & Culture",
+            "budget": 13520098.0,
+            "spent": 6654494.58,
+            "color": "#ec4899"
+      },
+      {
             "name": "Planning",
-            "budget": 13127832.0,
-            "spent": 7528870.86,
+            "budget": 13152332.0,
+            "spent": 7545315.76,
             "color": "#64748b"
       },
       {
             "name": "Housing",
-            "budget": 11252465.0,
-            "spent": 6843505.06,
+            "budget": 12805255.0,
+            "spent": 7563092.16,
             "color": "#8b5cf6"
       },
       {
             "name": "Homeless Strategy & Ops",
-            "budget": 9943869.0,
-            "spent": 2634131.79,
+            "budget": 9965869.0,
+            "spent": 2646647.97,
             "color": "#a78bfa"
-      },
-      {
-            "name": "Arts & Culture",
-            "budget": 9265752.0,
-            "spent": 5826031.38,
-            "color": "#ec4899"
       },
       {
             "name": "Social Services (Courts)",
@@ -427,42 +427,42 @@
     const BREAKDOWN = {
       "Police (APD)": {
             "Labor": {
-                  "budget": 188741835.0,
-                  "spent": 137265371.11
+                  "budget": 352195881.0,
+                  "spent": 233420599.65
             },
             "Benefits": {
-                  "budget": 62152334.0,
-                  "spent": 34807650.9
+                  "budget": 210741980.0,
+                  "spent": 126316743.76
             },
             "Contracted Services": {
-                  "budget": 2261463.0,
-                  "spent": 1054644.95
+                  "budget": 2218827.0,
+                  "spent": 1051195.71
             },
             "Technology": {
-                  "budget": 32847390.0,
+                  "budget": 29513570.0,
                   "spent": 19366805.2
             },
             "Facilities & Fleet": {
-                  "budget": 20664208.0,
-                  "spent": 7863989.31
+                  "budget": 20023982.0,
+                  "spent": 7724403.71
             },
             "Supplies & Equip.": {
-                  "budget": 5462364.0,
-                  "spent": 2347559.45
+                  "budget": 5020962.0,
+                  "spent": 2309978.83
             },
             "Grants": {
-                  "budget": 560672.0,
-                  "spent": 360637.83
+                  "budget": 102500.0,
+                  "spent": 14809.55
             },
             "Transfers & Other": {
-                  "budget": 59866252.0,
-                  "spent": 29941298.19
+                  "budget": 58344280.0,
+                  "spent": 29634720.53
             }
       },
       "Fire": {
             "Labor": {
                   "budget": 162895013.0,
-                  "spent": 111728223.75
+                  "spent": 114812412.19
             },
             "Benefits": {
                   "budget": 60963286.0,
@@ -474,87 +474,53 @@
             },
             "Technology": {
                   "budget": 9720121.0,
-                  "spent": 5187401.38
+                  "spent": 5182721.38
             },
             "Facilities & Fleet": {
                   "budget": 10782228.0,
                   "spent": 5284727.11
             },
             "Supplies & Equip.": {
-                  "budget": 4791180.0,
-                  "spent": 1901674.85
+                  "budget": 7603416.0,
+                  "spent": 2305143.01
             },
             "Transfers & Other": {
                   "budget": 16309942.0,
-                  "spent": 8713834.73
-            }
-      },
-      "EMS": {
-            "Labor": {
-                  "budget": 152186852.0,
-                  "spent": 92354425.13
-            },
-            "Benefits": {
-                  "budget": 53603407.0,
-                  "spent": 30954796.38
-            },
-            "Contracted Services": {
-                  "budget": 697051.0,
-                  "spent": 365197.07
-            },
-            "Technology": {
-                  "budget": 6699488.0,
-                  "spent": 3821654.2
-            },
-            "Facilities & Fleet": {
-                  "budget": 7302147.0,
-                  "spent": 3325258.18
-            },
-            "Supplies & Equip.": {
-                  "budget": 5968333.0,
-                  "spent": 2636102.64
-            },
-            "Grants": {
-                  "budget": 10000.0,
-                  "spent": 0.0
-            },
-            "Transfers & Other": {
-                  "budget": 17760986.0,
-                  "spent": 9280958.57
+                  "spent": 8896312.59
             }
       },
       "Parks & Recreation": {
             "Labor": {
-                  "budget": 67426998.0,
-                  "spent": 39363585.75
+                  "budget": 66981424.0,
+                  "spent": 38947128.07
             },
             "Benefits": {
-                  "budget": 28459960.8,
-                  "spent": 16322889.11
+                  "budget": 27577207.2,
+                  "spent": 15833902.47
             },
             "Contracted Services": {
-                  "budget": 5632856.0,
-                  "spent": 1764657.06
+                  "budget": 11282960.0,
+                  "spent": 3662879.0
             },
             "Technology": {
-                  "budget": 6343211.0,
-                  "spent": 3635983.96
+                  "budget": 6072313.0,
+                  "spent": 3506813.18
             },
             "Facilities & Fleet": {
-                  "budget": 12139433.0,
-                  "spent": 6231294.78
+                  "budget": 12444437.0,
+                  "spent": 7000492.24
             },
             "Supplies & Equip.": {
-                  "budget": 4216967.0,
-                  "spent": 1390195.1
+                  "budget": 6769525.0,
+                  "spent": 4055796.48
             },
             "Grants": {
                   "budget": 105166.0,
                   "spent": 0.0
             },
             "Transfers & Other": {
-                  "budget": 7901804.0,
-                  "spent": 2611088.77
+                  "budget": 8124018.0,
+                  "spent": 2758935.39
             }
       },
       "Public Library": {
@@ -568,23 +534,23 @@
             },
             "Contracted Services": {
                   "budget": 708977.0,
-                  "spent": 448005.68
+                  "spent": 452074.1
             },
             "Technology": {
-                  "budget": 19624281.0,
-                  "spent": 10951015.82
+                  "budget": 19624481.0,
+                  "spent": 10951540.68
             },
             "Facilities & Fleet": {
                   "budget": 2563278.0,
                   "spent": 1761675.65
             },
             "Supplies & Equip.": {
-                  "budget": 5009222.0,
-                  "spent": 1728113.27
+                  "budget": 5458732.0,
+                  "spent": 1769194.73
             },
             "Transfers & Other": {
-                  "budget": 4842345.0,
-                  "spent": 3111903.97
+                  "budget": 4844745.0,
+                  "spent": 3113983.01
             }
       },
       "Public Health": {
@@ -593,32 +559,66 @@
                   "spent": 16834753.25
             },
             "Benefits": {
-                  "budget": 14599353.0,
-                  "spent": 7405973.11
+                  "budget": 14870705.0,
+                  "spent": 7549351.13
             },
             "Contracted Services": {
-                  "budget": 883695.0,
-                  "spent": 177170.85
+                  "budget": 1834487.0,
+                  "spent": 957947.79
             },
             "Technology": {
-                  "budget": 6108947.0,
-                  "spent": 3605286.87
+                  "budget": 6111517.0,
+                  "spent": 3605502.81
             },
             "Facilities & Fleet": {
-                  "budget": 2739259.0,
-                  "spent": 538636.69
+                  "budget": 2793259.0,
+                  "spent": 562936.29
             },
             "Supplies & Equip.": {
-                  "budget": 775384.0,
-                  "spent": 126765.56
+                  "budget": 976542.0,
+                  "spent": 256388.76
             },
             "Grants": {
-                  "budget": 2542204.0,
-                  "spent": 1246760.39
+                  "budget": 3420204.0,
+                  "spent": 1598975.61
             },
             "Transfers & Other": {
-                  "budget": 9969745.0,
-                  "spent": 6701091.47
+                  "budget": 10057517.0,
+                  "spent": 6793480.29
+            }
+      },
+      "EMS": {
+            "Labor": {
+                  "budget": 6403116.0,
+                  "spent": 11904454.39
+            },
+            "Benefits": {
+                  "budget": 11821273.0,
+                  "spent": 7096613.52
+            },
+            "Contracted Services": {
+                  "budget": 1576737.0,
+                  "spent": 560876.83
+            },
+            "Technology": {
+                  "budget": 6699488.0,
+                  "spent": 3821654.2
+            },
+            "Facilities & Fleet": {
+                  "budget": 7368147.0,
+                  "spent": 3370246.24
+            },
+            "Supplies & Equip.": {
+                  "budget": 6078933.0,
+                  "spent": 2702979.9
+            },
+            "Grants": {
+                  "budget": 10000.0,
+                  "spent": 0.0
+            },
+            "Transfers & Other": {
+                  "budget": 17974550.0,
+                  "spent": 10476846.01
             }
       },
       "Nondepartmental": {
@@ -635,6 +635,36 @@
                   "spent": 21323596.03
             }
       },
+      "Municipal Court": {
+            "Labor": {
+                  "budget": 12917909.0,
+                  "spent": 8663767.7
+            },
+            "Benefits": {
+                  "budget": 7857989.0,
+                  "spent": 4779407.19
+            },
+            "Contracted Services": {
+                  "budget": 9224009.0,
+                  "spent": 3048373.54
+            },
+            "Technology": {
+                  "budget": 2522864.0,
+                  "spent": 1069400.65
+            },
+            "Facilities & Fleet": {
+                  "budget": 4138372.0,
+                  "spent": 2096404.08
+            },
+            "Supplies & Equip.": {
+                  "budget": 176131.0,
+                  "spent": 85566.54
+            },
+            "Transfers & Other": {
+                  "budget": 6043760.0,
+                  "spent": 3534246.94
+            }
+      },
       "Social Services (Homeless)": {
             "Grants": {
                   "budget": 39492782.0,
@@ -645,34 +675,38 @@
                   "spent": 0.0
             }
       },
-      "Municipal Court": {
+      "Animal Services": {
             "Labor": {
-                  "budget": 12917909.0,
-                  "spent": 8663767.7
+                  "budget": 9484295.0,
+                  "spent": 5811912.14
             },
             "Benefits": {
-                  "budget": 5037379.0,
-                  "spent": 2970557.91
+                  "budget": 4453568.0,
+                  "spent": 2646120.99
             },
             "Contracted Services": {
-                  "budget": 6793199.0,
-                  "spent": 1678207.54
+                  "budget": 2550934.0,
+                  "spent": 1213617.33
             },
             "Technology": {
-                  "budget": 1512180.0,
-                  "spent": 877978.09
+                  "budget": 1282909.0,
+                  "spent": 733232.75
             },
             "Facilities & Fleet": {
-                  "budget": 4138372.0,
-                  "spent": 2096404.08
+                  "budget": 1551558.0,
+                  "spent": 433885.14
             },
             "Supplies & Equip.": {
-                  "budget": 102961.0,
-                  "spent": 49799.32
+                  "budget": 2231928.0,
+                  "spent": 1121805.34
+            },
+            "Grants": {
+                  "budget": 1000.0,
+                  "spent": 0.0
             },
             "Transfers & Other": {
-                  "budget": 5978182.0,
-                  "spent": 3450338.4
+                  "budget": 4233153.0,
+                  "spent": 2399056.32
             }
       },
       "Social Services (Health)": {
@@ -693,68 +727,64 @@
                   "spent": -460000.0
             }
       },
-      "Animal Services": {
-            "Labor": {
-                  "budget": 9484295.0,
-                  "spent": 5716578.4
-            },
-            "Benefits": {
-                  "budget": 4453568.0,
-                  "spent": 2646120.99
-            },
-            "Contracted Services": {
-                  "budget": 2550934.0,
-                  "spent": 1213617.33
-            },
-            "Technology": {
-                  "budget": 1200909.0,
-                  "spent": 693402.81
-            },
-            "Facilities & Fleet": {
-                  "budget": 1344084.0,
-                  "spent": 390020.76
-            },
-            "Supplies & Equip.": {
-                  "budget": 1183806.0,
-                  "spent": 584334.94
-            },
-            "Grants": {
-                  "budget": 1000.0,
-                  "spent": 0.0
-            },
-            "Transfers & Other": {
-                  "budget": 4207153.0,
-                  "spent": 2373892.22
-            }
-      },
       "Forensic Science": {
             "Labor": {
                   "budget": 7368917.0,
-                  "spent": 4836098.54
+                  "spent": 4843674.7
             },
             "Benefits": {
                   "budget": 3488346.0,
                   "spent": 2112044.49
             },
             "Contracted Services": {
-                  "budget": 172385.0,
-                  "spent": 68388.81
+                  "budget": 5297699.0,
+                  "spent": 70013.81
             },
             "Technology": {
                   "budget": 641908.0,
                   "spent": 199124.16
             },
             "Facilities & Fleet": {
-                  "budget": 1018995.0,
-                  "spent": 392256.43
+                  "budget": 1174867.0,
+                  "spent": 546053.47
             },
             "Supplies & Equip.": {
-                  "budget": 488170.0,
-                  "spent": 223860.49
+                  "budget": 526270.0,
+                  "spent": 247443.95
             },
             "Transfers & Other": {
-                  "budget": 60852.0,
-                  "spent": 95812.43
+                  "budget": 160852.0,
+                  "spent": 131455.15
+            }
+      },
+      "Arts & Culture": {
+            "Labor": {
+                  "budget": 7487598.0,
+                  "spent": 4756614.22
+            },
+            "Benefits": {
+                  "budget": 2491279.0,
+                  "spent": 1351566.42
+            },
+            "Contracted Services": {
+                  "budget": 3204525.0,
+                  "spent": 512173.88
+            },
+            "Technology": {
+                  "budget": 40103.0,
+                  "spent": 17411.35
+            },
+            "Facilities & Fleet": {
+                  "budget": 1785115.0,
+                  "spent": 508655.54
+            },
+            "Supplies & Equip.": {
+                  "budget": 342188.0,
+                  "spent": 134531.72
+            },
+            "Transfers & Other": {
+                  "budget": -1830710.0,
+                  "spent": -626458.55
             }
       },
       "Planning": {
@@ -783,38 +813,38 @@
                   "spent": 7866.69
             },
             "Transfers & Other": {
-                  "budget": 1096842.0,
-                  "spent": 573475.0
+                  "budget": 1121342.0,
+                  "spent": 589919.9
             }
       },
       "Housing": {
             "Labor": {
-                  "budget": 6119311.0,
-                  "spent": 4072662.81
+                  "budget": 9447215.0,
+                  "spent": 5912330.53
             },
             "Benefits": {
-                  "budget": 2748370.0,
-                  "spent": 1458293.27
+                  "budget": 5262184.0,
+                  "spent": 2886223.47
             },
             "Contracted Services": {
-                  "budget": 570353.0,
-                  "spent": 4768.1
+                  "budget": 573353.0,
+                  "spent": 7188.16
             },
             "Technology": {
                   "budget": 639713.0,
                   "spent": 385918.96
             },
             "Facilities & Fleet": {
-                  "budget": 1190746.0,
-                  "spent": 770969.65
+                  "budget": 1259098.0,
+                  "spent": 803916.61
             },
             "Supplies & Equip.": {
                   "budget": 44103.0,
                   "spent": 13164.63
             },
             "Transfers & Other": {
-                  "budget": -60131.0,
-                  "spent": 133914.57
+                  "budget": -4420411.0,
+                  "spent": -2449463.27
             }
       },
       "Homeless Strategy & Ops": {
@@ -831,54 +861,24 @@
                   "spent": 25904.67
             },
             "Technology": {
-                  "budget": 165341.0,
-                  "spent": 102949.55
+                  "budget": 175341.0,
+                  "spent": 109329.55
             },
             "Facilities & Fleet": {
                   "budget": 378088.0,
                   "spent": 195530.25
             },
             "Supplies & Equip.": {
-                  "budget": 27206.0,
-                  "spent": 2796.41
+                  "budget": 31206.0,
+                  "spent": 7263.91
             },
             "Grants": {
                   "budget": 5000000.0,
                   "spent": 0.0
             },
             "Transfers & Other": {
-                  "budget": 185412.0,
-                  "spent": -326752.63
-            }
-      },
-      "Arts & Culture": {
-            "Labor": {
-                  "budget": 6038722.0,
-                  "spent": 4383989.98
-            },
-            "Benefits": {
-                  "budget": 2319953.0,
-                  "spent": 1219319.9
-            },
-            "Contracted Services": {
-                  "budget": 697227.0,
-                  "spent": 229356.4
-            },
-            "Technology": {
-                  "budget": 40103.0,
-                  "spent": 17411.35
-            },
-            "Facilities & Fleet": {
-                  "budget": 1777115.0,
-                  "spent": 508467.64
-            },
-            "Supplies & Equip.": {
-                  "budget": 278772.0,
-                  "spent": 113516.86
-            },
-            "Transfers & Other": {
-                  "budget": -1886140.0,
-                  "spent": -646030.75
+                  "budget": 193412.0,
+                  "spent": -325083.95
             }
       },
       "Social Services (Courts)": {
