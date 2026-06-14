@@ -1,0 +1,50 @@
+name: Refresh fire section data snapshots
+
+on:
+  # Daily at 13:00 UTC (after the main Socrata batch at 14:00 UTC)
+  schedule:
+    - cron: "0 13 * * *"
+  workflow_dispatch:   # manual trigger from Actions tab
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Generate fire data snapshots
+        # The script exits 2 when Socrata is down and skips the write — we
+        # treat that as success so the workflow stays green during outages
+        # and we don't churn the run history. Any other non-zero exit
+        # (genuine bug) is treated as a failure.
+        run: |
+          set +e
+          python scripts/generate_fire_data.py
+          rc=$?
+          set -e
+          if [ "$rc" = "2" ]; then
+            echo "::warning::Socrata is down — fire snapshot preserved, no changes to commit."
+            exit 0
+          fi
+          exit "$rc"
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/fire/data.json docs/fire/trends/data.json
+          git diff --cached --quiet || git commit -m "chore: refresh fire data snapshots [skip ci]"
+          git pull --rebase origin main
+          git push

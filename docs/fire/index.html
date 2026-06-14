@@ -105,6 +105,12 @@
     #update-banner:hover { background: #b91c1c; }
     #update-banner .dismiss { margin-left: 8px; opacity: 0.8; font-weight: 400; }
 
+    #snapshot-banner {
+      background: #f59e0b; color: #1e293b; font-size: 11px; font-weight: 600;
+      padding: 7px 14px; text-align: center; display: none;
+      border-bottom: 1px solid #b45309;
+    }
+
     #sidebar {
       width: 280px; flex-shrink: 0;
       background: var(--sidebar-bg); border-left: 1px solid var(--sidebar-border);
@@ -183,6 +189,7 @@
   </div>
 
   <div id="content">
+    <div id="snapshot-banner"></div>
     <div id="map"></div>
     <button id="update-banner" type="button">
       <span id="update-text"></span><span class="dismiss" onclick="dismissUpdate(event)">✕</span>
@@ -217,6 +224,7 @@
     const TILES_ATTR  = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>';
 
     const DATA_URL      = "https://data.austintexas.gov/resource/wpu4-x69d.json";
+    const SNAPSHOT_URL  = "data.json";   // pre-fetched fallback (refreshed daily by GH Actions)
     const REFRESH_MS    = 60000;   // re-fetch the feed every 60s (city updates ~every 5 min)
 
     const map = L.map("map", { center: [30.2672, -97.7431], zoom: 11 });
@@ -397,23 +405,63 @@
       return res.json();
     }
 
+    async function fetchSnapshot() {
+      const res = await fetch(SNAPSHOT_URL);
+      if (!res.ok) throw new Error(`snapshot HTTP ${res.status}`);
+      const data = await res.json();
+      if (!data || !Array.isArray(data.records)) {
+        throw new Error("snapshot missing records[]");
+      }
+      return data;
+    }
+
+    let snapshotMeta = null;   // {generated_at, days, record_count, source} for the banner
+
     // Initial (and post-update) render.
     async function loadData() {
       try {
         allRecords = await fetchRecords();
         renderMap();
-      } catch (err) {
-        document.getElementById("panel-summary").textContent = "Error: " + err.message;
-        document.getElementById("sidebar-list").innerHTML =
-          `<p style="padding:12px;color:#ef4444;font-size:12px;">Failed to load: ${err.message}</p>`;
+      } catch (liveErr) {
+        // Socrata is down (Tyler Tech outage). Fall back to the pre-fetched
+        // snapshot, refreshed daily by the GitHub Actions workflow.
+        try {
+          const snap = await fetchSnapshot();
+          allRecords = snap.records;
+          snapshotMeta = snap.meta || null;
+          renderMap();
+          showSnapshotBanner();
+        } catch (snapErr) {
+          document.getElementById("panel-summary").textContent = "Error: " + liveErr.message;
+          document.getElementById("sidebar-list").innerHTML =
+            `<p style="padding:12px;color:#ef4444;font-size:12px;">Failed to load: ${liveErr.message}<br/><span style="color:#94a3b8;">No snapshot fallback available.</span></p>`;
+        }
       }
     }
 
-    // Background poll: fetch quietly, never touch the map. If genuinely new
-    // incidents have appeared since what's on screen, offer an opt-in update.
+    function showSnapshotBanner() {
+      if (!snapshotMeta) return;
+      const generated = snapshotMeta.generated_at || "?";
+      const count = snapshotMeta.record_count || 0;
+      const days = snapshotMeta.days || 90;
+      const banner = document.getElementById("snapshot-banner");
+      if (!banner) return;
+      banner.innerHTML = `⚠ Live feed unavailable — showing cached snapshot from ${generated} UTC (${count.toLocaleString()} incidents, last ${days} days). Live updates are paused.`;
+      banner.style.display = "block";
+    }
+
+    function hideSnapshotBanner() {
+      const banner = document.getElementById("snapshot-banner");
+      if (banner) banner.style.display = "none";
+    }
+
+    // Background poll: fetch quietly, never touch the map. If Socrata comes
+    // back, fetch fresh data and offer an opt-in update.
     async function pollForUpdates() {
       let data;
       try { data = await fetchRecords(); } catch { return; }  // keep showing current data on error
+      hideSnapshotBanner();
+      snapshotMeta = null;
       const shownIds = new Set(allRecords.map(r => r.traffic_report_id));
       const newCount = data.reduce((n, r) => n + (shownIds.has(r.traffic_report_id) ? 0 : 1), 0);
       if (newCount > 0) {

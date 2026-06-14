@@ -50,6 +50,8 @@
     .fbtn:hover { background: #dbeafe; color: #1e293b; }
     #theme-toggle { position: fixed; top: 10px; right: 12px; z-index: 200; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 4px 9px; font-size: 11px; color: var(--text-sub); cursor: pointer; }
 
+    #snapshot-banner { background: #f59e0b; color: #1e293b; font-size: 12px; font-weight: 600; padding: 8px 16px; text-align: center; display: none; border-bottom: 1px solid #b45309; margin: 14px auto 0; max-width: 1100px; width: 100%; border-radius: 6px; }
+
     #stats { display: flex; flex-wrap: wrap; justify-content: center; gap: 0; max-width: 1100px; width: 100%; margin: 14px auto 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; }
     .stat { flex: 1; min-width: 120px; text-align: center; padding: 12px 8px; border-right: 1px solid var(--border); }
     .stat:last-child { border-right: none; }
@@ -79,6 +81,8 @@
       <a class="fbtn" href="../../">🏠 Austin 311 Home</a>
     </div>
   </div>
+
+  <div id="snapshot-banner"></div>
 
   <div id="stats">
     <div class="stat"><div class="stat-value" id="s-total" style="color:#dc2626;">…</div><div class="stat-label">Total fires</div><div class="stat-sub" id="s-total-sub">2023–present</div></div>
@@ -139,6 +143,7 @@
 
     const V5  = "https://data.austintexas.gov/resource/v5hh-nyr8.json";  // AFD 2023-2025 (fires only)
     const WPU = "https://data.austintexas.gov/resource/wpu4-x69d.json";  // real-time (all types)
+    const SNAPSHOT_URL = "data.json";   // pre-fetched fallback (refreshed daily by GH Actions)
     const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 
     // Canonical AFD fire-type codes — used to filter the all-types live feed down to fires.
@@ -160,14 +165,38 @@
     function ymLabel(y, m) { return MONTHS[m] + " " + y; }
 
     async function load() {
-      const cd = encodeURIComponent;
-      const [afdMonthly, liveMonthly, afdType, afdDist, afdPri] = await Promise.all([
-        getJSON(`${V5}?$select=date_trunc_ym(incdate) as ym, count(*) as n&$group=ym&$order=ym&$limit=1000`),
-        getJSON(`${WPU}?$where=${cd("published_date >= '2026-01-01'")}&$select=date_trunc_ym(to_floating_timestamp(published_date, 'America/Chicago')) as ym, issue_reported, count(*) as n&$group=ym,issue_reported&$limit=10000`),
-        getJSON(`${V5}?$select=problem, count(*) as n&$group=problem&$order=n DESC&$limit=30`),
-        getJSON(`${V5}?$select=council_district, count(*) as n&$group=council_district&$order=n DESC&$limit=30`),
-        getJSON(`${V5}?$select=prioritydescription, count(*) as n&$group=prioritydescription&$order=n DESC&$limit=20`),
-      ]);
+      let afdMonthly, liveMonthly, afdType, afdDist, afdPri;
+      let fromSnapshot = false;
+
+      try {
+        const cd = encodeURIComponent;
+        [afdMonthly, liveMonthly, afdType, afdDist, afdPri] = await Promise.all([
+          getJSON(`${V5}?$select=date_trunc_ym(incdate) as ym, count(*) as n&$group=ym&$order=ym&$limit=1000`),
+          getJSON(`${WPU}?$where=${cd("published_date >= '2026-01-01'")}&$select=date_trunc_ym(to_floating_timestamp(published_date, 'America/Chicago')) as ym, issue_reported, count(*) as n&$group=ym,issue_reported&$limit=10000`),
+          getJSON(`${V5}?$select=problem, count(*) as n&$group=problem&$order=n DESC&$limit=30`),
+          getJSON(`${V5}?$select=council_district, count(*) as n&$group=council_district&$order=n DESC&$limit=30`),
+          getJSON(`${V5}?$select=prioritydescription, count(*) as n&$group=prioritydescription&$order=n DESC&$limit=20`),
+        ]);
+      } catch (liveErr) {
+        // Socrata is down (Tyler Tech outage). Fall back to the pre-fetched
+        // snapshot, refreshed daily by the GitHub Actions workflow.
+        const snap = await getJSON(SNAPSHOT_URL);
+        if (!snap || !Array.isArray(snap.monthly) || !Array.isArray(snap.by_type)) {
+          throw new Error("snapshot missing required fields");
+        }
+        // Translate snapshot shape into the per-dataset vars the rest of the
+        // pipeline expects.
+        afdMonthly = snap.monthly
+          .filter(r => r.afd > 0)
+          .map(r => ({ ym: r.ym, n: r.afd }));
+        liveMonthly = snap.monthly
+          .filter(r => r.live > 0)
+          .map(r => ({ ym: r.ym, issue_reported: "FIRE", n: r.live }));   // already filtered server-side
+        afdType = snap.by_type;
+        afdDist = snap.by_district;
+        afdPri  = snap.by_priority;
+        fromSnapshot = true;
+      }
 
       // ── stitch the continuous monthly series ───────────────────────────────
       const monthly = new Map();   // (y*12+m) -> { y, m, afd, live }
@@ -200,7 +229,7 @@
       document.getElementById("s-peak").textContent = labels[peakI] + " (" + totals[peakI].toLocaleString() + ")";
       const topType = afdType[0] ? cleanType(afdType[0].problem) : "—";
       document.getElementById("s-type").textContent = topType;
-      const topDist = afdDist.find(r => r.council_district && r.council_district !== "-");
+      const topDist = afdDist.find(r => r.council_district && r.council_district && r.council_district !== "-");
       document.getElementById("s-district").textContent = topDist ? "District " + topDist.council_district : "—";
 
       // ── seasonal (year over year) ────────────────────────────────────────────
@@ -220,7 +249,15 @@
         tension: 0.3, pointRadius: 2,
       }));
 
+      if (fromSnapshot) showSnapshotBanner();
       drawCharts(labels, afdSeries, liveSeries, seasonalSets, afdType, afdDist, afdPri);
+    }
+
+    function showSnapshotBanner() {
+      const banner = document.getElementById("snapshot-banner");
+      if (!banner) return;
+      banner.innerHTML = "⚠ Socrata is currently unavailable — showing a cached snapshot. Live data will resume automatically once the platform comes back.";
+      banner.style.display = "block";
     }
 
     function cleanType(s) {
