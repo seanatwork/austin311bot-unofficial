@@ -519,7 +519,7 @@ Socrata: `$where` SoQL filtering, `$group`/`$select` aggregation.
 - Each service module uses a module-level `_session` singleton for HTTP connection reuse.
 - **`open311_client.py`** provides `open311_get(session, url, params)` with exponential backoff (up to 8 retries; 15s starting delay for 429, respects `Retry-After`). Also provides `subscribe_popup_html()` and `telegram_subscribe_link()` for alert subscription buttons embedded in map popups.
 - All bot output is Markdown-formatted.
-- Environment variables: `TELEGRAM_BOT_TOKEN` (required), `OPEN311_API_KEY` (preferred; some legacy modules still read `AUSTINAPIKEY` — migration in progress), `GOOGLE_MAPS_API_KEY` (optional, for `/directory`), `ALERTS_DB_PATH` (optional, defaults to `/tmp/austin311_alerts.db` — set to a Fly volume path in production).
+- Environment variables: `TELEGRAM_BOT_TOKEN` (required), `AUSTINAPIKEY` (used for both Socrata app token and Open311 API key — same value, same GitHub Actions secret), `GOOGLE_MAPS_API_KEY` (optional, for `/directory`), `ALERTS_DB_PATH` (optional, defaults to `/tmp/austin311_alerts.db` — set to a Fly volume path in production).
 
 ## Open311 API — Known Pagination Gotcha
 
@@ -567,7 +567,7 @@ Public maps are deployed via GitHub Pages (`docs/` folder), generated from the s
 - Mobile-friendly viewport meta tag
 
 **Notes:**
-- `AUSTINAPIKEY`/`OPEN311_API_KEY` must be set as a GitHub Actions secret for rate limit headroom
+- `AUSTINAPIKEY` must be set as a GitHub Actions secret for rate limit headroom
 - 429 rate limit errors during local runs are normal without the token
 - `.venv/` is the working virtualenv (system Python is externally managed)
 

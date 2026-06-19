@@ -24,7 +24,7 @@ RETRY_DELAY = 1.0
 MAX_PAGES = 100  # 90 days can exceed 2,000 records; cap at 10,000
 
 # API key from environment
-API_KEY = os.getenv("OPEN311_API_KEY")
+API_KEY = os.getenv("AUSTINAPIKEY")
 
 # Austin local time approximation (CDT = UTC-5, CST = UTC-6; use -6 as conservative default)
 _AUSTIN_OFFSET = timedelta(hours=-6)

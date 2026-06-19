@@ -7,7 +7,7 @@ writes a compact JSON data file, and generates a Leaflet map page with
 address search and dynamic radius based on distance from downtown Austin.
 
 Run:
-    OPEN311_API_KEY=sk... python scripts/generate_nearby_page.py
+    AUSTINAPIKEY=sk... python scripts/generate_nearby_page.py
 """
 import json
 import logging
@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 OPEN311_URL = "https://311.austintexas.gov/open311/v2/requests.json"
-API_KEY = os.getenv("OPEN311_API_KEY")
+API_KEY = os.getenv("AUSTINAPIKEY")
 DAYS_BACK = 180
 
 # Austin city center (roughly Congress & 6th)

@@ -238,7 +238,7 @@ def fetch_animals_monthly(months_back: int = 13, use_cache: bool = True) -> list
 
     CATEGORY = "animal"
     MAX_PAGES = 10
-    api_key = os.getenv("OPEN311_API_KEY")
+    api_key = os.getenv("AUSTINAPIKEY")
 
     if use_cache:
         init_cache()

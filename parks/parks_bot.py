@@ -40,7 +40,7 @@ RETRY_DELAY = 1.0
 MAX_PAGES = 15  # cap at 1,500 records per code for performance
 
 # API key from environment
-API_KEY = os.getenv("OPEN311_API_KEY")
+API_KEY = os.getenv("AUSTINAPIKEY")
 
 # Park service codes and human-readable labels
 SERVICE_CODES = {

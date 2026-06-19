@@ -40,7 +40,7 @@ MAX_RETRIES = 3
 RETRY_DELAY = 1.0
 MAX_PAGES = 10  # up to 1,000 records per code
 
-API_KEY = os.getenv("OPEN311_API_KEY")
+API_KEY = os.getenv("AUSTINAPIKEY")
 
 # Service codes to search and their department labels
 # 

@@ -40,7 +40,7 @@ def _get_session() -> requests.Session:
     global _session
     if _session is None:
         _session = requests.Session()
-        # AUSTINAPIKEY / OPEN311_API_KEY are Open311 keys, NOT Socrata tokens —
+        # AUSTINAPIKEY is the Open311 key (NOT a Socrata token) —
         # sending them causes a 403. Only use a dedicated SOCRATA_APP_TOKEN if set.
         headers = {"Accept": "application/json", "User-Agent": "austin311bot/0.1 (hate crime)"}
         token = os.getenv("SOCRATA_APP_TOKEN", "")

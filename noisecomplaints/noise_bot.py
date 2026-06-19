@@ -34,7 +34,7 @@ RETRYABLE_ERRORS = (
     requests.exceptions.ConnectionError,
 )
 
-API_KEY = os.getenv("OPEN311_API_KEY")
+API_KEY = os.getenv("AUSTINAPIKEY")
 
 _session: Optional[requests.Session] = None
 

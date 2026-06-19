@@ -79,7 +79,7 @@ Shared utilities in `open311_client.py`: `open311_get()` with exponential backof
 
 - **Python:** PEP 8, Black formatting. Module-level `_session` singleton for HTTP reuse.
 - **Commits:** Conventional Commits (`feat:`, `fix:`, `docs:`)
-- **Env vars:** `TELEGRAM_BOT_TOKEN` (required), `OPEN311_API_KEY` (preferred over legacy `AUSTINAPIKEY`), `ALERTS_DB_PATH` (optional)
+- **Env vars:** `TELEGRAM_BOT_TOKEN` (required), `AUSTINAPIKEY` (used for both Socrata app token and Open311 API key — same value, same GitHub Actions secret), `ALERTS_DB_PATH` (optional)
 - **Bot output:** All Markdown-formatted. Use `_send_chunked()` to split at 4000-char boundaries.
 
 ## Key Rules

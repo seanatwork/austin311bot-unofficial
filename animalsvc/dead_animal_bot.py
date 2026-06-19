@@ -26,7 +26,7 @@ SERVICE_CODES = {
     "ZZARDEAC": "Dead Animal Collection",
 }
 
-API_KEY = os.getenv("OPEN311_API_KEY")
+API_KEY = os.getenv("AUSTINAPIKEY")
 
 MAX_PAGES = 20    # cap at 2,000 records per window
 PAGE_DELAY = 0.4  # seconds between page requests to avoid 429s

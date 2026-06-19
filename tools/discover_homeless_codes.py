@@ -16,7 +16,7 @@ from datetime import datetime, timezone, timedelta
 # Add parent directory to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-API_KEY = os.getenv("OPEN311_API_KEY", "")
+API_KEY = os.getenv("AUSTINAPIKEY", "")
 BASE_URL = "https://311.austintexas.gov/open311/v2"
 
 

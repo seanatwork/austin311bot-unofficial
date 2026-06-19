@@ -22,7 +22,7 @@ TIMEOUT = 45
 MAX_RETRIES = 8
 MAX_PAGES = 10
 
-API_KEY = os.getenv("OPEN311_API_KEY")
+API_KEY = os.getenv("AUSTINAPIKEY")
 
 RETRYABLE_ERRORS = (
     requests.exceptions.Timeout,
