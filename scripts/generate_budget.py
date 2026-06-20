@@ -23,6 +23,32 @@ from open311_client import og_meta_tags
 
 API_URL = "https://data.austintexas.gov/resource/g5k8-8sud.json"
 GENERAL_FUND_CODE = "1000"
+ENTERPRISE_FUNDS = {
+    "5010": "Austin Energy",
+    "5020": "Austin Water — Water Utility Operating",
+    "5025": "Austin Water — Reclaimed Water",
+    "5029": "Austin Water — Community Benefit Charge",
+    "5030": "Austin Water — Wastewater Utility Operating",
+}
+
+# CapMetro FY2026 data (not in City of Austin budget dataset — separate entity)
+# Source: CapMetro FY2026 Proposed Budget PDF
+CAPMETRO_DATA = {
+    "sales_tax": 398_989_672,
+    "passenger_revenue": 18_876_274,
+    "freight_rail": 6_932_445,
+    "misc_revenue": 18_151_169,
+    "operating_grants": 70_135_282,
+    "capital_grants_federal": 31_082_990,
+    "capital_grants_state": 530_278,
+    "other_capital": 17_131_394,
+    "fund_balance_used": 63_379_108,
+    "operating_expenses": 442_432_699,
+    "capital_project_expense": 155_016_177,
+    "atp_contribution": 21_854_540,
+    "interlocal_agreements": 5_905_196,
+}
+
 OUT_PATH = Path(__file__).parent.parent / "docs" / "budget" / "index.html"
 
 DEPT_DISPLAY = {
@@ -69,6 +95,37 @@ DEPT_COLORS = {
     "Austin Human Resources": "#64748b",
 }
 DEFAULT_COLOR = "#64748b"
+
+# Enterprise fund program display names
+AE_PROGRAM_DISPLAY = {
+    "Transfers, Debt Service, and Other Requirements": "Debt Service & Transfers",
+    "Electric Service Delivery": "Electric Service Delivery",
+    "Power Generation, Market Operations & Resource Planning": "Power Generation & Markets",
+    "Support Services": "Support Services",
+    "Customer Care": "Customer Care",
+    "Customer Energy Solutions": "Energy Efficiency Programs",
+    "Power Supply": "Power Supply",
+}
+
+AW_PROGRAM_COLORS = {
+    "Transfers, Debt Service, and Other Requirements": "#64748b",
+    "Operations": "#3b82f6",
+    "Support Services": "#8b5cf6",
+    "Environmental, Planning, and Development Services": "#22c55e",
+    "Customer Experience": "#f59e0b",
+    "Engineering and Technical Services": "#06b6d4",
+    "Other Utility Program Requirements": "#ec4899",
+}
+
+AE_PROGRAM_COLORS = {
+    "Transfers, Debt Service, and Other Requirements": "#64748b",
+    "Electric Service Delivery": "#f59e0b",
+    "Power Generation, Market Operations & Resource Planning": "#ef4444",
+    "Support Services": "#8b5cf6",
+    "Customer Care": "#06b6d4",
+    "Customer Energy Solutions": "#22c55e",
+    "Power Supply": "#f97316",
+}
 
 PUBLIC_SAFETY = {
     "Austin Police",
@@ -193,13 +250,91 @@ def aggregate(rows):
     return max_fy, max_q, depts, dept_cats
 
 
+# ── enterprise fund fetch + aggregate ─────────────────────────────────────────
+
+def fetch_enterprise_rows():
+    """Fetch Austin Energy and Austin Water budget data."""
+    headers = {}
+    token = os.getenv("AUSTINAPIKEY")
+    if token:
+        headers["X-App-Token"] = token
+
+    fund_codes = list(ENTERPRISE_FUNDS.keys())
+    results = {}
+    for fcode in fund_codes:
+        rows, offset, limit = [], 0, 10_000
+        while True:
+            resp = requests.get(
+                API_URL,
+                params={"fund_code": fcode, "$limit": limit, "$offset": offset},
+                headers=headers,
+                timeout=30,
+            )
+            resp.raise_for_status()
+            batch = resp.json()
+            rows.extend(batch)
+            if len(batch) < limit:
+                break
+            offset += limit
+            time.sleep(0.3)
+        results[fcode] = rows
+    return results
+
+
+def aggregate_enterprise(fund_data):
+    """Aggregate enterprise fund data to program level."""
+    max_fy, max_q = 0, 0
+    # Find latest FY/Q across all funds
+    for rows in fund_data.values():
+        if not rows:
+            continue
+        for r in rows:
+            fy = int(r["budget_fiscal_year"])
+            q = int(r["thru_quarter"])
+            max_fy = max(max_fy, fy)
+            max_q = max(max_q, q)
+
+    # Combined AE: fund 5010
+    ae_programs = defaultdict(lambda: {"budget": 0.0, "spent": 0.0})
+    aw_programs = defaultdict(lambda: {"budget": 0.0, "spent": 0.0})
+
+    for fcode, rows in fund_data.items():
+        for r in rows:
+            if int(r["budget_fiscal_year"]) != max_fy or int(r["thru_quarter"]) != max_q:
+                continue
+            prog = r.get("program_name", "Unknown")
+            budget = float(r.get("budget") or 0)
+            spent = float(r.get("expenditures") or 0)
+            if fcode == "5010":
+                ae_programs[prog]["budget"] += budget
+                ae_programs[prog]["spent"] += spent
+            else:
+                # All AW funds combined
+                aw_programs[prog]["budget"] += budget
+                aw_programs[prog]["spent"] += spent
+
+    ae_sorted = sorted(
+        [{"name": k, **v} for k, v in ae_programs.items() if v["budget"] > 0],
+        key=lambda d: d["budget"], reverse=True,
+    )
+    aw_sorted = sorted(
+        [{"name": k, **v} for k, v in aw_programs.items() if v["budget"] > 0],
+        key=lambda d: d["budget"], reverse=True,
+    )
+
+    ae_total = sum(d["budget"] for d in ae_sorted)
+    aw_total = sum(d["budget"] for d in aw_sorted)
+
+    return max_fy, max_q, ae_sorted, aw_sorted, ae_total, aw_total
+
+
 # ── html ───────────────────────────────────────────────────────────────────────
 
 def fmt_stat(n):
     return f"${n/1e9:.2f}B" if n >= 1e9 else f"${n/1e6:.0f}M"
 
 
-def generate_html(fy, quarter, depts, dept_cats):
+def generate_html(fy, quarter, depts, dept_cats, ae_programs, aw_programs, ae_total, aw_total, capmetro):
     total_budget = sum(d["budget"] for d in depts)
     total_spent  = sum(d["spent"]  for d in depts)
     ps_budget    = sum(d["budget"] for d in depts if d["dept_name"] in PUBLIC_SAFETY)
@@ -211,6 +346,55 @@ def generate_html(fy, quarter, depts, dept_cats):
     q_end_yr  = fy_start if quarter == 1 else fy
     period    = f"Oct {fy_start}–{q_end_mo} {q_end_yr}"
     updated   = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+
+    # ── enterprise fund JS data ──
+    ae_prog_list = [
+        {"name": AE_PROGRAM_DISPLAY.get(p["name"], p["name"]), "budget": round(p["budget"], 2),
+         "spent": round(p["spent"], 2), "color": AE_PROGRAM_COLORS.get(p["name"], "#64748b")}
+        for p in ae_programs
+    ]
+    aw_prog_list = [
+        {"name": p["name"], "budget": round(p["budget"], 2),
+         "spent": round(p["spent"], 2), "color": AW_PROGRAM_COLORS.get(p["name"], "#64748b")}
+        for p in aw_programs
+    ]
+
+    ae_data = {
+        "total": round(ae_total, 2),
+        "spent": round(sum(p["spent"] for p in ae_programs), 2),
+        "programs": ae_prog_list,
+    }
+    aw_data = {
+        "total": round(aw_total, 2),
+        "spent": round(sum(p["spent"] for p in aw_programs), 2),
+        "programs": aw_prog_list,
+    }
+
+    # ── CapMetro JS data ──
+    cap_total_funding = sum(v for k, v in capmetro.items() if k != "fund_balance_used")
+    cm_revenue_items = [
+        {"label": "Sales Tax (1%)", "amount": capmetro["sales_tax"], "color": "#f59e0b"},
+        {"label": "Operating Grants (Federal)", "amount": capmetro["operating_grants"], "color": "#3b82f6"},
+        {"label": "Capital Grants (Federal)", "amount": capmetro["capital_grants_federal"], "color": "#06b6d4"},
+        {"label": "Passenger Revenue / Fares", "amount": capmetro["passenger_revenue"], "color": "#22c55e"},
+        {"label": "Miscellaneous Revenue", "amount": capmetro["misc_revenue"], "color": "#8b5cf6"},
+        {"label": "Other Capital Contributions", "amount": capmetro["other_capital"], "color": "#a78bfa"},
+        {"label": "Freight Railroad Revenue", "amount": capmetro["freight_rail"], "color": "#f97316"},
+        {"label": "Capital Grants (State)", "amount": capmetro["capital_grants_state"], "color": "#ec4899"},
+    ]
+    cm_revenue_items.sort(key=lambda x: x["amount"], reverse=True)
+
+    cm_expense_items = [
+        {"label": "Operating Expenses", "amount": capmetro["operating_expenses"], "color": "#ef4444"},
+        {"label": "Capital Project Expense", "amount": capmetro["capital_project_expense"], "color": "#3b82f6"},
+        {"label": "ATP Contribution (Project Connect)", "amount": capmetro["atp_contribution"], "color": "#8b5cf6"},
+        {"label": "Interlocal Agreements", "amount": capmetro["interlocal_agreements"], "color": "#64748b"},
+    ]
+
+    js_capmetro_revenue = json.dumps(cm_revenue_items)
+    js_capmetro_expenses = json.dumps(cm_expense_items)
+    js_ae = json.dumps(ae_data)
+    js_aw = json.dumps(aw_data)
 
     js_depts = json.dumps([
         {
@@ -246,7 +430,7 @@ def generate_html(fy, quarter, depts, dept_cats):
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Austin 311 — Austin General Fund FY{fy}</title>
+  <title>Austin 311 — Austin City Budget FY{fy}</title>
   {og_meta_tags("budget")}
   <!-- Google tag (gtag.js) -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
@@ -413,8 +597,8 @@ def generate_html(fy, quarter, depts, dept_cats):
   <button id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
 
   <div id="panel">
-    <div id="panel-title">💰 Austin General Fund — FY{fy}</div>
-    <div id="panel-subtitle">Adopted budget by department · actuals through Q{quarter} ({period})</div>
+    <div id="panel-title">💰 Austin City Budget — FY{fy}</div>
+    <div id="panel-subtitle">General Fund · Enterprise Funds · CapMetro · actuals through Q{quarter} ({period})</div>
     <div id="last-updated">Updated: {updated}</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Austin 311 Home</a>
@@ -519,8 +703,68 @@ def generate_html(fy, quarter, depts, dept_cats):
       </div>
     </div>
 
+    <hr class="section-divider" />
+
+    <!-- ── Enterprise Funds (Austin Energy + Austin Water) ── -->
+    <div>
+      <div class="section-heading">⚡ Enterprise Funds — Austin Energy &amp; Austin Water</div>
+      <p class="section-sub">Funded entirely by utility rates, not taxes. These are large, independent operations that every Austin resident pays into. Data through Q{quarter} ({period}).</p>
+
+      <div class="fund-grid" style="grid-template-columns: 1fr 1fr;">
+        <!-- Austin Energy -->
+        <div class="chart-block">
+          <div class="chart-title">🏭 Austin Energy — {fmt_stat(ae_total)}</div>
+          <div class="chart-sub">Solid = spent · Dim = remaining · Adopted budget through Q{quarter}</div>
+          <div class="chart-container" style="height: 280px;"><canvas id="aeChart"></canvas></div>
+        </div>
+        <!-- Austin Water -->
+        <div class="chart-block">
+          <div class="chart-title">💧 Austin Water — {fmt_stat(aw_total)}</div>
+          <div class="chart-sub">Solid = spent · Dim = remaining · Adopted budget through Q{quarter}</div>
+          <div class="chart-container" style="height: 280px;"><canvas id="awChart"></canvas></div>
+        </div>
+      </div>
+
+      <div id="data-source" style="margin-top: 8px;">
+        Data: <a href="https://data.austintexas.gov/resource/g5k8-8sud" target="_blank" rel="noopener">City of Austin Operating Budget (g5k8-8sud)</a>
+        · Funds 5010, 5020, 5025, 5029, 5030
+      </div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- ── CapMetro ── -->
+    <div>
+      <div class="section-heading">🚌 CapMetro — FY2026 Operating &amp; Capital Budget</div>
+      <p class="section-sub">CapMetro is a separate regional transit authority, not a city department. Funded by a <strong>1% sales tax</strong> across Austin + member cities. The City has no control over this budget.</p>
+
+      <div class="fund-grid" style="grid-template-columns: 1fr 1fr;">
+        <!-- Revenue -->
+        <div class="chart-block">
+          <div class="chart-title">💰 Revenue — {fmt_stat(cap_total_funding)}</div>
+          <div class="chart-sub">Plus {fmt_stat(capmetro['fund_balance_used'])} drawn from fund balance reserves</div>
+          <div class="chart-container" style="height: 320px;"><canvas id="cmRevenueChart"></canvas></div>
+        </div>
+        <!-- Expenses -->
+        <div class="chart-block">
+          <div class="chart-title">📊 Expenses — {fmt_stat(capmetro['operating_expenses'] + capmetro['capital_project_expense'] + capmetro['atp_contribution'] + capmetro['interlocal_agreements'])}</div>
+          <div class="chart-sub">Structurally balanced: Revenue = Expenses</div>
+          <div class="chart-container" style="height: 320px;"><canvas id="cmExpenseChart"></canvas></div>
+        </div>
+      </div>
+
+      <div id="data-source" style="margin-top: 8px;">
+        Data: <a href="https://www.capmetro.org/docs/default-source/about-capital-metro-docs/financial-transparency-docs/annual-budgets-docs/fy2026-proposed-budget-v01.pdf" target="_blank" rel="noopener">CapMetro FY2026 Proposed Budget</a>
+        · Sales tax = 71% of revenue
+      </div>
+    </div>
+
+    <hr class="section-divider" />
+
     <div id="data-source">
-      Data: <a href="https://data.austintexas.gov/resource/g5k8-8sud" target="_blank" rel="noopener">City of Austin Operating Budget (g5k8-8sud)</a>
+      <strong>General Fund</strong> — <a href="https://data.austintexas.gov/resource/g5k8-8sud" target="_blank" rel="noopener">City of Austin Operating Budget (g5k8-8sud)</a>
+      · Enterprise Funds — same dataset, funds 5010/5020/5025/5029/5030
+      · CapMetro — <a href="https://www.capmetro.org/financial-info" target="_blank" rel="noopener">CapMetro Financial Transparency</a>
       · FY{fy} · refreshed quarterly
     </div>
 
@@ -719,6 +963,115 @@ def generate_html(fy, quarter, depts, dept_cats):
       document.getElementById("drill-hint").style.display = "block";
       if (drillChart) {{ drillChart.destroy(); drillChart = null; }}
     }}
+
+    // ── Enterprise Fund Charts ──────────────────────────────────────────────
+    const AE = {js_ae};
+    const AW = {js_aw};
+
+    function makeProgChart(canvasId, data, colorFn) {{
+      return new Chart(document.getElementById(canvasId), {{
+        type: "bar",
+        data: {{
+          labels: data.programs.map(p => p.name),
+          datasets: [
+            {{
+              label: "Spent",
+              data: data.programs.map(p => p.spent),
+              backgroundColor: data.programs.map((p, i) => colorFn(p, i)),
+              borderRadius: 0,
+              stack: "budget",
+            }},
+            {{
+              label: "Remaining",
+              data: data.programs.map(p => p.budget - p.spent),
+              backgroundColor: data.programs.map((p, i) => colorFn(p, i) + "40"),
+              borderRadius: 4,
+              stack: "budget",
+            }},
+          ],
+        }},
+        options: {{
+          indexAxis: "y",
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {{
+            legend: {{ display: false }},
+            tooltip: {{
+              backgroundColor: tipBg, borderColor: tipBorder, borderWidth: 1,
+              titleColor: tipTitle, bodyColor: tipBody,
+              callbacks: {{
+                afterTitle: ctx => `Adopted: ${{fmt(data.total)}}`,
+                label: ctx => ctx.datasetIndex === 0
+                  ? ` Spent: ${{fmt(ctx.raw)}} (${{pct(ctx.raw, ctx.chart.data.datasets[0].data[ctx.dataIndex] + ctx.chart.data.datasets[1].data[ctx.dataIndex])}})`
+                  : ` Remaining: ${{fmt(ctx.raw)}}`,
+              }},
+            }},
+          }},
+          scales: {{
+            x: {{
+              stacked: true,
+              ticks: {{ color: tickColor, font: {{ size: 10 }}, callback: v => "$" + (v / 1e6).toFixed(0) + "M" }},
+              grid: {{ color: gridColor }},
+              beginAtZero: true,
+            }},
+            y: {{
+              stacked: true,
+              ticks: {{ color: tickColor, font: {{ size: 10 }} }},
+              grid: {{ color: gridColor }},
+            }},
+          }},
+        }},
+      }});
+    }}
+
+    makeProgChart("aeChart", AE, p => p.color || "#64748b");
+    makeProgChart("awChart", AW, p => p.color || "#64748b");
+
+    // ── CapMetro Charts ─────────────────────────────────────────────────────
+    const CM_REV = {js_capmetro_revenue};
+    const CM_EXP = {js_capmetro_expenses};
+
+    function makeDonutChart(canvasId, items, total) {{
+      return new Chart(document.getElementById(canvasId), {{
+        type: "doughnut",
+        data: {{
+          labels: items.map(i => i.label),
+          datasets: [{{
+            data: items.map(i => i.amount),
+            backgroundColor: items.map(i => i.color),
+            borderWidth: 2,
+            borderColor: isDark ? "#161a24" : "#ffffff",
+            hoverOffset: 10,
+          }}],
+        }},
+        options: {{
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: "52%",
+          plugins: {{
+            legend: {{
+              position: "bottom",
+              labels: {{ color: legColor, font: {{ size: 10 }}, boxWidth: 10, padding: 8 }},
+            }},
+            tooltip: {{
+              backgroundColor: "#1e2230", borderColor: "#3d4868", borderWidth: 1,
+              titleColor: "#f1f5f9", bodyColor: "#e2e8f0",
+              callbacks: {{
+                label: ctx => {{
+                  const p = total ? ((ctx.parsed / total) * 100).toFixed(1) : "0";
+                  return ` ${{fmt(ctx.parsed)}} (${{p}}%)`;
+                }},
+              }},
+            }},
+          }},
+        }},
+      }});
+    }}
+
+    const cmRevTotal = CM_REV.reduce((s, i) => s + i.amount, 0);
+    const cmExpTotal = CM_EXP.reduce((s, i) => s + i.amount, 0);
+    makeDonutChart("cmRevenueChart", CM_REV, cmRevTotal);
+    makeDonutChart("cmExpenseChart", CM_EXP, cmExpTotal);
   </script>
 </body>
 </html>"""
@@ -734,7 +1087,13 @@ def main():
     fy, quarter, depts, dept_cats = aggregate(rows)
     print(f"  FY{fy} Q{quarter} — {len(depts)} departments")
 
-    html = generate_html(fy, quarter, depts, dept_cats)
+    print("Fetching Enterprise Fund data...")
+    fund_data = fetch_enterprise_rows()
+    efy, eq, ae_progs, aw_progs, ae_total, aw_total = aggregate_enterprise(fund_data)
+    print(f"  Austin Energy: {fmt_stat(ae_total)} ({len(ae_progs)} programs)")
+    print(f"  Austin Water:  {fmt_stat(aw_total)} ({len(aw_progs)} programs)")
+
+    html = generate_html(fy, quarter, depts, dept_cats, ae_progs, aw_progs, ae_total, aw_total, CAPMETRO_DATA)
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(html, encoding="utf-8")
     print(f"  Written → {OUT_PATH}")
