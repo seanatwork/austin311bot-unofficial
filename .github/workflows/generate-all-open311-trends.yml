@@ -28,10 +28,8 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .cache/open311_cache.db
-          key: open311-trends-${{ github.run_id }}
+          key: open311-${{ github.run_id }}
           restore-keys: |
-            open311-trends-
-            open311-maps-
             open311-
 
       - name: Install dependencies
