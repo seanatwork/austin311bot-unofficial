@@ -84,7 +84,7 @@ jobs:
         if: always()
         with:
           path: .cache/open311_cache.db
-          key: open311-maps-${{ github.run_id }}-${{ github.run_attempt }}
+          key: open311-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Commit and push all maps
         run: |
