@@ -736,7 +736,7 @@ def generate_html(fy, quarter, depts, dept_cats, ae_programs, aw_programs, ae_to
     <!-- ── CapMetro ── -->
     <div>
       <div class="section-heading">🚌 CapMetro — FY2026 Operating &amp; Capital Budget</div>
-      <p class="section-sub">CapMetro is a separate regional transit authority, not a city department. Funded by a <strong>1% sales tax</strong> across Austin + member cities. The City has no control over this budget.</p>
+      <p class="section-sub">CapMetro is a separate regional transit authority, not a city department. Funded by a <strong>1% sales tax</strong> across Austin + member cities.</p>
 
       <div class="fund-grid" style="grid-template-columns: 1fr 1fr;">
         <!-- Revenue -->
