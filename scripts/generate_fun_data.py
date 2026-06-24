@@ -578,7 +578,6 @@ _PROFANITY_CENSOR = {
     "bitch": "b****",
     "bitches": "b****es",
     "damn": "d***",
-    "ass": "a**",
     "bastard": "b*****d",
 }
 
