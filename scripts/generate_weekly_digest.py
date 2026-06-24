@@ -340,8 +340,16 @@ _FALLBACK_KEYWORDS = {
 
 
 def _generate_fallback_digest(records: list) -> dict:
-    """Generate a keyword-based digest when the LLM is unavailable."""
+    """Generate a keyword-based digest when the LLM is unavailable.
+
+    Also marks each record with a 'notable' boolean so the UI can default
+    to showing only the keyword-matched (notable) complaints.
+    """
     logger.info("Generating keyword-based fallback digest")
+
+    # Mark all records as not notable by default; we'll flip some below
+    for r in records:
+        r["notable"] = False
 
     # Count by theme
     theme_counts: dict = {}
@@ -357,6 +365,7 @@ def _generate_fallback_digest(records: list) -> dict:
                         theme_examples[theme] = []
                     if len(theme_examples[theme]) < 3:
                         theme_examples[theme].append(r["text"][:120])
+                    r["notable"] = True
                     matched = True
                     break
             if matched:
@@ -379,9 +388,11 @@ def _generate_fallback_digest(records: list) -> dict:
     import random
     random.shuffle(unusual_candidates)
     most_unusual = unusual_candidates[0] if unusual_candidates else (records[0] if records else {})
+    if most_unusual:
+        most_unusual["notable"] = True
 
     return {
-        "weeklyHeadline": f"{total} notable complaints this week across {len(themes)} categories.",
+        "weeklyHeadline": f"Top themes this week: {', '.join(t for t, _ in themes[:3])}.",
         "themes": [
             {"theme": t, "count": c, "examples": theme_examples.get(t, [])}
             for t, c in themes[:6]
@@ -431,10 +442,11 @@ def main() -> None:
             logger.info("LLM unavailable, using keyword fallback")
             digest = _generate_fallback_digest(records)
 
-    # Add metadata
+    # Add metadata and raw complaint records for the browse UI
     digest["_generated"] = now.isoformat()
     digest["_totalDescriptions"] = len(records)
     digest["_source"] = "Open311 (29 service codes, last 7 days)"
+    digest["complaints"] = records
 
     # Write to docs/complaints/digest.json
     out_path = Path(__file__).resolve().parent.parent / "docs" / "complaints" / "digest.json"
