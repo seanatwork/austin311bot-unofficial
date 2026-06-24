@@ -173,6 +173,126 @@
     .item-meta .id::before { content: "🎫 "; }
     .item-meta .id a { color: var(--text-desc); text-decoration: none; }
     .item-meta .id a:hover { color: var(--accent); text-decoration: underline; }
+    /* ── digest: weekly summary ── */
+    .digest-section { margin-bottom: 1.5rem; }
+    .digest-headline {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--text-head);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .digest-sub {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+    .digest-sub a { color: var(--text-desc); }
+    .digest-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .digest-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.1rem;
+    }
+    .digest-card h3 {
+      font-size: 0.95rem;
+      color: var(--text-head);
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .digest-card h3 .count {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+    .digest-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.35rem;
+      font-size: 0.85rem;
+    }
+    .digest-bar-fill {
+      height: 8px;
+      border-radius: 4px;
+      background: var(--accent);
+      min-width: 4px;
+      flex-shrink: 0;
+    }
+    .digest-bar-label {
+      color: var(--text);
+      white-space: nowrap;
+    }
+    .digest-bar-count {
+      color: var(--text-muted);
+      font-size: 0.78rem;
+      white-space: nowrap;
+    }
+    .digest-examples {
+      margin-top: 0.5rem;
+      padding-left: 0.5rem;
+      border-left: 2px solid var(--border);
+    }
+    .digest-example {
+      font-size: 0.82rem;
+      color: var(--text-desc);
+      margin-bottom: 0.25rem;
+      font-style: italic;
+    }
+    .digest-venue-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+    .digest-venue-tag {
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.82rem;
+      color: var(--text);
+    }
+    .digest-unusual {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.1rem;
+      border-left: 3px solid var(--accent);
+    }
+    .digest-unusual-text {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.55;
+      margin-bottom: 0.5rem;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+    .digest-unusual-meta {
+      font-size: 0.78rem;
+      color: var(--text-desc);
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .digest-unusual-meta a { color: var(--text-desc); }
+    .digest-sentiment {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.8rem 1rem;
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.5;
+    }
     .empty {
       text-align: center;
       color: var(--text-desc);
@@ -210,20 +330,26 @@
       var CATEGORIES = [];
       var current = "__all__";
 
-      fetch("../fun/data.json")
-        .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-        .then(function (data) {
-          var fd = (data && data.funnyDescriptions) || {};
-          ALL = fd.allItems || fd.items || [];
-          if (!ALL.length) {
-            document.getElementById("list").innerHTML = '<div class="empty">No complaints loaded.</div>';
-            return;
-          }
-          render(fd);
-        })
-        .catch(function (err) {
-          document.getElementById("list").innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
-        });
+      var DIGEST = null;
+
+      // Fetch both data sources in parallel
+      Promise.all([
+        fetch("../fun/data.json").then(function (r) { if (!r.ok) throw new Error("fun/data.json HTTP " + r.status); return r.json(); }),
+        fetch("digest.json").then(function (r) { if (!r.ok) return null; return r.json(); }).catch(function () { return null; })
+      ]).then(function (results) {
+        var funData = results[0];
+        DIGEST = results[1];
+
+        var fd = (funData && funData.funnyDescriptions) || {};
+        ALL = fd.allItems || fd.items || [];
+        if (!ALL.length && !DIGEST) {
+          document.getElementById("list").innerHTML = '<div class="empty">No complaints loaded.</div>';
+          return;
+        }
+        render(fd);
+      }).catch(function (err) {
+        document.getElementById("list").innerHTML = '<div class="empty">Failed to load: ' + escapeHtml(err.message) + '</div>';
+      });
 
       function render(fd) {
         var counts = {};
@@ -235,13 +361,18 @@
 
         var chips = document.getElementById("chips");
         chips.innerHTML = "";
+        if (DIGEST) {
+          chips.appendChild(buildChip("__digest__", "📊 This Week", null));
+        }
         chips.appendChild(buildChip("__all__", "All", ALL.length));
         CATEGORIES.forEach(function (cat) {
           chips.appendChild(buildChip(cat, cat, counts[cat]));
         });
 
         var initial = (location.hash || "").replace(/^#/, "");
-        if (initial && (initial === "__all__" || counts[decodeURIComponent(initial)])) {
+        if (initial === "__digest__" && DIGEST) {
+          select("__digest__");
+        } else if (initial && (initial === "__all__" || counts[decodeURIComponent(initial)])) {
           select(decodeURIComponent(initial));
         } else {
           select("__all__");
@@ -249,7 +380,11 @@
 
         window.addEventListener("hashchange", function () {
           var h = decodeURIComponent((location.hash || "").replace(/^#/, ""));
-          if (h && (h === "__all__" || counts[h]) && h !== current) select(h);
+          if (h === "__digest__" && DIGEST) {
+            if (h !== current) select(h);
+          } else if (h && (h === "__all__" || counts[h]) && h !== current) {
+            select(h);
+          }
         });
       }
 
@@ -258,7 +393,11 @@
         el.className = "chip";
         el.type = "button";
         el.dataset.value = value;
-        el.innerHTML = '<span>' + escapeHtml(label) + '</span><span class="chip-count">' + count + '</span>';
+        var inner = '<span>' + escapeHtml(label) + '</span>';
+        if (count !== null && count !== undefined) {
+          inner += '<span class="chip-count">' + count + '</span>';
+        }
+        el.innerHTML = inner;
         el.addEventListener("click", function () { select(value); });
         return el;
       }
@@ -267,6 +406,17 @@
         current = value;
         var chips = document.querySelectorAll(".chip");
         chips.forEach(function (c) { c.classList.toggle("active", c.dataset.value === value); });
+
+        if (value === "__digest__" && DIGEST) {
+          document.getElementById("spoke-title").textContent = "📊 This Week in 311";
+          document.getElementById("spoke-meta").textContent = "";
+          renderDigest(DIGEST);
+          try {
+            history.replaceState(null, "", "#" + encodeURIComponent(value));
+          } catch (e) {}
+          window.scrollTo({ top: document.querySelector(".spoke-header").offsetTop - 12, behavior: "smooth" });
+          return;
+        }
 
         var items = value === "__all__" ? ALL.slice().sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); }) : ALL.filter(function (i) { return i.category === value; });
         document.getElementById("spoke-title").textContent = value === "__all__" ? "All categories" : value;
@@ -278,6 +428,92 @@
         } catch (e) {}
 
         window.scrollTo({ top: document.querySelector(".spoke-header").offsetTop - 12, behavior: "smooth" });
+      }
+
+      function renderDigest(d) {
+        var html = '<div class="digest-section">';
+
+        // Headline
+        if (d.weeklyHeadline) {
+          html += '<div class="digest-headline">' + escapeHtml(d.weeklyHeadline) + '</div>';
+        }
+
+        // Sentiment
+        if (d.sentimentNote && d.sentimentNote !== "No data available for this period.") {
+          html += '<div class="digest-sentiment">' + escapeHtml(d.sentimentNote) + '</div>';
+          html += '<div style="height:1rem;"></div>';
+        }
+
+        // Most unusual complaint
+        if (d.mostUnusualComplaint && d.mostUnusualComplaint.text) {
+          var muc = d.mostUnusualComplaint;
+          html += '<h3 style="font-size:0.95rem;color:var(--text-head);margin-bottom:0.5rem;">🌟 Most Unusual Complaint</h3>';
+          html += '<div class="digest-unusual">';
+          html += '<div class="digest-unusual-text">' + escapeHtml(muc.text) + '</div>';
+          html += '<div class="digest-unusual-meta">';
+          if (muc.address) html += '<span>' + escapeHtml(muc.address) + '</span>';
+          if (muc.category) html += '<span>' + escapeHtml(muc.category) + '</span>';
+          if (muc.ticketId) {
+            html += '<span><a href="https://311.austintexas.gov/tickets/' + encodeURIComponent(muc.ticketId) + '" target="_blank">' + escapeHtml(muc.ticketId) + '</a></span>';
+          }
+          html += '</div></div>';
+          html += '<div style="height:1rem;"></div>';
+        }
+
+        // Themes
+        if (d.themes && d.themes.length) {
+          html += '<h3 style="font-size:0.95rem;color:var(--text-head);margin-bottom:0.5rem;">📊 Top Themes This Week</h3>';
+          html += '<div class="digest-grid">';
+          var maxCount = d.themes[0].count || 1;
+          d.themes.forEach(function (t) {
+            var pct = Math.round(t.count / maxCount * 100);
+            html += '<div class="digest-card">';
+            html += '<h3>' + escapeHtml(t.theme) + ' <span class="count">' + t.count + '</span></h3>';
+            html += '<div class="digest-bar"><div class="digest-bar-fill" style="width:' + pct + '%;"></div><span class="digest-bar-count">' + t.count + '</span></div>';
+            if (t.examples && t.examples.length) {
+              html += '<div class="digest-examples">';
+              t.examples.forEach(function (ex) {
+                if (ex) html += '<div class="digest-example">"' + escapeHtml(ex.length > 200 ? ex.slice(0, 200) + '…' : ex) + '"</div>';
+              });
+              html += '</div>';
+            }
+            html += '</div>';
+          });
+          html += '</div>';
+          html += '<div style="height:1rem;"></div>';
+        }
+
+        // Mentioned venues
+        if (d.mentionedVenues && d.mentionedVenues.length) {
+          html += '<h3 style="font-size:0.95rem;color:var(--text-head);margin-bottom:0.5rem;">📍 Venues & Places Mentioned</h3>';
+          html += '<div class="digest-venue-list">';
+          d.mentionedVenues.forEach(function (v) {
+            if (v) html += '<span class="digest-venue-tag">' + escapeHtml(v) + '</span>';
+          });
+          html += '</div>';
+          html += '<div style="height:1rem;"></div>';
+        }
+
+        // Emerging issues
+        if (d.emergingIssues && d.emergingIssues.length) {
+          html += '<h3 style="font-size:0.95rem;color:var(--text-head);margin-bottom:0.5rem;">🔍 Emerging Issues</h3>';
+          html += '<div class="digest-sentiment">';
+          d.emergingIssues.forEach(function (issue) {
+            if (issue) html += '• ' + escapeHtml(issue) + '<br/>';
+          });
+          html += '</div>';
+        }
+
+        // Footer metadata
+        if (d._totalDescriptions) {
+          html += '<div class="digest-sub">Based on ' + d._totalDescriptions + ' complaints from the past 7 days. ';
+          if (d._fallback) html += '<em>Keyword-generated (LLM unavailable).</em> ';
+          html += '<a href="https://github.com/seankim65801/austin311bot-unofficial/blob/main/scripts/generate_weekly_digest.py" target="_blank">How this works</a>.';
+          html += '</div>';
+        }
+
+        html += '</div>';
+        document.getElementById("list").innerHTML = html;
       }
 
       function renderList(items) {
