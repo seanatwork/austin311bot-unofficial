@@ -546,6 +546,68 @@ def _generate_fallback_digest(citizen_complaints: list, city_responses: list) ->
     }
 
 
+# ── Homepage ticker output ──────────────────────────────────────────────────
+
+def _write_ticker_json(citizen_deduped: list, digest_picks: list, headline: str) -> None:
+    """Write docs/homepage/ticker.json for the homepage carousel.
+
+    Combines LLM-curated picks (stripped of editorial notes — raw text only)
+    with interestingness-ranked citizen complaints to produce ~40 items.
+    """
+    now = _utc_now()
+    seen_ids: set = set()
+    ticker_items: list = []
+
+    # 1. LLM-curated picks first (raw text only, no editorial notes)
+    for pick in digest_picks:
+        tid = pick.get("ticketId", "")
+        if tid and tid not in seen_ids:
+            seen_ids.add(tid)
+            ticker_items.append({
+                "text": pick.get("text", ""),
+                "category": pick.get("category", ""),
+                "address": pick.get("address", ""),
+                "date": pick.get("date", ""),
+                "id": tid,
+            })
+
+    # 2. Fill remaining slots (up to 40) from interestingness-ranked citizen complaints
+    scored = [(r, _interestingness_score(r)) for r in citizen_deduped]
+    scored.sort(key=lambda x: -x[1])
+
+    for record, score in scored:
+        if len(ticker_items) >= 40:
+            break
+        rid = record.get("id", "")
+        if rid and rid not in seen_ids:
+            seen_ids.add(rid)
+            ticker_items.append({
+                "text": record.get("text", ""),
+                "category": record.get("category", ""),
+                "address": record.get("address", ""),
+                "date": record.get("date", ""),
+                "id": rid,
+            })
+
+    ticker_data = {
+        "headline": headline,
+        "generated": now.isoformat(),
+        "items": ticker_items,
+    }
+
+    out_path = (
+        Path(__file__).resolve().parent.parent / "docs" / "homepage" / "ticker.json"
+    )
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(
+        json.dumps(ticker_data, indent=2, ensure_ascii=False), encoding="utf-8"
+    )
+    logger.info(
+        f"Ticker: wrote {len(ticker_items)} items to {out_path} "
+        f"({out_path.stat().st_size:,} bytes)"
+    )
+
+
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 def main() -> None:
@@ -554,6 +616,8 @@ def main() -> None:
 
     # Phase 1: Fetch descriptions
     records = fetch_weekly_descriptions()
+
+    citizen_deduped = []  # Track for ticker output
 
     if not records:
         logger.warning("No descriptions found for this week")
@@ -610,6 +674,12 @@ def main() -> None:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(digest, indent=2, ensure_ascii=False), encoding="utf-8")
     logger.info(f"Wrote {out_path.stat().st_size:,} bytes to {out_path}")
+
+    # Write homepage ticker (raw descriptions, no editorial notes)
+    if records:
+        digest_picks = digest.get("picks", [])
+        headline = digest.get("headline", "This week in Austin 311")
+        _write_ticker_json(citizen_deduped, digest_picks, headline)
 
 
 if __name__ == "__main__":

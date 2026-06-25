@@ -904,20 +904,19 @@
     // ── 311 Descriptions Ticker ────────────────────────────────────────────────
 
     (function loadFunTicker() {
-      fetch("fun/data.json")
+      fetch("homepage/ticker.json")
         .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
         .then(function(data) {
-          if (data.funnyDescriptions) renderFunnyDescriptions(data.funnyDescriptions);
+          if (data.items) renderTicker(data.items);
         })
         .catch(function(err) {
           document.getElementById("ticker-text").textContent = "Failed to load: " + err.message;
         });
     })();
 
-    function renderFunnyDescriptions(d) {
-      var items = d.items || [];
+    function renderTicker(items) {
       if (!items.length) {
-        document.getElementById("ticker-text").textContent = "No funny descriptions found.";
+        document.getElementById("ticker-text").textContent = "No descriptions found this week.";
         return;
       }
 
@@ -939,7 +938,7 @@
       var tickerPrev = document.getElementById("ticker-prev");
       var tickerNext = document.getElementById("ticker-next");
 
-      tickerSub.textContent = "Sampled from " + d.totalFetched.toLocaleString() + " recent 311 requests";
+      tickerSub.textContent = "Curated from this week\u2019s 311 complaints";
 
       var timer = null;
       var paused = false;
@@ -1024,6 +1023,61 @@
       showItem(0);
       resetTimers();
     }
+
+    // ── Card stats: inject open/total counts into map card descriptions ──────
+
+    (function loadCardStats() {
+      fetch("homepage/card-stats.json")
+        .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+        .then(function(data) {
+          if (!data.categories) return;
+          var cats = data.categories;
+
+          // Map link href patterns to category keys
+          var linkMap = {
+            "homeless/": "homeless",
+            "parking/": "parking",
+            "noise/": "noise",
+            "animal/": "animal",
+            "graffiti/": "graffiti",
+            "parks/": "parks",
+            "storm/": "storm",
+            "traffic/": "traffic",
+            "bicycle/": "bicycle",
+            "animal/dead/": "deadAnimal",
+          };
+
+          // Walk all card links and inject stats where we have data
+          // Check longer href prefixes first to avoid "animal/" matching "animal/dead/"
+          var cards = document.querySelectorAll(".card");
+          cards.forEach(function(card) {
+            var href = card.getAttribute("href") || "";
+            var catKey = null;
+            // Order matters: check most specific prefixes first
+            var prefixes = ["animal/dead/", "homeless/", "parking/", "noise/", "animal/", "graffiti/", "parks/", "storm/", "traffic/", "bicycle/"];
+            for (var i = 0; i < prefixes.length; i++) {
+              if (href.startsWith(prefixes[i])) {
+                catKey = linkMap[prefixes[i]];
+                break;
+              }
+            }
+            if (!catKey || !cats[catKey]) return;
+
+            var stats = cats[catKey];
+            var descEl = card.querySelector(".desc");
+            if (!descEl) return;
+
+            if (stats.open > 0) {
+              descEl.textContent = stats.open + " open \u00b7 " + stats.total + " total \u00b7 updated daily";
+            } else {
+              descEl.textContent = stats.total + " reports \u00b7 updated daily";
+            }
+          });
+        })
+        .catch(function() {
+          // Silently skip — cards keep their default descriptions
+        });
+    })();
 
     // ── pulse bar fetch (disabled until counters are working) ──
     /*
