@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-Generate docs/complaints/digest.json — LLM-powered weekly digest of 311 descriptions.
+Generate docs/complaints/digest.json — "Hidden Austin" curated weekly digest.
 
-Fetches ALL descriptions from 29 description-rich Open311 service codes (past 7 days),
-sends them to a free LLM via OpenRouter for summarization, and saves the result.
-
-The digest is surfaced as a "📊 This Week" chip on the existing complaints page.
+Fetches all descriptions from 29 Open311 service codes (past 7 days), separates
+citizen-written complaints from city boilerplate responses, deduplicates near-duplicates,
+then uses OpenRouter to curate 10-15 "Editor's Picks" with editorial commentary.
 
 Run:  OPENROUTER_API_KEY=... python scripts/generate_weekly_digest.py
 Output: docs/complaints/digest.json
 
-Fallback: If OpenRouter is unavailable, generates a keyword-based digest.
+Fallback: If OpenRouter is unavailable, surfaces the top 25 citizen-written
+complaints ranked by an interestingness heuristic.
 """
 
 import json
@@ -33,8 +33,6 @@ OPEN311_URL = "https://311.austintexas.gov/open311/v2/requests.json"
 OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # ── 29 description-rich service codes ──────────────────────────────────────
-# 25 proven codes from generate_fun_data.py's _FUNNY_CODES
-# + 4 promising extras (bicycle, dead animal, animal protection, construction)
 DIGEST_CODES = [
     ("DSOUCVMC", "Outdoor Music Venue"),
     ("APDNONNO", "Noise Complaint"),
@@ -61,7 +59,6 @@ DIGEST_CODES = [
     ("DRCHANEL", "Drainage"),
     ("ACBITE2", "Animal Bite"),
     ("COAACDD", "Vicious Dog"),
-    # Promising extras
     ("PWBICYCL", "Bicycle Issue"),
     ("ZZARDEAC", "Dead Animal"),
     ("ACINFORM", "Animal Protection"),
@@ -77,7 +74,7 @@ def _get_session() -> requests.Session:
         _session = requests.Session()
         _session.headers.update({
             "Accept": "application/json",
-            "User-Agent": "austin311bot/weekly-digest (pre-generator)",
+            "User-Agent": "austin311bot/weekly-digest",
         })
     return _session
 
@@ -107,7 +104,7 @@ def _fetch_open311(params: dict) -> Optional[list]:
         return None
 
 
-# ── Profanity censor (for fallback keyword-based digest) ──────────────────────
+# ── Profanity censor ────────────────────────────────────────────────────────
 
 _PROFANITY_CENSOR = {
     "fucking": "f***ing",
@@ -142,7 +139,6 @@ def fetch_weekly_descriptions() -> list:
 
     seen_ids: set = set()
     all_records: list = []
-    total_fetched = 0
 
     logger.info(f"Fetching descriptions from {week_ago:%Y-%m-%d} to {now:%Y-%m-%d}")
     logger.info(f"Scanning {len(DIGEST_CODES)} service codes…")
@@ -150,7 +146,7 @@ def fetch_weekly_descriptions() -> list:
     for code, label in DIGEST_CODES:
         code_records = 0
         page = 1
-        while page <= 3:  # 7-day windows typically fit in 1-2 pages
+        while page <= 3:
             records = _fetch_open311({
                 "service_code": code,
                 "start_date": start_str,
@@ -168,7 +164,6 @@ def fetch_weekly_descriptions() -> list:
                 sid = r.get("service_request_id")
                 if sid and sid not in seen_ids:
                     seen_ids.add(sid)
-                    # Prefer citizen-written description over city status_notes
                     desc = (r.get("description") or "").strip()
                     notes = (r.get("status_notes") or "").strip()
                     text = desc if len(desc) > 15 else (notes if len(notes) > 10 else "")
@@ -189,7 +184,6 @@ def fetch_weekly_descriptions() -> list:
             page += 1
             time.sleep(1.0)
 
-        total_fetched += code_records
         if code_records:
             logger.info(f"  {code} ({label}): {code_records} descriptions")
         time.sleep(0.5)
@@ -198,22 +192,148 @@ def fetch_weekly_descriptions() -> list:
     return all_records
 
 
-# ── Phase 2a: LLM-powered digest (OpenRouter) ────────────────────────────────
+# ── Phase 2: Classify & filter ───────────────────────────────────────────────
 
-def _build_prompt(records: list) -> str:
-    """Build the system + user prompt for the LLM digest."""
-    system = """You are an analyst for Austin 311, the city's non-emergency service request system.
-Analyze the citizen complaint descriptions provided and return a JSON object with these keys:
-- "weeklyHeadline": a one-sentence summary of the week in 311 (conversational, human)
-- "themes": array of objects, each with {"theme": string, "count": int, "examples": [string]}. Top complaint themes this week.
-- "emergingIssues": array of strings. Anything trending up, unusual, or notable that wasn't common before.
-- "mostUnusualComplaint": object with {"text": string, "address": string, "category": string, "ticketId": string}. The weirdest, funniest, or most uniquely-Austin complaint.
-- "mentionedVenues": array of strings. Business names, venue names, bar names, restaurant names, apartment complexes extracted from descriptions.
-- "sentimentNote": one-sentence observation about the overall tone this week (angrier? more patient? any pattern?)
-- "topComplaintTypes": array of objects, each with {"type": string, "count": int}. Fine-grained sub-types (e.g. "Loud Music/Party", "Barking Dog", "Blocked Driveway")
+# Patterns that indicate a city-written status update, not a citizen complaint.
+_CITY_BOILERPLATE = [
+    "close sr", "closed sr", "duplicate - close", "no issue found",
+    "inspection performed", "no action needed", "no violation",
+    "future work scheduled", "added for future clean up",
+    "referred to 311", "referred to", "citation issued",
+    "contact made", "unable to locate", "utl",
+    "patrol for bite", "patrolled for stray",
+    "job#", "no sound violation", "investigated",
+    "will monitor", "will continue to monitor",
+    "no further action", "case closed",
+    "sr closed", "work order submitted",
+    "assigned to", "routed to",
+]
 
-Keep descriptions concise and readable. If a description is too long, summarize the key point.
-Return ONLY valid JSON. No markdown fences, no commentary."""
+
+def _is_city_response(text: str) -> bool:
+    """Return True if the text looks like a city-written status update."""
+    t = text.strip().lower()
+    # Very short or all-caps descriptions are often city boilerplate
+    if len(t) < 30:
+        return True
+    # All-uppercase and > 60% uppercase letters = likely city boilerplate
+    alpha_chars = [c for c in text if c.isalpha()]
+    if alpha_chars and sum(1 for c in alpha_chars if c.isupper()) / len(alpha_chars) > 0.6:
+        return True
+    # Check known boilerplate phrases
+    for marker in _CITY_BOILERPLATE:
+        if marker in t:
+            return True
+    return False
+
+
+def _classify_and_filter(records: list) -> tuple:
+    """Split records into citizen-written complaints and city responses.
+
+    Returns (citizen_complaints, city_responses).
+    Also adds a 'notable' field to citizen complaints for the browse UI.
+    """
+    citizen = []
+    city = []
+    for r in records:
+        if _is_city_response(r["text"]):
+            city.append(r)
+        else:
+            r["notable"] = True  # All citizen-written are notable
+            citizen.append(r)
+
+    logger.info(
+        f"Classification: {len(citizen)} citizen-written, "
+        f"{len(city)} city responses"
+    )
+    return citizen, city
+
+
+# ── Phase 3: Deduplicate near-duplicates ─────────────────────────────────────
+
+def _text_similarity(a: str, b: str) -> float:
+    """Quick similarity check: Jaccard on word trigrams."""
+    def trigrams(s):
+        words = s.lower().split()
+        return set(" ".join(words[i:i+3]) for i in range(len(words) - 2))
+
+    ta, tb = trigrams(a), trigrams(b)
+    if not ta or not tb:
+        return 0.0
+    return len(ta & tb) / len(ta | tb)
+
+
+def _deduplicate_citizen(records: list) -> list:
+    """Remove near-duplicate citizen complaints (same address + similar text).
+
+    Keeps the longest version of each cluster. Adds a '_dedupCount' field
+    to indicate how many similar complaints were merged.
+    """
+    if len(records) <= 1:
+        return records
+
+    deduped = []
+    skipped_indices = set()
+
+    for i, r in enumerate(records):
+        if i in skipped_indices:
+            continue
+        dup_count = 1
+        best = r
+        for j in range(i + 1, len(records)):
+            if j in skipped_indices:
+                continue
+            other = records[j]
+            # Must share same address and date to be considered a duplicate
+            if r["address"] != other["address"] or r["date"] != other["date"]:
+                continue
+            if _text_similarity(r["text"], other["text"]) > 0.4:
+                dup_count += 1
+                skipped_indices.add(j)
+                if len(other["text"]) > len(best["text"]):
+                    best = other
+
+        best["_dedupCount"] = dup_count
+        deduped.append(best)
+
+    logger.info(f"Deduplication: {len(records)} → {len(deduped)} unique citizen complaints")
+    return deduped
+
+
+# ── Phase 4a: LLM-powered curation (OpenRouter) ──────────────────────────────
+
+def _build_prompt(records: list) -> tuple:
+    """Build the system + user prompt for the LLM curation."""
+    system = """You are the editor of "Hidden Austin," a weekly column that surfaces the most
+surprising, funny, infuriating, and uniquely-Austin 311 citizen complaints.
+
+Your job: select 10-15 individual complaints from the list below and, for each one,
+write a 2-4 sentence editorial note explaining WHY this complaint matters.
+
+What makes a complaint worth picking?
+- Vivid, specific details that paint a picture
+- Emotional language (frustration, desperation, humor, disbelief)
+- Complaints that reveal something about Austin life most residents don't see
+- Unexpected situations or creative problem descriptions
+- Complaints about well-known venues or neighborhoods that show a hidden side
+
+For each pick, think about: what does this individual complaint reveal about
+life in Austin? About neighborhood change? About city services? About the
+relationship between residents and their environment?
+
+Return ONLY valid JSON (no markdown fences, no commentary) with this structure:
+{
+  "headline": "A conversational one-sentence summary capturing the mood of this week's picks",
+  "picks": [
+    {
+      "ticketId": "the id field from the complaint",
+      "editorialNote": "Your 2-4 sentence editorial commentary. What's the bigger story here?"
+    }
+  ]
+}
+
+Do NOT include the complaint text in your response — we already have it.
+Only include ticketId (to match back) and editorialNote."""
 
     # Build compact description list
     desc_lines = []
@@ -226,8 +346,10 @@ Return ONLY valid JSON. No markdown fences, no commentary."""
             "text": r["text"],
         }, ensure_ascii=False))
 
-    user = f"Here are {len(records)} citizen 311 complaints from Austin this week (past 7 days):\n\n"
-    user += "[\n" + ",\n".join(desc_lines) + "\n]"
+    user = f"Here are {len(records)} citizen-written 311 complaints from Austin this week (past 7 days):\n\n"
+    user += "[\n" + ",\n".join(desc_lines) + "\n]\n\n"
+    user += "Select 10-15 of the most interesting ones. For each, provide "
+    user += "the ticketId and your editorial note. Return ONLY valid JSON."
 
     return system, user
 
@@ -238,28 +360,28 @@ def _estimate_tokens(text: str) -> int:
 
 
 def _call_llm(records: list) -> Optional[dict]:
-    """Send descriptions to OpenRouter free model and parse JSON response.
+    """Send citizen-written descriptions to OpenRouter and parse the curated picks.
 
     If the payload is too large for the model's context, trims to fit.
     """
     api_key = _get_openrouter_key()
     if not api_key:
-        logger.warning("OPENROUTER_API_KEY not set — skipping LLM digest")
+        logger.warning("OPENROUTER_API_KEY not set — skipping LLM curation")
         return None
 
     system, user = _build_prompt(records)
-    total_chars = len(system) + len(user)
     estimated_tokens = _estimate_tokens(f"{system}\n{user}")
 
     logger.info(f"LLM prompt: ~{estimated_tokens:,} estimated tokens ({len(records)} descriptions)")
 
-    # If payload seems too large for most free models (> 500K chars), trim
+    # Trim if needed
+    total_chars = len(system) + len(user)
     if total_chars > 500_000:
-        logger.warning(f"Payload too large ({total_chars:,} chars), trimming to newest records")
-        # Rebuild with fewer records — keep newest first
-        trimmed = records[:max(1, len(records) * 400_000 // total_chars)]
+        logger.warning(f"Payload too large ({total_chars:,} chars), trimming")
+        keep = max(1, len(records) * 400_000 // total_chars)
+        # Keep newest first
+        trimmed = sorted(records, key=lambda r: r["date"], reverse=True)[:keep]
         system, user = _build_prompt(trimmed)
-        total_chars = len(system) + len(user)
         estimated_tokens = _estimate_tokens(f"{system}\n{user}")
         logger.info(f"  Trimmed to {len(trimmed)} records (~{estimated_tokens:,} tokens)")
 
@@ -269,7 +391,7 @@ def _call_llm(records: list) -> Optional[dict]:
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ],
-        "temperature": 0.3,
+        "temperature": 0.7,
         "max_tokens": 4096,
     }
 
@@ -278,12 +400,12 @@ def _call_llm(records: list) -> Optional[dict]:
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
         "HTTP-Referer": "https://austin311.com",
-        "X-Title": "Austin 311 Weekly Digest",
+        "X-Title": "Hidden Austin Weekly Digest",
     }
 
     try:
         logger.info("Calling OpenRouter…")
-        resp = session.post(OPENROUTER_URL, headers=headers, json=payload, timeout=120)
+        resp = session.post(OPENROUTER_URL, headers=headers, json=payload, timeout=180)
         resp.raise_for_status()
         data = resp.json()
 
@@ -300,12 +422,14 @@ def _call_llm(records: list) -> Optional[dict]:
 
         result = json.loads(content)
 
-        # Validate minimal structure
-        if not isinstance(result, dict) or "themes" not in result:
-            logger.warning(f"LLM response missing expected keys: {list(result.keys())[:5]}")
+        if not isinstance(result, dict) or "picks" not in result:
+            logger.warning(f"LLM response missing 'picks' key: {list(result.keys())[:5]}")
             return None
 
-        logger.info(f"LLM digest generated: {result.get('weeklyHeadline', 'no headline')[:80]}")
+        logger.info(
+            f"LLM curated {len(result.get('picks', []))} picks. "
+            f"Headline: {result.get('headline', '')[:80]}"
+        )
         return result
 
     except requests.exceptions.HTTPError as e:
@@ -319,99 +443,105 @@ def _call_llm(records: list) -> Optional[dict]:
         return None
 
 
-# ── Phase 2b: Keyword-based fallback digest ──────────────────────────────────
+def _merge_picks_with_records(picks: list, records: list) -> list:
+    """Match LLM picks back to full record data by ticketId.
 
-_FALLBACK_KEYWORDS = {
-    "🔊 Noise/Music": ["loud music", "party", "dj", "live band", "karaoke", "blasting",
-                       "noise", "loud", "boom", "vibrating", "shaking"],
-    "🐕 Animals": ["loose dog", "barking", "vicious", "biting", "coyote", "rabid",
-                   "dead animal", "stray"],
-    "🚗 Parking": ["parking", "blocking", "driveway", "fire hydrant", "handicap",
-                   "bike lane", "sidewalk"],
-    "🏚️ Homeless/Encampment": ["camp", "tent", "homeless", "encampment", "vagrant",
-                                "transient", "shack"],
-    "🚮 Trash/Debris": ["trash", "debris", "dumping", "garbage", "litter"],
-    "🏗️ Construction": ["construction", "jackhammer", "drilling", "detour"],
-    "🚦 Traffic/Infrastructure": ["pothole", "street light", "signal", "sign",
-                                   "street sweeping", "sidewalk"],
-    "🌊 Storm/Flooding": ["flood", "drain", "storm", "erosion", "standing water"],
-    "🎆 Fireworks": ["firework", "firecracker"],
-}
-
-
-def _generate_fallback_digest(records: list) -> dict:
-    """Generate a keyword-based digest when the LLM is unavailable.
-
-    Also marks each record with a 'notable' boolean so the UI can default
-    to showing only the keyword-matched (notable) complaints.
+    Each pick from the LLM has {ticketId, editorialNote}.
+    We match them to the full record to get text, address, category, date.
     """
-    logger.info("Generating keyword-based fallback digest")
+    record_map = {r["id"]: r for r in records}
+    merged = []
+    for pick in picks:
+        tid = pick.get("ticketId", "")
+        record = record_map.get(tid)
+        if record:
+            merged.append({
+                "text": record["text"],
+                "editorialNote": pick.get("editorialNote", ""),
+                "address": record["address"],
+                "category": record["category"],
+                "ticketId": tid,
+                "date": record["date"],
+                "dedupCount": record.get("_dedupCount", 1),
+            })
+        else:
+            logger.warning(f"  Pick ticketId '{tid}' not found in records — skipping")
+    return merged
 
-    # Mark all records as not notable by default; we'll flip some below
-    for r in records:
-        r["notable"] = False
 
-    # Count by theme
-    theme_counts: dict = {}
-    theme_examples: dict = {}
-    for r in records:
-        text = r["text"].lower()
-        matched = False
-        for theme, keywords in _FALLBACK_KEYWORDS.items():
-            for kw in keywords:
-                if kw in text:
-                    theme_counts[theme] = theme_counts.get(theme, 0) + 1
-                    if theme not in theme_examples:
-                        theme_examples[theme] = []
-                    if len(theme_examples[theme]) < 3:
-                        theme_examples[theme].append(r["text"][:120])
-                    r["notable"] = True
-                    matched = True
-                    break
-            if matched:
-                break
+# ── Phase 4b: Interestingness-based fallback ────────────────────────────────
 
-    themes = sorted(theme_counts.items(), key=lambda x: -x[1])
-    total = len(records)
+def _interestingness_score(record: dict) -> float:
+    """Heuristic score for ranking citizen complaints when LLM is unavailable.
 
-    # Pick most unusual (citizen-written text, not city boilerplate)
-    _BOILERPLATE = ["close sr", "job#", "resolved", "no issue found", "inspection performed",
-                     "no action needed", "future work scheduled", "referred to",
-                     "citation issued", "contact made", "unable to locate", "utl"]
-    def _is_citizen_text(t):
-        t_lower = t.lower()
-        return len(t) > 80 and not any(b in t_lower for b in _BOILERPLATE)
+    Higher score = more likely to be an interesting read.
+    """
+    text = record["text"]
+    score = 0.0
 
-    unusual_candidates = [r for r in records if _is_citizen_text(r["text"])]
-    if not unusual_candidates:
-        unusual_candidates = [r for r in records if len(r["text"]) > 80]
-    import random
-    random.shuffle(unusual_candidates)
-    most_unusual = unusual_candidates[0] if unusual_candidates else (records[0] if records else {})
-    if most_unusual:
-        most_unusual["notable"] = True
+    # Length sweet spot: 80-400 chars
+    length = len(text)
+    if 80 <= length <= 400:
+        score += min(length / 80, 3.0)
+    elif length > 400:
+        score += 2.0  # Long but not too long
+    else:
+        score += length / 40  # Short but not boilerplate
+
+    # Emotional/exclamatory language
+    score += text.count("!") * 0.5
+    score += text.count("?") * 0.3
+    # ALL CAPS words suggest strong emotion
+    caps_words = [w for w in text.split() if w.isupper() and len(w) > 2]
+    score += len(caps_words) * 0.2
+
+    # Descriptive language markers
+    descriptive = ["please", "help", "need", "dangerous", "terrible",
+                   "awful", "beautiful", "massive", "ridiculous", "unsafe",
+                   "dying", "dead", "screaming", "yelling", "scared"]
+    for word in descriptive:
+        if word in text.lower():
+            score += 0.4
+
+    return score
+
+
+def _generate_fallback_digest(citizen_complaints: list, city_responses: list) -> dict:
+    """Generate a fallback digest by ranking citizen complaints by interestingness.
+
+    Returns the top 25 with simple auto-generated editorial notes.
+    """
+    logger.info("Generating interestingness-based fallback digest")
+
+    scored = [(r, _interestingness_score(r)) for r in citizen_complaints]
+    scored.sort(key=lambda x: -x[1])
+    top = scored[:25]
+
+    picks = []
+    for record, score in top:
+        cat = record["category"]
+        addr = record["address"].split(",")[0] if record["address"] else "Austin"
+        dedup = record.get("_dedupCount", 1)
+        dedup_note = (
+            f" Filed alongside {dedup - 1} other similar complaint(s) this week."
+            if dedup > 1 else ""
+        )
+        picks.append({
+            "text": record["text"],
+            "editorialNote": (
+                f"Filed in the {cat} category on {record['date']} "
+                f"near {addr}.{dedup_note}"
+            ),
+            "address": record["address"],
+            "category": record["category"],
+            "ticketId": record["id"],
+            "date": record["date"],
+            "dedupCount": dedup,
+        })
 
     return {
-        "weeklyHeadline": f"Top themes this week: {', '.join(t for t, _ in themes[:3])}.",
-        "themes": [
-            {"theme": t, "count": c, "examples": theme_examples.get(t, [])}
-            for t, c in themes[:6]
-        ],
-        "emergingIssues": [
-            t for t, c in themes[:3]
-        ] if themes else ["Not enough data"],
-        "mostUnusualComplaint": {
-            "text": most_unusual.get("text", ""),
-            "address": most_unusual.get("address", ""),
-            "category": most_unusual.get("category", ""),
-            "ticketId": most_unusual.get("id", ""),
-        } if most_unusual else None,
-        "mentionedVenues": [],
-        "sentimentNote": f"Keyword analysis of {total} descriptions across {len(themes)} themes.",
-        "topComplaintTypes": [
-            {"type": t, "count": c}
-            for t, c in themes[:8]
-        ],
+        "headline": f"Top {len(picks)} citizen complaints this week in Austin",
+        "picks": picks,
         "_fallback": True,
     }
 
@@ -420,33 +550,60 @@ def _generate_fallback_digest(records: list) -> dict:
 
 def main() -> None:
     now = _utc_now()
-    logger.info(f"Generating weekly digest at {now.isoformat()}")
+    logger.info(f"=== Hidden Austin digest — {now.isoformat()} ===")
 
     # Phase 1: Fetch descriptions
     records = fetch_weekly_descriptions()
+
     if not records:
         logger.warning("No descriptions found for this week")
         digest = {
-            "weeklyHeadline": "No 311 complaints found this week — quiet in Austin!",
-            "themes": [],
-            "emergingIssues": [],
-            "mostUnusualComplaint": None,
-            "mentionedVenues": [],
-            "sentimentNote": "No data available for this period.",
-            "topComplaintTypes": [],
+            "headline": "No 311 complaints found this week — quiet in Austin!",
+            "picks": [],
+            "citizenComplaints": [],
+            "cityResponses": [],
         }
     else:
-        # Phase 2: Try LLM, fall back to keyword-based
-        digest = _call_llm(records)
-        if digest is None:
-            logger.info("LLM unavailable, using keyword fallback")
-            digest = _generate_fallback_digest(records)
+        # Phase 2: Classify
+        citizen_raw, city_responses = _classify_and_filter(records)
 
-    # Add metadata and raw complaint records for the browse UI
-    digest["_generated"] = now.isoformat()
-    digest["_totalDescriptions"] = len(records)
-    digest["_source"] = "Open311 (29 service codes, last 7 days)"
-    digest["complaints"] = records
+        # Phase 3: Deduplicate citizen complaints
+        citizen_deduped = _deduplicate_citizen(citizen_raw)
+
+        # Remove internal dedup count for the browse list
+        citizen_complaints = []
+        for r in citizen_deduped:
+            c = {k: v for k, v in r.items() if not k.startswith("_")}
+            c["notable"] = True
+            citizen_complaints.append(c)
+
+        # Phase 4: LLM curation or fallback
+        llm_result = _call_llm(citizen_deduped)
+        if llm_result and llm_result.get("picks"):
+            picks = _merge_picks_with_records(llm_result["picks"], citizen_deduped)
+            digest = {
+                "headline": llm_result.get("headline", "This week in Austin 311"),
+                "picks": picks,
+            }
+            logger.info(f"LLM: {len(picks)} picks merged from LLM response")
+        else:
+            logger.info("LLM unavailable or returned no picks, using fallback")
+            digest = _generate_fallback_digest(citizen_deduped, city_responses)
+
+        digest["citizenComplaints"] = citizen_complaints
+        digest["cityResponses"] = city_responses
+
+    # Metadata
+    digest["_meta"] = {
+        "generated": now.isoformat(),
+        "totalDescriptions": len(records),
+        "citizenWritten": len(digest.get("citizenComplaints", [])),
+        "cityResponses": len(digest.get("cityResponses", [])),
+        "source": "Open311 (29 service codes, last 7 days)",
+        "fallback": digest.get("_fallback", False),
+    }
+    # Clean up top-level fallback flag — it's in _meta now
+    digest.pop("_fallback", None)
 
     # Write to docs/complaints/digest.json
     out_path = Path(__file__).resolve().parent.parent / "docs" / "complaints" / "digest.json"

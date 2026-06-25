@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Austin 311 — Weekly Digest</title>
-  <meta name="description" content="A weekly AI-powered digest of the most interesting, unusual, and revealing 311 complaints filed by Austin residents." />
+  <title>Hidden Austin — 311 Complaints</title>
+  <meta name="description" content="Hidden Austin — a weekly curation of the most surprising, revealing 311 complaints filed by Austin residents. Powered by AI." />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Austin 311 — Weekly Digest" />
-  <meta property="og:description" content="A weekly AI-powered digest of Austin 311 complaints." />
+  <meta property="og:title" content="Hidden Austin — Weekly 311 Digest" />
+  <meta property="og:description" content="The most surprising, funny, and revealing 311 complaints from Austin this week." />
   <meta property="og:url" content="https://austin311.com/complaints/" />
   <meta property="og:image" content="https://austin311.com/og-default.png" />
   <style>
@@ -28,6 +28,12 @@
       --chip-text-active: #ffffff;
       --chip-border: #cbd5e1;
       --accent: #3b82f6;
+      --accent-dim: #93c5fd;
+      --pick-border-1: #3b82f6;
+      --pick-border-2: #8b5cf6;
+      --pick-border-3: #ec4899;
+      --pick-border-4: #f59e0b;
+      --pick-border-5: #10b981;
     }
     @media (prefers-color-scheme: dark) {
       :root {
@@ -46,13 +52,19 @@
         --chip-text-active: #ffffff;
         --chip-border: #3d4868;
         --accent: #60a5fa;
+        --accent-dim: #1e3a5f;
+        --pick-border-1: #60a5fa;
+        --pick-border-2: #a78bfa;
+        --pick-border-3: #f472b6;
+        --pick-border-4: #fbbf24;
+        --pick-border-5: #34d399;
       }
     }
     html, body {
       background: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
-      line-height: 1.5;
+      line-height: 1.6;
       min-height: 100vh;
     }
     main {
@@ -65,167 +77,197 @@
       color: var(--text-desc);
       text-decoration: none;
       font-size: 0.9rem;
-      margin-bottom: 1rem;
+      margin-bottom: 0.5rem;
     }
     .back:hover { color: var(--text); }
-    h1 {
-      font-size: 1.65rem;
-      color: var(--text-head);
-      margin-bottom: 0.4rem;
-      letter-spacing: -0.01em;
-    }
-    .lede {
-      color: var(--text-desc);
-      font-size: 0.95rem;
-      margin-bottom: 1.5rem;
-    }
 
-    /* ── featured complaint ── */
-    .featured {
+    /* ── header ── */
+    .page-header {
       margin-bottom: 1.5rem;
-      padding-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
       border-bottom: 1px solid var(--border);
     }
-    .featured-label {
+    .page-header h1 {
+      font-size: 1.75rem;
+      color: var(--text-head);
+      margin-bottom: 0.3rem;
+      letter-spacing: -0.02em;
+    }
+    .page-header .subtitle {
+      color: var(--text-desc);
+      font-size: 0.92rem;
+    }
+
+    /* ── editor's picks ── */
+    .picks-section {
+      margin-bottom: 2.5rem;
+    }
+    .picks-label {
       font-size: 0.78rem;
-      font-weight: 600;
+      font-weight: 700;
       color: var(--text-muted);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
-      margin-bottom: 0.6rem;
+      letter-spacing: 0.06em;
+      margin-bottom: 0.5rem;
     }
-    .featured-headline {
+    .picks-headline {
       font-size: 1.15rem;
-      font-weight: 700;
+      font-weight: 600;
       color: var(--text-head);
       line-height: 1.5;
-      margin-bottom: 0.75rem;
+      margin-bottom: 1.25rem;
+      font-style: italic;
     }
-    .featured-text {
+    .pick-card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem 1.1rem;
-      font-size: 0.97rem;
+      border-radius: 10px;
+      padding: 1.2rem 1.25rem;
+      margin-bottom: 1rem;
+      border-left: 4px solid var(--accent);
+      transition: border-color 0.15s ease;
+    }
+    .pick-card:hover { border-left-color: var(--border-hover); }
+    .pick-card:nth-child(5n+1) { border-left-color: var(--pick-border-1); }
+    .pick-card:nth-child(5n+2) { border-left-color: var(--pick-border-2); }
+    .pick-card:nth-child(5n+3) { border-left-color: var(--pick-border-3); }
+    .pick-card:nth-child(5n+4) { border-left-color: var(--pick-border-4); }
+    .pick-card:nth-child(5n+5) { border-left-color: var(--pick-border-5); }
+    .pick-text {
+      font-size: 1.05rem;
       color: var(--text);
-      line-height: 1.55;
-      margin-bottom: 0.6rem;
+      line-height: 1.6;
+      margin-bottom: 0.65rem;
       white-space: pre-wrap;
       word-wrap: break-word;
-      border-left: 3px solid var(--accent);
+      font-weight: 500;
     }
-    .featured-meta {
-      font-size: 0.78rem;
+    .pick-text a {
+      color: inherit;
+      text-decoration: none;
+    }
+    .pick-text a:hover { color: var(--accent); }
+    .pick-note {
+      font-size: 0.88rem;
       color: var(--text-desc);
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      margin-bottom: 0.75rem;
-    }
-    .featured-meta a { color: var(--text-desc); }
-    .featured-meta a:hover { color: var(--accent); }
-
-    /* ── theme section ── */
-    .section-title {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--text-head);
-      margin-bottom: 0.75rem;
-      margin-top: 1.5rem;
-    }
-    .theme-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1rem 1.1rem;
-      margin-bottom: 0.75rem;
-    }
-    .theme-card h3 {
-      font-size: 0.95rem;
-      color: var(--text-head);
-      margin-bottom: 0.4rem;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-    .theme-card h3 .count {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-    .theme-examples {
+      font-style: italic;
+      line-height: 1.55;
+      margin-bottom: 0.6rem;
       padding-left: 0.5rem;
       border-left: 2px solid var(--border);
     }
-    .theme-example {
-      font-size: 0.82rem;
+    .pick-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.6rem 1rem;
+      font-size: 0.78rem;
       color: var(--text-desc);
-      margin-bottom: 0.25rem;
-      font-style: italic;
+    }
+    .pick-meta a { color: var(--text-desc); text-decoration: none; }
+    .pick-meta a:hover { color: var(--accent); }
+    .pick-dedup {
+      background: var(--accent-dim);
+      color: var(--accent);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      white-space: nowrap;
     }
 
-    /* ── venue tags ── */
-    .venue-list {
+    /* ── browse section (divider) ── */
+    .browse-divider {
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.4rem;
-    }
-    .venue-tag {
-      background: var(--bg-card-hover);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 0.25rem 0.65rem;
-      font-size: 0.85rem;
-      color: var(--text);
-    }
-
-    /* ── emerging issues ── */
-    .emerging-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.8rem 1rem;
-      font-size: 0.9rem;
-      color: var(--text);
-      line-height: 1.6;
-    }
-
-    /* ── sentiment ── */
-    .sentiment-box {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.8rem 1rem;
-      font-size: 0.9rem;
-      color: var(--text);
-      line-height: 1.5;
-    }
-
-    /* ── hub: category chips ── */
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 1.5rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--border);
-      margin-top: 1.5rem;
-    }
-    .chip {
-      display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      padding: 0.45rem 0.85rem;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+    .browse-divider h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-head);
+      white-space: nowrap;
+    }
+    .browse-divider .divider-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* ── search ── */
+    .search-wrap {
+      margin-bottom: 1rem;
+    }
+    .search-input {
+      width: 100%;
+      padding: 0.6rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 0.9rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .search-input:focus { border-color: var(--accent); }
+    .search-input::placeholder { color: var(--text-muted); }
+
+    /* ── toggle ── */
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      font-size: 0.85rem;
+      color: var(--text-desc);
+    }
+    .toggle-btn {
+      padding: 0.35rem 0.85rem;
       border-radius: 999px;
       border: 1px solid var(--chip-border);
       background: var(--chip-bg);
       color: var(--chip-text);
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.15s ease;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .toggle-btn.active {
+      background: var(--chip-bg-active);
+      color: var(--chip-text-active);
+      border-color: var(--chip-bg-active);
+    }
+    .toggle-btn:hover:not(.active) {
+      border-color: var(--border-hover);
+    }
+
+    /* ── chips ── */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-bottom: 1rem;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--chip-border);
+      background: var(--chip-bg);
+      color: var(--chip-text);
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.15s;
       user-select: none;
       white-space: nowrap;
+      font-family: inherit;
     }
     .chip:hover {
       border-color: var(--border-hover);
@@ -237,26 +279,26 @@
       border-color: var(--chip-bg-active);
     }
     .chip-count {
-      font-size: 0.75rem;
-      opacity: 0.7;
+      font-size: 0.72rem;
+      opacity: 0.65;
       font-variant-numeric: tabular-nums;
     }
     .chip.active .chip-count { opacity: 0.85; }
 
-    /* ── spoke: complaints list ── */
-    .spoke-header {
+    /* ── list ── */
+    .list-header {
       display: flex;
       align-items: baseline;
       justify-content: space-between;
-      margin-bottom: 1rem;
+      margin-bottom: 0.75rem;
       gap: 1rem;
     }
-    .spoke-title {
-      font-size: 1.1rem;
+    .list-header .title {
+      font-size: 1rem;
       color: var(--text-head);
       font-weight: 600;
     }
-    .spoke-meta {
+    .list-header .count {
       font-size: 0.8rem;
       color: var(--text-desc);
       font-variant-numeric: tabular-nums;
@@ -264,21 +306,21 @@
     .list {
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.5rem;
     }
     .item {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 8px;
-      padding: 1rem 1.1rem;
-      transition: border-color 0.15s ease;
+      padding: 0.75rem 1rem;
+      transition: border-color 0.15s;
     }
     .item:hover { border-color: var(--border-hover); }
     .item-text {
       color: var(--text);
-      font-size: 0.97rem;
-      line-height: 1.55;
-      margin-bottom: 0.6rem;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 0.4rem;
       white-space: pre-wrap;
       word-wrap: break-word;
     }
@@ -287,20 +329,18 @@
     .item-meta {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
-      font-size: 0.78rem;
+      gap: 0.6rem;
+      font-size: 0.74rem;
       color: var(--text-desc);
     }
-    .item-meta .addr::before { content: "📍 "; }
-    .item-meta .date::before { content: "📅 "; }
-    .item-meta .id::before { content: "🎫 "; }
-    .item-meta .id a { color: var(--text-desc); text-decoration: none; }
-    .item-meta .id a:hover { color: var(--accent); text-decoration: underline; }
+    .item-meta a { color: var(--text-desc); text-decoration: none; }
+    .item-meta a:hover { color: var(--accent); text-decoration: underline; }
 
+    /* ── footer ── */
     .footer-note {
       font-size: 0.8rem;
       color: var(--text-muted);
-      margin-top: 2rem;
+      margin-top: 2.5rem;
       padding-top: 1rem;
       border-top: 1px solid var(--border);
     }
@@ -322,17 +362,35 @@
 <body>
   <main>
     <a class="back" href="../">← Austin 311</a>
-    <h1>What Austin is complaining about</h1>
-    <p class="lede" id="lede">Loading…</p>
+    <div class="page-header">
+      <h1>Hidden Austin</h1>
+      <p class="subtitle" id="lede">Loading…</p>
+    </div>
 
-    <div id="featured" class="featured"></div>
-    <div id="digest-sections"></div>
+    <!-- Editor's Picks -->
+    <section class="picks-section" id="picks-section"></section>
+
+    <!-- Browse all (divider + search + chips + list) -->
+    <div class="browse-divider">
+      <h2>🔍 Browse all reports</h2>
+      <div class="divider-line"></div>
+    </div>
+
+    <div class="search-wrap">
+      <input type="text" class="search-input" id="search-input" placeholder="Search complaints…" />
+    </div>
+
+    <div class="toggle-row">
+      <span>Show:</span>
+      <button class="toggle-btn active" id="toggle-citizen">Citizen-written</button>
+      <button class="toggle-btn" id="toggle-all">All reports</button>
+    </div>
 
     <div class="chips" id="chips"></div>
 
-    <div class="spoke-header">
-      <div class="spoke-title" id="spoke-title">All</div>
-      <div class="spoke-meta" id="spoke-meta"></div>
+    <div class="list-header">
+      <div class="title" id="list-title">Complaints</div>
+      <div class="count" id="list-count"></div>
     </div>
 
     <div class="list" id="list">
@@ -344,80 +402,97 @@
 
   <script>
     (function () {
+      var CITIZEN = [];
+      var CITY = [];
       var ALL = [];
       var CATEGORIES = [];
-      var showingAll = false;  // toggled by clicking "All" chip
-      var current = "__all__";
+      var showAll = false;
+      var currentCategory = "__all__";
+      var currentQuery = "";
+
+      var PICK_COLORS = [
+        "var(--pick-border-1)", "var(--pick-border-2)", "var(--pick-border-3)",
+        "var(--pick-border-4)", "var(--pick-border-5)"
+      ];
 
       fetch("digest.json")
         .then(function (r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
         .then(function (d) {
-          ALL = d.complaints || [];
-          renderDigestSections(d);
-          renderFeatured(d);
+          CITIZEN = d.citizenComplaints || [];
+          CITY = d.cityResponses || [];
+          ALL = CITIZEN.concat(CITY);
+
+          renderPicks(d);
           renderFooter(d);
 
-          if (!ALL.length) {
-            document.getElementById("list").innerHTML = '<div class="empty">No complaints in this week\'s digest.</div>';
+          if (!CITIZEN.length && !CITY.length) {
+            document.getElementById("list").innerHTML = '<div class="empty">No complaints this week.</div>';
             return;
           }
+
           render();
         })
-        .catch(function (err) {
+        .catch(function () {
+          document.getElementById("lede").textContent = "Check back after the first weekly run.";
           document.getElementById("list").innerHTML = '<div class="empty">No digest available yet \u2014 check back after the first weekly run.</div>';
         });
 
-      function isNotable(i) {
-        return i.hasOwnProperty('notable') ? i.notable : true;
+      function activePool() {
+        return showAll ? ALL : CITIZEN;
       }
 
-      function activeForCategory(cat) {
-        var pool = showingAll && cat === "__all__" ? ALL : ALL.filter(function (i) { return isNotable(i); });
-        if (!cat || cat === "__all__") return pool.slice().sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); });
-        return pool.filter(function (i) { return i.category === cat; }).sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); });
+      function visibleItems() {
+        var pool = activePool();
+        var cat = currentCategory;
+        var q = currentQuery.trim().toLowerCase();
+
+        if (cat && cat !== "__all__") {
+          pool = pool.filter(function (i) { return i.category === cat; });
+        }
+        if (q) {
+          pool = pool.filter(function (i) {
+            return (i.text || "").toLowerCase().indexOf(q) !== -1
+                || (i.address || "").toLowerCase().indexOf(q) !== -1
+                || (i.category || "").toLowerCase().indexOf(q) !== -1;
+          });
+        }
+        return pool.slice().sort(function (a, b) {
+          return (b.date || "").localeCompare(a.date || "");
+        });
       }
 
       function render() {
-        var hasNotable = ALL.length > 0 && ALL[0].hasOwnProperty('notable');
-        var notableItems = hasNotable ? ALL.filter(function (i) { return i.notable; }) : ALL;
-        var notableCounts = {};
-        notableItems.forEach(function (i) { notableCounts[i.category] = (notableCounts[i.category] || 0) + 1; });
-        CATEGORIES = Object.keys(notableCounts).sort(function (a, b) { return notableCounts[b] - notableCounts[a]; });
-
+        // Lede
+        var pool = activePool();
+        var meta = null;
+        try { meta = JSON.parse(document.querySelector('script[type="application/json"]') ? "" : "{}") || {}; } catch(e) {}
         document.getElementById("lede").textContent =
-          showingAll
-            ? ALL.length + ' total complaints'
-            : notableItems.length + ' notable complaints out of ' + ALL.length + ' total';
+          (showAll ? ALL.length + " total reports" : CITIZEN.length + " citizen-written complaints")
+          + " filed this week in Austin.";
 
+        // Category counts from the active pool (citizen or all)
+        var pool = activePool();
+        var counts = {};
+        pool.forEach(function (i) {
+          counts[i.category] = (counts[i.category] || 0) + 1;
+        });
+        CATEGORIES = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
+
+        // Chips
         var chips = document.getElementById("chips");
         chips.innerHTML = "";
-        chips.appendChild(buildChip("__all__", "All " + ALL.length, null));
+        chips.appendChild(buildChip("__all__", "All categories", pool.length));
         CATEGORIES.forEach(function (cat) {
-          chips.appendChild(buildChip(cat, cat, notableCounts[cat]));
+          chips.appendChild(buildChip(cat, cat, counts[cat]));
         });
 
-        // Default: show notable across all categories
-        select(current === "__all__" && showingAll ? "__all__" : current);
-        // Wait — select resets current, so set it first
-        // Actually we need to select the right thing from scratch
-        var target = "__all__";
-        var initial = (location.hash || "").replace(/^#/, "");
-        if (initial === "__all__" || initial === "") {
-          // showingAll stays at default false -> notable view
-          target = "__all__";
-        } else if (notableCounts[decodeURIComponent(initial)]) {
-          target = decodeURIComponent(initial);
-        }
-        current = target;
-        select(target);
-
-        window.addEventListener("hashchange", function () {
-          var h = decodeURIComponent((location.hash || "").replace(/^#/, ""));
-          if (h === "__all__" || notableCounts[h]) {
-            if (h === "__all__") { showingAll = true; }
-            select(h);
-          }
+        // Activate current
+        var chipEls = chips.querySelectorAll(".chip");
+        chipEls.forEach(function (c) {
+          c.classList.toggle("active", c.dataset.value === currentCategory);
         });
+
+        refreshList();
       }
 
       function buildChip(value, label, count) {
@@ -425,175 +500,164 @@
         el.className = "chip";
         el.type = "button";
         el.dataset.value = value;
-        var inner = '<span>' + escapeHtml(label) + '</span>';
-        if (count !== null && count !== undefined) {
-          inner += '<span class="chip-count">' + count + '</span>';
-        }
-        el.innerHTML = inner;
+        el.innerHTML = '<span>' + escapeHtml(label) + '</span>'
+          + '<span class="chip-count">' + count + '</span>';
         el.addEventListener("click", function () {
-          if (value === "__all__") {
-            // Toggle showingAll on re-click of All
-            showingAll = !showingAll;
-            // Re-render chips with updated lede
-            var hasNotable = ALL.length > 0 && ALL[0].hasOwnProperty('notable');
-            var notableItems = hasNotable ? ALL.filter(function (i) { return i.notable; }) : ALL;
-            document.getElementById("lede").textContent =
-              showingAll
-                ? ALL.length + ' total complaints'
-                : notableItems.length + ' notable complaints out of ' + ALL.length + ' total';
-            // Update the All chip's active state
-            document.querySelectorAll(".chip").forEach(function (c) {
-              c.classList.toggle("active", c.dataset.value === value);
-            });
-            // Show the All list
-            current = value;
-            renderList(showingAll ? ALL.slice().sort(function (a, b) { return (b.date || "").localeCompare(a.date || ""); }) : activeForCategory("__all__"));
-            document.getElementById("spoke-title").textContent = showingAll ? "All complaints" : "Notable complaints";
-            document.getElementById("spoke-meta").textContent = "";
-            try { history.replaceState(null, "", "#__all__"); } catch (e) {}
-            window.scrollTo({ top: document.querySelector(".spoke-header").offsetTop - 12, behavior: "smooth" });
-          } else {
-            // Category chip — always shows notable in that category
-            showingAll = false;
-            select(value);
-          }
+          currentCategory = value;
+          // Re-highlight chips
+          document.querySelectorAll(".chip").forEach(function (c) {
+            c.classList.toggle("active", c.dataset.value === value);
+          });
+          refreshList();
+          window.scrollTo({ top: document.getElementById("list").offsetTop - 80, behavior: "smooth" });
         });
         return el;
       }
 
-      function select(value) {
-        current = value;
-        showingAll = false;
-        var chips = document.querySelectorAll(".chip");
-        chips.forEach(function (c) { c.classList.toggle("active", c.dataset.value === value); });
-
-        var items = activeForCategory(value);
-        document.getElementById("spoke-title").textContent = value === "__all__" ? "Notable complaints" : value;
-        document.getElementById("spoke-meta").textContent = items.length + (items.length === 1 ? " complaint" : " complaints");
+      function refreshList() {
+        var items = visibleItems();
+        document.getElementById("list-title").textContent =
+          currentCategory === "__all__" ? "Complaints" : currentCategory;
+        document.getElementById("list-count").textContent =
+          items.length + (items.length === 1 ? " result" : " results");
         renderList(items);
-
-        try {
-          history.replaceState(null, "", "#" + encodeURIComponent(value));
-        } catch (e) {}
-
-        window.scrollTo({ top: document.querySelector(".spoke-header").offsetTop - 12, behavior: "smooth" });
       }
 
       function renderList(items) {
         var list = document.getElementById("list");
         if (!items.length) {
-          list.innerHTML = '<div class="empty">No complaints in this category this week.</div>';
+          var msg = currentQuery
+            ? 'No complaints match "' + escapeHtml(currentQuery) + '".'
+            : "No complaints in this category this week.";
+          list.innerHTML = '<div class="empty">' + msg + '</div>';
           return;
         }
         var html = "";
         for (var i = 0; i < items.length; i++) {
           var it = items[i];
-          var ticketUrl = it.id ? "https://311.austintexas.gov/tickets/" + encodeURIComponent(it.id) : null;
+          var ticketUrl = it.id
+            ? "https://311.austintexas.gov/tickets/" + encodeURIComponent(it.id)
+            : null;
           var textHtml = escapeHtml(it.text || "");
           if (ticketUrl) {
             textHtml = '<a href="' + ticketUrl + '" target="_blank" rel="noopener">' + textHtml + '</a>';
           }
           var metaParts = [];
-          if (it.address) metaParts.push('<span class="addr">' + escapeHtml(it.address) + '</span>');
-          if (it.date) metaParts.push('<span class="date">' + escapeHtml(it.date) + '</span>');
+          if (it.address) metaParts.push('<span>' + escapeHtml(it.address) + '</span>');
+          if (it.date) metaParts.push('<span>' + escapeHtml(it.date) + '</span>');
+          if (it.category) metaParts.push('<span>' + escapeHtml(it.category) + '</span>');
           if (it.id) {
-            metaParts.push('<span class="id"><a href="https://311.austintexas.gov/tickets/' + encodeURIComponent(it.id) + '" target="_blank" rel="noopener">' + escapeHtml(it.id) + '</a></span>');
+            metaParts.push('<span><a href="https://311.austintexas.gov/tickets/'
+              + encodeURIComponent(it.id) + '" target="_blank" rel="noopener">'
+              + escapeHtml(it.id) + '</a></span>');
           }
           html += '<div class="item">'
             + '<div class="item-text">' + textHtml + '</div>'
-            + (metaParts.length ? '<div class="item-meta">' + metaParts.join("") + '</div>' : '')
+            + '<div class="item-meta">' + metaParts.join(" · ") + '</div>'
             + '</div>';
         }
         list.innerHTML = html;
       }
 
-      function renderFeatured(d) {
-        var el = document.getElementById("featured");
-        if (!d || !d.mostUnusualComplaint || !d.mostUnusualComplaint.text) {
-          el.innerHTML = '';
+      function renderPicks(d) {
+        var el = document.getElementById("picks-section");
+        if (!d || !d.picks || !d.picks.length) {
+          el.innerHTML = "";
           return;
         }
-        var muc = d.mostUnusualComplaint;
-        var html = '<div class="featured-label">This week\u2019s most unusual complaint' +
-          (d._totalDescriptions ? ' out of ' + d._totalDescriptions + ' reports' : '') + '</div>';
-        if (d.weeklyHeadline) {
-          html += '<div class="featured-headline">' + escapeHtml(d.weeklyHeadline) + '</div>';
-        }
-        html += '<div class="featured-text">' + escapeHtml(muc.text) + '</div>';
-        html += '<div class="featured-meta">';
-        if (muc.address) html += '<span>📍 ' + escapeHtml(muc.address) + '</span>';
-        if (muc.category) html += '<span>📂 ' + escapeHtml(muc.category) + '</span>';
-        if (muc.ticketId) {
-          html += '<span>🎫 <a href="https://311.austintexas.gov/tickets/' + encodeURIComponent(muc.ticketId) + '" target="_blank">' + escapeHtml(muc.ticketId) + '</a></span>';
-        }
-        html += '</div></div>';
-        el.innerHTML = html;
-      }
-
-      function renderDigestSections(d) {
-        var el = document.getElementById("digest-sections");
-        if (!d) { el.innerHTML = ''; return; }
-        var html = "";
-
-        // Sentiment (skip generic keyword-fallback one)
-        if (d.sentimentNote && d.sentimentNote.indexOf("Keyword analysis") === -1) {
-          html += '<div class="section-title">💡 Overall Vibe</div>';
-          html += '<div class="sentiment-box">' + escapeHtml(d.sentimentNote) + '</div>';
+        var html = '<div class="picks-label">🏆 Editor\u2019s Picks</div>';
+        if (d.headline) {
+          html += '<div class="picks-headline">' + escapeHtml(d.headline) + '</div>';
         }
 
-        // Themes
-        if (d.themes && d.themes.length) {
-          html += '<div class="section-title">📊 Top Themes</div>';
-          d.themes.forEach(function (t) {
-            html += '<div class="theme-card">';
-            html += '<h3>' + escapeHtml(t.theme) + ' <span class="count">' + t.count + '</span></h3>';
-            if (t.examples && t.examples.length) {
-              html += '<div class="theme-examples">';
-              t.examples.forEach(function (ex) {
-                if (ex) html += '<div class="theme-example">\u201c' + escapeHtml(ex.length > 200 ? ex.slice(0, 200) + '\u2026' : ex) + '\u201d</div>';
-              });
-              html += '</div>';
-            }
-            html += '</div>';
-          });
-        }
+        d.picks.forEach(function (pick, idx) {
+          var ticketUrl = pick.ticketId
+            ? "https://311.austintexas.gov/tickets/" + encodeURIComponent(pick.ticketId)
+            : null;
+          var color = PICK_COLORS[idx % PICK_COLORS.length];
 
-        // Venues
-        if (d.mentionedVenues && d.mentionedVenues.length) {
-          html += '<div class="section-title">📍 Venues & Places Mentioned</div>';
-          html += '<div class="venue-list">';
-          d.mentionedVenues.forEach(function (v) {
-            if (v) html += '<span class="venue-tag">' + escapeHtml(v) + '</span>';
-          });
+          html += '<div class="pick-card" style="border-left-color:' + color + '">';
+
+          // Complaint text
+          var textHtml = escapeHtml(pick.text || "");
+          if (ticketUrl) {
+            textHtml = '<a href="' + ticketUrl + '" target="_blank" rel="noopener">' + textHtml + '</a>';
+          }
+          html += '<div class="pick-text">' + textHtml + '</div>';
+
+          // Editorial note
+          if (pick.editorialNote) {
+            html += '<div class="pick-note">' + escapeHtml(pick.editorialNote) + '</div>';
+          }
+
+          // Meta line
+          html += '<div class="pick-meta">';
+          if (pick.address) html += '<span>📍 ' + escapeHtml(pick.address) + '</span>';
+          if (pick.category) html += '<span>📂 ' + escapeHtml(pick.category) + '</span>';
+          if (pick.date) html += '<span>📅 ' + escapeHtml(pick.date) + '</span>';
+          if (pick.ticketId) {
+            html += '<span>🎫 <a href="' + ticketUrl + '" target="_blank" rel="noopener">'
+              + escapeHtml(pick.ticketId) + '</a></span>';
+          }
+          if (pick.dedupCount && pick.dedupCount > 1) {
+            html += '<span class="pick-dedup">'
+              + (pick.dedupCount - 1) + ' similar this week</span>';
+          }
           html += '</div>';
-        }
 
-        // Emerging issues
-        if (d.emergingIssues && d.emergingIssues.length) {
-          html += '<div class="section-title">🔍 Emerging Issues</div>';
-          html += '<div class="emerging-box">';
-          d.emergingIssues.forEach(function (issue) {
-            if (issue) html += '\u2022 ' + escapeHtml(issue) + '<br/>';
-          });
           html += '</div>';
-        }
+        });
 
         el.innerHTML = html;
       }
 
       function renderFooter(d) {
         var el = document.getElementById("footer-note");
-        if (!d) { el.innerHTML = ''; return; }
-        var html = '';
-        if (d._totalDescriptions) {
-          html += 'Based on ' + d._totalDescriptions + ' complaints from the past 7 days. ';
+        var html = "";
+        var meta = d._meta || {};
+        if (meta.totalDescriptions) {
+          html += "Based on " + meta.totalDescriptions + " reports from the past 7 days";
+          if (meta.citizenWritten) {
+            html += " (" + meta.citizenWritten + " citizen-written, "
+              + meta.cityResponses + " city responses)";
+          }
+          html += ". ";
         }
-        if (d._fallback) {
-          html += '<em>Keyword-generated (AI model unavailable this run).</em> ';
+        if (meta.fallback) {
+          html += "<em>AI-curated picks unavailable this run — showing top citizen complaints.</em> ";
         }
-        html += 'Data: <a href="https://311.austintexas.gov/open311/v2" target="_blank">Austin Open311 API</a>.';
+        if (meta.generated) {
+          html += "Generated " + meta.generated.slice(0, 10) + ". ";
+        }
+        html += 'Data: <a href="https://311.austintexas.gov/open311/v2" target="_blank">Austin Open311 API</a>. '
+          + 'Curated with <a href="https://openrouter.ai/" target="_blank">OpenRouter</a>.';
         el.innerHTML = html;
       }
+
+      // ── Search ──
+      var searchDebounce = null;
+      document.getElementById("search-input").addEventListener("input", function () {
+        clearTimeout(searchDebounce);
+        var self = this;
+        searchDebounce = setTimeout(function () {
+          currentQuery = self.value;
+          refreshList();
+        }, 250);
+      });
+
+      // ── Toggle ──
+      document.getElementById("toggle-citizen").addEventListener("click", function () {
+        showAll = false;
+        this.classList.add("active");
+        document.getElementById("toggle-all").classList.remove("active");
+        render();
+      });
+      document.getElementById("toggle-all").addEventListener("click", function () {
+        showAll = true;
+        this.classList.add("active");
+        document.getElementById("toggle-citizen").classList.remove("active");
+        render();
+      });
 
       function escapeHtml(s) {
         return String(s).replace(/[&<>"']/g, function (c) {
