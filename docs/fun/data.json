@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-21T12:05:01.033424+00:00",
+  "updated": "2026-06-28T11:42:15.727102+00:00",
   "bars": {
     "top10": [
       {
@@ -98,8 +98,8 @@
     "months": [
       {
         "label": "Sep 2025",
-        "count": 19,
-        "pct": 54,
+        "count": 24,
+        "pct": 69,
         "isPupping": false
       },
       {
@@ -116,8 +116,8 @@
       },
       {
         "label": "Jun 2025",
-        "count": 7,
-        "pct": 20,
+        "count": 2,
+        "pct": 6,
         "isPupping": false
       }
     ]
@@ -127,13 +127,20 @@
     "uniqueLocations": 98,
     "repeatRate": 2,
     "winner": {
-      "address": "1807 Aldrich St",
+      "address": "1627 Lupine Ln",
       "count": 2,
       "status": "\u2705 Cleaned",
-      "lat": 30.298055787236382,
-      "lon": -97.70671195356192
+      "lat": 30.243179538332722,
+      "lon": -97.73100072999415
     },
     "top15": [
+      {
+        "address": "1627 Lupine Ln",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.243179538332722,
+        "lon": -97.73100072999415
+      },
       {
         "address": "1807 Aldrich St",
         "count": 2,
@@ -142,11 +149,32 @@
         "lon": -97.70671195356192
       },
       {
-        "address": "666 E Riverside Dr",
-        "count": 2,
+        "address": "401 Rio Grande St",
+        "count": 1,
         "status": "\u2705 Cleaned",
-        "lat": 30.2515565155159,
-        "lon": -97.74090986698866
+        "lat": 30.26808728008315,
+        "lon": -97.75011393638832
+      },
+      {
+        "address": "222 West Ave",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.26739672,
+        "lon": -97.75200864
+      },
+      {
+        "address": "1100 Rose St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.270837565805717,
+        "lon": -97.7560841186917
+      },
+      {
+        "address": "3201 Beanna St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.29199947,
+        "lon": -97.72845621
       },
       {
         "address": "1304 W Riverside Dr",
@@ -210,222 +238,180 @@
         "status": "\u2705 Cleaned",
         "lat": 30.315706393453866,
         "lon": -97.71730173379183
-      },
-      {
-        "address": "135 S Congress Ave",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.26098521954962,
-        "lon": -97.74542276309643
-      },
-      {
-        "address": "811 E 41st St",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.29877732,
-        "lon": -97.72524542
-      },
-      {
-        "address": "906 W Cesar Chavez St",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.265711774453678,
-        "lon": -97.75569017976522
-      },
-      {
-        "address": "3601 Zach Scott St",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.294281293270327,
-        "lon": -97.68998526719804
       }
     ]
   },
   "parking": {
     "total": 100,
-    "peakHour": "9pm",
-    "peakCount": 13,
+    "peakHour": "5pm",
+    "peakCount": 18,
     "hours": [
       {
-        "hour": 6,
-        "label": "6am",
+        "hour": 1,
+        "label": "1am",
         "count": 1,
-        "pct": 8,
-        "isPeak": false
-      },
-      {
-        "hour": 7,
-        "label": "7am",
-        "count": 2,
-        "pct": 15,
-        "isPeak": false
-      },
-      {
-        "hour": 8,
-        "label": "8am",
-        "count": 1,
-        "pct": 8,
+        "pct": 6,
         "isPeak": false
       },
       {
         "hour": 9,
         "label": "9am",
-        "count": 3,
-        "pct": 23,
+        "count": 5,
+        "pct": 28,
         "isPeak": false
       },
       {
         "hour": 10,
         "label": "10am",
-        "count": 1,
-        "pct": 8,
+        "count": 4,
+        "pct": 22,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
-        "count": 8,
-        "pct": 62,
+        "count": 1,
+        "pct": 6,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
-        "count": 7,
-        "pct": 54,
+        "count": 5,
+        "pct": 28,
         "isPeak": false
       },
       {
         "hour": 13,
         "label": "1pm",
-        "count": 8,
-        "pct": 62,
+        "count": 18,
+        "pct": 100,
         "isPeak": false
       },
       {
         "hour": 14,
         "label": "2pm",
         "count": 6,
-        "pct": 46,
+        "pct": 33,
         "isPeak": false
       },
       {
         "hour": 15,
         "label": "3pm",
-        "count": 3,
-        "pct": 23,
+        "count": 2,
+        "pct": 11,
         "isPeak": false
       },
       {
         "hour": 16,
         "label": "4pm",
-        "count": 12,
-        "pct": 92,
+        "count": 16,
+        "pct": 89,
         "isPeak": false
       },
       {
         "hour": 17,
         "label": "5pm",
-        "count": 11,
-        "pct": 85,
-        "isPeak": false
+        "count": 18,
+        "pct": 100,
+        "isPeak": true
       },
       {
         "hour": 18,
         "label": "6pm",
-        "count": 8,
-        "pct": 62,
+        "count": 7,
+        "pct": 39,
         "isPeak": false
       },
       {
         "hour": 19,
         "label": "7pm",
         "count": 7,
-        "pct": 54,
+        "pct": 39,
         "isPeak": false
       },
       {
         "hour": 20,
         "label": "8pm",
-        "count": 7,
-        "pct": 54,
+        "count": 5,
+        "pct": 28,
         "isPeak": false
       },
       {
         "hour": 21,
         "label": "9pm",
-        "count": 13,
-        "pct": 100,
-        "isPeak": true
+        "count": 1,
+        "pct": 6,
+        "isPeak": false
       },
       {
         "hour": 22,
         "label": "10pm",
-        "count": 1,
-        "pct": 8,
+        "count": 2,
+        "pct": 11,
         "isPeak": false
       },
       {
         "hour": 23,
         "label": "11pm",
-        "count": 1,
-        "pct": 8,
+        "count": 2,
+        "pct": 11,
         "isPeak": false
       }
     ],
     "violationTypes": [
       {
         "type": "Other",
-        "count": 28,
+        "count": 27,
         "pct": 100
       },
       {
-        "type": "Oversized Vehicle",
-        "count": 7,
-        "pct": 25
-      },
-      {
-        "type": "Fire Hydrant",
-        "count": 4,
-        "pct": 14
+        "type": "No Parking Zone",
+        "count": 8,
+        "pct": 30
       },
       {
         "type": "Sidewalk",
-        "count": 4,
-        "pct": 14
+        "count": 6,
+        "pct": 22
       },
       {
         "type": "Bike Lane",
-        "count": 3,
-        "pct": 11
+        "count": 5,
+        "pct": 19
       },
       {
-        "type": "No Parking Zone",
-        "count": 3,
-        "pct": 11
+        "type": "Oversized Vehicle",
+        "count": 4,
+        "pct": 15
       },
       {
-        "type": "Driveway",
-        "count": 2,
-        "pct": 7
+        "type": "Tow Zone",
+        "count": 3,
+        "pct": 11
       },
       {
         "type": "Blocking",
         "count": 2,
         "pct": 7
+      },
+      {
+        "type": "Abandoned",
+        "count": 1,
+        "pct": 4
       }
     ]
   },
   "graffitiSpeedrun": {
     "totalClosed": 100,
-    "avgDays": 192.3,
-    "medianDays": 264.6,
+    "avgDays": 175.6,
+    "medianDays": 251.8,
     "fastestDays": [
       0.1,
-      0.4,
+      0.2,
       0.5,
       0.5,
-      0.7
+      0.5
     ],
     "buckets": {
       "under1h": {
@@ -433,11 +419,11 @@
         "label": "Under 1 hour"
       },
       "1hTo6h": {
-        "count": 1,
+        "count": 2,
         "label": "1\u20136 hours"
       },
       "6hTo24h": {
-        "count": 8,
+        "count": 6,
         "label": "6\u201324 hours"
       },
       "1dTo3d": {
@@ -445,1435 +431,18 @@
         "label": "1\u20133 days"
       },
       "3dTo7d": {
-        "count": 4,
+        "count": 8,
         "label": "3\u20137 days"
       },
       "7dTo30d": {
-        "count": 7,
+        "count": 8,
         "label": "7\u201330 days"
       },
       "over30d": {
-        "count": 66,
+        "count": 62,
         "label": "Over 30 days"
       }
     },
     "longestOpen": null
-  },
-  "funnyDescriptions": {
-    "totalFetched": 12500,
-    "totalCandidates": 143,
-    "selected": 40,
-    "items": [
-      {
-        "text": "Hate Speech on the trail. Swatstika and f*** Jews graffiti on the bridge",
-        "category": "Graffiti",
-        "code": "HHSGRAFF",
-        "address": "2007 Barton Springs Rd, Austin",
-        "date": "2025-10-21",
-        "id": "25-00354650"
-      },
-      {
-        "text": "Uneven, high risk trip and fall surface . Today a participant in a city program tripped and fell on this uneven concrete slab. She twisted her ankle and was in pain.  Participant reported that years ago her elderly mom also tripped and fell in the same spot. Our high school intern also tripped on th",
-        "category": "Homeless/Grounds",
-        "code": "PRGRDISS",
-        "address": "2129 William Barton Dr, Austin",
-        "date": "2026-06-18",
-        "id": "26-00199854"
-      },
-      {
-        "text": "Someone came in and cut a ton of branches in the park and left piles everywhere. It\u2019s been a few months and these piles have not been. We\u2019re worried about animals and snakes starting to make homes out of them.",
-        "category": "Homeless/Grounds",
-        "code": "PRGRDISS",
-        "address": "4902 Fairview Dr, Austin",
-        "date": "2026-05-07",
-        "id": "26-00144070"
-      },
-      {
-        "text": "possum in our backyard-does not run away and is acting strangely",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "11112 Bexley Ln, Austin",
-        "date": "2025-07-07",
-        "id": "25-00230450"
-      },
-      {
-        "text": "There is a black cow wandering loose in the Bolm park along 183. It has been getting closer and closer to 183 and is a definite safety hazard.",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "1671 Ed Bluestein Blvd Svrd NB, Austin",
-        "date": "2026-05-05",
-        "id": "26-00140554"
-      },
-      {
-        "text": "Neighbors Letting Their Dog Roam The Streets And Its Attacking Animals",
-        "category": "Loose Dog",
-        "code": "ACLONAG",
-        "address": "1403 Click Cv, Austin",
-        "date": "2026-05-31",
-        "id": "26-00175658"
-      },
-      {
-        "text": "Music still excessively loud. Please actually do something",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "118 W 5th St, Austin",
-        "date": "2025-10-13",
-        "id": "25-00345395"
-      },
-      {
-        "text": "KA members yelling \u201cf*** you\u201d at man trying to make doordash delivery",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "2515 Leon St, Austin",
-        "date": "2025-10-10",
-        "id": "25-00342592"
-      },
-      {
-        "text": "Very Loud Music in the neighborhood. Please make it stop! Noise complaint!",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "915 Duncan Ln, Austin",
-        "date": "2025-03-29",
-        "id": "25-00099423"
-      },
-      {
-        "text": "Apt 1065 blasting music.  Refuses to turn it down when I ask.  He has toddlers and still just blasts music loudly.",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "1817 E Oltorf St, Austin",
-        "date": "2025-10-09",
-        "id": "25-00342457"
-      },
-      {
-        "text": "Please shut this f***head up. It\u2019s after 11pm and he just cranked up his backyard speaker and it is coming through our walls.",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "2237 Palmera Cv, Austin",
-        "date": "2025-10-13",
-        "id": "25-00345407"
-      },
-      {
-        "text": "Pedicab disturbing the peace and breaking noise curfew at 22:58. Disorderly conduct. Northbound Waller Street towards East 6th Street. Loud music can be heard several blocks before being seen and several box after pa**ing. This is happening multiple occasions leading up to and during the weekend..",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "206 Waller St, Austin",
-        "date": "2025-10-10",
-        "id": "25-00342633"
-      },
-      {
-        "text": "Latina Supermarket is blasting ads over their loudspeakers all day every day",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "512 W Stassney Ln, Austin",
-        "date": "2025-10-09",
-        "id": "25-00341820"
-      },
-      {
-        "text": "-- auto translated (en) --\nScandal and loud music that hasn't let you sleep since last night please do something\n-- original (es-US) --\nEscandalo y musica a alto volumen que no deja dormir desde anoche por favor hagan algo",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "8909 Galewood Dr, Austin",
-        "date": "2025-10-12",
-        "id": "25-00344771"
-      },
-      {
-        "text": "-- auto translated (en) --\nIcenhauers music can be heard from 500 yards down the street. It\u2019s very loud and way last cutoff \n-- original (en) --\nIcenhauers music can be heard from 500 yards down the street. It\u2019s very loud and way last cutoff",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "83 Rainey St, Austin",
-        "date": "2024-03-03",
-        "id": "24-00074466"
-      },
-      {
-        "text": "Cutting down a tree and the machine is insanely loud at Terrace Cove Apartments, Shaking my apartment",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "1810 Nelms Dr, Austin",
-        "date": "2025-10-11",
-        "id": "25-00343946"
-      },
-      {
-        "text": "LOUD MUSIC. Same person at Terrace Cove Apts blasting music again",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "1820 Nelms Dr, Austin",
-        "date": "2025-10-11",
-        "id": "25-00343959"
-      },
-      {
-        "text": "BODY TO BE REMOVED FROM ROW.  GET THE BUMS OFF OUR STREETS!  SOCIETY SHOULD NOT BE DESENSITIZED TO PEOPLE LAYING ON THE SIDE OF THE ROAD!",
-        "category": "Obstruction",
-        "code": "OBSTMIDB",
-        "address": "7709 E Ben White Blvd Svrd EB, Austin",
-        "date": "2026-05-22",
-        "id": "26-00165424"
-      },
-      {
-        "text": "Every Thursday night some bar or bars do not adhere to the 11pm cutoff time on W 6th. It\u2019s always loud music with pounding ba**. Location is only a guess at the general area. Specific venue unknown but there\u2019s only a few short blocks. Just follow your ears. Please send enforcement before tomorrow.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "709 W 6th St, Austin",
-        "date": "2026-06-19",
-        "id": "26-00200434"
-      },
-      {
-        "text": "Luna not complying with sound impact plan, over decibel limit",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "118 W 5th St, Austin",
-        "date": "2026-05-16",
-        "id": "26-00155954"
-      },
-      {
-        "text": "Luna ba** INSANE. Please take sound reading from 2nd story or above, not street level, it's inaccurate.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-06-20",
-        "id": "26-00201612"
-      },
-      {
-        "text": "It is past midnight and non compliant with city ordinance. Squash this!!!!",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "900 Red River St, Austin",
-        "date": "2026-05-08",
-        "id": "26-00145066"
-      },
-      {
-        "text": "Luna ba** over sound limits. Repeat offender. Please measure decibels from 2nd story or higher (physics) thank youuu",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-05-30",
-        "id": "26-00174305"
-      },
-      {
-        "text": "Persistent low-frequency ba** from The Loading Dock event venue is clearly audible and physically felt inside my home. The ba** continues well past 2 AM and is currently ongoing at 4:30 AM. Even with all doors and windows closed, the vibrations penetrate the structure and have made it impossible to ",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "6910 Shirley Ave, Austin",
-        "date": "2026-05-03",
-        "id": "26-00138311"
-      },
-      {
-        "text": "Luna ba** IS TORTURE MAKE IT STOP",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-06-05",
-        "id": "26-00182273"
-      },
-      {
-        "text": "Please send enforcement to the Far Out. They are above allowed decibel levels and disturbing the neighborhood",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "8504 S Congress Ave, Austin",
-        "date": "2026-04-26",
-        "id": "26-00128938"
-      },
-      {
-        "text": "It\u2019s 1am and still the city has done nothing about Twin Nightckub blasting music about city limits. The police do not inspect at the time the issue is reported. The city is useless to allow this to go on.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "416 Colorado St, Austin",
-        "date": "2026-05-03",
-        "id": "26-00138258"
-      },
-      {
-        "text": "Luna is so f***ing loud tonight. They\u2019ve been cited multiple times this week and they\u2019re still going at it. \n\nLuna, if you\u2019re going to play loud, at least play different music. I\u2019m tired of the same stupid a** drums every f***ing weekend. We\u2019re in Austin TX, stop trying to act like you\u2019re a nightclu",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-05-02",
-        "id": "26-00137127"
-      },
-      {
-        "text": "I can hear the clubs on 4th and Colorado playing party in the USA in my apt. I\u2019m getting sick of this it\u2019s everyday and there\u2019s so many compalints on 311 yet the city does nothing. You need to fix the acceptable noise limits it\u2019s getting out of control when so many people are calling it out",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "200 W 4th St, Austin",
-        "date": "2026-04-14",
-        "id": "26-00114577"
-      },
-      {
-        "text": "Victory Lap playing music way over decibel limit. Walking by is a hazard to our hearing.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "85 Rainey St, Austin",
-        "date": "2026-05-02",
-        "id": "26-00137056"
-      },
-      {
-        "text": "Bar Fino DJ is over the decibel limit. Walking by in the sidewalk makes my ears ring.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "84 Rainey St, Austin",
-        "date": "2026-06-14",
-        "id": "26-00193693"
-      },
-      {
-        "text": "-- auto translated (en) --\nThese idiots invited DJ... can someone come???? It's boom boom boom!!!! It's Tuesday!!!! Why this stupid bar is breaking laws!!!!! \n-- original (ru-RU) --\nThese idiots invited DJ\u2026.. can somebody come???? It\u2019s boom boom boom!!!! It\u2019s TUESDaY!!!! Why this stupid bar is break",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "504 W 24th St, Austin",
-        "date": "2026-04-15",
-        "id": "26-00115822"
-      },
-      {
-        "text": "Luna blasting music outside of OMV regulations",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "118 W 5th St, Austin",
-        "date": "2026-04-29",
-        "id": "26-00132938"
-      },
-      {
-        "text": "All of this trash was on my property and I picked it up and put it back on their lawn. They have a car parked on their lawn, and last night until 2am they had 3 cars parked on their lawn with one of them on my lawn. They had a party last night in their driveway until 2am. I made multiple noise compl",
-        "category": "Parking",
-        "code": "PARKINGV",
-        "address": "8721 Talyne Chaise Cir, Austin",
-        "date": "2026-06-14",
-        "id": "26-00193863"
-      },
-      {
-        "text": "Code violation - High gra** weeds well over 12\u201d, blocking access to the sidewalk, dangerously tall for fires and snake issues within the neighborhood.",
-        "category": "Tree/Environmental",
-        "code": "DSDENVCO",
-        "address": "1324 Tillerfield Trl, Austin",
-        "date": "2026-05-19",
-        "id": "26-00159535"
-      },
-      {
-        "text": "Large redwood tree cut down, wondering if had correct permits to do so",
-        "category": "Tree/Environmental",
-        "code": "DSDENVCO",
-        "address": "5624 Sunshine Dr, Austin",
-        "date": "2026-03-30",
-        "id": "26-00096629"
-      },
-      {
-        "text": "Neighbor is using a handyman (Al Richards DBA Freddie\u2019s Handyman) and not a licensed arbirist to trim oak trees in their yard currently. Given that\u2019s its oak wilt season and unclear if they have a permit, I thought you\u2019d like to know. Address is 1802 or 1800 Parkside Lane 78745.",
-        "category": "Tree/Environmental",
-        "code": "DSDENVCO",
-        "address": "1770 Parkside Ln, Austin",
-        "date": "2026-05-21",
-        "id": "26-00163412"
-      },
-      {
-        "text": "Homeless encampment growing on 29th and Lamar. Menacing group of men. It\u2019s just a matter of time before some UT girls are going to be hurt/killed by these characters. I don\u2019t run there without my large dog and husband. The trash situation is out of control. Please help!!! Didn\u2019t dare take picture if",
-        "category": "Vicious Dog",
-        "code": "COAACDD",
-        "address": "1109 W 29th St, Austin",
-        "date": "2026-02-26",
-        "id": "26-00058962"
-      },
-      {
-        "text": "Escalating danger \u2014 Second man and second dog camping in the JJ Seabrook neighborhood. Both dogs are still loose and aggressive. They have charged my elderly neighbor while he was walking his dog.",
-        "category": "Vicious Dog",
-        "code": "COAACDD",
-        "address": "3311 Denver Ave, Austin",
-        "date": "2026-01-05",
-        "id": "26-00004384"
-      },
-      {
-        "text": "Illegal camping in JJ Seabrook Greenbelt with an aggressive dog that\u2019s attacking neighborhood dogs",
-        "category": "Vicious Dog",
-        "code": "COAACDD",
-        "address": "2100 Pershing Dr, Austin",
-        "date": "2026-01-01",
-        "id": "26-00000589"
-      }
-    ],
-    "allItems": [
-      {
-        "text": "PUPPIES AND POSTPARTUM MOM IN DANGER NEED HELP - the mother dog and her puppies living in a shopping cart. Her bag is now covering the puppies in the shopping cart but you can see them from the side in person. A rescue lady has been trying to help since May and needs help. She said homeless people s",
-        "category": "Animal Care",
-        "code": "ACPROPER",
-        "address": "4502 West Gate Blvd, Austin",
-        "date": "2026-06-20",
-        "id": "26-00202206"
-      },
-      {
-        "text": "701 Center Ridge Dr #226 Austin TX 78753 is where the dog abusers live. Pretty sure I\u2019ve heard them hit this dog but they hit each other too, so I don\u2019t know for sure. They also have a baby and a cat. This couple leaves their dog outside all day and night in extreme weather. This is the best angle I",
-        "category": "Animal Care",
-        "code": "ACPROPER",
-        "address": "701 Center Ridge Dr, Austin",
-        "date": "2026-06-20",
-        "id": "26-00201715"
-      },
-      {
-        "text": "Dogs left outside as ma**ive thunderstorm approaches. This is not the first time, dogs have no shelter and are consistently left outside. They are barking and scratching at the back door. Insanely inhumane",
-        "category": "Animal Care",
-        "code": "ACPROPER",
-        "address": "5904 Silver Screen Dr, Austin",
-        "date": "2026-05-11",
-        "id": "26-00148067"
-      },
-      {
-        "text": "There is a case of animal abuse in my apartment located at 12001 metric blvd Austin Tex 78758. There is a grey Pitbull who appears to have just had puppies and the owner is not feeding them. The dog is skin and bone. The apartment the dog is located in is 810. Their downstairs neighbor has told me s",
-        "category": "Animal Care",
-        "code": "ACPROPER",
-        "address": "12001 Metric Blvd, Austin",
-        "date": "2026-05-11",
-        "id": "26-00148417"
-      },
-      {
-        "text": "Three dogs left for extended period of time without adequate access to water in all weather conditions. Yard frequently has trash dogs are eating and feces. White dog looks potentially malnourished",
-        "category": "Animal Care",
-        "code": "ACPROPER",
-        "address": "11282 Taylor Draper Ln, Austin",
-        "date": "2026-05-07",
-        "id": "26-00144284"
-      },
-      {
-        "text": "Walking past this house, I can hear roosters screaming, dogs incessantly barking, squealing pigs, and loud chickens. The noise is completely out of hand. Please investigate.",
-        "category": "Animal Care",
-        "code": "ACPROPER",
-        "address": "7205 Providence Ave, Austin",
-        "date": "2026-05-06",
-        "id": "26-00143031"
-      },
-      {
-        "text": "I saw this man unloading 3 poorly cared for puppies (malnourished, dirty, incredibly matted into a crate to try to sell them on the south side of the Pfluger pedestrian bridge. I definitely believe these dogs are in a puppy mill situation and are not cared for. They were very nervous to be around hi",
-        "category": "Animal Care",
-        "code": "ACPROPER",
-        "address": "1124 W Riverside Dr, Austin",
-        "date": "2026-04-23",
-        "id": "26-00126623"
-      },
-      {
-        "text": "Encountered a mange looking coyote on my property this afternoon.  Not aggressive and ran away from me.  Just reporting in case records are kept.  You can close this case report.  Thanks.",
-        "category": "Coyote",
-        "code": "ACCOYTE",
-        "address": "6107 Highland Hills Dr, Austin",
-        "date": "2026-05-24",
-        "id": "26-00166988"
-      },
-      {
-        "text": "Coyote at my back fence. 3rd time I have seen him this week. I reported it to you yesterday. This morning it stared me down when I was clapping and yelling. Not too afraid of me at this point. I\u2019m afraid it might have rabies.",
-        "category": "Coyote",
-        "code": "ACCOYTE",
-        "address": "2514 Great Oaks Pkwy, Austin",
-        "date": "2026-04-30",
-        "id": "26-00134749"
-      },
-      {
-        "text": "Very sick canine spotted during day time in the creek, possibly a juvenile coyote with severe mange missing lots of fur, didn\u2019t run away from humans",
-        "category": "Coyote",
-        "code": "ACCOYTE",
-        "address": "12118 Walnut Park Xing, Austin",
-        "date": "2026-01-19",
-        "id": "26-00019510"
-      },
-      {
-        "text": "Saw a juvenile coyote with mange in Dry Creek.",
-        "category": "Coyote",
-        "code": "ACCOYTE",
-        "address": "6810 Thorncliffe Dr, Austin",
-        "date": "2025-12-12",
-        "id": "25-00416177"
-      },
-      {
-        "text": "Coyote roaming residential neighborhood during the day. Appears to have mange but seems scared, concerned for the safety of the coyote and residents as it has made itself more present throughout the days.",
-        "category": "Coyote",
-        "code": "ACCOYTE",
-        "address": "4917 Fort Clark Dr, Austin",
-        "date": "2025-11-05",
-        "id": "25-00373654"
-      },
-      {
-        "text": "Coyote with mange living in my backyard at 1505 Payne Ave 78757",
-        "category": "Coyote",
-        "code": "ACCOYTE",
-        "address": "1505 Payne Ave, Austin",
-        "date": "2025-09-16",
-        "id": "25-00315135"
-      },
-      {
-        "text": "We spotted what looks like a manged coyote or fox walking down the sidewalk a few minutes ago.",
-        "category": "Coyote",
-        "code": "ACCOYTE",
-        "address": "13121 Coriander Dr, Austin",
-        "date": "2025-08-19",
-        "id": "25-00280563"
-      },
-      {
-        "text": "We've seen this coyote with mange on Centennial Trail 3-4 times in the last week. It was in our driveway this morning but it ran off.",
-        "category": "Coyote",
-        "code": "ACCOYTE",
-        "address": "10920 Centennial Trl, Austin",
-        "date": "2025-07-03",
-        "id": "25-00225206"
-      },
-      {
-        "text": "I was walking down the street, Lambs Lane, about 200 feet from Wm., Cannon Blvd., when ONE deranged individual by the name of Marta Garza, pulled up alongside me in her white Mazda or Toyotas Crossover and started to cuss me out in Spanish, for NO reason; she warned/threatened me that her son, willi",
-        "category": "Flooding",
-        "code": "DRFLOODG",
-        "address": "4508 Raleigh Cir, Austin",
-        "date": "2023-07-08",
-        "id": "23-00332889"
-      },
-      {
-        "text": "Hate Speech on the trail. Swatstika and f*** Jews graffiti on the bridge",
-        "category": "Graffiti",
-        "code": "HHSGRAFF",
-        "address": "2007 Barton Springs Rd, Austin",
-        "date": "2025-10-21",
-        "id": "25-00354650"
-      },
-      {
-        "text": "Uneven, high risk trip and fall surface . Today a participant in a city program tripped and fell on this uneven concrete slab. She twisted her ankle and was in pain.  Participant reported that years ago her elderly mom also tripped and fell in the same spot. Our high school intern also tripped on th",
-        "category": "Homeless/Grounds",
-        "code": "PRGRDISS",
-        "address": "2129 William Barton Dr, Austin",
-        "date": "2026-06-18",
-        "id": "26-00199854"
-      },
-      {
-        "text": "Individuals camping in Mabel Davis Park woods in 2 places\nWoods off Wickshire Lane behind Montecito apartments and woods off Parker behind the skate park. I live at Montecito Apartments and my building borders the park woods. I often smell campfires out there and see belongings strewn along the park",
-        "category": "Homeless/Grounds",
-        "code": "PRGRDISS",
-        "address": "1925 Wickshire Ln, Austin",
-        "date": "2026-06-16",
-        "id": "26-00196600"
-      },
-      {
-        "text": "Someone came in and cut a ton of branches in the park and left piles everywhere. It\u2019s been a few months and these piles have not been. We\u2019re worried about animals and snakes starting to make homes out of them.",
-        "category": "Homeless/Grounds",
-        "code": "PRGRDISS",
-        "address": "4902 Fairview Dr, Austin",
-        "date": "2026-05-07",
-        "id": "26-00144070"
-      },
-      {
-        "text": "The Guinea Hen is back AGAIN. EVERY DAY NOW FOR WEEKS. It is constantly screaming and screaming incredibly loud, chasing people and cars all up and down the road and flying up on all the rooftops along my neighborhood. PLEASE come pick this nuisance up as soon as possible! It's relentless. It's driv",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "7013 Rufus Dr, Austin",
-        "date": "2026-05-31",
-        "id": "26-00175917"
-      },
-      {
-        "text": "Annoying Turkey sized Bird walking up and down the street, chasing people and cars and squealing constantly at high volume. It's obviously somebody's pet but they don't keep it locked in properly so it busts loose and wanders around causing all kinda hell. Please come Get this thing or somebody migh",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "208 W Lisa Dr, Austin",
-        "date": "2026-05-22",
-        "id": "26-00165414"
-      },
-      {
-        "text": "There is a black cow wandering loose in the Bolm park along 183. It has been getting closer and closer to 183 and is a definite safety hazard.",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "1671 Ed Bluestein Blvd Svrd NB, Austin",
-        "date": "2026-05-05",
-        "id": "26-00140554"
-      },
-      {
-        "text": "Two parakeet birds showed up. One has a ring around the ankle. They seem hungry and semi friendly",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "5916 Pinon Vista Dr, Austin",
-        "date": "2026-03-28",
-        "id": "26-00095049"
-      },
-      {
-        "text": "Loose roosters roaming all around goodnight ranch- they have been here 2 weeks plus and are getting increasingly hungry",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "5904 Comanche Moon Trl, Austin",
-        "date": "2026-03-23",
-        "id": "26-00088760"
-      },
-      {
-        "text": "Cow loose on lakeline just past the lakeline metro rail station. Closest intersection is lakeline and staked plains.",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "10302 Lakeline Blvd, Austin",
-        "date": "2026-03-19",
-        "id": "26-00084281"
-      },
-      {
-        "text": "There is a loose cow that managed to escape from the ranch near 10209 Lockhart rd. She\u2019s still right next to the ranch, but on the wrong side of the fence and there isn\u2019t anything blocking her from wandering on to Old Lockhart road.",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "10167 Old Lockhart Rd, Austin",
-        "date": "2025-11-03",
-        "id": "25-00370956"
-      },
-      {
-        "text": "Rooster loose on the side of the road",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "8914 Pleasant Ln, Austin",
-        "date": "2025-09-15",
-        "id": "25-00313661"
-      },
-      {
-        "text": "Loose rooster still not caught. Now injuring animals",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "3004 Stroud Path, Austin",
-        "date": "2025-07-29",
-        "id": "25-00255791"
-      },
-      {
-        "text": "Lost rooster broke into neighborhood",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "5707 Taunton Dr, Austin",
-        "date": "2025-07-21",
-        "id": "25-00245750"
-      },
-      {
-        "text": "possum in our backyard-does not run away and is acting strangely",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "11112 Bexley Ln, Austin",
-        "date": "2025-07-07",
-        "id": "25-00230450"
-      },
-      {
-        "text": "Residential house owns a rooster who crows a lot in the mornings.",
-        "category": "Loose Animal",
-        "code": "ACLOANIM",
-        "address": "6818 Vine St, Austin",
-        "date": "2025-05-23",
-        "id": "25-00169085"
-      },
-      {
-        "text": "Loose dogs. Come on guys this place just opened up and you are letting them use it as an off leash dog park. Have some f***ing respect. Millions were spent on these trails. Do better",
-        "category": "Loose Dog",
-        "code": "ACLONAG",
-        "address": "502 River St, Austin",
-        "date": "2026-06-09",
-        "id": "26-00186921"
-      },
-      {
-        "text": "Neighbors Letting Their Dog Roam The Streets And Its Attacking Animals",
-        "category": "Loose Dog",
-        "code": "ACLONAG",
-        "address": "1403 Click Cv, Austin",
-        "date": "2026-05-31",
-        "id": "26-00175658"
-      },
-      {
-        "text": "Loud as f*** exhaust cars on corner of 1st and w Riverside, driving in circles around the intersection right outside residential area",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "601 W Riverside Dr, Austin",
-        "date": "2025-10-16",
-        "id": "25-00349306"
-      },
-      {
-        "text": "A band has been practicing in the adu of 2303 e 17th st for over six hours nonstop. The decibel level is regularly over 80 inside my housebecause of this.",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "1605 Chestnut Ave, Austin",
-        "date": "2025-10-16",
-        "id": "25-00349276"
-      },
-      {
-        "text": "Ongoing code violation issue with Double Trouble at 103 North Loop Blvd having outdoor live music events. Loud amplified noise within feet of residential property. \u201cPermits may not be issued for using sound equipment within 100 feet of the property zoned and used as residential.\u201d Please send code of",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "103 E North Loop Blvd, Austin",
-        "date": "2025-10-16",
-        "id": "25-00349256"
-      },
-      {
-        "text": "Are you going to do something about the very loud music instead of just closing the complaint?",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "1209 W Anderson Ln, Austin",
-        "date": "2025-10-15",
-        "id": "25-00348655"
-      },
-      {
-        "text": "Please help! SUPER loud amplified music coming from 1117 Lott Ave. this house has NO regard for neighbors and we are all scared of them. Please someone help me and my immediate neighbors! We are scared to talk to them bc it\u2019s several generations living in one house (and I am a single female) it\u2019s co",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "1117 Lott Ave, Austin",
-        "date": "2025-10-15",
-        "id": "25-00347981"
-      },
-      {
-        "text": "Booming music from cars in Givens park. We can feel it in our homes 1/4 mile away. Constant issue.",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "1130 Springdale Rd, Austin",
-        "date": "2025-10-14",
-        "id": "25-00346613"
-      },
-      {
-        "text": "Loud truck parked in drive way with lights off, blasting music 1234 AM, at 11810 Rotherham Dr, Austin TX 78753",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "11810 Rotherham Dr, Austin",
-        "date": "2025-10-14",
-        "id": "25-00346699"
-      },
-      {
-        "text": "Music still excessively loud. Please actually do something",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "118 W 5th St, Austin",
-        "date": "2025-10-13",
-        "id": "25-00345395"
-      },
-      {
-        "text": "Another pedicab ruining the piece of a residential neighborhood.",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "1712 E 2nd St, Austin",
-        "date": "2025-10-13",
-        "id": "25-00345429"
-      },
-      {
-        "text": "Ridiculously loud blaring music continues from Paris Lounge at 9710 No. Lamar. This started at 3AM",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "9710 N Lamar Blvd, Austin",
-        "date": "2025-10-13",
-        "id": "25-00345449"
-      },
-      {
-        "text": "Please shut this f***head up. It\u2019s after 11pm and he just cranked up his backyard speaker and it is coming through our walls.",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "2237 Palmera Cv, Austin",
-        "date": "2025-10-13",
-        "id": "25-00345407"
-      },
-      {
-        "text": "Blaring music from the after hours nightclub at 9710 North Lamar Blvd. I believe it\u2019s called Paris lounge. our neighborhood has had issues with this nightclub playing blaring music until six in the morning.",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "9710 N Lamar Blvd, Austin",
-        "date": "2025-10-13",
-        "id": "25-00345442"
-      },
-      {
-        "text": "KA has been retaliating against noise complaints and is now playing music 24/7 for 2 weeks now. They go wayyy over the decimal limit. Please make them stop, they are blasting music on purpose to \u201cpunish\u201d their neighbors for reporting them.",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "2515 Leon St, Austin",
-        "date": "2025-10-13",
-        "id": "25-00345740"
-      },
-      {
-        "text": "Noise complaint ordinance, disorderly conduct pedicabs playing loud music disturbing the peace of neighborhood, past midnight sound curfew. Northbound Waller Street towards East 6th Street. https://youtu.be/361uXtc_eaA?si=BvxAVvbISeB_PMyJ.",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "206 Waller St, Austin",
-        "date": "2025-10-13",
-        "id": "25-00345405"
-      },
-      {
-        "text": "12222 Shropshire playing loud music in backyard after hours",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "12222 Shropshire Blvd, Austin",
-        "date": "2025-10-12",
-        "id": "25-00344763"
-      },
-      {
-        "text": "Coconut club loud yelling and music that exceeds permit and district levels",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "310 Colorado St, Austin",
-        "date": "2025-10-12",
-        "id": "25-00344798"
-      },
-      {
-        "text": "neighbors blasting music from garage. reported earlier, music has gotten louder despite my request being closed...",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "2309 Cocao Ln, Austin",
-        "date": "2025-10-12",
-        "id": "25-00344825"
-      },
-      {
-        "text": "Neighbors in shared duplex in side A have excessively loud music and ba** which is vibrating  our very thin walls so much that wall hangings are falling off the walls",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "9103 Japonica Ct, Austin",
-        "date": "2025-10-12",
-        "id": "25-00345291"
-      },
-      {
-        "text": "-- auto translated (en) --\nScandal and loud music that hasn't let you sleep since last night please do something\n-- original (es-US) --\nEscandalo y musica a alto volumen que no deja dormir desde anoche por favor hagan algo",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "8909 Galewood Dr, Austin",
-        "date": "2025-10-12",
-        "id": "25-00344771"
-      },
-      {
-        "text": "-- auto translated (en) --\nOnce again they have scandal and loud music, last night they didn't let us sleep and again it's not fair please do something \n-- original (es-US) --\nOtra vez tienen esc\u00e1ndalo y m\u00fasica a alto volumen, anoche no nos dejaron dormir y ya otra vez no es justo por favor hagan al",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "8909 Galewood Dr, Austin",
-        "date": "2025-10-12",
-        "id": "25-00344765"
-      },
-      {
-        "text": "LOUD MUSIC. Same person at Terrace Cove Apts blasting music again",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "1820 Nelms Dr, Austin",
-        "date": "2025-10-11",
-        "id": "25-00343959"
-      },
-      {
-        "text": "Cutting down a tree and the machine is insanely loud at Terrace Cove Apartments, Shaking my apartment",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "1810 Nelms Dr, Austin",
-        "date": "2025-10-11",
-        "id": "25-00343946"
-      },
-      {
-        "text": "KA members yelling \u201cf*** you\u201d at man trying to make doordash delivery",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "2515 Leon St, Austin",
-        "date": "2025-10-10",
-        "id": "25-00342592"
-      },
-      {
-        "text": "Pedicab disturbing the peace and breaking noise curfew at 22:58. Disorderly conduct. Northbound Waller Street towards East 6th Street. Loud music can be heard several blocks before being seen and several box after pa**ing. This is happening multiple occasions leading up to and during the weekend..",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "206 Waller St, Austin",
-        "date": "2025-10-10",
-        "id": "25-00342633"
-      },
-      {
-        "text": "Latina Supermarket is blasting ads over their loudspeakers all day every day",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "512 W Stassney Ln, Austin",
-        "date": "2025-10-09",
-        "id": "25-00341820"
-      },
-      {
-        "text": "Apt 1065 blasting music.  Refuses to turn it down when I ask.  He has toddlers and still just blasts music loudly.",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "1817 E Oltorf St, Austin",
-        "date": "2025-10-09",
-        "id": "25-00342457"
-      },
-      {
-        "text": "Tesla Super chargers near the shops at Gateway have people blasting music while charging. This has been happening for the past week during the day and at night around 10 pm.",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "9800 Stonelake Blvd, Austin",
-        "date": "2025-10-09",
-        "id": "25-00342099"
-      },
-      {
-        "text": "Very Loud Music in the neighborhood. Please make it stop! Noise complaint!",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "915 Duncan Ln, Austin",
-        "date": "2025-03-29",
-        "id": "25-00099423"
-      },
-      {
-        "text": "-- auto translated (en) --\nIcenhauers music can be heard from 500 yards down the street. It\u2019s very loud and way last cutoff \n-- original (en) --\nIcenhauers music can be heard from 500 yards down the street. It\u2019s very loud and way last cutoff",
-        "category": "Noise Complaint",
-        "code": "APDNONNO",
-        "address": "83 Rainey St, Austin",
-        "date": "2024-03-03",
-        "id": "24-00074466"
-      },
-      {
-        "text": "One of the plastic lane dividers on oltorf, a little west of I-35, is bent over hanging into the inner east bound lane.  It damaged the paint on my vehicle.  Please send insurance information and compensation to John Dukes.  jwdukes@gmail.com 361-550-4949",
-        "category": "Obstruction",
-        "code": "OBSTMIDB",
-        "address": "1007 E Oltorf St, Austin",
-        "date": "2026-06-19",
-        "id": "26-00201228"
-      },
-      {
-        "text": "Ben Wight and MANCHACA corner homeless dump. Worse than ever. Please take care of this. We live in an attractive city and it\u2019s insane. What keeps happening from the local church. We have women in the street with their tops off in my neighborhood around the corner. Please take care of this soon.",
-        "category": "Obstruction",
-        "code": "OBSTMIDB",
-        "address": "1917 W Ben White Blvd Svrd EB, Austin",
-        "date": "2026-06-13",
-        "id": "26-00193036"
-      },
-      {
-        "text": "BODY TO BE REMOVED FROM ROW.  GET THE BUMS OFF OUR STREETS!  SOCIETY SHOULD NOT BE DESENSITIZED TO PEOPLE LAYING ON THE SIDE OF THE ROAD!",
-        "category": "Obstruction",
-        "code": "OBSTMIDB",
-        "address": "7709 E Ben White Blvd Svrd EB, Austin",
-        "date": "2026-05-22",
-        "id": "26-00165424"
-      },
-      {
-        "text": "Luna ba** so loud, can't sleep",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-06-20",
-        "id": "26-00201660"
-      },
-      {
-        "text": "Luna ba** already insane, I could hear it while I was in the shower!",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-06-20",
-        "id": "26-00201592"
-      },
-      {
-        "text": "Luna ba** INSANE. Please take sound reading from 2nd story or above, not street level, it's inaccurate.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-06-20",
-        "id": "26-00201612"
-      },
-      {
-        "text": "Every Thursday night some bar or bars do not adhere to the 11pm cutoff time on W 6th. It\u2019s always loud music with pounding ba**. Location is only a guess at the general area. Specific venue unknown but there\u2019s only a few short blocks. Just follow your ears. Please send enforcement before tomorrow.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "709 W 6th St, Austin",
-        "date": "2026-06-19",
-        "id": "26-00200434"
-      },
-      {
-        "text": "Whilst I appreciate Mexico won a World Cup game tonight  the drumming and shouting and loud music is deafening and yet again we can not get any rest. I believe it is coming from both The Flower Shop and a bar next door to Cenote on 7th. Please send someone out to sort this out. I am so sorry to be c",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "1303 E 7th St, Austin",
-        "date": "2026-06-19",
-        "id": "26-00200429"
-      },
-      {
-        "text": "Bar Fino DJ is over the decibel limit. Walking by in the sidewalk makes my ears ring.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "84 Rainey St, Austin",
-        "date": "2026-06-14",
-        "id": "26-00193693"
-      },
-      {
-        "text": "Inn cahoots blasting music can hear six blocks away",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "1216 E 6th St, Austin",
-        "date": "2026-06-13",
-        "id": "26-00192773"
-      },
-      {
-        "text": "loud music at The Flower Shop. They get louder and louder as it gets later in the night and goes past 2am. This place does not have the proper zoning for bar use. It is also sometimes past capacity on the upper deck. Uber drivers and driverless vehicles block the entrance off 7th and Lydia, very dan",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "1302 E 7th St, Austin",
-        "date": "2026-06-13",
-        "id": "26-00192766"
-      },
-      {
-        "text": "Luna vibrating my apartment",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-06-05",
-        "id": "26-00182270"
-      },
-      {
-        "text": "Luna ba** IS TORTURE MAKE IT STOP",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-06-05",
-        "id": "26-00182273"
-      },
-      {
-        "text": "Luna ba** over sound limits. Repeat offender. Please measure decibels from 2nd story or higher (physics) thank youuu",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-05-30",
-        "id": "26-00174305"
-      },
-      {
-        "text": "Hi, me again. Luna too loud. Pls help. It\u2019s too much. We are just trying to sleep. I can hear them through headphones playing music. City of Austin I can\u2019t put in this little paragraph how useless you are and how much genuine hate I carry for you in my heart and I\u2019m trying to be less hateful and nic",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-05-24",
-        "id": "26-00166488"
-      },
-      {
-        "text": "Luna over decibel limit- please state in your inspection where you are taking decibel reading from... it needs to be from 2nd story or higher",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "118 W 5th St, Austin",
-        "date": "2026-05-23",
-        "id": "26-00165581"
-      },
-      {
-        "text": "Luna too loud please help",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-05-22",
-        "id": "26-00164049"
-      },
-      {
-        "text": "Please do something about the Far Out. My walls are shaking from the ba** and keeping my baby awake.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "8504 S Congress Ave, Austin",
-        "date": "2026-05-18",
-        "id": "26-00157631"
-      },
-      {
-        "text": "Luna not complying with sound impact plan, over decibel limit",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "118 W 5th St, Austin",
-        "date": "2026-05-16",
-        "id": "26-00155954"
-      },
-      {
-        "text": "Amplified music without a permit at San Gines. It ends around 9pm so not worth sending an inspector after that time. This is regularly happening Weds and Thurs evenings between 7-9pm.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "2072 S Lamar Blvd, Austin",
-        "date": "2026-05-15",
-        "id": "26-00154389"
-      },
-      {
-        "text": "It is past midnight and non compliant with city ordinance. Squash this!!!!",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "900 Red River St, Austin",
-        "date": "2026-05-08",
-        "id": "26-00145066"
-      },
-      {
-        "text": "BOOM BOOM BOOM BOOM BOOM yessssss we love when bars and clubs and do whatever they f*** they want bc 311 doesn\u2019t do sh** about it - almost 5 hours of the skybar place breaking the f***ing DBs.  Every bar around and every residential home is pissed off and 311 is f***ing useless - f*** you - I hope y",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "500 W 6th St, Austin",
-        "date": "2026-05-07",
-        "id": "26-00143717"
-      },
-      {
-        "text": "Twins blasting music over 100 decibels.  The only way to prove it is to not send an enforcement officer 24 hr later. This is happening real time.   Friday. Saturday. Sunday.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "219 W 4th St, Austin",
-        "date": "2026-05-04",
-        "id": "26-00139041"
-      },
-      {
-        "text": "Clubs on 4th and Colorado are so loud. Can you please do something  this is unliveable",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "121 W 4th St, Austin",
-        "date": "2026-05-03",
-        "id": "26-00138169"
-      },
-      {
-        "text": "Twin Nightclub is yet again blaring music above permitted decibals. Would be lovely if the city did a d*** thing about it. You should also look at the non-ADA compliance and under-age patrons",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "416 Colorado St, Austin",
-        "date": "2026-05-03",
-        "id": "26-00138219"
-      },
-      {
-        "text": "It\u2019s 1am and still the city has done nothing about Twin Nightckub blasting music about city limits. The police do not inspect at the time the issue is reported. The city is useless to allow this to go on.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "416 Colorado St, Austin",
-        "date": "2026-05-03",
-        "id": "26-00138258"
-      },
-      {
-        "text": "Persistent low-frequency ba** from The Loading Dock event venue is clearly audible and physically felt inside my home. The ba** continues well past 2 AM and is currently ongoing at 4:30 AM. Even with all doors and windows closed, the vibrations penetrate the structure and have made it impossible to ",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "6910 Shirley Ave, Austin",
-        "date": "2026-05-03",
-        "id": "26-00138311"
-      },
-      {
-        "text": "Victory Lap playing music way over decibel limit. Walking by is a hazard to our hearing.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "85 Rainey St, Austin",
-        "date": "2026-05-02",
-        "id": "26-00137056"
-      },
-      {
-        "text": "Really, really loud music\u2014it\u2019s loud in my apartment 40 floors up! Has to be over decibel limit on the street.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "92 Rainey St, Austin",
-        "date": "2026-05-02",
-        "id": "26-00137055"
-      },
-      {
-        "text": "Luna is so f***ing loud tonight. They\u2019ve been cited multiple times this week and they\u2019re still going at it. \n\nLuna, if you\u2019re going to play loud, at least play different music. I\u2019m tired of the same stupid a** drums every f***ing weekend. We\u2019re in Austin TX, stop trying to act like you\u2019re a nightclu",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-05-02",
-        "id": "26-00137127"
-      },
-      {
-        "text": "Far out is above decibel levels again",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "8504 S Congress Ave, Austin",
-        "date": "2026-05-01",
-        "id": "26-00135734"
-      },
-      {
-        "text": "Luna Blasting music on a Tuesday",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-04-29",
-        "id": "26-00132924"
-      },
-      {
-        "text": "Luna blasting music outside of OMV regulations",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "118 W 5th St, Austin",
-        "date": "2026-04-29",
-        "id": "26-00132938"
-      },
-      {
-        "text": "Luna ridiculously loud I can hear it in my apt. ITS A WEDNESDAY NIGHT!!! Can this city do something about this please???? So many complaints every week.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "118 W 5th St, Austin",
-        "date": "2026-04-29",
-        "id": "26-00132921"
-      },
-      {
-        "text": "after-hours audibility violation at Luna Rooftop/Aura. It is a Tuesday night, past the 10:30 p.m. curfew, and they are operating a full club-style sound system that is clearly audible inside my home and causing structural vibration. Even if this is a private event, they are past the legal cutoff for",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "118 W 5th St, Austin",
-        "date": "2026-04-29",
-        "id": "26-00132915"
-      },
-      {
-        "text": "Loud music as usual from clubs in 4th and Colorado. Do something please",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "121 W 4th St, Austin",
-        "date": "2026-04-27",
-        "id": "26-00129812"
-      },
-      {
-        "text": "Luna playing after hours it\u2019s 2:08",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-04-26",
-        "id": "26-00129058"
-      },
-      {
-        "text": "They are getting louder please send help.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-04-26",
-        "id": "26-00128991"
-      },
-      {
-        "text": "Luna too loud, sound enforcement man (or woman) please lock in and do something about it.",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-04-26",
-        "id": "26-00128964"
-      },
-      {
-        "text": "Please send enforcement to the Far Out. They are above allowed decibel levels and disturbing the neighborhood",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "8504 S Congress Ave, Austin",
-        "date": "2026-04-26",
-        "id": "26-00128938"
-      },
-      {
-        "text": "Luna still blasting music",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-04-25",
-        "id": "26-00128103"
-      },
-      {
-        "text": "Such loud music i can feel it in my apt. City needs to do something about this or change the noise ordinances. Every few days there\u2019s so many complaints on 311 and absolutely no meaningful action",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "121 W 4th St, Austin",
-        "date": "2026-04-24",
-        "id": "26-00126778"
-      },
-      {
-        "text": "Twins Nightclub is playing music way above the decibal and they have no ADA access it is blocked my multiple items which is illegal. Why does the city continue to allow this and do nothing. No other bar despite what your stupid investigations say is this loud. It\u2019s not fair to residents live within ",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "316 Lavaca St, Austin",
-        "date": "2026-04-20",
-        "id": "26-00121721"
-      },
-      {
-        "text": "Luna playing loud music past 2am",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "120 W 5th St, Austin",
-        "date": "2026-04-19",
-        "id": "26-00121004"
-      },
-      {
-        "text": "-- auto translated (en) --\nThese idiots invited DJ... can someone come???? It's boom boom boom!!!! It's Tuesday!!!! Why this stupid bar is breaking laws!!!!! \n-- original (ru-RU) --\nThese idiots invited DJ\u2026.. can somebody come???? It\u2019s boom boom boom!!!! It\u2019s TUESDaY!!!! Why this stupid bar is break",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "504 W 24th St, Austin",
-        "date": "2026-04-15",
-        "id": "26-00115822"
-      },
-      {
-        "text": "I can hear the clubs on 4th and Colorado playing party in the USA in my apt. I\u2019m getting sick of this it\u2019s everyday and there\u2019s so many compalints on 311 yet the city does nothing. You need to fix the acceptable noise limits it\u2019s getting out of control when so many people are calling it out",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "200 W 4th St, Austin",
-        "date": "2026-04-14",
-        "id": "26-00114577"
-      },
-      {
-        "text": "Twilight Club has been blasting music since before 8pm on a Sunday night. When will this city do anything about it. Coming from nyc this is unacceptable",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "219 W 4th St, Austin",
-        "date": "2026-04-13",
-        "id": "26-00113274"
-      },
-      {
-        "text": "I live in the Fifth and West condominium adjacent to The Betty.  The extremely loud dance music they play late a night has a tremendous amount of ba** energy that transmits throughout the structure inside our condominium.  The deep ba** travels so much that we can hear the \u201cboom boom boom\u201d sounds on",
-        "category": "Outdoor Music Venue",
-        "code": "DSOUCVMC",
-        "address": "506 Rio Grande St, Austin",
-        "date": "2026-04-12",
-        "id": "26-00112717"
-      },
-      {
-        "text": "Parking in a permit zone without a permit and blocking a driveway partially",
-        "category": "Parking",
-        "code": "PARKINGV",
-        "address": "708 W Gibson St, Austin",
-        "date": "2026-06-20",
-        "id": "26-00202323"
-      },
-      {
-        "text": "3 vehicles illegally parked in our valet. one of the vehicles was also parked here yesterday during our permitted operational hourslane with a tow away sign attached",
-        "category": "Parking",
-        "code": "PARKINGV",
-        "address": "509 San Jacinto Blvd, Austin",
-        "date": "2026-06-20",
-        "id": "26-00202303"
-      },
-      {
-        "text": "2 vehicles illegally parked in our permitted valet lane with a tow away sign attached",
-        "category": "Parking",
-        "code": "PARKINGV",
-        "address": "509 San Jacinto Blvd, Austin",
-        "date": "2026-06-19",
-        "id": "26-00201303"
-      },
-      {
-        "text": "1 vehicle illegally parked in our permitted valet lane (has handicap tag) but it is making it difficult to work around hence we do have an event and not sure when this vehicle will be leaving",
-        "category": "Parking",
-        "code": "PARKINGV",
-        "address": "509 San Jacinto Blvd, Austin",
-        "date": "2026-06-18",
-        "id": "26-00200216"
-      },
-      {
-        "text": "All of this trash was on my property and I picked it up and put it back on their lawn. They have a car parked on their lawn, and last night until 2am they had 3 cars parked on their lawn with one of them on my lawn. They had a party last night in their driveway until 2am. I made multiple noise compl",
-        "category": "Parking",
-        "code": "PARKINGV",
-        "address": "8721 Talyne Chaise Cir, Austin",
-        "date": "2026-06-14",
-        "id": "26-00193863"
-      },
-      {
-        "text": "Large, deep pothole on Brandt road that prevents right turns onto Slaughter Lane. Creates a large traffic bottleneck behind the first car that extends fully down Brandt and snakes around the road if the first car in line isn\u2019t turning right.",
-        "category": "Pothole",
-        "code": "SBPOTREP",
-        "address": "2428 Brandt Rd, Austin",
-        "date": "2026-05-12",
-        "id": "26-00151290"
-      },
-      {
-        "text": "The sign at the intersection of  Horse Trap Ln and Rattlesnake Trl got damaged during the heavy winds we saw over the weekend.  Please help fix it.  Thank you.",
-        "category": "Street Sign",
-        "code": "SIGNSTRE",
-        "address": "9000 Rattlesnake Trl, Austin",
-        "date": "2026-03-19",
-        "id": "26-00083914"
-      },
-      {
-        "text": "Trash dumped all along the side of the road heading westbound on Sprinkle Cutoff",
-        "category": "Street Sweeping",
-        "code": "ZZARSTSW",
-        "address": "10126 Sprinkle Rd, Austin",
-        "date": "2026-04-13",
-        "id": "26-00114432"
-      },
-      {
-        "text": "Street sweeping needed on bike lane all along burleson. Bike lane is useless with all kinds of nails and debris. If it can\u2019t be sweeped by a street sweeper. People will ride in the street making the bike lane useless. Alternative is to remove all the plastic dividers for sweeper access. Both sides o",
-        "category": "Street Sweeping",
-        "code": "ZZARSTSW",
-        "address": "2619 Burleson Rd, Austin",
-        "date": "2026-04-03",
-        "id": "26-00102326"
-      },
-      {
-        "text": "Small green belt behind my house is overgrown. Poison ivy keeps coming through my fence line. I have multiple wildlife digging up my yard from skunks (5+) raccoons (3+) possums (3+) coyotes (2+). I have already spent $350 hiring pest control to capture & relocate wildlife. I can\u2019t afford to keep doi",
-        "category": "Tree/Environmental",
-        "code": "DSDENVCO",
-        "address": "2206 Lear Ln, Austin",
-        "date": "2026-06-19",
-        "id": "26-00201298"
-      },
-      {
-        "text": "Neighbor is using a handyman (Al Richards DBA Freddie\u2019s Handyman) and not a licensed arbirist to trim oak trees in their yard currently. Given that\u2019s its oak wilt season and unclear if they have a permit, I thought you\u2019d like to know. Address is 1802 or 1800 Parkside Lane 78745.",
-        "category": "Tree/Environmental",
-        "code": "DSDENVCO",
-        "address": "1770 Parkside Ln, Austin",
-        "date": "2026-05-21",
-        "id": "26-00163412"
-      },
-      {
-        "text": "Code violation - High gra** weeds well over 12\u201d, blocking access to the sidewalk, dangerously tall for fires and snake issues within the neighborhood.",
-        "category": "Tree/Environmental",
-        "code": "DSDENVCO",
-        "address": "1324 Tillerfield Trl, Austin",
-        "date": "2026-05-19",
-        "id": "26-00159535"
-      },
-      {
-        "text": "A crew cut down what looked to be a protected Pecan tree at 308 Kemp St.  Lot is undeveloped, but just acquired a permit to build.",
-        "category": "Tree/Environmental",
-        "code": "DSDENVCO",
-        "address": "308 Kemp St, Austin",
-        "date": "2026-04-29",
-        "id": "26-00134186"
-      },
-      {
-        "text": "I am reporting an active Environmental and Tree Ordinance violation at 1905 E 22nd St. There is a backhoe currently clearing the lot and impacting tree root zones. The Environmental Inspection 2026-011750 EV is still OPEN and has not pa**ed. There is no orange tree protection fencing and no silt fen",
-        "category": "Tree/Environmental",
-        "code": "DSDENVCO",
-        "address": "1905 E 22nd St, Austin",
-        "date": "2026-04-08",
-        "id": "26-00107829"
-      },
-      {
-        "text": "Large redwood tree cut down, wondering if had correct permits to do so",
-        "category": "Tree/Environmental",
-        "code": "DSDENVCO",
-        "address": "5624 Sunshine Dr, Austin",
-        "date": "2026-03-30",
-        "id": "26-00096629"
-      },
-      {
-        "text": "I\u2019d like to report potential improper pruning of a protected pecan tree. A neighboring property removed a significant portion of the canopy, and I\u2019m concerned it may exceed what\u2019s allowed without a permit. I believe the address is 6406 Cannonleague. This is not a pruning, they topped this tree. The ",
-        "category": "Tree/Environmental",
-        "code": "DSDENVCO",
-        "address": "6406 Cannonleague Dr, Austin",
-        "date": "2026-03-17",
-        "id": "26-00081741"
-      },
-      {
-        "text": "Making an update to previous report. Caught this on camera at 2am. These dogs killed a skunk this morning and have attempted to bite several neighbors and dogs.  The address dogs live is 5105 Woodmoor Dr. 78721 & just moved in a couple of months ago when dogs were 1st seen running loose (not 5101). ",
-        "category": "Vicious Dog",
-        "code": "COAACDD",
-        "address": "4410 Elmsgrove Dr, Austin",
-        "date": "2026-04-29",
-        "id": "26-00132853"
-      },
-      {
-        "text": "Snow riden is being threatened by a Walter Jose Lee Mexican . And myself as a movie producer filing on set with vin diesel who lives at 507 a . Chester h also filming . To many people filming you right it up as a buse of authority.kd Petrie abuse of authority threatened to kill my baby . Our sameyei",
-        "category": "Vicious Dog",
-        "code": "COAACDD",
-        "address": "5300 Levander Loop, Austin",
-        "date": "2026-03-08",
-        "id": "26-00071244"
-      },
-      {
-        "text": "At around 6:40pm today, I was walking my dog Major down French heading south towards Manor rd. While pa**ing in front of 3000 French, I witnessed two unleashed dogs, a golden brown dog and spotted gray dog, roaming around the front yard. The gray dog took notice of Major and sprinted at us, barking,",
-        "category": "Vicious Dog",
-        "code": "COAACDD",
-        "address": "3101 Breeze Ter, Austin",
-        "date": "2026-03-07",
-        "id": "26-00069922"
-      },
-      {
-        "text": "Homeless encampment growing on 29th and Lamar. Menacing group of men. It\u2019s just a matter of time before some UT girls are going to be hurt/killed by these characters. I don\u2019t run there without my large dog and husband. The trash situation is out of control. Please help!!! Didn\u2019t dare take picture if",
-        "category": "Vicious Dog",
-        "code": "COAACDD",
-        "address": "1109 W 29th St, Austin",
-        "date": "2026-02-26",
-        "id": "26-00058962"
-      },
-      {
-        "text": "Escalating danger \u2014 Second man and second dog camping in the JJ Seabrook neighborhood. Both dogs are still loose and aggressive. They have charged my elderly neighbor while he was walking his dog.",
-        "category": "Vicious Dog",
-        "code": "COAACDD",
-        "address": "3311 Denver Ave, Austin",
-        "date": "2026-01-05",
-        "id": "26-00004384"
-      },
-      {
-        "text": "Illegal camping in JJ Seabrook Greenbelt with an aggressive dog that\u2019s attacking neighborhood dogs",
-        "category": "Vicious Dog",
-        "code": "COAACDD",
-        "address": "2100 Pershing Dr, Austin",
-        "date": "2026-01-01",
-        "id": "26-00000589"
-      },
-      {
-        "text": "A family of skunks, some appear to be rabid (daytime movements), live under the shed in the back of this property that is adjacent to Township Drive.",
-        "category": "Wildlife",
-        "code": "WILDEXPO",
-        "address": "11102 Township Cv, Austin",
-        "date": "2026-05-19",
-        "id": "26-00160731"
-      },
-      {
-        "text": "There is a whole family of raccoons living in a house that's about to be demolished on Tuesday the 12th. The house is at 85 Navasota, 78702. Please help relocate the family.",
-        "category": "Wildlife",
-        "code": "WILDEXPO",
-        "address": "85 Navasota St, Austin",
-        "date": "2026-05-07",
-        "id": "26-00143921"
-      },
-      {
-        "text": "Im having a problem with the overgrown empty lot again someone owns it it needs to be maintained regularly so many rodents skunks armadillos raccoons are nesting in there and inhabiting my backyard! I have a tiny dog he\u2019s been sprayed 3 times by skunks!!! These people need to maintain a clear lot!!",
-        "category": "Wildlife",
-        "code": "WILDEXPO",
-        "address": "6607 Breezy Pass, Austin",
-        "date": "2026-04-06",
-        "id": "26-00105684"
-      }
-    ]
   }
 }
