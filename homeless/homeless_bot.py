@@ -26,7 +26,7 @@ import time
 import logging
 import requests
 from datetime import datetime, timezone, timedelta
-from open311_client import open311_get, subscribe_popup_html, og_meta_tags
+from open311_client import open311_get, og_meta_tags
 from typing import Optional
 from collections import defaultdict
 import io
@@ -757,7 +757,6 @@ def generate_encampment_map(days_back: int = 180) -> tuple[Optional[io.BytesIO],
         notes_block = f"<b>Resolution Notes:</b><br/><i>{notes_short}</i><br/>" if notes_short else ""
 
         ticket_url = f"https://311.austintexas.gov/tickets/{req_id}"
-        sub_link = subscribe_popup_html(lat, lon)
         popup_html = f"""
         <div style="font-family: sans-serif; max-width: 300px;">
             <b><a href="{ticket_url}" target="_blank" style="color: #0066cc;">Report #{req_id}</a></b><br/>
@@ -770,7 +769,6 @@ def generate_encampment_map(days_back: int = 180) -> tuple[Optional[io.BytesIO],
             {attrs_block}
             {desc_block}
             {notes_block}
-            {sub_link}
         </div>
         """
 

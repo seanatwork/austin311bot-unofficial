@@ -16,7 +16,7 @@ import requests
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 
-from open311_client import open311_get, subscribe_popup_html, og_meta_tags
+from open311_client import open311_get, og_meta_tags
 
 logger = logging.getLogger(__name__)
 
@@ -379,7 +379,6 @@ def generate_dead_animal_map(days_back: int = 90) -> tuple:
             desc_block  = f"<b>{note_label}:</b><br/><i>{notes_short}</i><br/>"
 
         ticket_url = f"https://311.austintexas.gov/tickets/{req_id}"
-        sub_link   = subscribe_popup_html(lat, lon, alert_code="animal")
         popup_html = f"""
         <div style="font-family:sans-serif;max-width:300px;font-size:13px;">
             <b><a href="{ticket_url}" target="_blank" style="color:#0066cc;">Report #{req_id}</a></b><br/>
@@ -389,7 +388,6 @@ def generate_dead_animal_map(days_back: int = 90) -> tuple:
             <br/>
             <b>Status:</b> {'🔴 Open' if status == 'open' else '🟢 Closed'}<br/><br/>
             {desc_block}
-            {sub_link}
         </div>
         """
         popup = folium.Popup(popup_html, max_width=300)

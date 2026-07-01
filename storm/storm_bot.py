@@ -13,7 +13,7 @@ import requests
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 
-from open311_client import subscribe_popup_html, og_meta_tags
+from open311_client import og_meta_tags
 
 logger = logging.getLogger(__name__)
 
@@ -418,8 +418,6 @@ def generate_storm_map(days_back: int = 90) -> tuple[Optional[io.BytesIO], str]:
         desc_short = (desc_text[:500] + "...") if len(desc_text) > 500 else desc_text
         desc_block = f"<b>Description:</b><br/><i>{desc_short.replace(chr(10), '<br/>')}</i><br/>" if desc_short else ""
         ticket_url = f"https://311.austintexas.gov/tickets/{req_id}"
-        sub_link = subscribe_popup_html(lat, lon)
-
         popup_html = f"""
         <div style="font-family:sans-serif;max-width:310px;">
             <b><a href="{ticket_url}" target="_blank" style="color:#0066cc;">Report #{req_id}</a></b><br/>
@@ -430,7 +428,6 @@ def generate_storm_map(days_back: int = 90) -> tuple[Optional[io.BytesIO], str]:
             <b>Status:</b> {'🔴 Open' if status == 'open' else '🟢 Closed'}<br/>
             <b>Type:</b> {service_label}<br/><br/>
             {desc_block}
-            {sub_link}
         </div>
         """
         popup = folium.Popup(popup_html, max_width=310)
