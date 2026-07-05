@@ -1,5 +1,5 @@
 {
-  "updated": "2026-06-28T11:42:15.727102+00:00",
+  "updated": "2026-07-05T11:23:40.758015+00:00",
   "bars": {
     "top10": [
       {
@@ -73,16 +73,16 @@
         "pct": 24.7
       },
       {
+        "name": "The Beez Kneez/the Cat's Pajamas",
+        "address": "610 Nueces St",
+        "delta": 262902.0,
+        "pct": 324.6
+      },
+      {
         "name": "Mexican Sugar",
         "address": "11506 Century Oaks Ter Ste 128",
         "delta": 199983.0,
         "pct": 213.6
-      },
-      {
-        "name": "Modern Bar",
-        "address": "610 Davis St Ste 100",
-        "delta": 161665.0,
-        "pct": 690.4
       }
     ],
     "curDate": "2026-04-30",
@@ -91,49 +91,56 @@
     "prevLabel": "March 2026"
   },
   "coyotes": {
-    "total": 85,
+    "total": 94,
     "pupping": 0,
     "puppingPct": 0,
     "isPeak": false,
     "months": [
       {
+        "label": "Oct 2025",
+        "count": 4,
+        "pct": 11,
+        "isPupping": false
+      },
+      {
         "label": "Sep 2025",
-        "count": 24,
-        "pct": 69,
+        "count": 37,
+        "pct": 100,
         "isPupping": false
       },
       {
         "label": "Aug 2025",
         "count": 24,
-        "pct": 69,
+        "pct": 65,
         "isPupping": false
       },
       {
         "label": "Jul 2025",
-        "count": 35,
-        "pct": 100,
-        "isPupping": false
-      },
-      {
-        "label": "Jun 2025",
-        "count": 2,
-        "pct": 6,
+        "count": 29,
+        "pct": 78,
         "isPupping": false
       }
     ]
   },
   "graffiti": {
     "total": 100,
-    "uniqueLocations": 98,
-    "repeatRate": 2,
+    "uniqueLocations": 96,
+    "repeatRate": 4,
     "winner": {
-      "address": "1627 Lupine Ln",
+      "address": "901 Barton Springs Rd",
       "count": 2,
       "status": "\u2705 Cleaned",
-      "lat": 30.243179538332722,
-      "lon": -97.73100072999415
+      "lat": 30.259455155298248,
+      "lon": -97.75381259281956
     },
     "top15": [
+      {
+        "address": "901 Barton Springs Rd",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.259455155298248,
+        "lon": -97.75381259281956
+      },
       {
         "address": "1627 Lupine Ln",
         "count": 2,
@@ -147,6 +154,27 @@
         "status": "\u2705 Cleaned",
         "lat": 30.298055787236382,
         "lon": -97.70671195356192
+      },
+      {
+        "address": "5377 Freidrich Ln",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.200508370753546,
+        "lon": -97.75606401264668
+      },
+      {
+        "address": "2400 Leon St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.28860948,
+        "lon": -97.7498351
+      },
+      {
+        "address": "4018 Vineland Dr",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.29426385,
+        "lon": -97.70907029
       },
       {
         "address": "401 Rio Grande St",
@@ -210,193 +238,186 @@
         "status": "\u2705 Cleaned",
         "lat": 30.28970331,
         "lon": -97.72846256
-      },
-      {
-        "address": "2918 Medical Arts St",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.28947340405525,
-        "lon": -97.728459296212
-      },
-      {
-        "address": "815 W Cesar Chavez St",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.26548937899324,
-        "lon": -97.75418378412724
-      },
-      {
-        "address": "E 40th St & Red River St",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.2985812,
-        "lon": -97.72263743
-      },
-      {
-        "address": "607 E 53rd St",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.315706393453866,
-        "lon": -97.71730173379183
       }
     ]
   },
   "parking": {
     "total": 100,
-    "peakHour": "5pm",
-    "peakCount": 18,
+    "peakHour": "3pm",
+    "peakCount": 13,
     "hours": [
+      {
+        "hour": 0,
+        "label": "12am",
+        "count": 1,
+        "pct": 8,
+        "isPeak": false
+      },
       {
         "hour": 1,
         "label": "1am",
         "count": 1,
-        "pct": 6,
+        "pct": 8,
+        "isPeak": false
+      },
+      {
+        "hour": 6,
+        "label": "6am",
+        "count": 1,
+        "pct": 8,
+        "isPeak": false
+      },
+      {
+        "hour": 7,
+        "label": "7am",
+        "count": 1,
+        "pct": 8,
+        "isPeak": false
+      },
+      {
+        "hour": 8,
+        "label": "8am",
+        "count": 2,
+        "pct": 15,
         "isPeak": false
       },
       {
         "hour": 9,
         "label": "9am",
-        "count": 5,
-        "pct": 28,
+        "count": 8,
+        "pct": 62,
         "isPeak": false
       },
       {
         "hour": 10,
         "label": "10am",
-        "count": 4,
-        "pct": 22,
+        "count": 6,
+        "pct": 46,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
         "count": 1,
-        "pct": 6,
+        "pct": 8,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
-        "count": 5,
-        "pct": 28,
-        "isPeak": false
-      },
-      {
-        "hour": 13,
-        "label": "1pm",
-        "count": 18,
-        "pct": 100,
+        "count": 6,
+        "pct": 46,
         "isPeak": false
       },
       {
         "hour": 14,
         "label": "2pm",
-        "count": 6,
-        "pct": 33,
+        "count": 2,
+        "pct": 15,
         "isPeak": false
       },
       {
         "hour": 15,
         "label": "3pm",
-        "count": 2,
-        "pct": 11,
-        "isPeak": false
+        "count": 13,
+        "pct": 100,
+        "isPeak": true
       },
       {
         "hour": 16,
         "label": "4pm",
-        "count": 16,
-        "pct": 89,
+        "count": 12,
+        "pct": 92,
         "isPeak": false
       },
       {
         "hour": 17,
         "label": "5pm",
-        "count": 18,
-        "pct": 100,
-        "isPeak": true
+        "count": 5,
+        "pct": 38,
+        "isPeak": false
       },
       {
         "hour": 18,
         "label": "6pm",
-        "count": 7,
-        "pct": 39,
+        "count": 10,
+        "pct": 77,
         "isPeak": false
       },
       {
         "hour": 19,
         "label": "7pm",
-        "count": 7,
-        "pct": 39,
+        "count": 5,
+        "pct": 38,
         "isPeak": false
       },
       {
         "hour": 20,
         "label": "8pm",
-        "count": 5,
-        "pct": 28,
+        "count": 7,
+        "pct": 54,
         "isPeak": false
       },
       {
         "hour": 21,
         "label": "9pm",
-        "count": 1,
-        "pct": 6,
+        "count": 9,
+        "pct": 69,
         "isPeak": false
       },
       {
         "hour": 22,
         "label": "10pm",
-        "count": 2,
-        "pct": 11,
+        "count": 1,
+        "pct": 8,
         "isPeak": false
       },
       {
         "hour": 23,
         "label": "11pm",
-        "count": 2,
-        "pct": 11,
+        "count": 9,
+        "pct": 69,
         "isPeak": false
       }
     ],
     "violationTypes": [
       {
         "type": "Other",
-        "count": 27,
+        "count": 24,
         "pct": 100
       },
       {
-        "type": "No Parking Zone",
-        "count": 8,
-        "pct": 30
-      },
-      {
         "type": "Sidewalk",
-        "count": 6,
-        "pct": 22
+        "count": 20,
+        "pct": 83
       },
       {
         "type": "Bike Lane",
-        "count": 5,
-        "pct": 19
+        "count": 6,
+        "pct": 25
       },
       {
         "type": "Oversized Vehicle",
         "count": 4,
-        "pct": 15
-      },
-      {
-        "type": "Tow Zone",
-        "count": 3,
-        "pct": 11
+        "pct": 17
       },
       {
         "type": "Blocking",
-        "count": 2,
-        "pct": 7
+        "count": 3,
+        "pct": 12
       },
       {
-        "type": "Abandoned",
+        "type": "Handicap",
+        "count": 2,
+        "pct": 8
+      },
+      {
+        "type": "Alley",
+        "count": 1,
+        "pct": 4
+      },
+      {
+        "type": "Driveway",
         "count": 1,
         "pct": 4
       }
@@ -404,13 +425,13 @@
   },
   "graffitiSpeedrun": {
     "totalClosed": 100,
-    "avgDays": 175.6,
-    "medianDays": 251.8,
+    "avgDays": 162.1,
+    "medianDays": 249.7,
     "fastestDays": [
       0.1,
+      0.1,
       0.2,
-      0.5,
-      0.5,
+      0.2,
       0.5
     ],
     "buckets": {
@@ -419,11 +440,11 @@
         "label": "Under 1 hour"
       },
       "1hTo6h": {
-        "count": 2,
+        "count": 4,
         "label": "1\u20136 hours"
       },
       "6hTo24h": {
-        "count": 6,
+        "count": 7,
         "label": "6\u201324 hours"
       },
       "1dTo3d": {
@@ -431,7 +452,7 @@
         "label": "1\u20133 days"
       },
       "3dTo7d": {
-        "count": 8,
+        "count": 9,
         "label": "3\u20137 days"
       },
       "7dTo30d": {
@@ -439,7 +460,7 @@
         "label": "7\u201330 days"
       },
       "over30d": {
-        "count": 62,
+        "count": 58,
         "label": "Over 30 days"
       }
     },
