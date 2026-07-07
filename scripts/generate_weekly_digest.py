@@ -308,18 +308,21 @@ def _build_prompt(records: list) -> tuple:
 surprising, funny, infuriating, and uniquely-Austin 311 citizen complaints.
 
 Your job: select 10-15 individual complaints from the list below and, for each one,
-write a 2-4 sentence editorial note explaining WHY this complaint matters.
+write a 1-2 sentence editorial note saying what's interesting about the complaint.
 
-What makes a complaint worth picking?
-- Vivid, specific details that paint a picture
-- Emotional language (frustration, desperation, humor, disbelief)
-- Complaints that reveal something about Austin life most residents don't see
-- Unexpected situations or creative problem descriptions
-- Complaints about well-known venues or neighborhoods that show a hidden side
+CRITICAL RULE — NEVER fabricate or embellish facts. You must:
+- Only describe details that are EXPLICITLY present in the complaint text
+- NEVER add specific numbers (floor counts, decibel levels, distances, prices, etc.) unless they appear verbatim in the complaint
+- NEVER invent quotes or claims the complainant didn't write
+- NEVER speculate about things not in the complaint text
+- If you're not sure whether a detail is in the text, DON'T include it
+- Keep it short: 1-2 sentences max, 200 characters max
 
-For each pick, think about: what does this individual complaint reveal about
-life in Austin? About neighborhood change? About city services? About the
-relationship between residents and their environment?
+What makes a complaint worth picking:
+- Emotional language (frustration, humor, disbelief)
+- Unexpected situations or creative descriptions
+- Complaints that reflect something about Austin life
+- Complaints about well-known venues or neighborhoods
 
 Return ONLY valid JSON (no markdown fences, no commentary) with this structure:
 {
@@ -327,7 +330,7 @@ Return ONLY valid JSON (no markdown fences, no commentary) with this structure:
   "picks": [
     {
       "ticketId": "the id field from the complaint",
-      "editorialNote": "Your 2-4 sentence editorial commentary. What's the bigger story here?"
+      "editorialNote": "1-2 sentence note on what's interesting, using ONLY facts from the complaint text. No fabricated details, no embellishment."
     }
   ]
 }
@@ -455,9 +458,15 @@ def _merge_picks_with_records(picks: list, records: list) -> list:
         tid = pick.get("ticketId", "")
         record = record_map.get(tid)
         if record:
+            note = pick.get("editorialNote", "")
+            validated = _validate_editorial_note(note, record["text"])
+            # If LLM note was fabricated, use the simple factual fallback
+            if not validated and note:
+                logger.info(f"  Using fallback note for {tid}")
+                validated = _fallback_note(record)
             merged.append({
                 "text": record["text"],
-                "editorialNote": pick.get("editorialNote", ""),
+                "editorialNote": validated,
                 "address": record["address"],
                 "category": record["category"],
                 "ticketId": tid,
@@ -467,6 +476,53 @@ def _merge_picks_with_records(picks: list, records: list) -> list:
         else:
             logger.warning(f"  Pick ticketId '{tid}' not found in records — skipping")
     return merged
+
+
+def _validate_editorial_note(note: str, complaint_text: str) -> str:
+    """Strip fabricated details from editorial notes.
+
+    If the note contains specific numbers (floor counts, decibel levels,
+    dollar amounts, distances, years) not found in the complaint text,
+    or exceeds 300 chars, falls back to a simple factual note.
+    """
+    if not note:
+        return ""
+
+    # Cap length — no 4-sentence essays
+    if len(note) > 300:
+        logger.warning(f"  Editorial note too long ({len(note)} chars), truncating")
+        note = note[:297] + "..."
+
+    # Check for fabricated numbers: extract all digits from note and complaint
+    note_numbers = set(re.findall(r'\b\d+', note))
+    complaint_numbers = set(re.findall(r'\b\d+', complaint_text))
+
+    # Numbers like 1 (a/an/one) and common small numbers are fine
+    harmless = {"0", "1", "2", "3", "4", "5", "1st", "2nd", "3rd"}
+    note_numbers -= harmless
+
+    fabricated = note_numbers - complaint_numbers
+    if fabricated:
+        logger.warning(
+            f"  Editorial note contains numbers not in complaint: "
+            f"{sorted(fabricated, key=int) if all(n.isdigit() for n in fabricated) else sorted(fabricated)} "
+            f"— reverting to factual note"
+        )
+        return ""
+
+    return note
+
+
+def _fallback_note(record: dict) -> str:
+    """Generate a simple, factual editorial note for a pick."""
+    cat = record.get("category", "")
+    addr = (record.get("address", "") or "").split(",")[0]
+    date = record.get("date", "")
+    dedup = record.get("_dedupCount", 1)
+    parts = [f"Filed in the {cat} category on {date} near {addr}."] if cat and date and addr else []
+    if dedup > 1:
+        parts.append(f" Similar complaint(s) filed {dedup - 1} other time(s) this week.")
+    return " ".join(parts)
 
 
 # ── Phase 4b: Interestingness-based fallback ────────────────────────────────
@@ -519,24 +575,14 @@ def _generate_fallback_digest(citizen_complaints: list, city_responses: list) ->
 
     picks = []
     for record, score in top:
-        cat = record["category"]
-        addr = record["address"].split(",")[0] if record["address"] else "Austin"
-        dedup = record.get("_dedupCount", 1)
-        dedup_note = (
-            f" Filed alongside {dedup - 1} other similar complaint(s) this week."
-            if dedup > 1 else ""
-        )
         picks.append({
             "text": record["text"],
-            "editorialNote": (
-                f"Filed in the {cat} category on {record['date']} "
-                f"near {addr}.{dedup_note}"
-            ),
+            "editorialNote": _fallback_note(record),
             "address": record["address"],
             "category": record["category"],
             "ticketId": record["id"],
             "date": record["date"],
-            "dedupCount": dedup,
+            "dedupCount": record.get("_dedupCount", 1),
         })
 
     return {

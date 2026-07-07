@@ -569,7 +569,6 @@
         if (d.headline) {
           html += '<div class="picks-headline">' + escapeHtml(d.headline) + '</div>';
         }
-
         d.picks.forEach(function (pick, idx) {
           var ticketUrl = pick.ticketId
             ? "https://311.austintexas.gov/tickets/" + encodeURIComponent(pick.ticketId)
