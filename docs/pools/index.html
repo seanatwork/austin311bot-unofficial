@@ -206,11 +206,34 @@
     const layer = L.layerGroup().addTo(map);
     const markersByName = new Map();
 
-    function statusKey(s) {
-      const v = (s || "").toLowerCase();
-      if (v === "open")   return "open";
-      if (v === "closed") return "closed";
-      return "open";   // 1 special "Operated by Pease Park Conservancy" entry — treat as open
+    // ── Hybrid loading: patched JSON first, Socrata fallback ──────────
+    let _verifiedAt = "";
+
+    function statusKey(p) {
+      // Use scraped status if available
+      const raw = p._scraped_status || p.status || "";
+      const v = raw.toLowerCase();
+      // "Closed for Maintenance", "closed" → closed
+      if (v.includes("closed")) return "closed";
+      // "Opens June 13", "Opens May 29" → these are future reopen dates → closed
+      if (/^opens?\s/.test(v)) return "closed";
+      // "Open May through October", "Open*", "Open" → open
+      if (v.includes("open")) return "open";
+      // "Operated by Pease Park Conservancy" → treat as open
+      return "open";
+    }
+
+    function effectiveStatus(p) {
+      // Return the human-readable display status
+      return p._scraped_status || p.status || "—";
+    }
+
+    function effectiveWeekday(p) {
+      return p._scraped_weekday || p.weekday || "";
+    }
+
+    function effectiveWeekend(p) {
+      return p._scraped_weekend || p.weekend || "";
     }
 
     function parseAddress(loc) {
@@ -238,24 +261,31 @@
       const lon = parseFloat(p.location_1 && p.location_1.longitude);
       const directions = (lat && lon) ? `https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}` : "";
       const websiteUrl = p.website && p.website.url;
-      const sk = statusKey(p.status);
+      const sk = statusKey(p);
+      const displayStatus = effectiveStatus(p);
+      const noticeHtml = p._notice
+        ? `<div style="background:#fef3c7;color:#92400e;border:1px solid #fcd34d;border-radius:4px;padding:4px 6px;margin:5px 0;font-size:11px;">⚠ ${p._notice}</div>`
+        : "";
       const statusBadge =
         sk === "open"   ? `<span class="badge badge-open">🟢 Open</span>` :
         sk === "closed" ? `<span class="badge badge-closed">⚪ Closed</span>` :
-                          `<span class="badge badge-other">${p.status || "—"}</span>`;
+                          `<span class="badge badge-other">${displayStatus}</span>`;
       const dateNote = sk === "closed" && p.open_date
         ? `<div style="color:#666;font-size:11px;margin-top:3px;">Reopens ${fmtDate(p.open_date)}</div>`
         : (sk === "open" && p.open_date
             ? `<div style="color:#666;font-size:11px;margin-top:3px;">Open since ${fmtDate(p.open_date)}</div>`
             : "");
+      const wkdy = effectiveWeekday(p);
+      const wknd = effectiveWeekend(p);
       return `<div style="font-family:sans-serif;font-size:12px;max-width:260px;line-height:1.5;">
         <b style="font-size:13px;color:${meta.color};">${p.pool_name || "Unnamed"}</b>
         <span style="color:var(--text-sub);font-size:11px;"> · ${p.pool_type || ""}</span><br/>
         ${addr ? `<span style="color:#666;font-size:11px;">${addr}</span><br/>` : ""}
         <div style="margin:5px 0;">${statusBadge}</div>
+        ${noticeHtml}
         ${dateNote}
-        <div style="margin-top:5px;"><b>Weekdays:</b> ${p.weekday || "—"}</div>
-        <div><b>Weekends:</b> ${p.weekend || "—"}</div>
+        <div style="margin-top:5px;"><b>Weekdays:</b> ${wkdy || "—"}</div>
+        <div><b>Weekends:</b> ${wknd || "—"}</div>
         ${p.closure_days && p.closure_days !== "None" ? `<div style="color:#a00;"><b>Closed:</b> ${p.closure_days}</div>` : ""}
         ${p.phone ? `<div style="margin-top:4px;">📞 <a href="tel:${p.phone}">${p.phone}</a></div>` : ""}
         <div style="margin-top:5px;display:flex;gap:8px;flex-wrap:wrap;">
@@ -266,7 +296,7 @@
     }
 
     function isShown(p) {
-      return activeTypes.has(p.pool_type) && activeStatus.has(statusKey(p.status));
+      return activeTypes.has(p.pool_type) && activeStatus.has(statusKey(p));
     }
 
     function renderMap() {
@@ -279,7 +309,7 @@
         const lon = parseFloat(p.location_1 && p.location_1.longitude);
         if (!lat || !lon) return;
         const meta = typeMeta(p.pool_type);
-        const sk = statusKey(p.status);
+        const sk = statusKey(p);
         const m = L.circleMarker([lat, lon], {
           radius: meta.radius,
           fillColor: meta.color,
@@ -291,19 +321,19 @@
         markersByName.set(p.pool_name, m);
       });
 
-      const openCount   = shown.filter(p => statusKey(p.status) === "open").length;
-      const closedCount = shown.filter(p => statusKey(p.status) === "closed").length;
+      const openCount   = shown.filter(p => statusKey(p) === "open").length;
+      const closedCount = shown.filter(p => statusKey(p) === "closed").length;
+      const tsNote = _verifiedAt ? ` · Verified ${_verifiedAt}` : "";
       document.getElementById("panel-summary").textContent =
-        `${shown.length} shown · ${openCount} open · ${closedCount} closed (of ${allPools.length} total)`;
+        `${shown.length} shown · ${openCount} open · ${closedCount} closed (of ${allPools.length} total)${tsNote}`;
 
       renderSidebar(shown);
     }
 
     function renderSidebar(shown) {
-      // sort: open first, then by name
       const sorted = shown.slice().sort((a, b) => {
-        const aOpen = statusKey(a.status) === "open" ? 0 : 1;
-        const bOpen = statusKey(b.status) === "open" ? 0 : 1;
+        const aOpen = statusKey(a) === "open" ? 0 : 1;
+        const bOpen = statusKey(b) === "open" ? 0 : 1;
         if (aOpen !== bOpen) return aOpen - bOpen;
         return (a.pool_name || "").localeCompare(b.pool_name || "");
       });
@@ -313,15 +343,18 @@
         return;
       }
       list.innerHTML = sorted.map(p => {
-        const sk = statusKey(p.status);
+        const sk = statusKey(p);
         const meta = typeMeta(p.pool_type);
         const badge =
           sk === "open"   ? `<span class="badge badge-open">Open</span>` :
           sk === "closed" ? `<span class="badge badge-closed">Closed</span>` :
                             `<span class="badge badge-other">Other</span>`;
-        const hours = (sk === "open" && p.weekday && !/closed/i.test(p.weekday))
-          ? `<b>Weekday:</b> ${p.weekday} · <b>Weekend:</b> ${p.weekend}`
-          : (p.open_date ? `Reopens ${fmtDate(p.open_date)}` : (p.weekday || ""));
+        const wkdy = effectiveWeekday(p);
+        const wknd = effectiveWeekend(p);
+        const displayStatus = effectiveStatus(p);
+        const hours = (sk === "open" && wkdy && !/closed/i.test(wkdy))
+          ? `<b>Weekday:</b> ${wkdy} · <b>Weekend:</b> ${wknd}`
+          : (displayStatus !== "Open" ? displayStatus : (wkdy || ""));
         return `<div class="pool-item ${sk}" onclick="focusPool('${(p.pool_name || '').replace(/'/g, "\\'")}')">
           <div class="pool-name"><span class="swatch" style="background:${meta.color};"></span>${p.pool_name || "Unnamed"}</div>
           <div class="pool-meta">${p.pool_type || ""} ${badge}</div>
@@ -355,7 +388,30 @@
       renderMap();
     }
 
+    function fmtTimestamp(isoStr) {
+      if (!isoStr) return "";
+      try {
+        const d = new Date(isoStr);
+        return d.toLocaleDateString("en-US", { month: "short", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "America/Chicago" });
+      } catch { return ""; }
+    }
+
     async function loadData() {
+      // Try local patched JSON first (generated by scripts/generate_pool_data.py)
+      try {
+        const res = await fetch("pool-data.json");
+        if (res.ok) {
+          const payload = await res.json();
+          allPools = payload.pools || [];
+          _verifiedAt = fmtTimestamp(payload._meta && payload._meta.generated_at);
+          if (allPools.length) {
+            renderMap();
+            return;
+          }
+        }
+      } catch (_) { /* fall through to Socrata */ }
+
+      // Fallback: live Socrata API
       try {
         const url = "https://data.austintexas.gov/resource/xaxa-886r.json?$limit=200";
         const res = await fetch(url);
