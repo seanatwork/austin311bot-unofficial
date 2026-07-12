@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-05T11:23:40.758015+00:00",
+  "updated": "2026-07-12T11:04:58.718230+00:00",
   "bars": {
     "top10": [
       {
@@ -73,16 +73,16 @@
         "pct": 24.7
       },
       {
-        "name": "The Beez Kneez/the Cat's Pajamas",
-        "address": "610 Nueces St",
-        "delta": 262902.0,
-        "pct": 324.6
-      },
-      {
         "name": "Mexican Sugar",
         "address": "11506 Century Oaks Ter Ste 128",
         "delta": 199983.0,
         "pct": 213.6
+      },
+      {
+        "name": "Modern Bar",
+        "address": "610 Davis St Ste 100",
+        "delta": 161665.0,
+        "pct": 690.4
       }
     ],
     "curDate": "2026-04-30",
@@ -91,15 +91,15 @@
     "prevLabel": "March 2026"
   },
   "coyotes": {
-    "total": 94,
+    "total": 90,
     "pupping": 0,
     "puppingPct": 0,
     "isPeak": false,
     "months": [
       {
         "label": "Oct 2025",
-        "count": 4,
-        "pct": 11,
+        "count": 7,
+        "pct": 19,
         "isPupping": false
       },
       {
@@ -116,24 +116,38 @@
       },
       {
         "label": "Jul 2025",
-        "count": 29,
-        "pct": 78,
+        "count": 22,
+        "pct": 59,
         "isPupping": false
       }
     ]
   },
   "graffiti": {
     "total": 100,
-    "uniqueLocations": 96,
-    "repeatRate": 4,
+    "uniqueLocations": 94,
+    "repeatRate": 6,
     "winner": {
-      "address": "901 Barton Springs Rd",
+      "address": "2222 Rio Grande St",
       "count": 2,
       "status": "\u2705 Cleaned",
-      "lat": 30.259455155298248,
-      "lon": -97.75381259281956
+      "lat": 30.28688249,
+      "lon": -97.74506676
     },
     "top15": [
+      {
+        "address": "2222 Rio Grande St",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.28688249,
+        "lon": -97.74506676
+      },
+      {
+        "address": "815 W Cesar Chavez St",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.265929528632192,
+        "lon": -97.75354125628412
+      },
       {
         "address": "901 Barton Springs Rd",
         "count": 2,
@@ -161,6 +175,34 @@
         "status": "\u2705 Cleaned",
         "lat": 30.200508370753546,
         "lon": -97.75606401264668
+      },
+      {
+        "address": "4552 Mueller Blvd",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.297539904530247,
+        "lon": -97.70709027059617
+      },
+      {
+        "address": "San Gabriel St & W 22nd St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.28547322,
+        "lon": -97.74810687
+      },
+      {
+        "address": "2901 N Lamar Blvd",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.29819051,
+        "lon": -97.74822243
+      },
+      {
+        "address": "605 Davis St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.260189409021784,
+        "lon": -97.73920879556339
       },
       {
         "address": "2400 Leon St",
@@ -196,187 +238,124 @@
         "status": "\u2705 Cleaned",
         "lat": 30.270837565805717,
         "lon": -97.7560841186917
-      },
-      {
-        "address": "3201 Beanna St",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.29199947,
-        "lon": -97.72845621
-      },
-      {
-        "address": "1304 W Riverside Dr",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.265432867966073,
-        "lon": -97.7558831206209
-      },
-      {
-        "address": "5103 Bruning Ave",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.31410912932042,
-        "lon": -97.71947240858665
-      },
-      {
-        "address": "4551 Mueller Blvd",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.29762689606411,
-        "lon": -97.70707964764404
-      },
-      {
-        "address": "812 W 11th St",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.27551785,
-        "lon": -97.74980036
-      },
-      {
-        "address": "2912 Medical Arts St",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.28970331,
-        "lon": -97.72846256
       }
     ]
   },
   "parking": {
     "total": 100,
-    "peakHour": "3pm",
-    "peakCount": 13,
+    "peakHour": "8pm",
+    "peakCount": 19,
     "hours": [
-      {
-        "hour": 0,
-        "label": "12am",
-        "count": 1,
-        "pct": 8,
-        "isPeak": false
-      },
-      {
-        "hour": 1,
-        "label": "1am",
-        "count": 1,
-        "pct": 8,
-        "isPeak": false
-      },
-      {
-        "hour": 6,
-        "label": "6am",
-        "count": 1,
-        "pct": 8,
-        "isPeak": false
-      },
       {
         "hour": 7,
         "label": "7am",
         "count": 1,
-        "pct": 8,
+        "pct": 5,
         "isPeak": false
       },
       {
         "hour": 8,
         "label": "8am",
-        "count": 2,
-        "pct": 15,
+        "count": 4,
+        "pct": 21,
         "isPeak": false
       },
       {
         "hour": 9,
         "label": "9am",
-        "count": 8,
-        "pct": 62,
+        "count": 7,
+        "pct": 37,
         "isPeak": false
       },
       {
         "hour": 10,
         "label": "10am",
-        "count": 6,
-        "pct": 46,
+        "count": 10,
+        "pct": 53,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
-        "count": 1,
-        "pct": 8,
+        "count": 8,
+        "pct": 42,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
+        "count": 4,
+        "pct": 21,
+        "isPeak": false
+      },
+      {
+        "hour": 13,
+        "label": "1pm",
         "count": 6,
-        "pct": 46,
+        "pct": 32,
         "isPeak": false
       },
       {
         "hour": 14,
         "label": "2pm",
-        "count": 2,
-        "pct": 15,
+        "count": 3,
+        "pct": 16,
         "isPeak": false
       },
       {
         "hour": 15,
         "label": "3pm",
-        "count": 13,
-        "pct": 100,
-        "isPeak": true
+        "count": 1,
+        "pct": 5,
+        "isPeak": false
       },
       {
         "hour": 16,
         "label": "4pm",
-        "count": 12,
-        "pct": 92,
+        "count": 11,
+        "pct": 58,
         "isPeak": false
       },
       {
         "hour": 17,
         "label": "5pm",
-        "count": 5,
-        "pct": 38,
+        "count": 9,
+        "pct": 47,
         "isPeak": false
       },
       {
         "hour": 18,
         "label": "6pm",
-        "count": 10,
-        "pct": 77,
+        "count": 5,
+        "pct": 26,
         "isPeak": false
       },
       {
         "hour": 19,
         "label": "7pm",
-        "count": 5,
-        "pct": 38,
+        "count": 6,
+        "pct": 32,
         "isPeak": false
       },
       {
         "hour": 20,
         "label": "8pm",
-        "count": 7,
-        "pct": 54,
-        "isPeak": false
+        "count": 19,
+        "pct": 100,
+        "isPeak": true
       },
       {
         "hour": 21,
         "label": "9pm",
-        "count": 9,
-        "pct": 69,
+        "count": 5,
+        "pct": 26,
         "isPeak": false
       },
       {
         "hour": 22,
         "label": "10pm",
         "count": 1,
-        "pct": 8,
-        "isPeak": false
-      },
-      {
-        "hour": 23,
-        "label": "11pm",
-        "count": 9,
-        "pct": 69,
+        "pct": 5,
         "isPeak": false
       }
     ],
@@ -388,51 +367,51 @@
       },
       {
         "type": "Sidewalk",
-        "count": 20,
-        "pct": 83
+        "count": 8,
+        "pct": 33
       },
       {
         "type": "Bike Lane",
-        "count": 6,
-        "pct": 25
+        "count": 7,
+        "pct": 29
       },
       {
-        "type": "Oversized Vehicle",
+        "type": "Fire Hydrant",
+        "count": 5,
+        "pct": 21
+      },
+      {
+        "type": "Blocking",
         "count": 4,
         "pct": 17
       },
       {
-        "type": "Blocking",
+        "type": "Handicap",
         "count": 3,
         "pct": 12
       },
       {
-        "type": "Handicap",
+        "type": "No Parking Zone",
         "count": 2,
         "pct": 8
       },
       {
-        "type": "Alley",
-        "count": 1,
-        "pct": 4
-      },
-      {
-        "type": "Driveway",
-        "count": 1,
-        "pct": 4
+        "type": "Fire Lane",
+        "count": 2,
+        "pct": 8
       }
     ]
   },
   "graffitiSpeedrun": {
     "totalClosed": 100,
-    "avgDays": 162.1,
-    "medianDays": 249.7,
+    "avgDays": 155.0,
+    "medianDays": 235.4,
     "fastestDays": [
       0.1,
-      0.1,
       0.2,
-      0.2,
-      0.5
+      0.8,
+      0.9,
+      1.0
     ],
     "buckets": {
       "under1h": {
@@ -440,23 +419,23 @@
         "label": "Under 1 hour"
       },
       "1hTo6h": {
-        "count": 4,
+        "count": 2,
         "label": "1\u20136 hours"
       },
       "6hTo24h": {
-        "count": 7,
+        "count": 3,
         "label": "6\u201324 hours"
       },
       "1dTo3d": {
-        "count": 14,
+        "count": 12,
         "label": "1\u20133 days"
       },
       "3dTo7d": {
-        "count": 9,
+        "count": 15,
         "label": "3\u20137 days"
       },
       "7dTo30d": {
-        "count": 8,
+        "count": 10,
         "label": "7\u201330 days"
       },
       "over30d": {
