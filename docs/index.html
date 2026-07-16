@@ -17,69 +17,86 @@
   <meta name="twitter:description" content="Live maps and trends across 311 reports, APD crime, crashes, parking, courts, and more — refreshed daily. Subscribe to alerts on Telegram." />
   <meta name="twitter:image" content="https://austin311.com/og-default.png" />
   <meta name="description" content="Live maps and trends across 311 reports, APD crime, crashes, parking, courts, and more — refreshed daily. Subscribe to alerts on Telegram." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── color tokens ── */
+    /* ── Austin color tokens (muted earthy) ── */
     :root {
-      --bg:           #f8fafc;
-      --bg-card:      #ffffff;
-      --bg-card-hover:#f1f5f9;
-      --bg-cta:       #ffffff;
-      --border:       #e2e8f0;
-      --border-hover: #94a3b8;
-      --border-cta:   #cbd5e1;
-      --border-cta-hover: #3b82f6;
-      --text:         #1e293b;
-      --text-head:    #0f172a;
-      --text-tag:     #475569;
-      --text-label:   #0f172a;
-      --text-desc:    #64748b;
-      --text-disc:    #475569;
-      --text-disc-a:  #0f172a;
-      --text-cta:     #1e293b;
-      --text-footer:  #94a3b8;
-      --text-footer-a:#64748b;
-      --text-footer-hover: #475569;
-      --btn-bg:       #e2e8f0;
-      --btn-border:   #cbd5e1;
-      --btn-color:    #475569;
-      --bar-bg:       #cbd5e1;
-      --bar-fill:      #3b82f6;
-      --disc-border:  #e2e8f0;
+      --bg:           #F5F0E8;
+      --bg-card:      #FDFBF7;
+      --bg-card-hover:#F2EBE0;
+      --bg-cta:       #FDFBF7;
+      --border:       #E0D5C5;
+      --border-hover: #B8A898;
+      --border-cta:   #D4C8B4;
+      --border-cta-hover: #2C6E8A;
+      --text:         #3D3028;
+      --text-head:    #2C1810;
+      --text-tag:     #6B5C50;
+      --text-label:   #2C1810;
+      --text-desc:    #7B6C60;
+      --text-disc:    #5C4B40;
+      --text-disc-a:  #2C1810;
+      --text-cta:     #3D3028;
+      --text-footer:  #A89888;
+      --text-footer-a:#6B5C50;
+      --text-footer-hover: #4A3020;
+      --text-muted:   #A89888;
+      --text-sub:     #6B5C50;
+      --btn-bg:       #E8DCC8;
+      --btn-border:   #D4C8B4;
+      --btn-color:    #5C4B40;
+      --bar-bg:       #D4C8B4;
+      --bar-fill:     #C2855C;
+      --disc-border:  #E0D5C5;
+      --accent-blue:  #2C6E8A;
+      --accent-warm:  #C2855C;
+      --accent-green: #7A9A6D;
+      --accent-gold:  #D4A84B;
+      --accent-purple:#7B6B9E;
+      --shadow-warm:  rgba(194, 133, 92, 0.12);
     }
 
     html.dark {
-      --bg:           #0f1117;
-      --bg-card:      #1e2230;
-      --bg-card-hover:#252b3b;
-      --bg-cta:       #1e2230;
-      --border:       #2d3348;
-      --border-hover: #4a5568;
-      --border-cta:   #3d4868;
-      --border-cta-hover: #60a5fa;
-      --text:         #e2e8f0;
-      --text-head:    #f8fafc;
-      --text-tag:     #94a3b8;
-      --text-label:   #f1f5f9;
-      --text-desc:    #64748b;
-      --text-disc:    #94a3b8;
-      --text-disc-a:  #cbd5e1;
-      --text-cta:     #e2e8f0;
-      --text-footer:  #475569;
-      --text-footer-a:#64748b;
-      --text-footer-hover: #94a3b8;
-      --btn-bg:       #252b3b;
-      --btn-border:   #3d4868;
-      --btn-color:    #94a3b8;
-      --bar-bg:       #3d4868;
-      --bar-fill:      #60a5fa;
-      --disc-border:  #334155;
+      --bg:           #1A1614;
+      --bg-card:      #231E1A;
+      --bg-card-hover:#2D2620;
+      --bg-cta:       #231E1A;
+      --border:       #3A3028;
+      --border-hover: #5C4B40;
+      --border-cta:   #4A3D32;
+      --border-cta-hover: #5BA0B8;
+      --text:         #D4C8BC;
+      --text-head:    #F0E8DC;
+      --text-tag:     #9B8B78;
+      --text-label:   #EAE0D4;
+      --text-desc:    #8A7868;
+      --text-disc:    #9B8B78;
+      --text-disc-a:  #C4B8A8;
+      --text-cta:     #D4C8BC;
+      --text-footer:  #5C4B40;
+      --text-footer-a:#7B6C60;
+      --text-footer-hover: #A89888;
+      --text-muted:   #5C4B40;
+      --text-sub:     #8A7868;
+      --btn-bg:       #2D2620;
+      --btn-border:   #4A3D32;
+      --btn-color:    #9B8B78;
+      --bar-bg:       #4A3D32;
+      --bar-fill:     #C2855C;
+      --disc-border:  #3A3028;
+      --shadow-warm:  rgba(194, 133, 92, 0.08);
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(194,133,92,0.06) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 80% 90%, rgba(44,110,138,0.04) 0%, transparent 60%);
       color: var(--text);
       min-height: 100vh;
       display: flex;
@@ -87,7 +104,23 @@
       align-items: center;
       padding: 2.5rem 1rem 3rem;
       transition: background 0.2s, color 0.2s;
+      position: relative;
+      overflow-x: hidden;
     }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.03;
+      background-image:
+        repeating-linear-gradient(0deg, transparent, transparent 3px, #2C1810 3px, #2C1810 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 3px, #2C1810 3px, #2C1810 4px);
+      mask-image: radial-gradient(ellipse 70% 50% at 50% 30%, black 20%, transparent 70%);
+      -webkit-mask-image: radial-gradient(ellipse 70% 50% at 50% 30%, black 20%, transparent 70%);
+    }
+    html.dark body::before { opacity: 0.015; }
 
     /* ── theme toggle ── */
     #theme-toggle {
@@ -129,35 +162,59 @@
 
     header {
       text-align: center;
-      margin-bottom: 1rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+      z-index: 1;
     }
 
     header h1 {
-      font-size: 2.2rem;
+      font-family: "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 2.4rem;
       font-weight: 700;
       letter-spacing: -0.5px;
       color: var(--text-head);
+      line-height: 1.15;
     }
 
-    header p {
+    header .subtitle {
       margin-top: 0.5rem;
       color: var(--text-tag);
       font-size: 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    header .subtitle .atx-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      border-radius: 999px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--btn-color);
+      letter-spacing: 0.02em;
     }
 
     /* ── "311 Near You" search hero ── */
     .nearby-hero {
       width: 100%;
       max-width: 900px;
-      background: linear-gradient(135deg, #1e3a5f 0%, #2563eb 50%, #3b82f6 100%);
+      background: linear-gradient(135deg, #7B5A3A 0%, #C2855C 35%, #2C6E8A 100%);
       border-radius: 16px;
       padding: 2rem 2rem 1.8rem;
       margin-bottom: 2rem;
       text-align: center;
-      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.25);
+      box-shadow: 0 4px 20px var(--shadow-warm);
+      position: relative;
+      z-index: 1;
     }
     html.dark .nearby-hero {
-      box-shadow: 0 4px 20px rgba(37, 99, 235, 0.15);
+      box-shadow: 0 4px 20px rgba(194, 133, 92, 0.1);
     }
     .nearby-hero h2 {
       font-size: 1.5rem;
@@ -207,9 +264,9 @@
     .nearby-search-row button:hover { background: rgba(255,255,255,0.3); }
     .nearby-search-row button.primary {
       background: #ffffff;
-      color: #2563eb;
+      color: #2C6E8A;
     }
-    .nearby-search-row button.primary:hover { background: #e2e8f0; }
+    .nearby-search-row button.primary:hover { background: #F0E8DC; }
     .nearby-hero .nearby-stats {
       margin-top: 1rem;
       font-size: 0.8rem;
@@ -229,7 +286,7 @@
     .card {
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 1.75rem 1.5rem;
       text-decoration: none;
       color: inherit;
@@ -237,26 +294,38 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 0.6rem;
-      transition: background 0.15s, border-color 0.15s, transform 0.15s;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--border);
+      border-radius: 14px 14px 0 0;
+      transition: background 0.2s;
     }
 
     .card:hover {
       background: var(--bg-card-hover);
       border-color: var(--border-hover);
       transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--shadow-warm);
     }
+    .card:hover::before { background: var(--bar-fill); }
 
-    .card .icon  { font-size: 2rem; line-height: 1; }
+    .card .icon  { font-size: 2.4rem; line-height: 1; }
     .card .label { font-size: 1.1rem; font-weight: 600; color: var(--text-label); }
     .card .desc  { font-size: 0.82rem; color: var(--text-desc); line-height: 1.4; }
 
     .card-group { display: flex; flex-direction: column; }
-    .card-group .card {
-      flex: 1;
-      border-bottom-left-radius: 0;
-      border-bottom-right-radius: 0;
-      border-bottom: none;
-    }
+    .card-group .card { border-radius: 14px 14px 0 0; }
+    .card-group .card::before { border-radius: 14px 14px 0 0; }
     .card-group .card:hover { transform: none; }
     .trends-pill {
       display: block;
@@ -268,8 +337,7 @@
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-top: none;
-      border-bottom-left-radius: 12px;
-      border-bottom-right-radius: 12px;
+      border-radius: 0 0 14px 14px;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
     .trends-pill:hover {
@@ -322,6 +390,8 @@
       font-size: 0.75rem;
       color: var(--text-footer);
       text-align: center;
+      position: relative;
+      z-index: 1;
     }
 
     footer a { color: var(--text-footer-a); text-decoration: none; }
@@ -524,6 +594,18 @@
       font-size: 0.78rem;
       font-weight: 400;
     }
+
+    /* ── sunset glow ticker loading ── */
+    .ticker-loading {
+      animation: sunsetPulse 2s ease-in-out infinite;
+    }
+    @keyframes sunsetPulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 0.9; }
+    }
+
+    /* z-index layering for content above bg pattern */
+    .grid, header, .nearby-hero, #pulse-bar, .disclaimer, footer { position: relative; z-index: 1; }
   </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
@@ -541,7 +623,7 @@
 
   <header>
     <h1>Austin 311</h1>
-    <p>Real data on what your city is doing — and what it isn't.</p>
+    <p class="subtitle">Real data on what your city is doing — and what it isn't. <span class="atx-badge">🎵 Live Music Capital</span></p>
   </header>
 
   <!-- ── 311 Near You (hidden until feature is fully working) ── -->
@@ -580,7 +662,7 @@
   <div class="card ticker-card" id="funny-card" style="margin-bottom:1.25rem;max-width:900px;width:100%;">
     <div id="funny-content">
       <div class="ticker-content">
-        <div class="ticker-quote" id="ticker-text">Loading 311 descriptions…</div>
+        <div class="ticker-quote ticker-loading" id="ticker-text">Loading 311 descriptions…</div>
         <div class="ticker-meta">
           <span class="ticker-badge" id="ticker-badge">—</span>
           <span class="ticker-addr" id="ticker-address"></span>
@@ -697,15 +779,15 @@
       <span class="label">911 Response</span>
       <span class="desc">APD dispatch response times across years, priorities &amp; districts</span>
     </a>
-    <a class="card" href="fun/" style="border-color:#fde68a;">
+    <a class="card" href="fun/" style="border-color:#D4A84B;">
       <span class="icon">🎉</span>
-      <span class="label" style="color:#d97706;">Fun Data!</span>
+      <span class="label" style="color:#C2855C;">Fun Data!</span>
       <span class="desc">Bar of the month · coyote sightings · graffiti hall of fame &amp; more</span>
     </a>
     <button class="card more-btn" id="more-btn" onclick="toggleMore()" aria-expanded="false" type="button">
       <span class="icon" id="more-icon">→</span>
       <span class="label" id="more-label">More…</span>
-      <span class="desc">CapMetro · Noise · Hate Crimes · Graffiti · Storm &amp; Drainage · Bicycle · Child Care · Restaurants · Animal Shelter · Dead Animal · Code Enforcement · Micromobility · COVID-19 Complaints</span>
+      <span class="desc">CapMetro · Noise · Hate Crimes · Graffiti · Storm &amp; Drainage · Bicycle · Child Care · Restaurants · Dead Animal · Code · Micromobility · COVID</span>
       
     </button>
   </div>
@@ -776,9 +858,9 @@
       <span class="label">Code Enforcement</span>
       <span class="desc">City of Austin code enforcement dashboard — violations &amp; inspections</span>
     </a>
-    <a class="card" href="covid/" style="border-color:#fecaca;">
+    <a class="card" href="covid/" style="border-color:#D4A0A0;">
       <span class="icon">😷</span>
-      <span class="label" style="color:#dc2626;">COVID-19 Complaints</span>
+      <span class="label" style="color:#C2855C;">COVID-19 Complaints</span>
       <span class="desc">All 964 COVID non-compliance reports filed via 311 — in Austinites' own words</span>
     </a>
   </div>
@@ -802,11 +884,8 @@
 
   <footer>
     <a href="https://github.com/seanatwork" target="_blank" rel="noopener">Vibecoded with ❤️</a>
-    &nbsp;·&nbsp;
-    <a href="https://venmo.com/seansatwork" target="_blank" rel="noopener" style="display:inline-flex;align-items:center;gap:5px;">
-      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.35 2c.76 1.26 1.1 2.56 1.1 4.2 0 5.23-4.47 12.02-8.1 16.8H5.13L2 4.01l6.87-.65 1.73 13.95C12.08 14.4 14.4 9.3 14.4 5.6c0-1.82-.31-3.07-.79-4.1z"/></svg>
-      ☕ buy me a coffee · @seansatwork
-    </a>
+    <br />
+    <span style="font-size:0.7rem;opacity:0.7;">🤘 Keep Austin Weird</span>
   </footer>
 
   <script>
@@ -952,6 +1031,7 @@
       }
 
       function showItem(index) {
+        tickerText.classList.remove("ticker-loading");
         var item = items[index];
         var text = item.text;
         var ticketUrl = item.id ? 'https://311.austintexas.gov/tickets/' + item.id : null;
