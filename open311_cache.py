@@ -342,3 +342,161 @@ def update_last_fetch_date(category: str):
     """Update the last full fetch timestamp for a category."""
     now = datetime.now(timezone.utc).isoformat()
     set_cache_metadata(f"{category}_last_full_fetch", now)
+
+
+def get_all_records_with_location(
+    category: str,
+    since: Optional[datetime] = None,
+) -> list:
+    """Get cached records that have valid lat/long coordinates.
+
+    Args:
+        category: Category name
+        since: Only return records since this datetime
+
+    Returns:
+        List of records with non-null lat/long
+    """
+    if not CACHE_DB.exists():
+        return []
+
+    conn = sqlite3.connect(CACHE_DB)
+    try:
+        cursor = conn.cursor()
+
+        query = """
+            SELECT service_request_id, service_code, status,
+                   requested_datetime, updated_datetime,
+                   lat, long, address, raw_json
+            FROM service_requests
+            WHERE category = ? AND lat IS NOT NULL AND long IS NOT NULL
+        """
+        params = [category]
+
+        if since:
+            query += " AND requested_datetime >= ?"
+            params.append(since.isoformat())
+
+        cursor.execute(query, params)
+        columns = [desc[0] for desc in cursor.description]
+        records = []
+
+        for row in cursor.fetchall():
+            record = dict(zip(columns, row))
+            if record.get("raw_json"):
+                try:
+                    raw = json.loads(record["raw_json"])
+                    record.update(raw)
+                except json.JSONDecodeError:
+                    pass
+            records.append(record)
+
+        return records
+    finally:
+        conn.close()
+
+
+def get_record_count_by_date(
+    category: str,
+    since: Optional[datetime] = None,
+    group_by_day: bool = True,
+) -> dict:
+    """Get record counts grouped by date for a category.
+
+    Args:
+        category: Category name
+        since: Only count records since this datetime
+        group_by_day: If True, group by day (YYYY-MM-DD). If False, return total.
+
+    Returns:
+        If group_by_day: { "2026-07-01": {"total": 15, "open": 5, "closed": 10}, ... }
+        If not: {"total": 1500, "open": 200, "closed": 1300}
+    """
+    if not CACHE_DB.exists():
+        return {}
+
+    conn = sqlite3.connect(CACHE_DB)
+    try:
+        cursor = conn.cursor()
+
+        if group_by_day:
+            query = """
+                SELECT
+                    SUBSTR(requested_datetime, 1, 10) as day,
+                    status,
+                    COUNT(*) as cnt
+                FROM service_requests
+                WHERE category = ?
+            """
+            params = [category]
+
+            if since:
+                query += " AND requested_datetime >= ?"
+                params.append(since.isoformat())
+
+            query += " GROUP BY day, status ORDER BY day ASC"
+
+            cursor.execute(query, params)
+            result: dict = {}
+            for day, status, cnt in cursor.fetchall():
+                if day not in result:
+                    result[day] = {"total": 0, "open": 0, "closed": 0}
+                result[day]["total"] += cnt
+                status_lower = (status or "").lower()
+                if status_lower == "open":
+                    result[day]["open"] += cnt
+                else:
+                    result[day]["closed"] += cnt
+            return result
+        else:
+            query = """
+                SELECT status, COUNT(*) FROM service_requests
+                WHERE category = ?
+            """
+            params = [category]
+            if since:
+                query += " AND requested_datetime >= ?"
+                params.append(since.isoformat())
+            query += " GROUP BY status"
+
+            cursor.execute(query, params)
+            total = 0
+            open_count = 0
+            for status, cnt in cursor.fetchall():
+                total += cnt
+                if (status or "").lower() == "open":
+                    open_count += cnt
+            return {"total": total, "open": open_count, "closed": total - open_count}
+    finally:
+        conn.close()
+
+
+def get_distinct_service_codes(category: str) -> list:
+    """Get all distinct service codes stored for a category."""
+    if not CACHE_DB.exists():
+        return []
+
+    conn = sqlite3.connect(CACHE_DB)
+    try:
+        cursor = conn.cursor()
+        cursor.execute(
+            "SELECT DISTINCT service_code FROM service_requests WHERE category = ? ORDER BY service_code",
+            (category,),
+        )
+        return [row[0] for row in cursor.fetchall()]
+    finally:
+        conn.close()
+
+
+def get_all_categories() -> list:
+    """Get all distinct category tags in the cache."""
+    if not CACHE_DB.exists():
+        return []
+
+    conn = sqlite3.connect(CACHE_DB)
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT DISTINCT category FROM service_requests ORDER BY category")
+        return [row[0] for row in cursor.fetchall()]
+    finally:
+        conn.close()

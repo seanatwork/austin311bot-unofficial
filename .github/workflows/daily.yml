@@ -142,6 +142,11 @@ jobs:
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
+      - name: Generate query data (pre-computed datasets)
+        run: python scripts/generate_query_data.py
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
       - name: Save Open311 cache
         uses: actions/cache@v4
         if: always()
@@ -171,7 +176,12 @@ jobs:
             docs/court/index.html \
             docs/crime/hatecrime/index.html \
             docs/cameras/index.html \
-            docs/shelter/data.json
+            docs/shelter/data.json \
+            docs/querystore/daily_counts.json \
+            docs/querystore/district_counts.json \
+            docs/querystore/resolution_stats.json \
+            docs/querystore/monthly_aggregates.json \
+            docs/querystore/service_codes.json
           git diff --cached --quiet || git commit -m "chore: refresh daily data [skip ci]"
           git pull --rebase origin main
           git push

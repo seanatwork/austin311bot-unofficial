@@ -1,0 +1,16 @@
+name = "austin311-query-gateway"
+main = "src/index.js"
+compatibility_date = "2025-07-17"
+
+# AI binding for Workers AI (Llama 3.1 8B)
+[ai]
+binding = "AI"
+
+# Route: deploy to austin311.com/api/*
+[[routes]]
+pattern = "austin311.com/api/*"
+zone_name = "austin311.com"
+
+# Dev vars (production secrets set via `wrangler secret put`)
+[vars]
+SITE_BASE = "https://austin311.com"

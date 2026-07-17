@@ -135,6 +135,11 @@ jobs:
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
+      - name: Generate query data (pre-computed datasets)
+        run: python scripts/generate_query_data.py
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
       - name: Save Open311 cache
         uses: actions/cache@v4
         if: always()

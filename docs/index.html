@@ -275,6 +275,130 @@
     .nearby-hero .nearby-stats span { display: inline-block; margin: 0 6px; }
     .nearby-hero .nearby-stats strong { color: #ffffff; }
 
+    /* ── NL Query search bar ── */
+    .query-search-wrap {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto 1.5rem;
+      position: relative;
+      z-index: 1;
+    }
+    .query-search-bar {
+      width: 100%;
+      padding: 14px 20px 14px 48px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-family: "Outfit", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-card);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .query-search-bar:focus {
+      border-color: var(--accent-blue);
+      box-shadow: 0 0 0 3px rgba(44, 110, 138, 0.15);
+    }
+    .query-search-bar::placeholder {
+      color: var(--text-muted);
+    }
+    .query-search-icon {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .query-hints {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+    .query-loading {
+      text-align: center;
+      padding: 1rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .query-loading .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent-blue);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Results area ── */
+    .query-results {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto 1.5rem;
+    }
+    .query-results .answer-summary {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-head);
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+    .query-results .query-chart {
+      margin-bottom: 1rem;
+    }
+    .query-results .query-chart canvas {
+      max-height: 350px;
+    }
+    .query-results .query-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .query-results .query-table th,
+    .query-results .query-table td {
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .query-results .query-table th {
+      color: var(--text-tag);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+    .query-filter-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+    }
+    .query-filter-panel select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: var(--bg);
+      color: var(--text);
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    .query-filter-panel button {
+      padding: 8px 16px;
+      background: var(--accent-blue);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -626,6 +750,27 @@
     <p class="subtitle">Real data on what your city is doing — and what it isn't. <span class="atx-badge">🎵 Live Music Capital</span></p>
   </header>
 
+  <!-- ── NL Query Search ── -->
+  <div class="query-search-wrap">
+    <span class="query-search-icon">💬</span>
+    <input
+      type="text"
+      id="query-input"
+      class="query-search-bar"
+      placeholder="Ask about 311 data… e.g. &quot;How many graffiti complaints this month?&quot;"
+      autocomplete="off"
+    />
+    <div class="query-hints" id="query-hints">
+      Try: "Potholes in district 3" · "Noise complaint trend" · "Average graffiti resolution time"
+    </div>
+  </div>
+
+  <!-- ── Query results ── -->
+  <div id="query-loading" class="query-loading" style="display:none;">
+    <span class="spinner"></span> Searching…
+  </div>
+  <div id="query-results" class="query-results"></div>
+
   <!-- ── 311 Near You (hidden until feature is fully working) ── -->
   <div class="nearby-hero" style="display:none !important;">
     <h2>📍 311 Near You</h2>
@@ -873,6 +1018,10 @@
     <a href="https://data.texas.gov" target="_blank" rel="noopener">data.texas.gov</a>.
   </div>
 
+  <!-- ── Query Engine ── -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="query-engine.js"></script>
+
   <!-- telegram-cta hidden temporarily; restore when alerts are ready
   <a class="telegram-cta" href="https://t.me/austin311bot" target="_blank" rel="noopener">
     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="#3b82f6" aria-hidden="true">
@@ -906,7 +1055,8 @@
     if (dark) { html.classList.add("dark"); btn.textContent = "☀️ Light"; }
 
     // ── Zen mode ──────────────────────────────────────────────────────────────
-    const ZEN_TARGETS = ["main-grid", "more-btn", "more-grid"].map(id => document.getElementById(id));
+    const ZEN_TARGETS = ["main-grid", "more-btn", "more-grid", "funny-card", "query-hints"]
+      .map(id => document.getElementById(id));
     const zenBtn = document.getElementById("zen-toggle");
 
     function applyZen(on) {
