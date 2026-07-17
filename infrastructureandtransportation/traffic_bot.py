@@ -296,22 +296,8 @@ def format_infra_backlog(data: dict) -> str:
         bar = "█" * min(10, round(count / max_count * 10))
         msg += f"  {bar} *{label}*: {count}\n"
 
-    msg += "\n*Oldest unresolved — tap to look up:*"
     msg += "\n\n_Source: [Austin Open311 API](https://311.austintexas.gov/open311/v2)_"
     return msg
-
-
-def build_backlog_keyboard(data: dict):
-    """Returns a list of button rows for the oldest unresolved tickets."""
-    from telegram import InlineKeyboardButton
-    oldest_10 = data.get("oldest_10", [])
-    rows = []
-    for days_open, label, addr, ticket_id in oldest_10:
-        age_emoji = "🔴" if days_open >= 30 else "🟡" if days_open >= 14 else "🟢"
-        short_addr = addr[:28] + "…" if len(addr) > 30 else addr
-        btn_label = f"{age_emoji} {days_open}d · {short_addr}"
-        rows.append([InlineKeyboardButton(btn_label, callback_data=f"tlookup_{ticket_id}")])
-    return rows
 
 
 # =============================================================================

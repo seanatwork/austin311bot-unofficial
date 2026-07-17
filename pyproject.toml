@@ -8,13 +8,11 @@ dependencies = [
     "beautifulsoup4",
     "pandas",
     "typer[all]",
-    "python-telegram-bot[job-queue]==21.0",
     "python-dotenv",
     "folium",
 ]
 
 [project.scripts]
-austin311-bot = "austin311_bot:main"
 open311-ingest = "open311_ingest:main"
 scrape-bicycle = "bicycle.scrape_bicycle_complaints:main"
 search-311 = "tools.search_311_categories:main"
@@ -23,7 +21,6 @@ open311-aggregate = "tools.open311_aggregate_heatmap:main"
 [tool.setuptools]
 py-modules = [
     "open311_ingest",
-    "austin311_bot",
     "open311_client",
     "open311_cache",
 ]

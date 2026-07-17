@@ -695,36 +695,6 @@ def get_park_resolution(days_back: int = 90) -> dict:
     }
 
 
-def build_park_name_keyboard(hotspots_data: dict, days: int):
-    """Build keyboard with actual park names for top parks."""
-    from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-    
-    hotspots = hotspots_data.get("hotspots", [])
-    if not hotspots:
-        return InlineKeyboardMarkup([[]])
-    
-    # Show top 7 parks with their actual names
-    top_parks = hotspots[:7]
-    keyboard = []
-    
-    for park, counts in top_parks:
-        open_count = counts["open"]
-        if open_count > 0:
-            label = f"{park} ({open_count} open)"
-        else:
-            label = f"{park} ({counts['total']} total)"
-        
-        # Use park name directly in callback data
-        callback_data = f"parks_detail_{park.replace(' ', '_')}_{days}"
-        keyboard.append([InlineKeyboardButton(label, callback_data=callback_data)])
-    
-    # Add "See more" option if there are more parks
-    if len(hotspots) > 7:
-        keyboard.append([InlineKeyboardButton(f"See more parks ({len(hotspots) - 7} remaining)", callback_data=f"parks_more_{days}")])
-    
-    return InlineKeyboardMarkup(keyboard)
-
-
 def format_unified_overview(hotspots_data: dict, stats_data: dict) -> str:
     """Format a unified overview combining hotspots and stats."""
     hotspots = hotspots_data.get("hotspots", [])

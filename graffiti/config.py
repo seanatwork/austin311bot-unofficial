@@ -7,7 +7,6 @@ Centralizes configuration from environment variables with sensible defaults.
 
 import os
 from pathlib import Path
-from typing import Optional
 
 
 class Config:
@@ -15,9 +14,6 @@ class Config:
 
     # Database
     DB_PATH: str = os.getenv("DB_PATH", "311_categories.db")
-
-    # Telegram
-    TELEGRAM_BOT_TOKEN: Optional[str] = os.getenv("AUSTIN311_BOT_TOKEN")
 
     # Service code for graffiti
     SERVICE_CODE: str = "HHSGRAFF"
@@ -42,16 +38,6 @@ class Config:
     # Logging
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-
-    @classmethod
-    def validate(cls) -> bool:
-        """Validate required configuration"""
-        if not cls.TELEGRAM_BOT_TOKEN:
-            raise ValueError(
-                "AUSTIN311_BOT_TOKEN environment variable is required. "
-                "Set it in Fly.io secrets or .env file."
-            )
-        return True
 
     @classmethod
     def get_project_root(cls) -> Path:

@@ -68,34 +68,6 @@ def open311_get(
         raise
 
 
-# ── Telegram deep-link helper for map popups ──────────────────────────────────
-
-TELEGRAM_BOT_USERNAME = "austin311bot"
-
-
-def telegram_subscribe_link(lat: float, lon: float, alert_code: str = "311") -> str:
-    """Build a t.me deep link that pre-fills the alerts subscription flow.
-
-    alert_code is "311" for nearby_311 alerts or "animal" for animal_nearby.
-    Lat/lon are encoded as signed integer microdegrees so the payload only
-    contains characters Telegram permits ([A-Za-z0-9_-]).
-    """
-    lat_int = int(round(lat * 1_000_000))
-    lon_int = int(round(lon * 1_000_000))
-    return f"https://t.me/{TELEGRAM_BOT_USERNAME}?start=sub_{alert_code}_{lat_int}_{lon_int}"
-
-
-def subscribe_popup_html(lat: float, lon: float, alert_code: str = "311") -> str:
-    """HTML snippet to embed at the bottom of a Folium map popup."""
-    href = telegram_subscribe_link(lat, lon, alert_code)
-    return (
-        '<div style="margin-top:6px;padding-top:6px;border-top:1px solid #e5e7eb;">'
-        f'<a href="{href}" target="_blank" '
-        'style="color:#0088cc;font-size:12px;text-decoration:none;font-weight:600;">'
-        '🔔 Alert me near here →</a></div>'
-    )
-
-
 # ── Open Graph / Twitter card metadata for each docs/<slug>/ page ─────────────
 
 SITE_BASE_URL = "https://austin311.com"
@@ -103,7 +75,7 @@ SITE_BASE_URL = "https://austin311.com"
 # (slug → (title, description)). slug "" is the landing page.
 _OG_PAGES = {
     "":            ("Austin 311 — Real data on what your city is doing",
-                    "Live maps and trends across 311 reports, APD crime, crashes, parking, courts, and more — refreshed daily. Subscribe to alerts on Telegram."),
+                    "Live maps and trends across 311 reports, APD crime, crashes, parking, courts, and more — refreshed daily."),
     "animal":      ("Austin 311 — Animal Services Map",
                     "Loose dogs, bites, and wildlife reports across Austin — last 30/60/90 days, refreshed daily."),
     "bicycle":     ("Austin 311 — Bicycle Infrastructure Map",

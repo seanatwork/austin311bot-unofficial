@@ -17,7 +17,6 @@ W, H = 1200, 630
 # Palette (matches docs/index.html light-mode tokens)
 BG          = (248, 250, 252)   # --bg
 ACCENT      = (217, 119, 6)     # amber 600 — Austin "Fun" highlight
-TELEGRAM    = (0, 136, 204)     # Telegram blue
 TEXT_HEAD   = (15, 23, 42)      # --text-head
 TEXT_BODY   = (30, 41, 59)      # --text
 TEXT_MUTED  = (100, 116, 139)   # --text-desc
@@ -98,13 +97,11 @@ def main() -> None:
                   font=pill, fill=TEXT_BODY)
         x += pw + gap
 
-    # Footer — site URL on the left, Telegram CTA on the right
+    # Footer — site URL centered
     footer_y = H - 70
-    draw.text((60, footer_y), "austin311.com", font=label, fill=TEXT_MUTED)
-
-    cta = "Get alerts → @austin311bot"
-    cw = draw.textlength(cta, font=label)
-    draw.text((W - cw - 60, footer_y), cta, font=label, fill=TELEGRAM)
+    url_text = "austin311.com"
+    uw = draw.textlength(url_text, font=label)
+    draw.text(((W - uw) / 2, footer_y), url_text, font=label, fill=TEXT_MUTED)
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     img.save(OUT_PATH, "PNG", optimize=True)
