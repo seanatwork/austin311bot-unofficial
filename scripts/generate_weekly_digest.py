@@ -1,16 +1,13 @@
 #!/usr/bin/env python3
 """
-Generate docs/complaints/digest.json — "Hidden Austin" curated weekly digest.
+Generate docs/complaints/digest.json — "Hidden Austin" weekly digest.
 
 Fetches all descriptions from 29 Open311 service codes (past 7 days), separates
 citizen-written complaints from city boilerplate responses, deduplicates near-duplicates,
-then uses OpenRouter to curate 10-15 "Editor's Picks" with editorial commentary.
+then surfaces the most interesting citizen-written complaints via a heuristic ranking.
 
-Run:  OPENROUTER_API_KEY=... python scripts/generate_weekly_digest.py
+Run:  python scripts/generate_weekly_digest.py
 Output: docs/complaints/digest.json
-
-Fallback: If OpenRouter is unavailable, surfaces the top 25 citizen-written
-complaints ranked by an interestingness heuristic.
 """
 
 import json
@@ -30,7 +27,6 @@ logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 OPEN311_URL = "https://311.austintexas.gov/open311/v2/requests.json"
-OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # ── 29 description-rich service codes ──────────────────────────────────────
 DIGEST_CODES = [
@@ -77,10 +73,6 @@ def _get_session() -> requests.Session:
             "User-Agent": "austin311bot/weekly-digest",
         })
     return _session
-
-
-def _get_openrouter_key() -> Optional[str]:
-    return os.getenv("OPENROUTER_API_KEY") or None
 
 
 def _utc_now() -> datetime:
@@ -300,235 +292,10 @@ def _deduplicate_citizen(records: list) -> list:
     return deduped
 
 
-# ── Phase 4a: LLM-powered curation (OpenRouter) ──────────────────────────────
-
-def _build_prompt(records: list) -> tuple:
-    """Build the system + user prompt for the LLM curation."""
-    system = """You are the editor of "Hidden Austin," a weekly column that surfaces the most
-surprising, funny, infuriating, and uniquely-Austin 311 citizen complaints.
-
-Your job: select 10-15 individual complaints from the list below and, for each one,
-write a 1-2 sentence editorial note saying what's interesting about the complaint.
-
-CRITICAL RULE — NEVER fabricate or embellish facts. You must:
-- Only describe details that are EXPLICITLY present in the complaint text
-- NEVER add specific numbers (floor counts, decibel levels, distances, prices, etc.) unless they appear verbatim in the complaint
-- NEVER invent quotes or claims the complainant didn't write
-- NEVER speculate about things not in the complaint text
-- If you're not sure whether a detail is in the text, DON'T include it
-- Keep it short: 1-2 sentences max, 200 characters max
-
-What makes a complaint worth picking:
-- Emotional language (frustration, humor, disbelief)
-- Unexpected situations or creative descriptions
-- Complaints that reflect something about Austin life
-- Complaints about well-known venues or neighborhoods
-
-Return ONLY valid JSON (no markdown fences, no commentary) with this structure:
-{
-  "headline": "A conversational one-sentence summary capturing the mood of this week's picks",
-  "picks": [
-    {
-      "ticketId": "the id field from the complaint",
-      "editorialNote": "1-2 sentence note on what's interesting, using ONLY facts from the complaint text. No fabricated details, no embellishment."
-    }
-  ]
-}
-
-Do NOT include the complaint text in your response — we already have it.
-Only include ticketId (to match back) and editorialNote."""
-
-    # Build compact description list
-    desc_lines = []
-    for r in records:
-        desc_lines.append(json.dumps({
-            "id": r["id"],
-            "cat": r["category"],
-            "addr": r["address"],
-            "date": r["date"],
-            "text": r["text"],
-        }, ensure_ascii=False))
-
-    user = f"Here are {len(records)} citizen-written 311 complaints from Austin this week (past 7 days):\n\n"
-    user += "[\n" + ",\n".join(desc_lines) + "\n]\n\n"
-    user += "Select 10-15 of the most interesting ones. For each, provide "
-    user += "the ticketId and your editorial note. Return ONLY valid JSON."
-
-    return system, user
-
-
-def _estimate_tokens(text: str) -> int:
-    """Rough token estimate: ~4 chars per token."""
-    return len(text) // 4
-
-
-def _call_llm(records: list) -> Optional[dict]:
-    """Send citizen-written descriptions to OpenRouter and parse the curated picks.
-
-    If the payload is too large for the model's context, trims to fit.
-    """
-    api_key = _get_openrouter_key()
-    if not api_key:
-        logger.warning("OPENROUTER_API_KEY not set — skipping LLM curation")
-        return None
-
-    system, user = _build_prompt(records)
-    estimated_tokens = _estimate_tokens(f"{system}\n{user}")
-
-    logger.info(f"LLM prompt: ~{estimated_tokens:,} estimated tokens ({len(records)} descriptions)")
-
-    # Trim if needed
-    total_chars = len(system) + len(user)
-    if total_chars > 500_000:
-        logger.warning(f"Payload too large ({total_chars:,} chars), trimming")
-        keep = max(1, len(records) * 400_000 // total_chars)
-        # Keep newest first
-        trimmed = sorted(records, key=lambda r: r["date"], reverse=True)[:keep]
-        system, user = _build_prompt(trimmed)
-        estimated_tokens = _estimate_tokens(f"{system}\n{user}")
-        logger.info(f"  Trimmed to {len(trimmed)} records (~{estimated_tokens:,} tokens)")
-
-    payload = {
-        "model": "openrouter/free",
-        "messages": [
-            {"role": "system", "content": system},
-            {"role": "user", "content": user},
-        ],
-        "temperature": 0.7,
-        "max_tokens": 4096,
-    }
-
-    session = _get_session()
-    headers = {
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json",
-        "HTTP-Referer": "https://austin311.com",
-        "X-Title": "Hidden Austin Weekly Digest",
-    }
-
-    try:
-        logger.info("Calling OpenRouter…")
-        resp = session.post(OPENROUTER_URL, headers=headers, json=payload, timeout=180)
-        resp.raise_for_status()
-        data = resp.json()
-
-        content = data.get("choices", [{}])[0].get("message", {}).get("content", "")
-        if not content:
-            logger.warning("OpenRouter returned empty response")
-            return None
-
-        # Strip markdown fences if present
-        content = content.strip()
-        if content.startswith("```"):
-            content = re.sub(r"^```(?:json)?\s*", "", content)
-            content = re.sub(r"\s*```$", "", content)
-
-        result = json.loads(content)
-
-        if not isinstance(result, dict) or "picks" not in result:
-            logger.warning(f"LLM response missing 'picks' key: {list(result.keys())[:5]}")
-            return None
-
-        logger.info(
-            f"LLM curated {len(result.get('picks', []))} picks. "
-            f"Headline: {result.get('headline', '')[:80]}"
-        )
-        return result
-
-    except requests.exceptions.HTTPError as e:
-        logger.warning(f"OpenRouter HTTP error: {e.response.status_code} {e.response.text[:200]}")
-        return None
-    except json.JSONDecodeError as e:
-        logger.warning(f"Failed to parse LLM JSON response: {e}")
-        return None
-    except Exception as e:
-        logger.warning(f"OpenRouter call failed: {e}")
-        return None
-
-
-def _merge_picks_with_records(picks: list, records: list) -> list:
-    """Match LLM picks back to full record data by ticketId.
-
-    Each pick from the LLM has {ticketId, editorialNote}.
-    We match them to the full record to get text, address, category, date.
-    """
-    record_map = {r["id"]: r for r in records}
-    merged = []
-    for pick in picks:
-        tid = pick.get("ticketId", "")
-        record = record_map.get(tid)
-        if record:
-            note = pick.get("editorialNote", "")
-            validated = _validate_editorial_note(note, record["text"])
-            # If LLM note was fabricated, use the simple factual fallback
-            if not validated and note:
-                logger.info(f"  Using fallback note for {tid}")
-                validated = _fallback_note(record)
-            merged.append({
-                "text": record["text"],
-                "editorialNote": validated,
-                "address": record["address"],
-                "category": record["category"],
-                "ticketId": tid,
-                "date": record["date"],
-                "dedupCount": record.get("_dedupCount", 1),
-            })
-        else:
-            logger.warning(f"  Pick ticketId '{tid}' not found in records — skipping")
-    return merged
-
-
-def _validate_editorial_note(note: str, complaint_text: str) -> str:
-    """Strip fabricated details from editorial notes.
-
-    If the note contains specific numbers (floor counts, decibel levels,
-    dollar amounts, distances, years) not found in the complaint text,
-    or exceeds 300 chars, falls back to a simple factual note.
-    """
-    if not note:
-        return ""
-
-    # Cap length — no 4-sentence essays
-    if len(note) > 300:
-        logger.warning(f"  Editorial note too long ({len(note)} chars), truncating")
-        note = note[:297] + "..."
-
-    # Check for fabricated numbers: extract all digits from note and complaint
-    note_numbers = set(re.findall(r'\b\d+', note))
-    complaint_numbers = set(re.findall(r'\b\d+', complaint_text))
-
-    # Numbers like 1 (a/an/one) and common small numbers are fine
-    harmless = {"0", "1", "2", "3", "4", "5", "1st", "2nd", "3rd"}
-    note_numbers -= harmless
-
-    fabricated = note_numbers - complaint_numbers
-    if fabricated:
-        logger.warning(
-            f"  Editorial note contains numbers not in complaint: "
-            f"{sorted(fabricated, key=int) if all(n.isdigit() for n in fabricated) else sorted(fabricated)} "
-            f"— reverting to factual note"
-        )
-        return ""
-
-    return note
-
-
-def _fallback_note(record: dict) -> str:
-    """Generate a simple, factual editorial note for a pick."""
-    cat = record.get("category", "")
-    addr = (record.get("address", "") or "").split(",")[0]
-    date = record.get("date", "")
-    dedup = record.get("_dedupCount", 1)
-    parts = [f"Filed in the {cat} category on {date} near {addr}."] if cat and date and addr else []
-    if dedup > 1:
-        parts.append(f" Similar complaint(s) filed {dedup - 1} other time(s) this week.")
-    return " ".join(parts)
-
-
-# ── Phase 4b: Interestingness-based fallback ────────────────────────────────
+# ── Phase 4: Interestingness-based curation ─────────────────────────────────
 
 def _interestingness_score(record: dict) -> float:
-    """Heuristic score for ranking citizen complaints when LLM is unavailable.
+    """Heuristic score for ranking citizen complaints.
 
     Higher score = more likely to be an interesting read.
     """
@@ -562,12 +329,12 @@ def _interestingness_score(record: dict) -> float:
     return score
 
 
-def _generate_fallback_digest(citizen_complaints: list, city_responses: list) -> dict:
-    """Generate a fallback digest by ranking citizen complaints by interestingness.
+def _generate_digest(citizen_complaints: list) -> dict:
+    """Generate digest by ranking citizen complaints by interestingness.
 
-    Returns the top 25 with simple auto-generated editorial notes.
+    Returns the top 25 most interesting complaints (no editorial notes).
     """
-    logger.info("Generating interestingness-based fallback digest")
+    logger.info("Generating interestingness-based digest")
 
     scored = [(r, _interestingness_score(r)) for r in citizen_complaints]
     scored.sort(key=lambda x: -x[1])
@@ -577,7 +344,6 @@ def _generate_fallback_digest(citizen_complaints: list, city_responses: list) ->
     for record, score in top:
         picks.append({
             "text": record["text"],
-            "editorialNote": _fallback_note(record),
             "address": record["address"],
             "category": record["category"],
             "ticketId": record["id"],
@@ -586,9 +352,8 @@ def _generate_fallback_digest(citizen_complaints: list, city_responses: list) ->
         })
 
     return {
-        "headline": f"Top {len(picks)} citizen complaints this week in Austin",
+        "headline": f"{len(picks)} notable citizen-written complaints this week in Austin",
         "picks": picks,
-        "_fallback": True,
     }
 
 
@@ -597,8 +362,8 @@ def _generate_fallback_digest(citizen_complaints: list, city_responses: list) ->
 def _write_ticker_json(citizen_deduped: list, digest_picks: list, headline: str) -> None:
     """Write docs/homepage/ticker.json for the homepage carousel.
 
-    Combines LLM-curated picks (stripped of editorial notes — raw text only)
-    with interestingness-ranked citizen complaints to produce ~40 items.
+    Combines top-ranked picks (raw text only) with interestingness-ranked
+    citizen complaints to produce ~40 items.
     """
     now = _utc_now()
     seen_ids: set = set()
@@ -687,18 +452,8 @@ def main() -> None:
             c["notable"] = True
             citizen_complaints.append(c)
 
-        # Phase 4: LLM curation or fallback
-        llm_result = _call_llm(citizen_deduped)
-        if llm_result and llm_result.get("picks"):
-            picks = _merge_picks_with_records(llm_result["picks"], citizen_deduped)
-            digest = {
-                "headline": llm_result.get("headline", "This week in Austin 311"),
-                "picks": picks,
-            }
-            logger.info(f"LLM: {len(picks)} picks merged from LLM response")
-        else:
-            logger.info("LLM unavailable or returned no picks, using fallback")
-            digest = _generate_fallback_digest(citizen_deduped, city_responses)
+        # Phase 4: Curation by interestingness heuristic
+        digest = _generate_digest(citizen_deduped)
 
         digest["citizenComplaints"] = citizen_complaints
         digest["cityResponses"] = city_responses
@@ -710,10 +465,7 @@ def main() -> None:
         "citizenWritten": len(digest.get("citizenComplaints", [])),
         "cityResponses": len(digest.get("cityResponses", [])),
         "source": "Open311 (29 service codes, last 7 days)",
-        "fallback": digest.get("_fallback", False),
     }
-    # Clean up top-level fallback flag — it's in _meta now
-    digest.pop("_fallback", None)
 
     # Write to docs/complaints/digest.json
     out_path = Path(__file__).resolve().parent.parent / "docs" / "complaints" / "digest.json"

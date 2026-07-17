@@ -1,0 +1,177 @@
+name: Daily data refresh
+
+on:
+  schedule:
+    - cron: "0 12 * * *"  # daily at noon UTC
+  workflow_dispatch:
+    inputs:
+      categories:
+        description: 'Categories to generate (comma-separated, or "all")'
+        required: false
+        default: 'all'
+
+concurrency:
+  group: daily-data
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -e .
+
+      - name: Restore Open311 cache
+        uses: actions/cache@v4
+        with:
+          path: .cache/open311_cache.db
+          key: open311-${{ github.run_id }}
+          restore-keys: |
+            open311-
+
+      - name: Generate pool data
+        run: python scripts/generate_pool_data.py
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate fire data snapshots
+        # The script exits 2 when Socrata is down and skips the write — we
+        # treat that as success so the workflow stays green during outages.
+        run: |
+          set +e
+          python scripts/generate_fire_data.py
+          rc=$?
+          set -e
+          if [ "$rc" = "2" ]; then
+            echo "::warning::Socrata is down — fire snapshot preserved, no changes to commit."
+            exit 0
+          fi
+          exit "$rc"
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate bicycle map
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'bicycle')
+        run: python scripts/generate_map.py bicycle
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate traffic map
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'traffic')
+        run: python scripts/generate_map.py traffic
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate animal map
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'animal')
+        run: python scripts/generate_map.py animal
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate homeless map
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'homeless')
+        run: python scripts/generate_map.py homeless
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate card stats
+        run: python scripts/generate_card_stats.py
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate crime map
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'crime')
+        run: python scripts/generate_map.py crime
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate crime trends
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'crime-trends')
+        run: python scripts/generate_map.py crime-trends
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate water map
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'water')
+        run: python scripts/generate_map.py water
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate childcare map
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'childcare')
+        run: python scripts/generate_map.py childcare
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate budget page
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'budget')
+        run: python scripts/generate_map.py budget
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate hate crime page
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'hate-crime')
+        run: python scripts/generate_map.py hate-crime
+
+      - name: Generate court data cache
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'court')
+        run: python scripts/generate_court_data.py
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate traffic cameras map
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'cameras')
+        run: python scripts/generate_map.py cameras
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate shelter data
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'shelter')
+        run: python scripts/generate_map.py shelter
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Save Open311 cache
+        uses: actions/cache@v4
+        if: always()
+        with:
+          path: .cache/open311_cache.db
+          key: open311-${{ github.run_id }}-${{ github.run_attempt }}
+
+      - name: Commit and push daily updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add \
+            docs/pools/pool-data.json \
+            docs/fire/data.json \
+            docs/fire/trends/data.json \
+            docs/bicycle/index.html \
+            docs/traffic/index.html \
+            docs/animal/index.html \
+            docs/homeless/index.html \
+            docs/homepage/card-stats.json \
+            docs/crime/index.html \
+            docs/crime/trends/index.html \
+            docs/water/index.html \
+            docs/childcare/index.html \
+            docs/budget/index.html \
+            docs/court/data.json \
+            docs/court/index.html \
+            docs/crime/hatecrime/index.html \
+            docs/cameras/index.html \
+            docs/shelter/data.json
+          git diff --cached --quiet || git commit -m "chore: refresh daily data [skip ci]"
+          git pull --rebase origin main
+          git push

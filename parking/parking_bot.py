@@ -606,6 +606,40 @@ def _extract_violation_type(description: str) -> str:
     return description[:47] + "..."
 
 
+def _violation_type_slug(violation_type: str) -> str:
+    """Map a violation type label to a URL-safe camelCase slug (no underscores).
+    
+    Used as a layer-key segment so the map can filter by type via ?type= param.
+    """
+    _TYPE_SLUGS = {
+        "Bike Lane": "bikeLane",
+        "Blocking Sidewalk": "blockingSidewalk",
+        "On Sidewalk": "onSidewalk",
+        "Blocking Driveway": "blockingDriveway",
+        "No Parking Zone": "noParkingZone",
+        "Commercial Zone": "commercialZone",
+        "Abandoned Vehicle": "abandonedVehicle",
+        "Illegal Parking": "illegalParking",
+        "Overnight Camping": "overnightCamping",
+        "Overnight Parking": "overnightParking",
+        "Fire Hydrant": "fireHydrant",
+        "Handicap Space": "handicapSpace",
+        "Bus Stop": "busStop",
+        "Crosswalk": "crosswalk",
+        "Sidewalk Ramp": "sidewalkRamp",
+        "Construction Zone": "constructionZone",
+        "Loading Zone": "loadingZone",
+        "Tow Zone": "towZone",
+        "Street Sweeping": "streetSweeping",
+    }
+    if violation_type in _TYPE_SLUGS:
+        return _TYPE_SLUGS[violation_type]
+    # Fallback: slugify the type label (lowercase, no spaces, no special chars)
+    import re
+    slug = re.sub(r'[^a-zA-Z0-9]', '', violation_type) if violation_type else "other"
+    return slug[:30] if slug else "other"
+
+
 def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str]:
     """Generate an interactive HTML map of parking reports.
 
@@ -639,36 +673,49 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
         except Exception:
             return days_back
 
-    # Pre-compute counts per bucket for dynamic title updates
+    # Pre-compute counts per bucket + violation type for dynamic title updates
+    type_to_slug_map = {}
+    all_slugs = set()
     bucket_counts = {"30": {"open": 0, "closed": 0}, "60": {"open": 0, "closed": 0}, "90": {"open": 0, "closed": 0}}
+    type_bucket_counts = {}
     for r in records:
         age = _age_days(r)
         status = (r.get("status") or "").lower()
         s = status if status in ("open", "closed") else "closed"
+        vt = _extract_violation_type(r.get("description") or "")
+        slug = _violation_type_slug(vt)
+        type_to_slug_map[vt] = slug
+        all_slugs.add(slug)
+        if slug not in type_bucket_counts:
+            type_bucket_counts[slug] = {"30": {"open": 0, "closed": 0}, "60": {"open": 0, "closed": 0}, "90": {"open": 0, "closed": 0}}
         if age <= 30:
             bucket_counts["30"][s] += 1
+            type_bucket_counts[slug]["30"][s] += 1
         if age <= 60:
             bucket_counts["60"][s] += 1
+            type_bucket_counts[slug]["60"][s] += 1
         if age <= 90:
             bucket_counts["90"][s] += 1
-    counts_js = str(bucket_counts).replace("'", '"')
+            type_bucket_counts[slug]["90"][s] += 1
+    counts_js = str(type_bucket_counts).replace("'", '"')
 
     # Create map centered on Austin
     m = folium.Map(location=[30.2672, -97.7431], zoom_start=11, tiles="CartoDB positron")
     m.get_root().header.add_child(folium.Element(og_meta_tags("parking")))
 
-    # Six FeatureGroups: open/closed × 30/60/90-day buckets
+    # FeatureGroups: open/closed × 30/60/90-day × violation type slug
     fg_clusters = {}
     fg_objects = {}
     for status_key in ("open", "closed"):
         for bucket in ("30", "60", "90"):
-            name = f"{status_key}_{bucket}"
-            show = (bucket == "30")
-            fg = folium.FeatureGroup(name=name, show=show, overlay=True)
-            cluster = MarkerCluster().add_to(fg)
-            fg.add_to(m)
-            fg_clusters[name] = cluster
-            fg_objects[name] = fg
+            for slug in all_slugs:
+                name = f"{status_key}_{bucket}_{slug}"
+                show = (bucket == "30")
+                fg = folium.FeatureGroup(name=name, show=show, overlay=True)
+                cluster = MarkerCluster().add_to(fg)
+                fg.add_to(m)
+                fg_clusters[name] = cluster
+                fg_objects[name] = fg
 
     # Add markers to the appropriate bucket
     for r in records:
@@ -692,9 +739,11 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
         else:
             bucket = "90"
 
-        cluster_key = f"{status}_{bucket}"
-        if cluster_key not in fg_clusters:
-            cluster_key = f"closed_{bucket}"
+        vt = _extract_violation_type(description)
+        slug = type_to_slug_map.get(vt, _violation_type_slug(vt))
+        if slug not in all_slugs:
+            slug = _violation_type_slug("")
+        cluster_key = f"{status}_{bucket}_{slug}"
         target_cluster = fg_clusters[cluster_key]
 
         address_line = f'<b>Address:</b> <a href="https://www.google.com/maps/search/?api=1&query={lat},{lon}" target="_blank">{address}</a><br/>' if address else ""
@@ -745,6 +794,10 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
     layer_map_js = "{" + ", ".join(
         f'"{k}": {fg_objects[k].get_name()}' for k in fg_objects
     ) + "}"
+    # JS map: violation type label -> slug for ?type= URL param lookup
+    type_slug_js = "{" + ", ".join(
+        f'"{vt}": "{slug}"' for vt, slug in type_to_slug_map.items()
+    ) + "}"
     panel_html = f"""
     <div id="map-panel" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
                 background: white; padding: 10px 16px; border-radius: 6px;
@@ -775,15 +828,29 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
         var currentDays = 30;
         var showOpen = true;
         var showClosed = true;
+        var currentType = 'all';
         var layerMap = null;
         var leafletMap = null;
-        var bucketCounts = {counts_js};
+        var typeSlugMap = {type_slug_js};
+        var typeBucketCounts = {counts_js};
 
         function updateSummary() {{
             var d = String(currentDays);
-            var counts = bucketCounts[d] || {{}};
-            var o = showOpen ? (counts.open || 0) : 0;
-            var c = showClosed ? (counts.closed || 0) : 0;
+            var o = 0, c = 0;
+            if (currentType === 'all') {{
+                Object.keys(typeBucketCounts).forEach(function(slug) {{
+                    var counts = (typeBucketCounts[slug] || {{}})[d] || {{}};
+                    if (showOpen) o += (counts.open || 0);
+                    if (showClosed) c += (counts.closed || 0);
+                }});
+            }} else {{
+                var catData = typeBucketCounts[currentType];
+                if (catData) {{
+                    var counts = catData[d] || {{}};
+                    o = showOpen ? (counts.open || 0) : 0;
+                    c = showClosed ? (counts.closed || 0) : 0;
+                }}
+            }}
             document.getElementById('map-summary').textContent =
                 'Last ' + d + ' days · ' + (o + c) + ' total · ' + o + ' open · ' + c + ' closed';
         }}
@@ -801,10 +868,12 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
                 var parts = key.split('_');
                 var status = parts[0];
                 var bucket = parseInt(parts[1]);
+                var typeSlug = parts.slice(2).join('_');
                 var timeOk = bucket <= currentDays;
                 var statusOk = (status === 'open' && showOpen) || (status === 'closed' && showClosed);
+                var typeOk = (currentType === 'all') || (typeSlug === currentType);
                 var layer = layerMap[key];
-                if (timeOk && statusOk) {{
+                if (timeOk && statusOk && typeOk) {{
                     if (!leafletMap.hasLayer(layer)) leafletMap.addLayer(layer);
                 }} else {{
                     if (leafletMap.hasLayer(layer)) leafletMap.removeLayer(layer);
@@ -830,21 +899,32 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
             updateSummary();
         }}
 
+        function setTypeFilter(slug) {{
+            currentType = slug;
+            updateLayers();
+            updateSummary();
+        }}
+
         document.addEventListener('DOMContentLoaded', function() {{
             setTimeout(initLayers, 1000);
             var typeFilter = new URLSearchParams(window.location.search).get('type');
             if (typeFilter) {{
-                var banner = document.createElement('div');
-                banner.id = 'type-filter-banner';
-                banner.style.cssText = 'position:absolute;bottom:24px;left:50%;transform:translateX(-50%);' +
-                    'background:#1d4ed8;color:#fff;padding:7px 14px;border-radius:6px;' +
-                    'font-family:sans-serif;font-size:12px;z-index:9999;white-space:nowrap;' +
-                    'box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;gap:10px;';
-                banner.innerHTML = '🔍 Filtered from trends: <strong>' + typeFilter + '</strong>' +
-                    ' &nbsp;<a href="../" style="color:#93c5fd;font-size:11px;">← back to trends</a>' +
-                    ' &nbsp;<span onclick="document.getElementById(\'type-filter-banner\').remove()" ' +
-                    'style="cursor:pointer;opacity:0.7;font-size:14px;">✕</span>';
-                document.body.appendChild(banner);
+                var slug = typeSlugMap[typeFilter];
+                if (slug) {{
+                    setTypeFilter(slug);
+                    var banner = document.createElement('div');
+                    banner.id = 'type-filter-banner';
+                    banner.style.cssText = 'position:absolute;bottom:24px;left:50%;transform:translateX(-50%);' +
+                        'background:#1d4ed8;color:#fff;padding:7px 14px;border-radius:6px;' +
+                        'font-family:sans-serif;font-size:12px;z-index:9999;white-space:nowrap;' +
+                        'box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;gap:10px;';
+                    banner.innerHTML = '🔍 Filtering: <strong>' + typeFilter + '</strong>' +
+                        ' &nbsp;<a href="." style="color:#93c5fd;font-size:11px;">show all</a>' +
+                        ' &nbsp;<a href="trends/" style="color:#93c5fd;font-size:11px;">← back to trends</a>' +
+                        ' &nbsp;<span onclick="setTypeFilter(\'all\');document.getElementById(\'type-filter-banner\').remove()" ' +
+                        'style="cursor:pointer;opacity:0.7;font-size:14px;">✕</span>';
+                    document.body.appendChild(banner);
+                }}
             }}
         }});
     </script>

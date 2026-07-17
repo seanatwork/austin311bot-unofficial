@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hidden Austin — 311 Complaints</title>
-  <meta name="description" content="Hidden Austin — a weekly curation of the most surprising, revealing 311 complaints filed by Austin residents. Powered by AI." />
+  <meta name="description" content="Hidden Austin — a weekly curation of the most surprising, revealing 311 complaints filed by Austin residents." />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="Hidden Austin — Weekly 311 Digest" />
   <meta property="og:description" content="The most surprising, funny, and revealing 311 complaints from Austin this week." />
@@ -98,7 +98,7 @@
       font-size: 0.92rem;
     }
 
-    /* ── editor's picks ── */
+    /* ── notable complaints ── */
     .picks-section {
       margin-bottom: 2.5rem;
     }
@@ -109,14 +109,6 @@
       text-transform: uppercase;
       letter-spacing: 0.06em;
       margin-bottom: 0.5rem;
-    }
-    .picks-headline {
-      font-size: 1.15rem;
-      font-weight: 600;
-      color: var(--text-head);
-      line-height: 1.5;
-      margin-bottom: 1.25rem;
-      font-style: italic;
     }
     .pick-card {
       background: var(--bg-card);
@@ -147,15 +139,6 @@
       text-decoration: none;
     }
     .pick-text a:hover { color: var(--accent); }
-    .pick-note {
-      font-size: 0.88rem;
-      color: var(--text-desc);
-      font-style: italic;
-      line-height: 1.55;
-      margin-bottom: 0.6rem;
-      padding-left: 0.5rem;
-      border-left: 2px solid var(--border);
-    }
     .pick-meta {
       display: flex;
       flex-wrap: wrap;
@@ -367,7 +350,7 @@
       <p class="subtitle" id="lede">Loading…</p>
     </div>
 
-    <!-- Editor's Picks -->
+<!-- Notable complaints -->
     <section class="picks-section" id="picks-section"></section>
 
     <!-- Browse all (divider + search + chips + list) -->
@@ -565,10 +548,7 @@
           el.innerHTML = "";
           return;
         }
-        var html = '<div class="picks-label">🏆 Editor\u2019s Picks</div>';
-        if (d.headline) {
-          html += '<div class="picks-headline">' + escapeHtml(d.headline) + '</div>';
-        }
+        var html = '<div class="picks-label">📋 Notable complaints this week</div>';
         d.picks.forEach(function (pick, idx) {
           var ticketUrl = pick.ticketId
             ? "https://311.austintexas.gov/tickets/" + encodeURIComponent(pick.ticketId)
@@ -583,11 +563,6 @@
             textHtml = '<a href="' + ticketUrl + '" target="_blank" rel="noopener">' + textHtml + '</a>';
           }
           html += '<div class="pick-text">' + textHtml + '</div>';
-
-          // Editorial note
-          if (pick.editorialNote) {
-            html += '<div class="pick-note">' + escapeHtml(pick.editorialNote) + '</div>';
-          }
 
           // Meta line
           html += '<div class="pick-meta">';
@@ -622,14 +597,10 @@
           }
           html += ". ";
         }
-        if (meta.fallback) {
-          html += "<em>AI-curated picks unavailable this run — showing top citizen complaints.</em> ";
-        }
         if (meta.generated) {
           html += "Generated " + meta.generated.slice(0, 10) + ". ";
         }
-        html += 'Data: <a href="https://311.austintexas.gov/open311/v2" target="_blank">Austin Open311 API</a>. '
-          + 'Curated with <a href="https://openrouter.ai/" target="_blank">OpenRouter</a>.';
+        html += 'Data: <a href="https://311.austintexas.gov/open311/v2" target="_blank">Austin Open311 API</a>.';
         el.innerHTML = html;
       }
 
