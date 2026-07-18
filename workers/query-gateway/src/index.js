@@ -142,13 +142,17 @@ async function parseQuestion(env, question) {
   ];
 
   try {
-    const result = await env.AI.run("@cf/meta/llama-3.1-8b-instruct", {
+    const result = await env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
       messages,
       max_tokens: 400,
       temperature: 0.1, // Low temp for deterministic structured output
     });
 
-    const text = (result.response || "").trim();
+    const text = extractLLMText(result).trim();
+    if (!text) {
+      console.error("LLM returned unexpected shape:", JSON.stringify(result).slice(0, 500));
+      return null;
+    }
     // Strip markdown code fences if present
     const jsonText = text.replace(/^```(?:json)?\s*/, "").replace(/\s*```$/, "");
 
@@ -158,6 +162,17 @@ async function parseQuestion(env, question) {
     console.error("LLM parse error:", e);
     return null;
   }
+}
+
+// Workers AI response shapes vary by model: {response: string},
+// OpenAI-style {choices: [{message: {content}}]}, or a bare string.
+function extractLLMText(result) {
+  if (typeof result === "string") return result;
+  if (!result || typeof result !== "object") return "";
+  if (typeof result.response === "string") return result.response;
+  const content = result.choices?.[0]?.message?.content;
+  if (typeof content === "string") return content;
+  return "";
 }
 
 function validateParams(params) {
@@ -217,6 +232,33 @@ function validateParams(params) {
 
 // ── Socrata Query Builder ───────────────────────────────────────────────────
 
+// Map common crime terms to fragments of APD `crime_type` values (fdj4-gpfu),
+// matched case-insensitively with LIKE. "burglary" → BURG covers
+// "BURGLARY OF RESIDENCE", "BURGLARY OF VEHICLE", etc.
+const CRIME_ALIASES = {
+  burglary: "BURG",
+  burg: "BURG",
+  theft: "THEFT",
+  larceny: "THEFT",
+  robbery: "ROBBERY",
+  assault: "ASSAULT",
+  vandalism: "MISCHIEF",
+  "criminal mischief": "MISCHIEF",
+  murder: "MURDER",
+  homicide: "MURDER",
+  rape: "RAPE",
+  dui: "DWI",
+  dwi: "DWI",
+};
+
+function crimeTypePattern(raw) {
+  const key = String(raw).toLowerCase().trim();
+  const fragment = CRIME_ALIASES[key] || key.toUpperCase();
+  // Sanitize: only word chars, spaces, dashes — never let quotes into SoQL
+  const safe = fragment.replace(/[^A-Z0-9 \-/]/g, "");
+  return safe.length >= 3 ? safe : null;
+}
+
 function buildSoQL(params) {
   const { socrata_dataset, date_range, district, group_by, limit } = params;
   const queries = [];
@@ -246,6 +288,12 @@ function buildSoQL(params) {
   if (district) {
     whereParts.push(`council_district = '${district}'`);
   }
+  if (socrata_dataset === "fdj4-gpfu" && params.crime_type) {
+    const pattern = crimeTypePattern(params.crime_type);
+    if (pattern) {
+      whereParts.push(`upper(crime_type) like '%${pattern}%'`);
+    }
+  }
 
   const query = {};
   query.$select = select;
@@ -258,7 +306,8 @@ function buildSoQL(params) {
     query.$group = group_by === "month" ? "month" : group_by;
   }
 
-  query.$order = "count DESC";
+  // Time series must be chronological; rankings sort by volume
+  query.$order = group_by === "month" ? "month" : "count DESC";
   query.$limit = limit || 50;
 
   return query;
@@ -301,13 +350,13 @@ async function fetchOpen311(env, params) {
 }
 
 async function fetchOpen311Ticket(env, ticketId) {
-  const url = `${OPEN311_BASE}/requests/${ticketId}.json`;
+  const url = new URL(`${OPEN311_BASE}/requests/${ticketId}.json`);
   if (env.AUSTINAPIKEY) {
     url.searchParams.set("$$app_token", env.AUSTINAPIKEY);
   }
 
   try {
-    const resp = await fetch(url, {
+    const resp = await fetch(url.toString(), {
       headers: { "Accept": "application/json", "User-Agent": "austin311bot/query-gateway" },
     });
     if (!resp.ok) return null;
@@ -514,18 +563,53 @@ async function handleQuery(request, env) {
 
       const socrataData = await resp.json();
       const entries = Array.isArray(socrataData) ? socrataData : [];
-      const total = entries.reduce((sum, row) => sum + (parseInt(row.count) || row.cnt || 1), 0);
+      const rowCount = (row) => parseInt(row.count) || row.cnt || 1;
+      const total = entries.reduce((sum, row) => sum + rowCount(row), 0);
+
+      // Human-readable month labels: "2025-07-01T00:00:00.000" → "Jul 2025"
+      const fmtMonth = (iso) => {
+        const d = new Date(iso);
+        return isNaN(d) ? iso : d.toLocaleString("en-US", { month: "short", year: "numeric", timeZone: "UTC" });
+      };
+      const isMonthly = params.group_by === "month" && entries.length > 0 && entries[0].month;
+
+      const scopeBits = [
+        params.crime_type ? `${params.crime_type} reports` : "records",
+        params.district ? `in district ${params.district}` : null,
+        isMonthly && entries.length ? `since ${fmtMonth(entries[0].month)}` : null,
+      ].filter(Boolean);
+
+      const rows = entries.map((row) => ({
+        ...row,
+        month: row.month ? fmtMonth(row.month) : row.month,
+      }));
+
+      const counts = entries.map(rowCount);
+      const peakIdx = counts.indexOf(Math.max(...counts));
+      const peakLabel = isMonthly && peakIdx >= 0 ? ` Peak: ${rows[peakIdx].month} (${counts[peakIdx]}).` : "";
 
       result = {
-        answer_summary: `Found ${total} matching records.`,
-        table_data: entries,
-        chart_config: entries.length <= 10 ? {
+        answer_summary: `Found ${total} ${scopeBits.join(" ")}.${peakLabel}`,
+        table_data: rows,
+        chart_config: isMonthly ? {
+          type: "line",
+          data: {
+            labels: rows.map((row) => row.month),
+            datasets: [{
+              label: params.crime_type ? `${params.crime_type} reports` : "Count",
+              data: counts,
+              borderColor: "#3b82f6",
+              tension: 0.3,
+              fill: false,
+            }],
+          },
+        } : (entries.length <= 10 ? {
           type: "bar",
           data: {
-            labels: entries.map((row) => row.month || row.council_district || row.crime_type || "Entry"),
-            datasets: [{ label: "Count", data: entries.map((row) => parseInt(row.count) || row.cnt || 1), backgroundColor: "#3b82f6" }],
+            labels: entries.map((row) => row.council_district ? `D${row.council_district}` : (row.crime_type || "Entry")),
+            datasets: [{ label: "Count", data: counts, backgroundColor: "#3b82f6" }],
           },
-        } : null,
+        } : null),
       };
     }
     // Open311 live query (recent data)

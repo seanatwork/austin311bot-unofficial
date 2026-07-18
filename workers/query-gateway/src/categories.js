@@ -140,6 +140,7 @@ Return ONLY valid JSON with these exact fields:
     "end": "YYYY-MM-DD" | null
   },
   "district": 1-10 or null,
+  "crime_type": string or null,  // only for fdj4-gpfu: e.g. "burglary", "theft", "assault", "robbery"
   "status": "open" | "closed" | null,
   "group_by": "day" | "month" | "category" | "district" | "status" | null,
   "limit": number or null,
@@ -170,6 +171,9 @@ A: {"intent":"hotspots","source":"open311","category":"traffic","service_codes":
 
 Q: "Show me the trend of violent crime over the past year"
 A: {"intent":"trend","source":"socrata","socrata_dataset":"fdj4-gpfu","date_range":{"start":"last_365d"},"group_by":"month"}
+
+Q: "Burglary trends in district 10"
+A: {"intent":"trend","source":"socrata","socrata_dataset":"fdj4-gpfu","crime_type":"burglary","district":10,"date_range":{"start":"last_365d"},"group_by":"month"}
 
 Q: "What's the status of ticket 26-00229538?"
 A: {"intent":"lookup","source":"open311","ticket_id":"26-00229538"}

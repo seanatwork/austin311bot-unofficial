@@ -25,6 +25,8 @@
   let precomputedLoaded = false;
   let dailyCounts = null;
   let resolutionStats = null;
+  let monthlyAggs = null;
+  let districtCounts = null;
   let serviceCodes = null;
   let chartInstance = null;
 
@@ -32,12 +34,16 @@
   async function preloadPrecomputed() {
     if (precomputedLoaded) return;
     try {
-      const [dcResp, rsResp] = await Promise.all([
+      const [dcResp, rsResp, maResp, distResp] = await Promise.all([
         fetch(`${QUERYSTORE_BASE}/daily_counts.json`),
         fetch(`${QUERYSTORE_BASE}/resolution_stats.json`),
+        fetch(`${QUERYSTORE_BASE}/monthly_aggregates.json`),
+        fetch(`${QUERYSTORE_BASE}/district_counts.json`),
       ]);
       if (dcResp.ok) dailyCounts = await dcResp.json();
       if (rsResp.ok) resolutionStats = await rsResp.json();
+      if (maResp.ok) monthlyAggs = await maResp.json();
+      if (distResp.ok) districtCounts = await distResp.json();
       precomputedLoaded = true;
     } catch (e) {
       console.warn("Pre-computed data not available:", e);
@@ -49,6 +55,12 @@
     if (!dailyCounts) return null;
 
     const q = question.toLowerCase();
+
+    // Crime/911 topics live in Socrata, not the 311 querystore — leave them
+    // to the worker rather than answering with all-category 311 data.
+    if (/crime|burglar|theft|larceny|assault|robber|murder|homicide|shoot|crash|\b911\b/.test(q)) {
+      return null;
+    }
 
     // Pattern: "how many [category] [timeframe]"
     const countMatch = q.match(
@@ -88,11 +100,35 @@
       return localResolutionTime(avgMatch[1]);
     }
 
+    // Generic resolution-time phrasing: "average graffiti resolution time",
+    // "resolution time for potholes", "how long does it take to fix a pothole".
+    // normalizeCategory() scans the whole question for a known category.
+    if (/(?:resolution|response)\s+time|time\s+to\s+(?:fix|resolve|close)|how\s+long\s+(?:does\s+it\s+take\s+)?to\s+(?:fix|resolve|close)/.test(q)) {
+      return localResolutionTime(q);
+    }
+
+    // Pattern: "[category] trend" / "trend over the last year" / "monthly volume"
+    if (/trend|over\s+time|month\s+over\s+month|monthly|by\s+month/.test(q)) {
+      const result = localTrend(q);
+      if (result) return result;
+    }
+
+    // Pattern: "[category] in district N" / "by district"
+    const districtMatch = q.match(/district\s+(\d{1,2})\b/);
+    if (districtMatch) {
+      const result = localDistrict(q, parseInt(districtMatch[1], 10));
+      if (result) return result;
+    } else if (/by\s+district|which\s+district|districts?\s+(?:has|have|with)/.test(q)) {
+      const result = localDistrict(q, null);
+      if (result) return result;
+    }
+
     return null; // Can't answer locally
   }
 
   function normalizeCategory(raw) {
     const mapping = {
+      "dead animal": "dead_animal",
       graffiti: "graffiti",
       pothole: "traffic", potholes: "traffic",
       "traffic signal": "traffic", signal: "traffic",
@@ -104,7 +140,6 @@
       park: "parks", parks: "parks",
       storm: "storm", flooding: "storm", drainage: "storm", debris: "storm",
       bicycle: "bicycle", bike: "bicycle",
-      "dead animal": "dead_animal",
     };
 
     const normalized = raw.toLowerCase().trim().replace(/\bi\s+ng\b/g, "");
@@ -240,6 +275,110 @@
     };
   }
 
+  function localTrend(rawQuestion) {
+    if (!monthlyAggs || !monthlyAggs.months) return null;
+    const months = monthlyAggs.months;
+    const keys = Object.keys(months).sort();
+    if (keys.length === 0) return null;
+
+    const category = normalizeCategory(rawQuestion);
+    const data = keys.map((m) => {
+      const bucket = months[m] || {};
+      if (category) return (bucket[category] || {}).total || 0;
+      return Object.values(bucket).reduce((sum, v) => sum + (v.total || 0), 0);
+    });
+
+    const name = category ? capitalize(category) : "All categories";
+    const first = data[0];
+    const latest = data[data.length - 1];
+    const direction = latest > first ? "up" : latest < first ? "down" : "flat";
+
+    return {
+      answer_summary: `${name} monthly volume: ${first} in ${keys[0]} → ${latest} in ${keys[keys.length - 1]} (trending ${direction}).`,
+      chart_config: {
+        type: "line",
+        data: {
+          labels: keys,
+          datasets: [{ label: name, data, borderColor: "#3b82f6", tension: 0.3, fill: false }],
+        },
+      },
+      table_data: keys.map((m, i) => ({ month: m, total: data[i] })),
+      source: "precomputed",
+    };
+  }
+
+  function localDistrict(rawQuestion, district) {
+    if (!districtCounts || !districtCounts.windows) return null;
+    const win = districtCounts.windows["90d"] || {};
+    const category = normalizeCategory(rawQuestion);
+
+    // Specific district, specific category: "potholes in district 3"
+    if (district && category) {
+      const d = (win[category] || {})[String(district)];
+      if (!d) {
+        return { answer_summary: `No ${capitalize(category)} complaints recorded in district ${district} over the last 90 days.`, source: "precomputed" };
+      }
+      return {
+        answer_summary: `${d.total} ${capitalize(category)} complaints in district ${district} (last 90 days). ${d.open} open, ${d.closed} closed.`,
+        chart_config: {
+          type: "doughnut",
+          data: {
+            labels: ["Open", "Closed"],
+            datasets: [{ label: capitalize(category), data: [d.open, d.closed], backgroundColor: ["#C2855C", "#7A9A6D"] }],
+          },
+        },
+        table_data: [{ status: "Open", count: d.open }, { status: "Closed", count: d.closed }],
+        source: "precomputed",
+      };
+    }
+
+    // Specific district, all categories
+    if (district && !category) {
+      const entries = Object.entries(win)
+        .map(([cat, districts]) => [cat, districts[String(district)]])
+        .filter(([, d]) => d)
+        .sort((a, b) => b[1].total - a[1].total);
+      if (entries.length === 0) return null;
+      const total = entries.reduce((sum, [, d]) => sum + d.total, 0);
+      return {
+        answer_summary: `${total} complaints in district ${district} (last 90 days). Top: ${entries.slice(0, 3).map(([c, d]) => `${capitalize(c)}: ${d.total}`).join(" · ")}`,
+        chart_config: {
+          type: "bar",
+          data: {
+            labels: entries.map(([c]) => capitalize(c)),
+            datasets: [{ label: `District ${district}`, data: entries.map(([, d]) => d.total), backgroundColor: "#3b82f6" }],
+          },
+        },
+        table_data: entries.map(([c, d]) => ({ category: capitalize(c), total: d.total, open: d.open })),
+        source: "precomputed",
+      };
+    }
+
+    // Category across all districts: "which district has the most noise complaints"
+    if (!district && category) {
+      const districts = win[category] || {};
+      const entries = Object.entries(districts)
+        .map(([d, v]) => [parseInt(d, 10), v])
+        .sort((a, b) => a[0] - b[0]);
+      if (entries.length === 0) return null;
+      const top = [...entries].sort((a, b) => b[1].total - a[1].total)[0];
+      return {
+        answer_summary: `${capitalize(category)} by district (last 90 days): district ${top[0]} leads with ${top[1].total}.`,
+        chart_config: {
+          type: "bar",
+          data: {
+            labels: entries.map(([d]) => `D${d}`),
+            datasets: [{ label: capitalize(category), data: entries.map(([, v]) => v.total), backgroundColor: "#3b82f6" }],
+          },
+        },
+        table_data: entries.map(([d, v]) => ({ district: d, total: v.total, open: v.open })),
+        source: "precomputed",
+      };
+    }
+
+    return null;
+  }
+
   function capitalize(category) {
     const names = {
       homeless: "Homeless", parking: "Parking", noise: "Noise", animal: "Animal Services",
@@ -348,7 +487,7 @@
           <option value="open">Open only</option>
           <option value="resolution">Resolution time</option>
         </select>
-        <button onclick="document.querySelector('script[src*=\\'query-engine\\']').queryFilterSubmit()">Submit</button>
+        <button onclick="window.queryFilterSubmit()">Submit</button>
       </div>`;
   }
 
@@ -377,6 +516,9 @@
     loadingEl.style.display = "block";
     resultsEl.innerHTML = "";
     if (hintsEl) hintsEl.style.display = "none";
+
+    // Make sure pre-computed data has loaded (DOMContentLoaded race)
+    await preloadPrecomputed();
 
     // Step 1: Try local pre-computed data first
     const local = tryLocalQuery(question);
