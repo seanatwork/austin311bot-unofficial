@@ -21,42 +21,22 @@ from typing import Optional
 import requests
 
 from open311_client import open311_get
+from categories import CATEGORY_CODES, CATEGORY_NAMES
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 OPEN311_URL = "https://311.austintexas.gov/open311/v2/requests.json"
 
-# ── Category → service codes mapping ────────────────────────────────────────
-# Mirrors the service code groupings used by each package's map generator.
-# Overlap is intentional — the same 311 report may be relevant to multiple
-# analysis categories (e.g., OBSTMIDB is both bicycle and homeless).
+# Category → service codes come from categories.py (shared with
+# generate_query_data.py). Overlap is intentional — the same 311 report may
+# be relevant to multiple categories (e.g., OBSTMIDB is both homeless and
+# traffic). Note the bicycle map page shows extra cycling-relevant codes,
+# but the Bicycle card counts PWBICYCL only, matching the reporting taxonomy.
 
-CATEGORY_CODES = {
-    "homeless": ["PRGRDISS", "ATCOCIRW", "OBSTMIDB", "SBDEBROW", "DRCHANEL"],
-    "parking":  ["PARKINGV"],
-    "noise":    ["APDNONNO", "DSOUCVMC", "AFDFIREW"],
-    "animal":   ["ACLONAG", "ACLOANIM", "ACBITE2", "COAACDD", "ACPROPER", "WILDEXPO", "ACINFORM"],
-    "graffiti": ["HHSGRAFF"],
-    "parks":    ["PRGRDISS", "PRGRDPLB", "PRGRDELC", "PRBLDPLB", "PRBLDISS", "PRBLDACH", "PRBLDELE", "COMPARLN", "PRCEMET1"],
-    "storm":    ["SWSSTORM", "DRCHANEL", "DRILID", "DRFLOODG", "DRSSPIPE", "DRFLOODR", "ZZEROSIO", "DRDITCH"],
-    "traffic":  ["SBPOTREP", "TRASIGMA", "STREETL2", "SBDEBROW", "ATTRSIMO", "SIGNSTRE", "OBSINTTR", "SBSIDERE", "SBSTRES", "OBSTMIDB", "ZZARSTSW", "DRCHANEL", "ATCOCIRW", "PWTRISRW", "SBGENRL", "SIGNNEWT", "TRASIGNE", "TPPECRNE"],
-    "bicycle":  ["PWBICYCL", "OBSTMIDB", "SBDEBROW", "ATCOCIRW", "ZZARSTSW"],
-    "deadAnimal": ["ZZARDEAC"],
-}
-
-# ── Card display names (matches homepage card labels) ──────────────────────
-CARD_NAMES = {
-    "homeless":   "Homeless",
-    "parking":    "Parking",
-    "noise":      "Noise",
-    "animal":     "Animal Services",
-    "graffiti":   "Graffiti",
-    "parks":      "Parks",
-    "storm":      "Storm & Drainage",
-    "traffic":    "Traffic",
-    "bicycle":    "Bicycle",
-    "deadAnimal": "Dead Animal",
+# ── Output keys used by the homepage JS (camelCase where historical) ────────
+OUTPUT_KEYS = {
+    "dead_animal": "deadAnimal",
 }
 
 DAYS_BACK = 90
@@ -139,9 +119,10 @@ def main() -> None:
     stats = {}
 
     for category, codes in CATEGORY_CODES.items():
+        out_key = OUTPUT_KEYS.get(category, category)
         cat_open = 0
         cat_total = 0
-        logger.info(f"{CARD_NAMES.get(category, category)} ({len(codes)} codes):")
+        logger.info(f"{CATEGORY_NAMES.get(category, category)} ({len(codes)} codes):")
 
         for code in codes:
             counts = _fetch_code_counts(code)
@@ -149,8 +130,8 @@ def main() -> None:
             cat_total += counts["total"]
             logger.info(f"  {code}: {counts['open']} open / {counts['total']} total")
 
-        stats[category] = {
-            "name": CARD_NAMES.get(category, category),
+        stats[out_key] = {
+            "name": CATEGORY_NAMES.get(category, category),
             "open": cat_open,
             "total": cat_total,
         }

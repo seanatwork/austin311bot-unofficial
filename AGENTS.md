@@ -131,8 +131,11 @@ Common pattern: fetch month-by-month (30-day windows) to avoid the Open311 pagin
 - `og_meta_tags(slug="")` — Open Graph + Twitter Card meta tags for a docs page
 - `SITE_BASE_URL` — `https://austin311.com`
 
-**`open311_cache.py`** — SQLite caching layer for Open311 data. First run fetches everything; later runs only fetch new records since the last fetch. Cache lives at `.cache/open311_cache.db` (gitignored, persisted in CI via GitHub Actions cache with 7-day retention).
-- API: `init_cache()`, `get_cached_records(category, since, service_codes)`, `cache_records(category, records)`, `get_last_fetch_date(category)`, `should_refresh_cache(category, max_age_hours=24)`, `get_cache_stats(category)`, `clear_cache(category)`
+**`open311_cache.py`** — SQLite caching layer for Open311 data. The cache mirrors raw Open311 records (one row per `service_request_id`, full record in `raw_json`); category semantics are applied at read/aggregation time, not at storage time. First run fetches everything; later runs only fetch new records since the last fetch. Cache lives at `.cache/open311_cache.db` (gitignored, persisted in CI via GitHub Actions cache with 7-day retention).
+- API: `init_cache()`, `get_cached_records(service_codes, since)`, `cache_records(category, records)`, `get_last_fetch_date(service_codes)`, `should_refresh_cache(category, max_age_hours=24)`, `get_cache_stats(category)`, `clear_cache(category)`
+- The `category` column on a row is only a provenance tag (which module cached it first) — service codes overlap across categories (e.g. `OBSTMIDB` is bicycle + homeless + traffic), so **never filter reads by category**; filter by `service_codes` instead.
+
+**`categories.py`** — canonical reporting taxonomy: `CATEGORY_CODES` (category → Open311 service codes) and `CATEGORY_NAMES`. Single source of truth for the aggregation scripts (`generate_query_data.py`, `generate_card_stats.py`). Map packages keep their own broader code lists for their map's domain — e.g. the bicycle *map* shows 5 cycling-relevant ROW codes, but the Bicycle *reporting category* counts `PWBICYCL` only so volume comparisons stay honest. Categories are not a partition: the same ticket can count toward multiple categories. The `homeless` reporting category additionally applies the encampment keyword filter (`homeless.homeless_bot.is_encampment_report`) at aggregation time.
 
 ### Common code patterns
 

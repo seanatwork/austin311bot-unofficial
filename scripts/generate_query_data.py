@@ -32,6 +32,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import requests
 
 from open311_client import open311_get
+from categories import CATEGORY_CODES, CATEGORY_NAMES
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -43,33 +44,15 @@ MAX_PAGES = 10
 PER_PAGE = 100
 API_KEY = os.getenv("AUSTINAPIKEY", "")
 
-# ── Category → service codes mapping ────────────────────────────────────────
-# Mirrors the service code groupings from generate_card_stats.py.
-CATEGORY_CODES: Dict[str, List[str]] = {
-    "homeless": ["PRGRDISS", "ATCOCIRW", "OBSTMIDB", "SBDEBROW", "DRCHANEL"],
-    "parking":  ["PARKINGV"],
-    "noise":    ["APDNONNO", "DSOUCVMC", "AFDFIREW"],
-    "animal":   ["ACLONAG", "ACLOANIM", "ACBITE2", "COAACDD", "ACPROPER", "WILDEXPO", "ACINFORM"],
-    "graffiti": ["HHSGRAFF"],
-    "parks":    ["PRGRDISS", "PRGRDPLB", "PRGRDELC", "PRBLDPLB", "PRBLDISS", "PRBLDACH", "PRBLDELE", "COMPARLN", "PRCEMET1"],
-    "storm":    ["SWSSTORM", "DRCHANEL", "DRILID", "DRFLOODG", "DRSSPIPE", "DRFLOODR", "ZZEROSIO", "DRDITCH"],
-    "traffic":  ["SBPOTREP", "TRASIGMA", "STREETL2", "SBDEBROW", "ATTRSIMO", "SIGNSTRE", "OBSINTTR", "SBSIDERE", "SBSTRES", "OBSTMIDB", "ZZARSTSW", "DRCHANEL", "ATCOCIRW", "PWTRISRW", "SBGENRL", "SIGNNEWT", "TRASIGNE", "TPPECRNE"],
-    "bicycle":  ["PWBICYCL", "OBSTMIDB", "SBDEBROW", "ATCOCIRW", "ZZARSTSW"],
-    "dead_animal": ["ZZARDEAC"],
-}
+# ── Per-category record filters ─────────────────────────────────────────────
+# Applied at aggregation time (the cache mirrors raw Open311 records).
+# The homeless category counts keyword-matched encampment reports only —
+# the same filter homeless/homeless_bot.py applies to the map — so the
+# chart and the map report the same definition of "homeless complaint".
+from homeless.homeless_bot import is_encampment_report
 
-# ── Display names ───────────────────────────────────────────────────────────
-CATEGORY_NAMES: Dict[str, str] = {
-    "homeless":    "Homeless",
-    "parking":     "Parking",
-    "noise":       "Noise",
-    "animal":      "Animal Services",
-    "graffiti":    "Graffiti",
-    "parks":       "Parks",
-    "storm":       "Storm & Drainage",
-    "traffic":     "Traffic",
-    "bicycle":     "Bicycle",
-    "dead_animal": "Dead Animal",
+CATEGORY_RECORD_FILTERS = {
+    "homeless": is_encampment_report,
 }
 
 # ── Service code → human-readable name ──────────────────────────────────────
@@ -227,31 +210,19 @@ def _fetch_category_monthly(
         get_cached_records,
         cache_records,
         get_last_fetch_date,
-        get_all_categories,
     )
 
     # Initialize cache
     if use_cache:
         init_cache()
-        # Look up by service codes only (not category) since codes overlap
-        # across categories (e.g., PRGRDISS is both homeless and parks).
-        # We'll tag new records under the current category.
-        all_cached = []
-        for cat in get_all_categories():
-            cat_records = get_cached_records(cat, service_codes=codes)
-            all_cached.extend(cat_records)
-        # Deduplicate by service_request_id
-        seen = set()
-        cached = []
-        for r in all_cached:
-            sid = r.get("service_request_id")
-            if sid and sid not in seen:
-                seen.add(sid)
-                cached.append(r)
-        cached_ids = seen
-        logger.info(f"  Cache: {len(cached)} existing records (across all categories) for {category}")
+        # Look up by service codes only (not category) — the cache mirrors raw
+        # Open311 records and codes overlap across categories (e.g. PRGRDISS
+        # is both homeless and parks), so rows may carry any category tag.
+        cached = get_cached_records(service_codes=codes)
+        cached_ids = {r.get("service_request_id") for r in cached}
+        logger.info(f"  Cache: {len(cached)} existing records for {category}")
 
-        last_fetch = get_last_fetch_date(category)
+        last_fetch = get_last_fetch_date(service_codes=codes)
         if last_fetch and len(cached) > 0:
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6):
@@ -264,7 +235,7 @@ def _fetch_category_monthly(
     now = _utc_now()
     # Derive freshness from cached records even if metadata for this category
     # is missing (common for overlapping codes cached under another category).
-    last_fetch = get_last_fetch_date(category)
+    last_fetch = get_last_fetch_date(service_codes=codes)
     if not last_fetch and cached:
         latest_dates = [r.get("requested_datetime", "") for r in cached if r.get("requested_datetime")]
         if latest_dates:
@@ -603,6 +574,11 @@ def main() -> None:
             months_back=months_back,
             use_cache=True,
         )
+        record_filter = CATEGORY_RECORD_FILTERS.get(category)
+        if record_filter:
+            before = len(records)
+            records = [r for r in records if record_filter(r)]
+            logger.info(f"  Filtered: {before} -> {len(records)} records")
         all_records[category] = records
         logger.info(f"  Total: {len(records)} records")
 

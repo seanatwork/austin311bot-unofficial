@@ -163,11 +163,11 @@ def fetch_storm_monthly(months_back: int = 13, use_cache: bool = True) -> list:
 
     if use_cache:
         init_cache()
-        cached_records = get_cached_records(CATEGORY, service_codes=list(SERVICE_CODES.keys()))
+        cached_records = get_cached_records(service_codes=list(SERVICE_CODES.keys()))
         cached_ids = {r.get("service_request_id") for r in cached_records}
         logger.info(f"Loaded {len(cached_records)} cached storm records")
 
-        last_fetch = get_last_fetch_date(CATEGORY)
+        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
         if last_fetch:
             logger.info(f"Last fetch was at {last_fetch}")
             cache_age = _utc_now() - last_fetch
@@ -184,7 +184,7 @@ def fetch_storm_monthly(months_back: int = 13, use_cache: bool = True) -> list:
     new_records: list = []
 
     if use_cache and cached_records:
-        last_fetch = get_last_fetch_date(CATEGORY)
+        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
         if last_fetch:
             fetch_start = last_fetch - timedelta(days=1)
         else:
@@ -269,11 +269,11 @@ def fetch_all_storm_reports(days_back: int = 90, use_cache: bool = True) -> list
 
     if use_cache:
         init_cache()
-        cached_records = get_cached_records(CATEGORY, service_codes=list(SERVICE_CODES.keys()))
+        cached_records = get_cached_records(service_codes=list(SERVICE_CODES.keys()))
         cached_ids = {r.get("service_request_id") for r in cached_records}
         logger.info(f"Loaded {len(cached_records)} cached storm records")
 
-        last_fetch = get_last_fetch_date(CATEGORY)
+        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
         if last_fetch:
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6) and len(cached_records) > 0:

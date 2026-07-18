@@ -177,6 +177,13 @@ def _is_encampment_report(record: dict) -> bool:
     return False
 
 
+# Public alias so aggregation scripts (e.g. scripts/generate_query_data.py)
+# can apply the exact same filter the map uses.
+def is_encampment_report(record: dict) -> bool:
+    """Public wrapper for the encampment keyword filter."""
+    return _is_encampment_report(record)
+
+
 def _make_request(params: dict) -> list:
     return open311_get(_get_session(), f"{OPEN311_BASE_URL}/requests.json", params)
 
@@ -298,12 +305,15 @@ def fetch_encampment_reports_monthly(months_back: int = 12, use_cache: bool = Tr
     # Initialize cache if using
     if use_cache:
         init_cache()
-        cached_records = get_cached_records(CATEGORY, service_codes=list(SERVICE_CODES.keys()))
-        cached_ids = {r.get("service_request_id") for r in cached_records}
-        logger.info(f"Loaded {len(cached_records)} cached records")
+        # Read raw cached records by service code (any category may have
+        # cached them), then apply the keyword filter at read time.
+        raw_cached = get_cached_records(service_codes=list(SERVICE_CODES.keys()))
+        cached_ids = {r.get("service_request_id") for r in raw_cached}
+        cached_records = [r for r in raw_cached if _is_encampment_report(r)]
+        logger.info(f"Loaded {len(raw_cached)} cached records ({len(cached_records)} keyword matches)")
 
         # Check if we have recent cache
-        last_fetch = get_last_fetch_date(CATEGORY)
+        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
         if last_fetch:
             logger.info(f"Last fetch was at {last_fetch}")
             # If cache is less than 6 days old and we have data, use it
@@ -323,7 +333,7 @@ def fetch_encampment_reports_monthly(months_back: int = 12, use_cache: bool = Tr
     # Calculate how far back we need to fetch
     # If we have cache, only fetch from last fetch date
     if use_cache and cached_records:
-        last_fetch = get_last_fetch_date(CATEGORY)
+        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
         if last_fetch:
             # Fetch from 1 day before last fetch to catch any missed records
             fetch_start = last_fetch - timedelta(days=1)
@@ -379,9 +389,9 @@ def fetch_encampment_reports_monthly(months_back: int = 12, use_cache: bool = Tr
                             seen_ids.add(sid)
                             r["_service_label"] = SERVICE_CODES.get(code, code)
                             r["_service_code"]  = code
+                            new_records.append(r)  # cache raw; filter at read time
                             if _is_encampment_report(r):
                                 all_matched.append(r)
-                                new_records.append(r)
                                 monthly_records += 1
                     if len(records) < 100:
                         break

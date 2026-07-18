@@ -176,12 +176,12 @@ def fetch_graffiti_monthly(months_back: int = 12, use_cache: bool = True) -> lis
     # Initialize cache if using
     if use_cache:
         init_cache()
-        cached_records = get_cached_records(CATEGORY, service_codes=[Config.SERVICE_CODE])
+        cached_records = get_cached_records(service_codes=[Config.SERVICE_CODE])
         cached_ids = {r.get("service_request_id") for r in cached_records}
         logger.info(f"Loaded {len(cached_records)} cached records")
 
         # Check if we have recent cache
-        last_fetch = get_last_fetch_date(CATEGORY)
+        last_fetch = get_last_fetch_date(service_codes=[Config.SERVICE_CODE])
         if last_fetch:
             logger.info(f"Last fetch was at {last_fetch}")
             cache_age = _utc_now() - last_fetch
@@ -199,7 +199,7 @@ def fetch_graffiti_monthly(months_back: int = 12, use_cache: bool = True) -> lis
 
     # Calculate how far back we need to fetch
     if use_cache and cached_records:
-        last_fetch = get_last_fetch_date(CATEGORY)
+        last_fetch = get_last_fetch_date(service_codes=[Config.SERVICE_CODE])
         if last_fetch:
             fetch_start = last_fetch - timedelta(days=1)
         else:

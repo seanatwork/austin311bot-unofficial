@@ -110,31 +110,40 @@ def set_cache_metadata(key: str, value: str):
 
 
 def get_cached_records(
-    category: str,
+    category: Optional[str] = None,
     since: Optional[datetime] = None,
     service_codes: Optional[List[str]] = None
 ) -> List[Dict[str, Any]]:
     """
-    Retrieve cached records for a category.
-    
+    Retrieve cached records, filtered by service code and/or category.
+
+    The cache mirrors raw Open311 records; the `category` column only records
+    which module cached the row first and is NOT a reliable partition (service
+    codes overlap across categories, e.g. OBSTMIDB is both bicycle and
+    homeless). Prefer filtering by `service_codes` alone.
+
     Args:
-        category: Category name (e.g., 'homeless', 'graffiti')
+        category: Only return rows tagged with this category (rarely wanted)
         since: Only return records since this datetime
         service_codes: Filter by specific service codes
-    
+
     Returns:
         List of cached records as dictionaries
     """
     if not CACHE_DB.exists():
         return []
-    
+
     conn = sqlite3.connect(CACHE_DB)
     try:
         cursor = conn.cursor()
-        
-        query = "SELECT * FROM service_requests WHERE category = ?"
-        params = [category]
-        
+
+        query = "SELECT * FROM service_requests WHERE 1=1"
+        params = []
+
+        if category:
+            query += " AND category = ?"
+            params.append(category)
+
         if since:
             since_str = since.isoformat()
             query += " AND requested_datetime >= ?"
@@ -170,9 +179,13 @@ def get_cached_records(
 def cache_records(category: str, records: List[Dict[str, Any]]):
     """
     Store records in cache.
-    
+
+    Records are keyed by service_request_id (one row per Open311 ticket).
+    `category` is only a provenance tag noting which module cached the row;
+    reads should filter by service code, not category.
+
     Args:
-        category: Category name for organization
+        category: Provenance tag for the caching module
         records: List of Open311 records to cache
     """
     if not records:
@@ -295,20 +308,35 @@ def clear_cache(category: Optional[str] = None):
         conn.close()
 
 
-def get_last_fetch_date(category: str) -> Optional[datetime]:
-    """Get the datetime of the most recent record in cache for a category."""
+def get_last_fetch_date(
+    category: Optional[str] = None,
+    service_codes: Optional[List[str]] = None,
+) -> Optional[datetime]:
+    """Get the datetime of the most recent cached record.
+
+    Args:
+        category: Restrict to rows tagged with this category (provenance only —
+            not a reliable partition; prefer service_codes)
+        service_codes: Restrict to these service codes
+    """
     if not CACHE_DB.exists():
         return None
-    
+
     conn = sqlite3.connect(CACHE_DB)
     try:
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT MAX(requested_datetime) FROM service_requests WHERE category = ?",
-            (category,)
-        )
+        query = "SELECT MAX(requested_datetime) FROM service_requests WHERE 1=1"
+        params = []
+        if category:
+            query += " AND category = ?"
+            params.append(category)
+        if service_codes:
+            placeholders = ','.join('?' * len(service_codes))
+            query += f" AND service_code IN ({placeholders})"
+            params.extend(service_codes)
+        cursor.execute(query, params)
         result = cursor.fetchone()
-        
+
         if result and result[0]:
             return datetime.fromisoformat(result[0])
         return None

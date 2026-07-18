@@ -102,11 +102,11 @@ def fetch_dead_animal_monthly(months_back: int = 13, use_cache: bool = True) -> 
 
     if use_cache:
         init_cache()
-        cached_records = get_cached_records(CATEGORY, service_codes=list(SERVICE_CODES.keys()))
+        cached_records = get_cached_records(service_codes=list(SERVICE_CODES.keys()))
         cached_ids = {r.get("service_request_id") for r in cached_records}
         logger.info(f"Loaded {len(cached_records)} cached dead-animal records")
 
-        last_fetch = get_last_fetch_date(CATEGORY)
+        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
         if last_fetch:
             logger.info(f"Last fetch was at {last_fetch}")
             cache_age = _utc_now() - last_fetch
@@ -123,7 +123,7 @@ def fetch_dead_animal_monthly(months_back: int = 13, use_cache: bool = True) -> 
     new_records: list = []
 
     if use_cache and cached_records:
-        last_fetch = get_last_fetch_date(CATEGORY)
+        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
         if last_fetch:
             fetch_start = last_fetch - timedelta(days=1)
         else:
@@ -207,8 +207,8 @@ def fetch_dead_animal_reports(days_back: int = 90, use_cache: bool = True) -> li
 
     if use_cache:
         init_cache()
-        cached = get_cached_records(CATEGORY, service_codes=list(SERVICE_CODES.keys()))
-        last_fetch = get_last_fetch_date(CATEGORY)
+        cached = get_cached_records(service_codes=list(SERVICE_CODES.keys()))
+        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
         if last_fetch and ((_utc_now() - last_fetch) < timedelta(days=6)) and cached:
             logger.info(f"Using {len(cached)} cached dead-animal records")
             return cached
