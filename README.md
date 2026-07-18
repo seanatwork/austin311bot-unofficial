@@ -51,8 +51,6 @@ scripts/generate_map.py <category>   # regenerate any map locally
 python scripts/generate_map.py crime-trends
 ```
 
-The repo also contains a Telegram bot (`austin311_bot.py`) that exposes the same data via [@austin311bot](https://t.me/austin311bot), currently in maintenance mode.
-
 ### Local setup
 
 ```bash
@@ -69,7 +67,6 @@ Generated maps are written to `docs/<category>/index.html`.
 | Variable | Required | Description |
 |----------|----------|-------------|
 | `AUSTINAPIKEY` | No | Socrata app token — higher rate limits for crime, budget, court, restaurant, water pages |
-| `TELEGRAM_BOT_TOKEN` | Bot only | Telegram bot token from [@BotFather](https://t.me/BotFather) |
 
 ---
 

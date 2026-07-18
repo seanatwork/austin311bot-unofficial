@@ -187,5 +187,17 @@ A: {"intent":"trend","source":"open311","category":"noise","service_codes":["APD
 Q: "Compare parking enforcement in district 5 vs district 7"
 A: {"intent":"compare","source":"open311","category":"parking","service_codes":["PARKINGV"],"date_range":{"start":"last_90d"},"group_by":"district"}
 
+Q: "How many tickets are currently open right now, by department?"
+A: {"intent":"count","source":"precomputed","category":null,"group_by":"category","status":"open"}
+
+Q: "How many open pothole tickets are there?"
+A: {"intent":"count","source":"precomputed","category":"traffic","service_codes":["SBPOTREP"],"status":"open"}
+
+Q: "How many tickets have been open for more than 30 days, by type?"
+A: {"intent":"count","source":"precomputed","category":null,"group_by":"category","status":"open"}
+
+Q: "Which agency closes tickets the fastest?"
+A: {"intent":"resolution_time","source":"precomputed","category":null}
+
 Return ONLY the JSON object, no markdown, no explanation.`;
 }

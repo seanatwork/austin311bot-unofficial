@@ -430,9 +430,23 @@ function formatFromPrecomputed(precomputed, params) {
 
   if (intent === "count" || intent === "rank") {
     const totals = precomputed.totals_90d || precomputed.totals_365d || {};
+    const wantOpen = params.status === "open";
     if (category && totals[category]) {
       const { total, open, closed } = totals[category];
       const name = CATEGORY_NAMES[category] || category;
+      if (wantOpen) {
+        return {
+          answer_summary: `${open} open ${name} tickets (filed in the last 90 days).`,
+          chart_config: {
+            type: "doughnut",
+            data: {
+              labels: ["Open", "Closed"],
+              datasets: [{ label: name, data: [open, closed], backgroundColor: ["#ef4444", "#22c55e"] }],
+            },
+          },
+          table_data: [{ status: "Open", count: open }, { status: "Closed", count: closed }],
+        };
+      }
       return {
         answer_summary: `${total} ${name} complaints in the selected period. ${open} open, ${closed} closed.`,
         chart_config: {
@@ -445,7 +459,26 @@ function formatFromPrecomputed(precomputed, params) {
         table_data: [{ status: "Open", count: open }, { status: "Closed", count: closed }],
       };
     }
-    // All categories
+    // All categories — optionally broken down by open status
+    if (wantOpen) {
+      const entries = Object.entries(totals).sort((a, b) => b[1].open - a[1].open);
+      const totalOpen = entries.reduce((sum, [, v]) => sum + v.open, 0);
+      return {
+        answer_summary: `${totalOpen} open tickets (filed in the last 90 days), by department: ${entries.slice(0, 5).map(([cat, v]) => `${CATEGORY_NAMES[cat] || cat}: ${v.open}`).join(", ")}`,
+        chart_config: {
+          type: "bar",
+          data: {
+            labels: entries.map(([cat]) => CATEGORY_NAMES[cat] || cat),
+            datasets: [{
+              label: "Open tickets",
+              data: entries.map(([, v]) => v.open),
+              backgroundColor: "#ef4444",
+            }],
+          },
+        },
+        table_data: entries.map(([cat, v]) => ({ department: CATEGORY_NAMES[cat] || cat, open: v.open })),
+      };
+    }
     const entries = Object.entries(totals)
       .sort((a, b) => b[1].total - a[1].total);
     return {

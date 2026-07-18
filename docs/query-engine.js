@@ -1,8 +1,9 @@
 /**
  * austin311.com — Client-side query engine
  *
- * Handles the NL search bar, routes queries to either local pre-computed JSON
- * or the Cloudflare Worker API, and renders results (summary + Chart.js + table).
+ * Handles the NL search bar. Queries go to the Cloudflare Worker (LLM-parsed)
+ * first; local pre-computed JSON with pattern matching is the offline fallback.
+ * Renders results (summary + Chart.js + table).
  */
 
 (function () {
@@ -79,6 +80,22 @@
     if (openMatch) {
       const category = normalizeCategory(openMatch[1]);
       return localOpenCount(category);
+    }
+
+    // Pattern: "how many tickets are (currently) open (right now)?, by department?"
+    // "open" phrasing varies ("tickets are open", "currently open", "open right
+    // now") and "department" maps to our categories.
+    if (/\bopen\b/.test(q) && /(?:tickets?|complaints?|reports?|requests?)/.test(q)) {
+      const category = normalizeCategory(q);
+      if (category && !/by\s+(?:department|category|type)s?/.test(q)) {
+        return localOpenCount(category);
+      }
+      return localOpenBreakdown();
+    }
+
+    // Pattern: "how many tickets by department/category" (no status filter)
+    if (/how\s+many/.test(q) && /by\s+(?:department|category|type)s?/.test(q)) {
+      return localCount(null, "last_90d");
     }
 
     // Pattern: "top [n] [metric]"
@@ -217,6 +234,25 @@
       };
     }
     return null;
+  }
+
+  function localOpenBreakdown() {
+    const totals = dailyCounts.totals_90d || {};
+    const entries = Object.entries(totals).sort((a, b) => b[1].open - a[1].open);
+    if (entries.length === 0) return null;
+    const totalOpen = entries.reduce((sum, [, v]) => sum + v.open, 0);
+    return {
+      answer_summary: `${totalOpen} open tickets (filed in the last 90 days), by department: ${entries.slice(0, 5).map(([c, v]) => `${capitalize(c)}: ${v.open}`).join(" · ")}`,
+      chart_config: {
+        type: "bar",
+        data: {
+          labels: entries.map(([c]) => capitalize(c)),
+          datasets: [{ label: "Open tickets", data: entries.map(([, v]) => v.open), backgroundColor: "#C2855C" }],
+        },
+      },
+      table_data: entries.map(([c, v]) => ({ department: capitalize(c), open: v.open })),
+      source: "precomputed",
+    };
   }
 
   function localTopCategories(n) {
@@ -520,7 +556,16 @@
     // Make sure pre-computed data has loaded (DOMContentLoaded race)
     await preloadPrecomputed();
 
-    // Step 1: Try local pre-computed data first
+    // Step 1: Ask the worker (LLM parses the question into structured params)
+    const result = await queryWorker(question);
+    if (result && !result.fallback) {
+      loadingEl.style.display = "none";
+      renderResults(result);
+      return;
+    }
+
+    // Step 2: Worker unavailable or couldn't parse — fall back to local
+    // pre-computed data matched against common question patterns
     const local = tryLocalQuery(question);
     if (local) {
       loadingEl.style.display = "none";
@@ -528,14 +573,9 @@
       return;
     }
 
-    // Step 2: Fall back to worker API
-    const result = await queryWorker(question);
-
     loadingEl.style.display = "none";
 
-    if (result && !result.fallback) {
-      renderResults(result);
-    } else if (result && result.fallback) {
+    if (result && result.fallback) {
       renderResults(result); // Shows filter panel
     } else {
       renderResults({ answer_summary: "Something went wrong. Please try again.", fallback: true });

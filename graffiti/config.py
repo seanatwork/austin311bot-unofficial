@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Configuration module for Graffiti Bot
+Configuration module for the graffiti package
 
 Centralizes configuration from environment variables with sensible defaults.
 """
