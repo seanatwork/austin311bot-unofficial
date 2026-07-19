@@ -23,6 +23,7 @@ py-modules = [
     "open311_ingest",
     "open311_client",
     "open311_cache",
+    "categories",
 ]
 
 [tool.setuptools.packages.find]
