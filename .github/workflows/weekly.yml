@@ -167,7 +167,12 @@ jobs:
             docs/animal/trends/index.html \
             docs/storm/trends/index.html \
             docs/animal/dead/trends/index.html \
-            docs/fun/data.json
+            docs/fun/data.json \
+            docs/querystore/daily_counts.json \
+            docs/querystore/district_counts.json \
+            docs/querystore/resolution_stats.json \
+            docs/querystore/monthly_aggregates.json \
+            docs/querystore/service_codes.json
           git diff --cached --quiet || git commit -m "chore: refresh weekly data [skip ci]"
           git pull --rebase origin main
           git push
