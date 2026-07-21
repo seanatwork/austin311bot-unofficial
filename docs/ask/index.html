@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ask the Data — Austin 311</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Ask the Data — Austin 311" />
+  <meta property="og:description" content="Ask questions about Austin 311 data in plain English — complaint counts, trends, resolution times, and more." />
+  <meta property="og:url" content="https://austin311.com/ask/" />
+  <meta property="og:image" content="https://austin311.com/og-default.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Austin 311" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Ask the Data — Austin 311" />
+  <meta name="twitter:description" content="Ask questions about Austin 311 data in plain English — complaint counts, trends, resolution times, and more." />
+  <meta name="twitter:image" content="https://austin311.com/og-default.png" />
+  <meta name="description" content="Ask questions about Austin 311 data in plain English — complaint counts, trends, resolution times, and more." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Violet Crown color tokens (matches homepage) ── */
+    :root {
+      --bg:           #F7F5FA;
+      --bg-card:      #FFFFFF;
+      --bg-card-hover:#F3EFF9;
+      --border:       #E3DEEE;
+      --border-hover: #B9A8E0;
+      --text:         #3A3344;
+      --text-head:    #241B3A;
+      --text-tag:     #6B6180;
+      --text-desc:    #7A7189;
+      --text-footer:  #A79FB8;
+      --text-footer-a:#7A6F94;
+      --text-footer-hover: #4C1D95;
+      --text-muted:   #A79FB8;
+      --accent-violet:#5B3FA8;
+      --accent-coral: #E8623D;
+      --shadow-warm:  rgba(91, 63, 168, 0.12);
+    }
+
+    html.dark {
+      --bg:           #16121F;
+      --bg-card:      #1F1A2E;
+      --bg-card-hover:#282239;
+      --border:       #342B4A;
+      --border-hover: #7A63C4;
+      --text:         #CFC8E0;
+      --text-head:    #F0EBFA;
+      --text-tag:     #9A8FB5;
+      --text-desc:    #8D82A6;
+      --text-footer:  #5C5178;
+      --text-footer-a:#8D82A6;
+      --text-footer-hover: #B9A8E0;
+      --text-muted:   #5C5178;
+      --accent-violet:#8B6FE0;
+      --accent-coral: #F07B54;
+      --shadow-warm:  rgba(139, 111, 224, 0.10);
+    }
+
+    body {
+      font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(91,63,168,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 80% 90%, rgba(232,98,61,0.05) 0%, transparent 60%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1rem 3rem;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    /* ── theme toggle ── */
+    #theme-toggle {
+      position: fixed;
+      top: 14px;
+      right: 16px;
+      z-index: 200;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.75rem;
+      color: var(--text-desc);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      user-select: none;
+    }
+    #theme-toggle:hover { color: var(--text); border-color: var(--border-hover); }
+
+    header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    header .home-link {
+      font-size: 0.85rem;
+      color: var(--text-tag);
+      text-decoration: none;
+    }
+    header .home-link:hover { color: var(--text-head); }
+    header h1 {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 2.4rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-head);
+      line-height: 1.15;
+      margin-top: 0.4rem;
+    }
+    header .subtitle {
+      margin-top: 0.5rem;
+      color: var(--text-tag);
+      font-size: 1rem;
+    }
+
+    /* ── NL Query search bar ── */
+    .query-search-wrap {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto 1.5rem;
+      position: relative;
+    }
+    .query-search-bar {
+      width: 100%;
+      padding: 14px 20px 14px 48px;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-family: "Public Sans", -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg-card);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .query-search-bar:focus {
+      border-color: var(--accent-violet);
+      box-shadow: 0 0 0 3px rgba(91, 63, 168, 0.15);
+    }
+    .query-search-bar::placeholder {
+      color: var(--text-muted);
+    }
+    .query-search-icon {
+      position: absolute;
+      left: 16px;
+      top: 26px;
+      transform: translateY(-50%);
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .query-hints {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.4rem;
+    }
+    .query-loading {
+      text-align: center;
+      padding: 1rem;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    .query-loading .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent-violet);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Results area ── */
+    .query-results {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto 1.5rem;
+    }
+    .query-results .answer-summary {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--text-head);
+      margin-bottom: 0.75rem;
+      line-height: 1.4;
+    }
+    .query-results .query-chart {
+      margin-bottom: 1rem;
+    }
+    .query-results .query-chart canvas {
+      max-height: 350px;
+    }
+    .query-results .query-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+    .query-results .query-table th,
+    .query-results .query-table td {
+      text-align: left;
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--border);
+    }
+    .query-results .query-table th {
+      color: var(--text-tag);
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+    }
+    .query-filter-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-top: 1rem;
+    }
+    .query-filter-panel select {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.9rem;
+      background: var(--bg);
+      color: var(--text);
+      margin-right: 8px;
+      margin-bottom: 8px;
+    }
+    .query-filter-panel button {
+      padding: 8px 16px;
+      background: var(--accent-violet);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+    }
+
+    footer {
+      margin-top: auto;
+      padding-top: 2.5rem;
+      font-size: 0.75rem;
+      color: var(--text-footer);
+      text-align: center;
+    }
+    footer a { color: var(--text-footer-a); text-decoration: none; }
+    footer a:hover { color: var(--text-footer-hover); }
+  </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TS158R7XSN');
+</script>
+</head>
+<body>
+
+  <button id="theme-toggle" aria-label="Toggle dark mode">🌙 Dark</button>
+
+  <header>
+    <a class="home-link" href="/">← Austin 311</a>
+    <h1>Ask the Data</h1>
+    <p class="subtitle">Ask questions about Austin 311 data in plain English.</p>
+  </header>
+
+  <!-- ── NL Query Search ── -->
+  <div class="query-search-wrap">
+    <span class="query-search-icon">💬</span>
+    <input
+      type="text"
+      id="query-input"
+      class="query-search-bar"
+      placeholder="Ask about 311 data… e.g. &quot;How many graffiti complaints this month?&quot;"
+      autocomplete="off"
+      autofocus
+    />
+    <div class="query-hints" id="query-hints">
+      Try: "Potholes in district 3" · "Noise complaint trend" · "Average graffiti resolution time"
+    </div>
+  </div>
+
+  <!-- ── Query results ── -->
+  <div id="query-loading" class="query-loading" style="display:none;">
+    <span class="spinner"></span> Searching…
+  </div>
+  <div id="query-results" class="query-results"></div>
+
+  <footer>
+    <a href="https://github.com/seanatwork" target="_blank" rel="noopener">Vibecoded with ❤️</a>
+    <br />
+    <span style="font-size:0.7rem;opacity:0.7;">🤘 Keep Austin Weird</span>
+  </footer>
+
+  <script>
+    const btn = document.getElementById("theme-toggle");
+    const html = document.documentElement;
+    const dark = localStorage.getItem("theme") === "dark";
+
+    if (dark) { html.classList.add("dark"); btn.textContent = "☀️ Light"; }
+
+    btn.addEventListener("click", () => {
+      const isDark = html.classList.toggle("dark");
+      btn.textContent = isDark ? "☀️ Light" : "🌙 Dark";
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    });
+  </script>
+
+  <!-- ── Query Engine ── -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="/query-engine.js"></script>
+</body>
+</html>
