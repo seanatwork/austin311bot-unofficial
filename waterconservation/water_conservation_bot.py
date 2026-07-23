@@ -9,7 +9,6 @@ Austin Water investigates and sends postcards or confirms violations.
 import io
 import os
 import re
-import time
 import tempfile
 import logging
 import requests
@@ -17,20 +16,12 @@ from collections import Counter
 from datetime import datetime, timezone, timedelta
 from typing import Optional
 
-from open311_client import og_meta_tags
+from open311_client import open311_get, og_meta_tags
 
 logger = logging.getLogger(__name__)
 
 OPEN311_BASE_URL = "https://311.austintexas.gov/open311/v2"
 SERVICE_CODE     = "WWREPORT"
-TIMEOUT          = 10
-MAX_RETRIES      = 3
-RETRY_DELAY      = 1.0
-
-RETRYABLE_ERRORS = (
-    requests.exceptions.Timeout,
-    requests.exceptions.ConnectionError,
-)
 
 _session: Optional[requests.Session] = None
 
@@ -55,20 +46,10 @@ def _isoformat_z(dt: datetime) -> str:
 
 
 def _make_request(params: dict, retries: int = 0) -> list:
+    """Fetch Open311 records using the shared retry/backoff logic."""
     session = _get_session()
     url = f"{OPEN311_BASE_URL}/requests.json"
-    try:
-        resp = session.get(url, params=params, timeout=TIMEOUT)
-        resp.raise_for_status()
-        data = resp.json()
-        return data if isinstance(data, list) else []
-    except RETRYABLE_ERRORS as e:
-        if retries < MAX_RETRIES:
-            delay = RETRY_DELAY * (2 ** retries)
-            logger.warning(f"Water conservation request failed ({e}), retrying in {delay:.1f}s")
-            time.sleep(delay)
-            return _make_request(params, retries + 1)
-        raise
+    return open311_get(session, url, params, retries)
 
 
 def _fetch_violations(days_back: int, limit: int = 100) -> list:
