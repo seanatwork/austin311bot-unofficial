@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-21T13:34:38.718792+00:00",
+  "generated": "2026-07-24T13:39:20.172528+00:00",
   "months": {
     "2025-05": {
       "homeless": {
@@ -611,9 +611,9 @@
     },
     "2026-07": {
       "homeless": {
-        "total": 86,
+        "total": 117,
         "open": 5,
-        "closed": 81
+        "closed": 112
       },
       "parking": {
         "total": 1410,
@@ -621,9 +621,9 @@
         "closed": 1380
       },
       "noise": {
-        "total": 801,
-        "open": 10,
-        "closed": 791
+        "total": 821,
+        "open": 13,
+        "closed": 808
       },
       "animal": {
         "total": 816,
@@ -641,14 +641,14 @@
         "closed": 85
       },
       "storm": {
-        "total": 180,
-        "open": 27,
-        "closed": 153
+        "total": 226,
+        "open": 35,
+        "closed": 191
       },
       "traffic": {
-        "total": 1543,
-        "open": 394,
-        "closed": 1149
+        "total": 3017,
+        "open": 649,
+        "closed": 2368
       },
       "bicycle": {
         "total": 28,
@@ -664,35 +664,35 @@
   },
   "day_of_week": {
     "homeless": {
-      "Fri": {
-        "total": 260,
-        "open": 6,
-        "closed": 254
-      },
       "Thu": {
-        "total": 274,
+        "total": 279,
         "open": 2,
-        "closed": 272
+        "closed": 277
       },
       "Wed": {
-        "total": 286,
+        "total": 289,
         "open": 3,
-        "closed": 283
+        "closed": 286
       },
       "Tue": {
-        "total": 305,
+        "total": 313,
         "open": 2,
-        "closed": 303
+        "closed": 311
       },
       "Mon": {
-        "total": 323,
+        "total": 333,
         "open": 3,
-        "closed": 320
+        "closed": 330
       },
       "Sun": {
-        "total": 204,
+        "total": 206,
         "open": 1,
-        "closed": 203
+        "closed": 205
+      },
+      "Fri": {
+        "total": 263,
+        "open": 6,
+        "closed": 257
       },
       "Sat": {
         "total": 221,
@@ -744,19 +744,19 @@
         "closed": 2620
       },
       "Fri": {
-        "total": 1198,
-        "open": 0,
+        "total": 1201,
+        "open": 3,
         "closed": 1198
       },
       "Wed": {
-        "total": 710,
+        "total": 712,
         "open": 0,
-        "closed": 710
+        "closed": 712
       },
       "Sun": {
-        "total": 3221,
+        "total": 3232,
         "open": 0,
-        "closed": 3221
+        "closed": 3232
       },
       "Thu": {
         "total": 1214,
@@ -764,14 +764,14 @@
         "closed": 1214
       },
       "Tue": {
-        "total": 619,
+        "total": 621,
         "open": 0,
-        "closed": 619
+        "closed": 621
       },
       "Mon": {
-        "total": 1291,
+        "total": 1293,
         "open": 4,
-        "closed": 1287
+        "closed": 1289
       }
     },
     "animal": {
@@ -886,77 +886,77 @@
       }
     },
     "storm": {
+      "Thu": {
+        "total": 1073,
+        "open": 53,
+        "closed": 1020
+      },
+      "Wed": {
+        "total": 909,
+        "open": 41,
+        "closed": 868
+      },
+      "Tue": {
+        "total": 976,
+        "open": 18,
+        "closed": 958
+      },
+      "Mon": {
+        "total": 1068,
+        "open": 35,
+        "closed": 1033
+      },
+      "Sun": {
+        "total": 535,
+        "open": 17,
+        "closed": 518
+      },
       "Sat": {
-        "total": 831,
+        "total": 833,
         "open": 50,
-        "closed": 781
+        "closed": 783
       },
       "Fri": {
         "total": 1022,
         "open": 60,
         "closed": 962
-      },
-      "Thu": {
-        "total": 1067,
-        "open": 47,
-        "closed": 1020
-      },
-      "Wed": {
-        "total": 900,
-        "open": 39,
-        "closed": 861
-      },
-      "Tue": {
-        "total": 961,
-        "open": 18,
-        "closed": 943
-      },
-      "Mon": {
-        "total": 1056,
-        "open": 35,
-        "closed": 1021
-      },
-      "Sun": {
-        "total": 533,
-        "open": 17,
-        "closed": 516
       }
     },
     "traffic": {
       "Fri": {
-        "total": 2590,
-        "open": 398,
-        "closed": 2192
+        "total": 2768,
+        "open": 446,
+        "closed": 2322
       },
       "Thu": {
-        "total": 2841,
-        "open": 336,
-        "closed": 2505
+        "total": 3173,
+        "open": 410,
+        "closed": 2763
       },
       "Wed": {
-        "total": 3048,
-        "open": 397,
-        "closed": 2651
+        "total": 3287,
+        "open": 439,
+        "closed": 2848
       },
       "Tue": {
-        "total": 2921,
-        "open": 330,
-        "closed": 2591
+        "total": 3202,
+        "open": 368,
+        "closed": 2834
       },
       "Mon": {
-        "total": 2812,
-        "open": 447,
-        "closed": 2365
+        "total": 3099,
+        "open": 481,
+        "closed": 2618
       },
       "Sun": {
-        "total": 1611,
-        "open": 252,
-        "closed": 1359
+        "total": 1685,
+        "open": 257,
+        "closed": 1428
       },
       "Sat": {
-        "total": 1801,
-        "open": 280,
-        "closed": 1521
+        "total": 1884,
+        "open": 294,
+        "closed": 1590
       }
     },
     "bicycle": {
