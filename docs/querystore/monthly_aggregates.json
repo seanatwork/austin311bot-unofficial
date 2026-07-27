@@ -1,5 +1,5 @@
 {
-  "generated": "2026-07-27T14:30:19.734226+00:00",
+  "generated": "2026-07-27T14:41:36.948361+00:00",
   "months": {
     "2025-05": {
       "homeless": {
@@ -611,9 +611,9 @@
     },
     "2026-07": {
       "homeless": {
-        "total": 117,
-        "open": 5,
-        "closed": 112
+        "total": 129,
+        "open": 11,
+        "closed": 118
       },
       "parking": {
         "total": 1860,
@@ -664,9 +664,24 @@
   },
   "day_of_week": {
     "homeless": {
-      "Thu": {
-        "total": 279,
+      "Mon": {
+        "total": 336,
+        "open": 4,
+        "closed": 332
+      },
+      "Sun": {
+        "total": 207,
         "open": 2,
+        "closed": 205
+      },
+      "Sat": {
+        "total": 222,
+        "open": 5,
+        "closed": 217
+      },
+      "Thu": {
+        "total": 280,
+        "open": 3,
         "closed": 277
       },
       "Wed": {
@@ -675,29 +690,14 @@
         "closed": 286
       },
       "Tue": {
-        "total": 313,
-        "open": 2,
-        "closed": 311
-      },
-      "Mon": {
-        "total": 333,
-        "open": 3,
-        "closed": 330
-      },
-      "Sun": {
-        "total": 206,
-        "open": 1,
-        "closed": 205
+        "total": 319,
+        "open": 4,
+        "closed": 315
       },
       "Fri": {
         "total": 263,
         "open": 6,
         "closed": 257
-      },
-      "Sat": {
-        "total": 221,
-        "open": 4,
-        "closed": 217
       }
     },
     "parking": {
@@ -822,11 +822,6 @@
         "open": 13,
         "closed": 168
       },
-      "Sat": {
-        "total": 168,
-        "open": 6,
-        "closed": 162
-      },
       "Fri": {
         "total": 194,
         "open": 28,
@@ -846,6 +841,11 @@
         "total": 222,
         "open": 13,
         "closed": 209
+      },
+      "Sat": {
+        "total": 168,
+        "open": 6,
+        "closed": 162
       }
     },
     "parks": {
@@ -960,6 +960,16 @@
       }
     },
     "bicycle": {
+      "Thu": {
+        "total": 33,
+        "open": 14,
+        "closed": 19
+      },
+      "Tue": {
+        "total": 36,
+        "open": 13,
+        "closed": 23
+      },
       "Mon": {
         "total": 38,
         "open": 12,
@@ -975,20 +985,10 @@
         "open": 14,
         "closed": 22
       },
-      "Thu": {
-        "total": 33,
-        "open": 14,
-        "closed": 19
-      },
       "Wed": {
         "total": 35,
         "open": 10,
         "closed": 25
-      },
-      "Tue": {
-        "total": 36,
-        "open": 13,
-        "closed": 23
       },
       "Sun": {
         "total": 21,

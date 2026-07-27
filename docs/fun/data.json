@@ -1,5 +1,5 @@
 {
-  "updated": "2026-07-20T18:57:10.916633+00:00",
+  "updated": "2026-07-27T14:39:16.848717+00:00",
   "bars": {
     "top10": [
       {
@@ -67,22 +67,22 @@
         "pct": 12.6
       },
       {
+        "name": "Texas Roadhouse",
+        "address": "9300 S Interstate 35 Bldg F",
+        "delta": 24342.0,
+        "pct": 30.1
+      },
+      {
         "name": "University Housing And Dining At Texas Unions",
         "address": "2301 Guadalupe St",
         "delta": 20120.0,
         "pct": 317.5
       },
       {
-        "name": "Lavaca Street Bar",
-        "address": "405 Lavaca St",
-        "delta": 17567.0,
-        "pct": 8.1
-      },
-      {
-        "name": "Fast Eddie's",
-        "address": "13945 N Highway 183 # 122",
-        "delta": 15198.0,
-        "pct": 24.1
+        "name": "El Naranjo Restaurant",
+        "address": "2717 S Lamar Blvd Apt 1085",
+        "delta": 17453.0,
+        "pct": 55.1
       }
     ],
     "curDate": "2026-06-30",
@@ -91,15 +91,15 @@
     "prevLabel": "May 2026"
   },
   "coyotes": {
-    "total": 94,
+    "total": 87,
     "pupping": 0,
     "puppingPct": 0,
     "isPeak": false,
     "months": [
       {
         "label": "Oct 2025",
-        "count": 19,
-        "pct": 51,
+        "count": 23,
+        "pct": 62,
         "isPupping": false
       },
       {
@@ -116,24 +116,31 @@
       },
       {
         "label": "Jul 2025",
-        "count": 14,
-        "pct": 38,
+        "count": 3,
+        "pct": 8,
         "isPupping": false
       }
     ]
   },
   "graffiti": {
-    "total": 100,
-    "uniqueLocations": 96,
+    "total": 292,
+    "uniqueLocations": 279,
     "repeatRate": 4,
     "winner": {
-      "address": "1130 W 6th St",
+      "address": "1914 Barton Springs Rd",
       "count": 2,
       "status": "\u2705 Cleaned",
-      "lat": 30.27283761,
-      "lon": -97.75692741
+      "lat": 30.265521127215315,
+      "lon": -97.76421798921788
     },
     "top15": [
+      {
+        "address": "1914 Barton Springs Rd",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.265521127215315,
+        "lon": -97.76421798921788
+      },
       {
         "address": "1130 W 6th St",
         "count": 2,
@@ -163,198 +170,212 @@
         "lon": -97.75381259281956
       },
       {
-        "address": "1315 Robert Browning St",
-        "count": 1,
+        "address": "8618 N Mopac Expy Svrd Sb",
+        "count": 2,
         "status": "\u2705 Cleaned",
-        "lat": 30.30174389288818,
-        "lon": -97.70911880784786
+        "lat": 30.373685692764564,
+        "lon": -97.74088304489851
       },
       {
-        "address": "1313 Fairwood Rd",
-        "count": 1,
+        "address": "12100 Metric Blvd",
+        "count": 2,
         "status": "\u2705 Cleaned",
-        "lat": 30.301201574468976,
-        "lon": -97.71162564842524
+        "lat": 30.405911544363924,
+        "lon": -97.69790332764387
       },
       {
-        "address": "4419 Rowood Rd",
-        "count": 1,
+        "address": "5377 Freidrich Ln",
+        "count": 2,
         "status": "\u2705 Cleaned",
-        "lat": 30.299541324375703,
-        "lon": -97.70962297610049
+        "lat": 30.200508370753546,
+        "lon": -97.75606401264668
       },
       {
-        "address": "1011 San Jacinto Blvd",
-        "count": 1,
+        "address": "7400 Latta Dr",
+        "count": 2,
         "status": "\u2705 Cleaned",
-        "lat": 30.27177212,
-        "lon": -97.73851915
+        "lat": 30.21603432,
+        "lon": -97.84881985
       },
       {
-        "address": "540 E Riverside Dr",
-        "count": 1,
+        "address": "5943 Highland Hills Dr",
+        "count": 2,
         "status": "\u2705 Cleaned",
-        "lat": 30.252369675254563,
-        "lon": -97.74212198559887
+        "lat": 30.34554232336132,
+        "lon": -97.75748960673809
       },
       {
-        "address": "606 Blanco St",
-        "count": 1,
+        "address": "6100 Arroyo Seco",
+        "count": 2,
         "status": "\u2705 Cleaned",
-        "lat": 30.273141,
-        "lon": -97.75708221
+        "lat": 30.33390742,
+        "lon": -97.73391164
       },
       {
-        "address": "1204 W 6th St",
-        "count": 1,
+        "address": "6600 Arroyo Seco",
+        "count": 2,
         "status": "\u2705 Cleaned",
-        "lat": 30.27310838,
-        "lon": -97.75751289
+        "lat": 30.33872317,
+        "lon": -97.73136755
       },
       {
-        "address": "301 Jessie St",
-        "count": 1,
+        "address": "3421 Pecos St",
+        "count": 2,
         "status": "\u2705 Cleaned",
-        "lat": 30.26330583790488,
-        "lon": -97.7588010855729
+        "lat": 30.312813638748608,
+        "lon": -97.76726391653995
       },
       {
-        "address": "4537 Guadalupe St",
+        "address": "4410 Avenue C",
         "count": 1,
         "status": "\u2705 Cleaned",
-        "lat": 30.312337375755337,
-        "lon": -97.73186579346657
+        "lat": 30.307258504575582,
+        "lon": -97.72691930604827
       },
       {
-        "address": "4414 Avenue D",
+        "address": "806 Edgecliff Ter",
         "count": 1,
         "status": "\u2705 Cleaned",
-        "lat": 30.309173751119115,
-        "lon": -97.72967711091042
-      },
-      {
-        "address": "4514 Avenue F",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.309331500603708,
-        "lon": -97.72683966904879
+        "lat": 30.251231562646925,
+        "lon": -97.73973170667887
       }
     ]
   },
   "parking": {
-    "total": 100,
+    "total": 300,
     "peakHour": "4pm",
-    "peakCount": 20,
+    "peakCount": 37,
     "hours": [
+      {
+        "hour": 0,
+        "label": "12am",
+        "count": 1,
+        "pct": 3,
+        "isPeak": false
+      },
+      {
+        "hour": 6,
+        "label": "6am",
+        "count": 2,
+        "pct": 5,
+        "isPeak": false
+      },
       {
         "hour": 7,
         "label": "7am",
-        "count": 6,
-        "pct": 30,
+        "count": 17,
+        "pct": 46,
         "isPeak": false
       },
       {
         "hour": 8,
         "label": "8am",
-        "count": 6,
-        "pct": 30,
+        "count": 21,
+        "pct": 57,
         "isPeak": false
       },
       {
         "hour": 9,
         "label": "9am",
-        "count": 3,
-        "pct": 15,
+        "count": 19,
+        "pct": 51,
         "isPeak": false
       },
       {
         "hour": 10,
         "label": "10am",
-        "count": 4,
-        "pct": 20,
+        "count": 20,
+        "pct": 54,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
-        "count": 7,
-        "pct": 35,
+        "count": 22,
+        "pct": 59,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
-        "count": 7,
-        "pct": 35,
+        "count": 19,
+        "pct": 51,
         "isPeak": false
       },
       {
         "hour": 13,
         "label": "1pm",
-        "count": 10,
-        "pct": 50,
+        "count": 17,
+        "pct": 46,
         "isPeak": false
       },
       {
         "hour": 14,
         "label": "2pm",
-        "count": 7,
-        "pct": 35,
+        "count": 12,
+        "pct": 32,
         "isPeak": false
       },
       {
         "hour": 15,
         "label": "3pm",
-        "count": 6,
+        "count": 11,
         "pct": 30,
         "isPeak": false
       },
       {
         "hour": 16,
         "label": "4pm",
-        "count": 20,
+        "count": 37,
         "pct": 100,
         "isPeak": true
       },
       {
         "hour": 17,
         "label": "5pm",
-        "count": 5,
-        "pct": 25,
+        "count": 26,
+        "pct": 70,
         "isPeak": false
       },
       {
         "hour": 18,
         "label": "6pm",
-        "count": 4,
-        "pct": 20,
+        "count": 18,
+        "pct": 49,
         "isPeak": false
       },
       {
         "hour": 19,
         "label": "7pm",
-        "count": 5,
-        "pct": 25,
+        "count": 33,
+        "pct": 89,
         "isPeak": false
       },
       {
         "hour": 20,
         "label": "8pm",
-        "count": 2,
-        "pct": 10,
+        "count": 6,
+        "pct": 16,
         "isPeak": false
       },
       {
         "hour": 21,
         "label": "9pm",
-        "count": 7,
-        "pct": 35,
+        "count": 9,
+        "pct": 24,
         "isPeak": false
       },
       {
         "hour": 22,
         "label": "10pm",
-        "count": 1,
+        "count": 8,
+        "pct": 22,
+        "isPeak": false
+      },
+      {
+        "hour": 23,
+        "label": "11pm",
+        "count": 2,
         "pct": 5,
         "isPeak": false
       }
@@ -362,84 +383,84 @@
     "violationTypes": [
       {
         "type": "Other",
-        "count": 20,
+        "count": 72,
         "pct": 100
       },
       {
-        "type": "No Parking Zone",
-        "count": 8,
-        "pct": 40
-      },
-      {
         "type": "Sidewalk",
-        "count": 8,
-        "pct": 40
-      },
-      {
-        "type": "Fire Lane",
-        "count": 3,
-        "pct": 15
-      },
-      {
-        "type": "Bike Lane",
-        "count": 2,
-        "pct": 10
+        "count": 23,
+        "pct": 32
       },
       {
         "type": "Oversized Vehicle",
-        "count": 2,
-        "pct": 10
+        "count": 22,
+        "pct": 31
+      },
+      {
+        "type": "No Parking Zone",
+        "count": 16,
+        "pct": 22
+      },
+      {
+        "type": "Bike Lane",
+        "count": 11,
+        "pct": 15
+      },
+      {
+        "type": "Fire Hydrant",
+        "count": 9,
+        "pct": 12
       },
       {
         "type": "Driveway",
-        "count": 2,
-        "pct": 10
+        "count": 6,
+        "pct": 8
       },
       {
-        "type": "Crosswalk",
-        "count": 1,
-        "pct": 5
+        "type": "Blocking",
+        "count": 5,
+        "pct": 7
       }
     ]
   },
   "graffitiSpeedrun": {
-    "totalClosed": 100,
-    "avgDays": 164.6,
-    "medianDays": 227.9,
+    "totalClosed": 292,
+    "avgDays": 62.0,
+    "medianDays": 4.1,
     "fastestDays": [
+      0.0,
+      0.0,
+      0.0,
       0.1,
-      1.1,
-      1.7,
-      1.8,
-      2.8
+      0.1
     ],
     "buckets": {
       "under1h": {
-        "count": 0,
+        "count": 3,
         "label": "Under 1 hour"
       },
       "1hTo6h": {
-        "count": 1,
+        "count": 17,
         "label": "1\u20136 hours"
       },
       "6hTo24h": {
-        "count": 0,
+        "count": 36,
         "label": "6\u201324 hours"
       },
       "1dTo3d": {
-        "count": 5,
+        "count": 60,
         "label": "1\u20133 days"
       },
       "3dTo7d": {
-        "count": 13,
+        "count": 65,
         "label": "3\u20137 days"
       },
       "7dTo30d": {
-        "count": 15,
+        "count": 39,
         "label": "7\u201330 days"
       },
       "over30d": {
-        "count": 66,
+        "count": 72,
         "label": "Over 30 days"
       }
     },
