@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-01T13:12:38.189861+00:00",
+  "generated": "2026-08-02T13:14:53.087265+00:00",
   "days": {
     "2025-05-01": {
       "parking": {
@@ -18552,9 +18552,9 @@
         "total": 12
       },
       "graffiti": {
-        "open": 2,
-        "closed": 0,
-        "total": 2
+        "open": 5,
+        "closed": 3,
+        "total": 8
       },
       "parks": {
         "open": 9,
@@ -18588,6 +18588,11 @@
         "closed": 2,
         "total": 2
       },
+      "graffiti": {
+        "open": 0,
+        "closed": 2,
+        "total": 2
+      },
       "storm": {
         "open": 3,
         "closed": 14,
@@ -18609,6 +18614,11 @@
         "open": 0,
         "closed": 7,
         "total": 7
+      },
+      "graffiti": {
+        "open": 6,
+        "closed": 0,
+        "total": 6
       },
       "storm": {
         "open": 9,
@@ -18637,6 +18647,11 @@
         "closed": 0,
         "total": 1
       },
+      "graffiti": {
+        "open": 4,
+        "closed": 0,
+        "total": 4
+      },
       "storm": {
         "open": 1,
         "closed": 0,
@@ -18652,75 +18667,89 @@
         "closed": 0,
         "total": 1
       }
+    },
+    "2026-07-31": {
+      "graffiti": {
+        "open": 2,
+        "closed": 0,
+        "total": 2
+      }
+    },
+    "2026-08-01": {
+      "graffiti": {
+        "open": 4,
+        "closed": 0,
+        "total": 4
+      }
     }
   },
   "totals_90d": {
     "homeless": {
       "open": 13,
-      "closed": 561,
-      "total": 574
+      "closed": 557,
+      "total": 570
     },
     "parking": {
       "open": 132,
-      "closed": 6011,
-      "total": 6143
+      "closed": 5929,
+      "total": 6061
     },
     "noise": {
       "open": 16,
-      "closed": 1119,
-      "total": 1135
+      "closed": 1107,
+      "total": 1123
     },
     "animal": {
-      "open": 1387,
-      "closed": 2633,
-      "total": 4020
+      "open": 1380,
+      "closed": 2594,
+      "total": 3974
     },
     "graffiti": {
-      "open": 97,
-      "closed": 109,
-      "total": 206
+      "open": 116,
+      "closed": 113,
+      "total": 229
     },
     "parks": {
-      "open": 630,
-      "closed": 1251,
-      "total": 1881
+      "open": 629,
+      "closed": 1227,
+      "total": 1856
     },
     "storm": {
       "open": 69,
-      "closed": 1090,
-      "total": 1159
+      "closed": 1082,
+      "total": 1151
     },
     "traffic": {
-      "open": 2438,
-      "closed": 9260,
-      "total": 11698
+      "open": 2433,
+      "closed": 9160,
+      "total": 11593
     },
     "bicycle": {
-      "open": 63,
-      "closed": 55,
-      "total": 118
+      "open": 62,
+      "closed": 54,
+      "total": 116
     },
     "dead_animal": {
       "open": 41,
-      "closed": 1511,
-      "total": 1552
+      "closed": 1491,
+      "total": 1532
     }
   },
   "totals_365d": {
     "homeless": {
       "open": 28,
-      "closed": 1864,
-      "total": 1892
+      "closed": 1861,
+      "total": 1889
     },
     "parking": {
       "open": 132,
-      "closed": 21932,
-      "total": 22064
+      "closed": 21861,
+      "total": 21993
     },
     "noise": {
       "open": 16,
-      "closed": 6638,
-      "total": 6654
+      "closed": 6628,
+      "total": 6644
     },
     "animal": {
       "open": 1490,
@@ -18728,9 +18757,9 @@
       "total": 4838
     },
     "graffiti": {
-      "open": 102,
-      "closed": 994,
-      "total": 1096
+      "open": 121,
+      "closed": 995,
+      "total": 1116
     },
     "parks": {
       "open": 861,
@@ -18739,13 +18768,13 @@
     },
     "storm": {
       "open": 69,
-      "closed": 3594,
-      "total": 3663
+      "closed": 3579,
+      "total": 3648
     },
     "traffic": {
       "open": 2751,
-      "closed": 15850,
-      "total": 18601
+      "closed": 15843,
+      "total": 18594
     },
     "bicycle": {
       "open": 75,
@@ -18754,8 +18783,8 @@
     },
     "dead_animal": {
       "open": 42,
-      "closed": 6357,
-      "total": 6399
+      "closed": 6330,
+      "total": 6372
     }
   }
 }
