@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-03T14:36:59.062297+00:00",
+  "generated": "2026-08-03T14:45:28.020352+00:00",
   "months": {
     "2025-05": {
       "homeless": {
@@ -611,9 +611,9 @@
     },
     "2026-07": {
       "homeless": {
-        "total": 157,
+        "total": 164,
         "open": 12,
-        "closed": 145
+        "closed": 152
       },
       "parking": {
         "total": 2185,
@@ -662,6 +662,11 @@
       }
     },
     "2026-08": {
+      "homeless": {
+        "total": 2,
+        "open": 0,
+        "closed": 2
+      },
       "parking": {
         "total": 191,
         "open": 15,
@@ -691,15 +696,25 @@
   },
   "day_of_week": {
     "homeless": {
+      "Sat": {
+        "total": 227,
+        "open": 5,
+        "closed": 222
+      },
+      "Fri": {
+        "total": 266,
+        "open": 6,
+        "closed": 260
+      },
       "Thu": {
-        "total": 281,
+        "total": 282,
         "open": 4,
-        "closed": 277
+        "closed": 278
       },
       "Wed": {
-        "total": 296,
+        "total": 298,
         "open": 3,
-        "closed": 293
+        "closed": 295
       },
       "Tue": {
         "total": 325,
@@ -707,24 +722,14 @@
         "closed": 321
       },
       "Mon": {
-        "total": 341,
+        "total": 344,
         "open": 4,
-        "closed": 337
+        "closed": 340
       },
       "Sun": {
         "total": 211,
         "open": 2,
         "closed": 209
-      },
-      "Sat": {
-        "total": 225,
-        "open": 5,
-        "closed": 220
-      },
-      "Fri": {
-        "total": 265,
-        "open": 6,
-        "closed": 259
       }
     },
     "parking": {
