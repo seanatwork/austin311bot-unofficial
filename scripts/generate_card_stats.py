@@ -65,15 +65,20 @@ def _isoformat_z(dt: datetime) -> str:
     return dt.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
-def _fetch_code_counts(service_code: str) -> dict:
-    """Fetch open and total counts for a single service code (last 90 days)."""
-    now = _utc_now()
-    start = now - timedelta(days=DAYS_BACK)
+def _fetch_window_counts(service_code: str, start: datetime, end: datetime) -> dict:
+    """Fetch open and total counts for a service code within [start, end).
+
+    The Open311 API returns oldest records first, so a high-volume code can
+    exceed MAX_PAGES * PER_PAGE records in a window and silently truncate —
+    recent (typically open) tickets are never seen. When a window is
+    truncated, split it in half recursively until it fits under the cap.
+    """
     start_str = _isoformat_z(start)
-    end_str = _isoformat_z(now)
+    end_str = _isoformat_z(end)
 
     open_count = 0
     total_count = 0
+    truncated = False
 
     session = _get_session()
     token = os.getenv("AUSTINAPIKEY", "")
@@ -106,9 +111,26 @@ def _fetch_code_counts(service_code: str) -> dict:
 
         if len(records) < PER_PAGE:
             break
+        if page == MAX_PAGES:
+            truncated = True
         time.sleep(0.5)
 
+    if truncated and (end - start) > timedelta(days=1):
+        mid = start + (end - start) / 2
+        first = _fetch_window_counts(service_code, start, mid)
+        second = _fetch_window_counts(service_code, mid, end)
+        return {
+            "open": first["open"] + second["open"],
+            "total": first["total"] + second["total"],
+        }
+
     return {"open": open_count, "total": total_count}
+
+
+def _fetch_code_counts(service_code: str) -> dict:
+    """Fetch open and total counts for a single service code (last 90 days)."""
+    now = _utc_now()
+    return _fetch_window_counts(service_code, now - timedelta(days=DAYS_BACK), now)
 
 
 def main() -> None:
