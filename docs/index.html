@@ -184,18 +184,41 @@
       gap: 0.6rem;
       flex-wrap: wrap;
     }
-    header .subtitle .atx-badge {
-      display: inline-flex;
+    header .ticket-lookup {
+      display: flex;
       align-items: center;
+      justify-content: center;
       gap: 0.3rem;
       background: var(--btn-bg);
       border: 1px solid var(--btn-border);
       border-radius: 999px;
+      padding: 2px 4px 2px 10px;
+      margin: 0.75rem auto 0;
+      width: fit-content;
+    }
+    header .ticket-lookup input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--btn-color);
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      width: 11.5em;
+    }
+    header .ticket-lookup input::placeholder {
+      color: var(--btn-color);
+      opacity: 0.6;
+    }
+    header .ticket-lookup button {
+      background: var(--btn-color);
+      color: var(--btn-bg);
+      border: none;
+      border-radius: 999px;
       padding: 2px 10px;
       font-size: 0.7rem;
       font-weight: 600;
-      color: var(--btn-color);
-      letter-spacing: 0.02em;
+      cursor: pointer;
     }
 
     /* ── "311 Near You" search hero ── */
@@ -668,7 +691,11 @@
 
   <header>
     <h1>Austin 311</h1>
-    <p class="subtitle">Real data on what your city is doing — and what it isn't. <span class="atx-badge">🎵 Live Music Capital</span></p>
+    <p class="subtitle">Real data on what your city is doing — and what it isn't.</p>
+    <form class="ticket-lookup" id="ticket-lookup">
+      <input type="text" id="ticket-number" placeholder="Track a ticket: 26-00253825" aria-label="311 ticket number" autocomplete="off" spellcheck="false">
+      <button type="submit">Look up</button>
+    </form>
   </header>
 
   <!-- ── Ask the data (hidden until feature is fully working) ── -->
@@ -944,6 +971,20 @@
   </footer>
 
   <script>
+    // Ticket lookup: paste a 311 ticket number (e.g. 26-00253825) and jump to the city's ticket page
+    document.getElementById("ticket-lookup").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const input = document.getElementById("ticket-number");
+      const ticket = input.value.trim();
+      if (!/^\d{2}-\d{8}$/.test(ticket)) {
+        input.setCustomValidity("Enter a ticket number like 26-00253825");
+        input.reportValidity();
+        return;
+      }
+      input.setCustomValidity("");
+      window.open("https://311.austintexas.gov/tickets/" + ticket, "_blank", "noopener");
+    });
+
     function toggleMore() {
       const grid  = document.getElementById("more-grid");
       const btn   = document.getElementById("more-btn");
