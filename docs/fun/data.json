@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-03T14:43:28.111469+00:00",
+  "updated": "2026-08-10T13:13:33.496278+00:00",
   "bars": {
     "top10": [
       {
@@ -91,15 +91,15 @@
     "prevLabel": "May 2026"
   },
   "coyotes": {
-    "total": 96,
+    "total": 103,
     "pupping": 0,
     "puppingPct": 0,
     "isPeak": false,
     "months": [
       {
         "label": "Nov 2025",
-        "count": 2,
-        "pct": 5,
+        "count": 13,
+        "pct": 35,
         "isPupping": false
       },
       {
@@ -116,15 +116,15 @@
       },
       {
         "label": "Aug 2025",
-        "count": 23,
-        "pct": 62,
+        "count": 19,
+        "pct": 51,
         "isPupping": false
       }
     ]
   },
   "graffiti": {
-    "total": 272,
-    "uniqueLocations": 261,
+    "total": 269,
+    "uniqueLocations": 259,
     "repeatRate": 4,
     "winner": {
       "address": "1130 W 6th St",
@@ -154,13 +154,6 @@
         "status": "\u2705 Cleaned",
         "lat": 30.265929528632192,
         "lon": -97.75354125628412
-      },
-      {
-        "address": "901 Barton Springs Rd",
-        "count": 2,
-        "status": "\u2705 Cleaned",
-        "lat": 30.259455155298248,
-        "lon": -97.75381259281956
       },
       {
         "address": "2006 S 6th St",
@@ -219,43 +212,43 @@
         "lon": -97.72691930604827
       },
       {
-        "address": "201 Dawson Rd",
+        "address": "825 W 6th St",
         "count": 1,
         "status": "\u2705 Cleaned",
-        "lat": 30.26189995814963,
-        "lon": -97.75509770213391
+        "lat": 30.27046763,
+        "lon": -97.75179135
       },
       {
-        "address": "806 Edgecliff Ter",
+        "address": "2017 Philomena St",
         "count": 1,
         "status": "\u2705 Cleaned",
-        "lat": 30.251231562646925,
-        "lon": -97.73973170667887
+        "lat": 30.299768499037626,
+        "lon": -97.7024706448186
       },
       {
-        "address": "4400 Duval St",
+        "address": "3704 Speedway",
         "count": 1,
         "status": "\u2705 Cleaned",
-        "lat": 30.30600261,
-        "lon": -97.72553757
+        "lat": 30.30030705,
+        "lon": -97.7340726
+      },
+      {
+        "address": "3001 Harris Park Ave",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.290777671365976,
+        "lon": -97.73132975700628
       }
     ]
   },
   "parking": {
     "total": 300,
-    "peakHour": "8pm",
-    "peakCount": 32,
+    "peakHour": "4pm",
+    "peakCount": 29,
     "hours": [
       {
-        "hour": 0,
-        "label": "12am",
-        "count": 1,
-        "pct": 3,
-        "isPeak": false
-      },
-      {
-        "hour": 1,
-        "label": "1am",
+        "hour": 5,
+        "label": "5am",
         "count": 1,
         "pct": 3,
         "isPeak": false
@@ -263,187 +256,187 @@
       {
         "hour": 6,
         "label": "6am",
-        "count": 3,
-        "pct": 9,
+        "count": 2,
+        "pct": 7,
         "isPeak": false
       },
       {
         "hour": 7,
         "label": "7am",
-        "count": 16,
-        "pct": 50,
+        "count": 18,
+        "pct": 62,
         "isPeak": false
       },
       {
         "hour": 8,
         "label": "8am",
-        "count": 16,
-        "pct": 50,
+        "count": 18,
+        "pct": 62,
         "isPeak": false
       },
       {
         "hour": 9,
         "label": "9am",
-        "count": 18,
-        "pct": 56,
+        "count": 19,
+        "pct": 66,
         "isPeak": false
       },
       {
         "hour": 10,
         "label": "10am",
-        "count": 26,
-        "pct": 81,
+        "count": 18,
+        "pct": 62,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
-        "count": 10,
-        "pct": 31,
+        "count": 20,
+        "pct": 69,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
-        "count": 20,
-        "pct": 62,
+        "count": 16,
+        "pct": 55,
         "isPeak": false
       },
       {
         "hour": 13,
         "label": "1pm",
-        "count": 20,
+        "count": 18,
         "pct": 62,
         "isPeak": false
       },
       {
         "hour": 14,
         "label": "2pm",
-        "count": 20,
-        "pct": 62,
+        "count": 11,
+        "pct": 38,
         "isPeak": false
       },
       {
         "hour": 15,
         "label": "3pm",
-        "count": 14,
-        "pct": 44,
+        "count": 18,
+        "pct": 62,
         "isPeak": false
       },
       {
         "hour": 16,
         "label": "4pm",
-        "count": 30,
-        "pct": 94,
-        "isPeak": false
+        "count": 29,
+        "pct": 100,
+        "isPeak": true
       },
       {
         "hour": 17,
         "label": "5pm",
-        "count": 21,
-        "pct": 66,
+        "count": 23,
+        "pct": 79,
         "isPeak": false
       },
       {
         "hour": 18,
         "label": "6pm",
-        "count": 22,
-        "pct": 69,
+        "count": 27,
+        "pct": 93,
         "isPeak": false
       },
       {
         "hour": 19,
         "label": "7pm",
-        "count": 18,
-        "pct": 56,
+        "count": 21,
+        "pct": 72,
         "isPeak": false
       },
       {
         "hour": 20,
         "label": "8pm",
-        "count": 32,
-        "pct": 100,
-        "isPeak": true
+        "count": 24,
+        "pct": 83,
+        "isPeak": false
       },
       {
         "hour": 21,
         "label": "9pm",
-        "count": 6,
-        "pct": 19,
+        "count": 14,
+        "pct": 48,
         "isPeak": false
       },
       {
         "hour": 22,
         "label": "10pm",
-        "count": 3,
-        "pct": 9,
+        "count": 1,
+        "pct": 3,
         "isPeak": false
       },
       {
         "hour": 23,
         "label": "11pm",
-        "count": 3,
-        "pct": 9,
+        "count": 2,
+        "pct": 7,
         "isPeak": false
       }
     ],
     "violationTypes": [
       {
         "type": "Other",
-        "count": 66,
+        "count": 55,
         "pct": 100
       },
       {
-        "type": "Oversized Vehicle",
-        "count": 20,
-        "pct": 30
-      },
-      {
         "type": "Sidewalk",
-        "count": 17,
-        "pct": 26
-      },
-      {
-        "type": "Bike Lane",
-        "count": 16,
-        "pct": 24
+        "count": 40,
+        "pct": 73
       },
       {
         "type": "No Parking Zone",
-        "count": 14,
-        "pct": 21
+        "count": 18,
+        "pct": 33
       },
       {
-        "type": "Fire Hydrant",
-        "count": 9,
-        "pct": 14
+        "type": "Oversized Vehicle",
+        "count": 16,
+        "pct": 29
       },
       {
-        "type": "Driveway",
-        "count": 6,
-        "pct": 9
+        "type": "Bike Lane",
+        "count": 13,
+        "pct": 24
       },
       {
-        "type": "Blocking",
-        "count": 6,
-        "pct": 9
+        "type": "Abandoned",
+        "count": 8,
+        "pct": 15
+      },
+      {
+        "type": "Handicap",
+        "count": 8,
+        "pct": 15
+      },
+      {
+        "type": "Tow Zone",
+        "count": 4,
+        "pct": 7
       }
     ]
   },
   "graffitiSpeedrun": {
-    "totalClosed": 272,
-    "avgDays": 62.7,
+    "totalClosed": 269,
+    "avgDays": 65.6,
     "medianDays": 4.1,
     "fastestDays": [
       0.0,
-      0.0,
+      0.1,
       0.1,
       0.1,
       0.1
     ],
     "buckets": {
       "under1h": {
-        "count": 2,
+        "count": 1,
         "label": "Under 1 hour"
       },
       "1hTo6h": {
@@ -451,23 +444,23 @@
         "label": "1\u20136 hours"
       },
       "6hTo24h": {
-        "count": 28,
+        "count": 29,
         "label": "6\u201324 hours"
       },
       "1dTo3d": {
-        "count": 59,
+        "count": 57,
         "label": "1\u20133 days"
       },
       "3dTo7d": {
-        "count": 61,
+        "count": 57,
         "label": "3\u20137 days"
       },
       "7dTo30d": {
-        "count": 36,
+        "count": 35,
         "label": "7\u201330 days"
       },
       "over30d": {
-        "count": 70,
+        "count": 74,
         "label": "Over 30 days"
       }
     },
