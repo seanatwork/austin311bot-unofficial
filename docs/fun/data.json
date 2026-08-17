@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-10T13:13:33.496278+00:00",
+  "updated": "2026-08-17T12:49:51.425585+00:00",
   "bars": {
     "top10": [
       {
@@ -91,15 +91,15 @@
     "prevLabel": "May 2026"
   },
   "coyotes": {
-    "total": 103,
+    "total": 98,
     "pupping": 0,
     "puppingPct": 0,
     "isPeak": false,
     "months": [
       {
         "label": "Nov 2025",
-        "count": 13,
-        "pct": 35,
+        "count": 16,
+        "pct": 43,
         "isPupping": false
       },
       {
@@ -116,16 +116,16 @@
       },
       {
         "label": "Aug 2025",
-        "count": 19,
-        "pct": 51,
+        "count": 11,
+        "pct": 30,
         "isPupping": false
       }
     ]
   },
   "graffiti": {
-    "total": 269,
+    "total": 266,
     "uniqueLocations": 259,
-    "repeatRate": 4,
+    "repeatRate": 3,
     "winner": {
       "address": "1130 W 6th St",
       "count": 2,
@@ -184,27 +184,6 @@
         "lon": -97.75606401264668
       },
       {
-        "address": "7400 Latta Dr",
-        "count": 2,
-        "status": "\u2705 Cleaned",
-        "lat": 30.21603432,
-        "lon": -97.84881985
-      },
-      {
-        "address": "5943 Highland Hills Dr",
-        "count": 2,
-        "status": "\u2705 Cleaned",
-        "lat": 30.34554232336132,
-        "lon": -97.75748960673809
-      },
-      {
-        "address": "6100 Arroyo Seco",
-        "count": 2,
-        "status": "\u2705 Cleaned",
-        "lat": 30.33390742,
-        "lon": -97.73391164
-      },
-      {
         "address": "4410 Avenue C",
         "count": 1,
         "status": "\u2705 Cleaned",
@@ -212,223 +191,251 @@
         "lon": -97.72691930604827
       },
       {
+        "address": "301 W Riverside Dr",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.258198119702822,
+        "lon": -97.74875700473785
+      },
+      {
+        "address": "Leon St & W 23rd St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.28730158,
+        "lon": -97.74943252
+      },
+      {
+        "address": "Music Ln & Academy Dr",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.25199192,
+        "lon": -97.74822105
+      },
+      {
+        "address": "219 S Lamar Blvd Nb",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.262949820693034,
+        "lon": -97.75754236160624
+      },
+      {
+        "address": "213 E 4th St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.26554497790557,
+        "lon": -97.74140942841768
+      },
+      {
+        "address": "821 W 6th St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.270544663278432,
+        "lon": -97.75141368733622
+      },
+      {
         "address": "825 W 6th St",
         "count": 1,
         "status": "\u2705 Cleaned",
         "lat": 30.27046763,
         "lon": -97.75179135
-      },
-      {
-        "address": "2017 Philomena St",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.299768499037626,
-        "lon": -97.7024706448186
-      },
-      {
-        "address": "3704 Speedway",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.30030705,
-        "lon": -97.7340726
-      },
-      {
-        "address": "3001 Harris Park Ave",
-        "count": 1,
-        "status": "\u2705 Cleaned",
-        "lat": 30.290777671365976,
-        "lon": -97.73132975700628
       }
     ]
   },
   "parking": {
     "total": 300,
     "peakHour": "4pm",
-    "peakCount": 29,
+    "peakCount": 36,
     "hours": [
       {
-        "hour": 5,
-        "label": "5am",
+        "hour": 0,
+        "label": "12am",
+        "count": 2,
+        "pct": 6,
+        "isPeak": false
+      },
+      {
+        "hour": 1,
+        "label": "1am",
+        "count": 2,
+        "pct": 6,
+        "isPeak": false
+      },
+      {
+        "hour": 2,
+        "label": "2am",
         "count": 1,
         "pct": 3,
         "isPeak": false
       },
       {
-        "hour": 6,
-        "label": "6am",
-        "count": 2,
-        "pct": 7,
-        "isPeak": false
-      },
-      {
         "hour": 7,
         "label": "7am",
-        "count": 18,
-        "pct": 62,
+        "count": 19,
+        "pct": 53,
         "isPeak": false
       },
       {
         "hour": 8,
         "label": "8am",
-        "count": 18,
-        "pct": 62,
+        "count": 13,
+        "pct": 36,
         "isPeak": false
       },
       {
         "hour": 9,
         "label": "9am",
-        "count": 19,
-        "pct": 66,
+        "count": 11,
+        "pct": 31,
         "isPeak": false
       },
       {
         "hour": 10,
         "label": "10am",
-        "count": 18,
-        "pct": 62,
+        "count": 27,
+        "pct": 75,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
-        "count": 20,
-        "pct": 69,
+        "count": 22,
+        "pct": 61,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
-        "count": 16,
-        "pct": 55,
+        "count": 15,
+        "pct": 42,
         "isPeak": false
       },
       {
         "hour": 13,
         "label": "1pm",
-        "count": 18,
-        "pct": 62,
+        "count": 10,
+        "pct": 28,
         "isPeak": false
       },
       {
         "hour": 14,
         "label": "2pm",
-        "count": 11,
-        "pct": 38,
+        "count": 18,
+        "pct": 50,
         "isPeak": false
       },
       {
         "hour": 15,
         "label": "3pm",
-        "count": 18,
-        "pct": 62,
+        "count": 12,
+        "pct": 33,
         "isPeak": false
       },
       {
         "hour": 16,
         "label": "4pm",
-        "count": 29,
+        "count": 36,
         "pct": 100,
         "isPeak": true
       },
       {
         "hour": 17,
         "label": "5pm",
-        "count": 23,
-        "pct": 79,
+        "count": 16,
+        "pct": 44,
         "isPeak": false
       },
       {
         "hour": 18,
         "label": "6pm",
-        "count": 27,
-        "pct": 93,
+        "count": 18,
+        "pct": 50,
         "isPeak": false
       },
       {
         "hour": 19,
         "label": "7pm",
-        "count": 21,
-        "pct": 72,
+        "count": 34,
+        "pct": 94,
         "isPeak": false
       },
       {
         "hour": 20,
         "label": "8pm",
-        "count": 24,
-        "pct": 83,
+        "count": 21,
+        "pct": 58,
         "isPeak": false
       },
       {
         "hour": 21,
         "label": "9pm",
-        "count": 14,
-        "pct": 48,
+        "count": 11,
+        "pct": 31,
         "isPeak": false
       },
       {
         "hour": 22,
         "label": "10pm",
-        "count": 1,
-        "pct": 3,
+        "count": 8,
+        "pct": 22,
         "isPeak": false
       },
       {
         "hour": 23,
         "label": "11pm",
-        "count": 2,
-        "pct": 7,
+        "count": 4,
+        "pct": 11,
         "isPeak": false
       }
     ],
     "violationTypes": [
       {
         "type": "Other",
-        "count": 55,
+        "count": 75,
         "pct": 100
       },
       {
         "type": "Sidewalk",
-        "count": 40,
-        "pct": 73
-      },
-      {
-        "type": "No Parking Zone",
-        "count": 18,
+        "count": 25,
         "pct": 33
       },
       {
-        "type": "Oversized Vehicle",
-        "count": 16,
-        "pct": 29
+        "type": "No Parking Zone",
+        "count": 15,
+        "pct": 20
       },
       {
         "type": "Bike Lane",
-        "count": 13,
-        "pct": 24
+        "count": 14,
+        "pct": 19
+      },
+      {
+        "type": "Oversized Vehicle",
+        "count": 10,
+        "pct": 13
+      },
+      {
+        "type": "Fire Hydrant",
+        "count": 7,
+        "pct": 9
+      },
+      {
+        "type": "Blocking",
+        "count": 6,
+        "pct": 8
       },
       {
         "type": "Abandoned",
-        "count": 8,
-        "pct": 15
-      },
-      {
-        "type": "Handicap",
-        "count": 8,
-        "pct": 15
-      },
-      {
-        "type": "Tow Zone",
-        "count": 4,
+        "count": 5,
         "pct": 7
       }
     ]
   },
   "graffitiSpeedrun": {
-    "totalClosed": 269,
-    "avgDays": 65.6,
-    "medianDays": 4.1,
+    "totalClosed": 266,
+    "avgDays": 67.7,
+    "medianDays": 5.0,
     "fastestDays": [
-      0.0,
+      0.1,
       0.1,
       0.1,
       0.1,
@@ -436,23 +443,23 @@
     ],
     "buckets": {
       "under1h": {
-        "count": 1,
+        "count": 0,
         "label": "Under 1 hour"
       },
       "1hTo6h": {
-        "count": 16,
+        "count": 15,
         "label": "1\u20136 hours"
       },
       "6hTo24h": {
-        "count": 29,
+        "count": 28,
         "label": "6\u201324 hours"
       },
       "1dTo3d": {
-        "count": 57,
+        "count": 56,
         "label": "1\u20133 days"
       },
       "3dTo7d": {
-        "count": 57,
+        "count": 54,
         "label": "3\u20137 days"
       },
       "7dTo30d": {
@@ -460,7 +467,7 @@
         "label": "7\u201330 days"
       },
       "over30d": {
-        "count": 74,
+        "count": 78,
         "label": "Over 30 days"
       }
     },
