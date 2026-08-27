@@ -400,7 +400,7 @@ years.forEach(y => {{
 }});
 
 const map = L.map("map", {{ zoomControl: true }}).setView([30.27, -97.74], 12);
-L.tileLayer("https://{{s}}.basemaps.cartocdn.com/light_all/{{z}}/{{x}}/{{y}}{{r}}.png", {{
+L.tileLayer("https://{{s}}.basemaps.cartocdn.com/light_all/{{z}}/{{x}}/{{y}}{{r}}.png?key=cb1_2du8_1_a49e4774820276874a1a5b33", {{
   attribution: "&copy; <a href='https://carto.com/'>CARTO</a>",
   subdomains: "abcd", maxZoom: 19,
 }}).addTo(map);

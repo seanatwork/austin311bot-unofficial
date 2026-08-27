@@ -392,7 +392,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
     var map = L.map('map', { zoomControl: true, attributionControl: false })
       .setView([centerLat, centerLon], 11);
 
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_2du8_1_a49e4774820276874a1a5b33', {
       maxZoom: 19, attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
     }).addTo(map);
 
@@ -575,7 +575,7 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
       map.eachLayer(function(l) {
         if (l instanceof L.TileLayer) {
           map.removeLayer(l);
-          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2du8_1_a49e4774820276874a1a5b33', {
             maxZoom: 19, attribution: '&copy; <a href="https://carto.com/">CARTO</a>'
           }).addTo(map);
         }
@@ -594,8 +594,8 @@ _HTML_TEMPLATE = r"""<!DOCTYPE html>
         if (l instanceof L.TileLayer) {
           map.removeLayer(l);
           var tileUrl = isDark
-            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-            : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_2du8_1_a49e4774820276874a1a5b33'
+            : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_2du8_1_a49e4774820276874a1a5b33';
           L.tileLayer(tileUrl, { maxZoom: 19 }).addTo(map);
         }
       });

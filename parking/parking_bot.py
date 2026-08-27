@@ -700,7 +700,12 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
     counts_js = str(type_bucket_counts).replace("'", '"')
 
     # Create map centered on Austin
-    m = folium.Map(location=[30.2672, -97.7431], zoom_start=11, tiles="CartoDB positron")
+    m = folium.Map(
+        location=[30.2672, -97.7431],
+        zoom_start=11,
+        tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_2du8_1_a49e4774820276874a1a5b33",
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    )
     m.get_root().header.add_child(folium.Element(og_meta_tags("parking")))
 
     # FeatureGroups: open/closed × 30/60/90-day × violation type slug
