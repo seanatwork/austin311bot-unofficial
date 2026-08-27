@@ -1,5 +1,5 @@
 {
-  "updated": "2026-08-24T12:55:13.092864+00:00",
+  "updated": "2026-08-27T22:19:21.510990+00:00",
   "bars": {
     "top10": [
       {
@@ -55,6 +55,18 @@
     ],
     "top5movers": [
       {
+        "name": "Levy At Austin Fc",
+        "address": "10414 Mckalla Pl",
+        "delta": 210632.0,
+        "pct": 702.2
+      },
+      {
+        "name": "The Roosevelt Room & The Eleanor",
+        "address": "307 W 5th St # 307b",
+        "delta": 109696.0,
+        "pct": 65.8
+      },
+      {
         "name": "Mama Lin's Soup And Leaves",
         "address": "13450 N Highway 183 Ste 112",
         "delta": 106321.0,
@@ -71,18 +83,6 @@
         "address": "310 W 2nd St",
         "delta": 73427.0,
         "pct": 28.6
-      },
-      {
-        "name": "75 1/2 Rainey Street",
-        "address": "75 1/2 Rainey St",
-        "delta": 71891.0,
-        "pct": 33.2
-      },
-      {
-        "name": "Matt's El Rancho, Inc.",
-        "address": "2613 S Lamar Blvd",
-        "delta": 62678.0,
-        "pct": 9.8
       }
     ],
     "curDate": "2026-07-31",
@@ -91,33 +91,33 @@
     "prevLabel": "June 2026"
   },
   "coyotes": {
-    "total": 107,
+    "total": 111,
     "pupping": 0,
     "puppingPct": 0,
     "isPeak": false,
     "months": [
       {
         "label": "Nov 2025",
-        "count": 30,
-        "pct": 81,
+        "count": 38,
+        "pct": 100,
         "isPupping": false
       },
       {
         "label": "Oct 2025",
         "count": 34,
-        "pct": 92,
+        "pct": 89,
         "isPupping": false
       },
       {
         "label": "Sep 2025",
         "count": 37,
-        "pct": 100,
+        "pct": 97,
         "isPupping": false
       },
       {
         "label": "Aug 2025",
-        "count": 6,
-        "pct": 16,
+        "count": 2,
+        "pct": 5,
         "isPupping": false
       }
     ]
@@ -243,197 +243,190 @@
   },
   "parking": {
     "total": 300,
-    "peakHour": "4pm",
-    "peakCount": 30,
+    "peakHour": "12pm",
+    "peakCount": 38,
     "hours": [
       {
-        "hour": 0,
-        "label": "12am",
+        "hour": 5,
+        "label": "5am",
         "count": 1,
         "pct": 3,
         "isPeak": false
       },
       {
-        "hour": 1,
-        "label": "1am",
-        "count": 5,
-        "pct": 17,
-        "isPeak": false
-      },
-      {
-        "hour": 3,
-        "label": "3am",
-        "count": 1,
-        "pct": 3,
+        "hour": 6,
+        "label": "6am",
+        "count": 3,
+        "pct": 8,
         "isPeak": false
       },
       {
         "hour": 7,
         "label": "7am",
-        "count": 7,
-        "pct": 23,
+        "count": 6,
+        "pct": 16,
         "isPeak": false
       },
       {
         "hour": 8,
         "label": "8am",
-        "count": 10,
-        "pct": 33,
+        "count": 25,
+        "pct": 66,
         "isPeak": false
       },
       {
         "hour": 9,
         "label": "9am",
-        "count": 15,
+        "count": 19,
         "pct": 50,
         "isPeak": false
       },
       {
         "hour": 10,
         "label": "10am",
-        "count": 29,
-        "pct": 97,
+        "count": 22,
+        "pct": 58,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
-        "count": 29,
-        "pct": 97,
+        "count": 19,
+        "pct": 50,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
-        "count": 17,
-        "pct": 57,
-        "isPeak": false
+        "count": 38,
+        "pct": 100,
+        "isPeak": true
       },
       {
         "hour": 13,
         "label": "1pm",
         "count": 17,
-        "pct": 57,
+        "pct": 45,
         "isPeak": false
       },
       {
         "hour": 14,
         "label": "2pm",
-        "count": 14,
-        "pct": 47,
+        "count": 24,
+        "pct": 63,
         "isPeak": false
       },
       {
         "hour": 15,
         "label": "3pm",
-        "count": 18,
-        "pct": 60,
+        "count": 27,
+        "pct": 71,
         "isPeak": false
       },
       {
         "hour": 16,
         "label": "4pm",
-        "count": 30,
-        "pct": 100,
-        "isPeak": true
+        "count": 23,
+        "pct": 61,
+        "isPeak": false
       },
       {
         "hour": 17,
         "label": "5pm",
-        "count": 27,
-        "pct": 90,
+        "count": 14,
+        "pct": 37,
         "isPeak": false
       },
       {
         "hour": 18,
         "label": "6pm",
-        "count": 22,
-        "pct": 73,
+        "count": 17,
+        "pct": 45,
         "isPeak": false
       },
       {
         "hour": 19,
         "label": "7pm",
-        "count": 18,
-        "pct": 60,
+        "count": 15,
+        "pct": 39,
         "isPeak": false
       },
       {
         "hour": 20,
         "label": "8pm",
-        "count": 22,
-        "pct": 73,
+        "count": 21,
+        "pct": 55,
         "isPeak": false
       },
       {
         "hour": 21,
         "label": "9pm",
-        "count": 8,
-        "pct": 27,
+        "count": 5,
+        "pct": 13,
         "isPeak": false
       },
       {
         "hour": 22,
         "label": "10pm",
-        "count": 8,
-        "pct": 27,
+        "count": 3,
+        "pct": 8,
         "isPeak": false
       },
       {
         "hour": 23,
         "label": "11pm",
-        "count": 2,
-        "pct": 7,
+        "count": 1,
+        "pct": 3,
         "isPeak": false
       }
     ],
     "violationTypes": [
       {
         "type": "Other",
-        "count": 72,
+        "count": 52,
         "pct": 100
       },
       {
-        "type": "Sidewalk",
-        "count": 18,
-        "pct": 25
-      },
-      {
         "type": "Bike Lane",
-        "count": 17,
-        "pct": 24
+        "count": 15,
+        "pct": 29
       },
       {
         "type": "No Parking Zone",
-        "count": 12,
-        "pct": 17
-      },
-      {
-        "type": "Tow Zone",
-        "count": 10,
-        "pct": 14
-      },
-      {
-        "type": "Fire Hydrant",
-        "count": 6,
-        "pct": 8
-      },
-      {
-        "type": "Handicap",
-        "count": 6,
-        "pct": 8
+        "count": 15,
+        "pct": 29
       },
       {
         "type": "Oversized Vehicle",
+        "count": 13,
+        "pct": 25
+      },
+      {
+        "type": "Sidewalk",
+        "count": 12,
+        "pct": 23
+      },
+      {
+        "type": "Driveway",
+        "count": 8,
+        "pct": 15
+      },
+      {
+        "type": "Blocking",
         "count": 6,
-        "pct": 8
+        "pct": 12
+      },
+      {
+        "type": "Handicap",
+        "count": 5,
+        "pct": 10
       }
     ]
   },
   "graffitiSpeedrun": {
     "totalClosed": 261,
-    "avgDays": 71.5,
-    "medianDays": 6.1,
+    "avgDays": 71.8,
+    "medianDays": 6.8,
     "fastestDays": [
       0.0,
       0.1,
@@ -451,7 +444,7 @@
         "label": "1\u20136 hours"
       },
       "6hTo24h": {
-        "count": 26,
+        "count": 21,
         "label": "6\u201324 hours"
       },
       "1dTo3d": {
@@ -463,11 +456,11 @@
         "label": "3\u20137 days"
       },
       "7dTo30d": {
-        "count": 37,
+        "count": 41,
         "label": "7\u201330 days"
       },
       "over30d": {
-        "count": 83,
+        "count": 84,
         "label": "Over 30 days"
       }
     },
