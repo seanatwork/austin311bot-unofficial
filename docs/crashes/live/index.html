@@ -217,6 +217,8 @@
       <button class="fbtn active" id="btn-90" onclick="setDays(90)">90d</button>
       <span style="margin:0 4px;color:var(--border);">|</span>
       <button class="fbtn source-tag" id="source-tag" onclick="showPicker()">⇄ Switch source</button>
+      <button class="fbtn" onclick="location.href='../'">📋 APD Records</button>
+      <button class="fbtn" onclick="location.href='../trends/'">📈 Trends</button>
       <button class="fbtn" onclick="location.href='../../'">🏠 Home</button>
     </div>
     <div class="btn-row" id="nav-btns">
@@ -246,7 +248,7 @@
             <div class="picker-card-desc">Time of day, day of week, dangerous streets, collision types, and monthly patterns from APD records.</div>
             <span class="picker-card-tag tag-trends">Analysis</span>
           </div>
-          <div class="picker-card" onclick="pickSource('apd')">
+          <div class="picker-card" onclick="location.href='../'">
             <div class="picker-card-icon">📋</div>
             <div class="picker-card-title">APD Crash Records</div>
             <div class="picker-card-desc">Official police crash reports with injury and fatality counts. Typically 2–4 weeks behind due to processing time.</div>
