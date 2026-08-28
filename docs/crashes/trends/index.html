@@ -13,6 +13,7 @@
     gtag('config', 'G-TS158R7XSN');
   </script>
   <script>if(localStorage.getItem("theme")==="dark")document.documentElement.classList.add("dark");</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -140,6 +141,8 @@
     .yr-table td.yr-mode { z-index: 1; }
     .yr-table .yr-total { font-weight: 700; color: var(--text-head); }
     .yr-table .yr-current { background: rgba(245,158,11,0.10); }
+    .yr-chart-title { font-size: 11px; font-weight: 700; color: var(--text-head); margin-bottom: 5px; }
+    .yr-chart-box { position: relative; height: 220px; }
 
     .legend-inline { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-sub); }
@@ -214,6 +217,24 @@
 
     const DOW_LABELS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+    // ── yearly trend config ───────────────────────────────────────────────────
+    const YR_MODES = [
+      { key: "ped",   label: "🚶 Pedestrian" },
+      { key: "moto",  label: "🏍️ Motorcycle" },
+      { key: "bike",  label: "🚲 Bicycle" },
+      { key: "mv",    label: "🚗 Motor vehicle" },
+      { key: "micro", label: "🛴 Micromobility" },
+      { key: "other", label: "Other" },
+    ];
+    const MODE_COLORS = {
+      ped: "#dc2626",
+      moto: "#7c3aed",
+      bike: "#16a34a",
+      mv: "#3b82f6",
+      micro: "#0ea5e9",
+      other: "#94a3b8",
+    };
+
     async function loadAll() {
       const el = document.getElementById("content");
       try {
@@ -254,6 +275,122 @@
 
     function bar(fill, color, pct) {
       return `<div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color};"></div></div>`;
+    }
+
+    function initYearCharts(years, currentYear) {
+      if (typeof Chart === "undefined" || !years.length) return;
+      const gridColor = isDark ? "#2d3348" : "#e2e8f0";
+      const tickColor = isDark ? "#94a3b8" : "#64748b";
+      const yearLabels = years.map(y => y.label);
+
+      const lineBase = {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: "index", intersect: false },
+        plugins: {
+          legend: { labels: { color: tickColor, boxWidth: 10, boxHeight: 10, font: { size: 10 } } },
+        },
+        scales: {
+          x: { ticks: { color: tickColor, maxTicksLimit: 18, font: { size: 10 } }, grid: { color: gridColor } },
+          y: { ticks: { color: tickColor, font: { size: 10 } }, grid: { color: gridColor }, beginAtZero: true },
+        },
+      };
+
+      const crashEl = document.getElementById("yr-chart-crashes");
+      if (crashEl) {
+        new Chart(crashEl, {
+          type: "line",
+          data: {
+            labels: yearLabels,
+            datasets: [{
+              label: "Crashes",
+              data: years.map(y => y.cnt),
+              borderColor: "#3b82f6",
+              backgroundColor: "rgba(59,130,246,0.12)",
+              fill: true,
+              tension: 0.25,
+              pointRadius: 2,
+              borderWidth: 2,
+            }],
+          },
+          options: Object.assign({}, lineBase, { plugins: { legend: { display: false } } }),
+        });
+      }
+
+      const fatalEl = document.getElementById("yr-chart-fatal");
+      if (fatalEl) {
+        new Chart(fatalEl, {
+          type: "line",
+          data: {
+            labels: yearLabels,
+            datasets: YR_MODES.map(m => ({
+              label: m.label,
+              data: years.map(y => y.modes[m.key].d),
+              borderColor: MODE_COLORS[m.key],
+              backgroundColor: MODE_COLORS[m.key],
+              tension: 0.25,
+              pointRadius: 2,
+              borderWidth: 2,
+            })),
+          },
+          options: lineBase,
+        });
+      }
+
+      const seriousEl = document.getElementById("yr-chart-serious");
+      if (seriousEl) {
+        new Chart(seriousEl, {
+          type: "line",
+          data: {
+            labels: yearLabels,
+            datasets: YR_MODES.map(m => ({
+              label: m.label,
+              data: years.map(y => y.modes[m.key].s),
+              borderColor: MODE_COLORS[m.key],
+              backgroundColor: MODE_COLORS[m.key],
+              tension: 0.25,
+              pointRadius: 2,
+              borderWidth: 2,
+            })),
+          },
+          options: lineBase,
+        });
+      }
+
+      const donutEl = document.getElementById("yr-chart-donut");
+      if (donutEl) {
+        const fullYears = years.filter(y => y.yr !== currentYear);
+        const sums = YR_MODES.map(m => fullYears.reduce((a, y) => a + y.modes[m.key].d, 0));
+        const total = sums.reduce((a, b) => a + b, 0);
+        new Chart(donutEl, {
+          type: "doughnut",
+          data: {
+            labels: YR_MODES.map(m => m.label),
+            datasets: [{
+              data: sums,
+              backgroundColor: YR_MODES.map(m => MODE_COLORS[m.key]),
+              borderColor: isDark ? "#161a24" : "#ffffff",
+              borderWidth: 2,
+            }],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: "58%",
+            plugins: {
+              legend: { position: "right", labels: { color: tickColor, boxWidth: 10, boxHeight: 10, font: { size: 10 } } },
+              tooltip: {
+                callbacks: {
+                  label: (ctx) => {
+                    const v = ctx.parsed || 0;
+                    return ` ${ctx.label}: ${v.toLocaleString()} (${total ? Math.round(v / total * 100) : 0}%)`;
+                  },
+                },
+              },
+            },
+          },
+        });
+      }
     }
 
     function render(hourRows, dowRows, streetRows, collsnRows, monthRows, totals, ytd, modes, latestDate, bikeStats, bikeMonthRows, yearRows) {
@@ -460,14 +597,6 @@
 
       // ── yearly trends (full dataset) ───────────────────────────────────────
       const currentYear = now.getFullYear();
-      const YR_MODES = [
-        { key: "ped",   label: "🚶 Pedestrian" },
-        { key: "moto",  label: "🏍️ Motorcycle" },
-        { key: "bike",  label: "🚲 Bicycle" },
-        { key: "mv",    label: "🚗 Motor vehicle" },
-        { key: "micro", label: "🛴 Micromobility" },
-        { key: "other", label: "Other" },
-      ];
       const years = (yearRows || []).map(r => {
         const y = parseInt(r.yr);
         return {
@@ -486,37 +615,6 @@
           },
         };
       }).sort((a, b) => a.yr - b.yr);
-
-      const maxYrCnt     = Math.max(...years.map(y => y.cnt), 1);
-      const maxYrDeaths  = Math.max(...years.map(y => y.deaths), 1);
-      const maxYrSerious = Math.max(...years.map(y => y.serious), 1);
-
-      const yrCrashHtml = years.map(y => {
-        const pct = Math.round(y.cnt / maxYrCnt * 100);
-        return `<div class="month-row">
-          <span class="month-lbl">${y.label}</span>
-          <div class="month-track"><div class="month-bar-crash" style="width:${pct}%"></div></div>
-          <span class="month-val-crash">${y.cnt.toLocaleString()}</span>
-        </div>`;
-      }).join("");
-
-      const yrDeathHtml = years.map(y => {
-        const pct = Math.round(y.deaths / maxYrDeaths * 100);
-        return `<div class="month-row">
-          <span class="month-lbl">${y.label}</span>
-          <div class="month-track"><div class="month-bar-death" style="width:${pct}%"></div></div>
-          <span class="month-val-crash" style="color:#dc2626;font-weight:700;">${y.deaths}</span>
-        </div>`;
-      }).join("");
-
-      const yrSeriousHtml = years.map(y => {
-        const pct = Math.round(y.serious / maxYrSerious * 100);
-        return `<div class="month-row">
-          <span class="month-lbl">${y.label}</span>
-          <div class="month-track"><div class="month-bar-injury" style="width:${pct}%"></div></div>
-          <span class="month-val-crash" style="color:#f59e0b;font-weight:700;">${y.serious}</span>
-        </div>`;
-      }).join("");
 
       const yrHead = `<tr><th class="yr-mode">Road user</th>${years.map(y => `<th${y.yr === currentYear ? ' class="yr-current"' : ""}>${y.label}</th>`).join("")}</tr>`;
       function yrRows(field) {
@@ -553,9 +651,27 @@
         <div style="font-size:11px;color:var(--text-muted);text-align:center;">Counts above cover the last 90 days of published APD records.</div>
 
         <div class="chart-card">
-          <div class="chart-title">🕐 Crashes by Time of Day</div>
-          <div class="chart-sub">${daysLabel} · red = peak hours · all 24 hours shown</div>
-          <div class="bar-rows">${hourHtml}</div>
+          <div class="chart-title">📅 Yearly Trends</div>
+          <div class="chart-sub">Full APD dataset · ${years.length ? years[0].yr : ""} – ${currentYear} · * = partial year (through ${latestFmt || "latest record"})</div>
+          <div class="chart-grid">
+            <div>
+              <div class="yr-chart-title">💥 Crashes per year</div>
+              <div class="yr-chart-box"><canvas id="yr-chart-crashes"></canvas></div>
+            </div>
+            <div>
+              <div class="yr-chart-title">🥧 Fatalities by road user · all-time share</div>
+              <div class="yr-chart-box"><canvas id="yr-chart-donut"></canvas></div>
+            </div>
+          </div>
+          <div class="yr-chart-title" style="margin-top:14px;">☠️ Fatalities by road user per year</div>
+          <div class="yr-chart-box"><canvas id="yr-chart-fatal"></canvas></div>
+          <div class="yr-chart-title" style="margin-top:14px;">🚑 Serious injuries by road user per year</div>
+          <div class="yr-chart-box"><canvas id="yr-chart-serious"></canvas></div>
+          <div class="month-series-title" style="margin-top:16px;">☠️ Fatalities by road user</div>
+          <div class="table-scroll">${yrFatalTable}</div>
+          <div class="month-series-title" style="margin-top:12px;">🚑 Serious injuries by road user</div>
+          <div class="table-scroll">${yrSeriousTable}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:8px;">${currentYear} is partial — data through ${latestFmt}.</div>
         </div>
 
         <div class="chart-grid">
@@ -607,25 +723,16 @@
         </div>
 
         <div class="chart-card">
-          <div class="chart-title">📅 Yearly Trends</div>
-          <div class="chart-sub">Full APD dataset · ${years.length ? years[0].yr : ""} – ${currentYear} · * = partial year (through ${latestFmt || "latest record"})</div>
-          <div class="month-series-title">💥 Crashes by year <span class="sub">scale 0–${maxYrCnt.toLocaleString()}</span></div>
-          <div class="month-rows">${yrCrashHtml}</div>
-          <div class="month-series-title" style="margin-top:12px;">☠️ Fatalities by year <span class="sub">scale 0–${maxYrDeaths}</span></div>
-          <div class="month-rows">${yrDeathHtml}</div>
-          <div class="month-series-title" style="margin-top:12px;">🚑 Serious injuries by year <span class="sub">scale 0–${maxYrSerious}</span></div>
-          <div class="month-rows">${yrSeriousHtml}</div>
-          <div class="month-series-title" style="margin-top:16px;">☠️ Fatalities by road user</div>
-          <div class="table-scroll">${yrFatalTable}</div>
-          <div class="month-series-title" style="margin-top:12px;">🚑 Serious injuries by road user</div>
-          <div class="table-scroll">${yrSeriousTable}</div>
-          <div style="font-size:10px;color:var(--text-muted);margin-top:8px;">${currentYear} is partial — data through ${latestFmt}.</div>
+          <div class="chart-title">🕐 Crashes by Time of Day</div>
+          <div class="chart-sub">${daysLabel} · red = peak hours · all 24 hours shown</div>
+          <div class="bar-rows">${hourHtml}</div>
         </div>
 
         <footer>
           Data: <a href="https://data.austintexas.gov/d/y2wy-tgr5" target="_blank" rel="noopener">APD Crash Report Data</a>
           &nbsp;·&nbsp; ${latestFmt ? `Most recent record: ${latestFmt} · APD records lag 2–4 weeks` : "APD records typically lag 2–4 weeks behind the current date."}
         </footer>`;
+      initYearCharts(years, currentYear);
     }
 
     loadAll();
