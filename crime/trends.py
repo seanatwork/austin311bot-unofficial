@@ -137,6 +137,20 @@ def _fetch_locations(days_back: int) -> list:
     return resp.json()
 
 
+def _fetch_yearly() -> list:
+    """Per-year + UCR code counts over the FULL dataset (2003-present)."""
+    params = {
+        "$select": "date_extract_y(occ_date) as yr, ucr_code, count(*) as cnt",
+        "$where": "ucr_code IS NOT NULL",
+        "$group": "yr, ucr_code",
+        "$order": "yr ASC",
+        "$limit": 100000,
+    }
+    resp = _get_session().get(f"{SOCRATA_BASE}/{CRIME_DATASET}.json", params=params, timeout=30)
+    resp.raise_for_status()
+    return resp.json()
+
+
 # ── aggregation ────────────────────────────────────────────────────────────────
 
 def _rolling_avg(counts: list, window: int = 3) -> list:
@@ -227,6 +241,34 @@ def _aggregate(monthly_rows: list, type_rows: list, location_rows: list, days_ba
     }
 
 
+def _aggregate_yearly(yearly_rows: list) -> dict:
+    """Yearly totals and per-category series over the full dataset."""
+    now = datetime.now(timezone.utc)
+    current_year = now.year
+
+    year_cat: dict = {}
+    for r in yearly_rows:
+        try:
+            yr = int(r.get("yr"))
+        except (TypeError, ValueError):
+            continue
+        cnt = int(r.get("cnt", 0))
+        cat = _ucr_to_category(r.get("ucr_code", ""))
+        year_cat.setdefault(yr, defaultdict(int))[cat] += cnt
+
+    years = sorted(year_cat)
+    totals = [sum(year_cat[y].values()) for y in years]
+    cats = [c for c in CATEGORY_ORDER if any(year_cat[y].get(c, 0) for y in years)]
+    cat_series = {c: [year_cat[y].get(c, 0) for y in years] for c in cats}
+
+    return {
+        "years": years,
+        "totals": totals,
+        "cat_series": cat_series,
+        "current_year": current_year,
+    }
+
+
 # ── HTML ───────────────────────────────────────────────────────────────────────
 
 def _render_html(data: dict, fetched_at: str) -> str:
@@ -236,6 +278,17 @@ def _render_html(data: dict, fetched_at: str) -> str:
     peak_month  = data["peak_month"]
     top_cat     = data["top_category"]
     months      = data["months"]
+
+    yearly       = data.get("yearly") or {}
+    yyears       = yearly.get("years", [])
+    ytotals      = yearly.get("totals", [])
+    ycurrent     = yearly.get("current_year", datetime.now(timezone.utc).year)
+    ycat_series  = yearly.get("cat_series", {})
+    ycats        = [
+        {"name": c, "color": CRIME_CATEGORIES[c]["color"], "data": ycat_series[c]}
+        for c in ycat_series
+    ]
+    yearly_first = yyears[0] if yyears else "—"
 
     peak_label = (
         datetime.strptime(peak_month, "%Y-%m").strftime("%b %Y")
@@ -249,6 +302,10 @@ def _render_html(data: dict, fetched_at: str) -> str:
         "rollingAvg":    data["rolling_avg"],
         "categories":    data["categories"],
         "locations":     data["locations"],
+        "yearlyYears":       yyears,
+        "yearlyTotals":      ytotals,
+        "yearlyCategories":  ycats,
+        "yearlyCurrentYear": ycurrent,
     })
 
     cat_height = max(320, len(data["categories"]) * 36)
@@ -302,6 +359,8 @@ def _render_html(data: dict, fetched_at: str) -> str:
     .chart-title {{ font-size: 13px; font-weight: 600; color: var(--chart-title); margin-bottom: 4px; }}
     .chart-sub {{ font-size: 11px; color: var(--text-muted); margin-bottom: 10px; }}
     .chart-container {{ position: relative; }}
+    .chart-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }}
+    @media (max-width: 580px) {{ .chart-grid {{ grid-template-columns: 1fr; }} }}
 
     /* drill-down panel */
     #drill-panel {{
@@ -379,6 +438,23 @@ def _render_html(data: dict, fetched_at: str) -> str:
   </div>
 
   <div id="chart-wrap">
+
+    <div class="chart-block">
+      <div class="chart-title">📅 Yearly Trends</div>
+      <div class="chart-sub">Full APD dataset · {yearly_first} – {ycurrent} · * = partial year</div>
+      <div class="chart-grid">
+        <div>
+          <div class="chart-sub">Total incidents per year</div>
+          <div class="chart-container" style="height:260px;"><canvas id="yearlyChart"></canvas></div>
+        </div>
+        <div>
+          <div class="chart-sub">Incidents by category — all-time share</div>
+          <div class="chart-container" style="height:260px;"><canvas id="yearDonutChart"></canvas></div>
+        </div>
+      </div>
+      <div class="chart-sub" style="margin-top:14px;">Incidents by category per year</div>
+      <div class="chart-container" style="height:300px;"><canvas id="yearCatChart"></canvas></div>
+    </div>
 
     <div class="chart-block">
       <div class="chart-title">Monthly incident totals</div>
@@ -597,6 +673,91 @@ def _render_html(data: dict, fetched_at: str) -> str:
         }},
       }},
     }});
+    // ── yearly trends (full dataset) ─────────────────────────────────────────
+    const YY = DATA.yearlyYears || [];
+    const YT = DATA.yearlyTotals || [];
+    const YCATS = DATA.yearlyCategories || [];
+    const YCUR = DATA.yearlyCurrentYear;
+    const YLABELS = YY.map(y => y === YCUR ? y + "*" : String(y));
+
+    new Chart(document.getElementById("yearlyChart"), {{
+      type: "line",
+      data: {{
+        labels: YLABELS,
+        datasets: [{{
+          label: "Incidents",
+          data: YT,
+          borderColor: "#3b82f6",
+          backgroundColor: "rgba(59,130,246,0.12)",
+          fill: true,
+          tension: 0.25,
+          pointRadius: 2,
+          borderWidth: 2,
+        }}],
+      }},
+      options: {{
+        responsive: true, maintainAspectRatio: false,
+        plugins: {{ legend: {{ display: false }}, tooltip: TIP }},
+        scales: {{
+          x: {{ ticks: {{ color: tick, font: {{ size: 10 }} }}, grid: {{ color: grid }} }},
+          y: {{ ticks: {{ color: tick, font: {{ size: 10 }}, callback: v => fmt(v) }}, grid: {{ color: grid }}, beginAtZero: true }},
+        }},
+      }},
+    }});
+
+    new Chart(document.getElementById("yearCatChart"), {{
+      type: "line",
+      data: {{
+        labels: YLABELS,
+        datasets: YCATS.map(c => ({{
+          label: c.name,
+          data: c.data,
+          borderColor: c.color,
+          backgroundColor: c.color,
+          tension: 0.25,
+          pointRadius: 0,
+          hoverRadius: 3,
+          borderWidth: 2,
+        }})),
+      }},
+      options: {{
+        responsive: true, maintainAspectRatio: false,
+        interaction: {{ mode: "index", intersect: false }},
+        plugins: {{ legend: {{ labels: {{ color: leg, font: {{ size: 10 }} }} }}, tooltip: TIP }},
+        scales: {{
+          x: {{ ticks: {{ color: tick, font: {{ size: 10 }} }}, grid: {{ color: grid }} }},
+          y: {{ ticks: {{ color: tick, font: {{ size: 10 }}, callback: v => fmt(v) }}, grid: {{ color: grid }}, beginAtZero: true }},
+        }},
+      }},
+    }});
+
+    const fullIdx = YY.map((y, i) => (y !== YCUR ? i : -1)).filter(i => i >= 0);
+    const donutData = YCATS.map(c => fullIdx.reduce((a, i) => a + (c.data[i] || 0), 0));
+    const donutTotal = donutData.reduce((a, b) => a + b, 0);
+    new Chart(document.getElementById("yearDonutChart"), {{
+      type: "doughnut",
+      data: {{
+        labels: YCATS.map(c => c.name),
+        datasets: [{{
+          data: donutData,
+          backgroundColor: YCATS.map(c => c.color),
+          borderColor: isDark ? "#161a24" : "#ffffff",
+          borderWidth: 2,
+        }}],
+      }},
+      options: {{
+        responsive: true, maintainAspectRatio: false, cutout: "58%",
+        plugins: {{
+          legend: {{ position: "right", labels: {{ color: leg, font: {{ size: 10 }} }} }},
+          tooltip: {{
+            ...TIP,
+            callbacks: {{
+              label: ctx => ` ${{ctx.label}}: ${{fmt(ctx.parsed)}} (${{pct(ctx.parsed, donutTotal)}})`,
+            }},
+          }},
+        }},
+      }},
+    }});
   </script>
 </body>
 </html>
@@ -612,6 +773,7 @@ def generate_crime_trends(
         monthly_rows   = _fetch_monthly(days_back)
         type_rows      = _fetch_by_type(days_back)
         location_rows  = _fetch_locations(days_back)
+        yearly_rows    = _fetch_yearly()
     except Exception as e:
         logger.error(f"crime trends fetch: {e}")
         return None, f"🚔 Error fetching crime data: {e}"
@@ -620,6 +782,7 @@ def generate_crime_trends(
         return None, f"🚔 No crime data found for last {days_back} days."
 
     data = _aggregate(monthly_rows, type_rows, location_rows, days_back)
+    data["yearly"] = _aggregate_yearly(yearly_rows)
     fetched_at = _format_central_time()
     html = _render_html(data, fetched_at)
 
