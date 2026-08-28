@@ -181,10 +181,21 @@
     .badge-serious { background: #f59e0b; color: #fff; }
     .badge-minor   { background: #2563eb; color: #fff; }
 
-    /* ── legend ── */
+    /* ── legend / severity toggles ── */
     #legend { padding: 8px 12px; border-top: 1px solid var(--border); flex-shrink: 0; }
-    .legend-row { display: flex; align-items: center; gap: 6px; font-size: 10px; color: var(--text-sub); margin-bottom: 3px; }
+    .legend-toggle {
+      display: flex; align-items: center; gap: 6px; width: 100%;
+      font-size: 10px; color: var(--text-sub);
+      background: none; border: none; cursor: pointer;
+      padding: 3px 0; font-family: inherit; text-align: left;
+    }
+    .legend-toggle:hover { color: var(--text-head); }
     .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .legend-toggle-label { flex: 1; }
+    .legend-toggle-check { color: #16a34a; font-weight: 700; font-size: 11px; }
+    .legend-toggle.off .legend-dot { opacity: 0.25; }
+    .legend-toggle.off .legend-toggle-label { color: var(--text-muted); text-decoration: line-through; }
+    .legend-toggle.off .legend-toggle-check { color: var(--text-muted); }
 
     /* ── mobile ── */
     @media (max-width: 640px) {
@@ -262,9 +273,21 @@
       <div id="sidebar-header">🕐 10 Most Recent Crashes</div>
       <div id="sidebar-list"><p style="padding:12px;color:var(--text-muted);font-size:12px;">Pick a source to load crashes.</p></div>
       <div id="legend">
-        <div class="legend-row"><div class="legend-dot" style="background:#dc2626;"></div> Fatal</div>
-        <div class="legend-row"><div class="legend-dot" style="background:#ea580c;"></div> Injury</div>
-        <div class="legend-row"><div class="legend-dot" style="background:#2563eb;"></div> No injury / unknown</div>
+        <button class="legend-toggle" data-sev="fatal" onclick="toggleSev('fatal')">
+          <div class="legend-dot" style="background:#dc2626;"></div>
+          <span class="legend-toggle-label">Fatal</span>
+          <span class="legend-toggle-check">✓</span>
+        </button>
+        <button class="legend-toggle" data-sev="injury" onclick="toggleSev('injury')">
+          <div class="legend-dot" style="background:#ea580c;"></div>
+          <span class="legend-toggle-label">Injury</span>
+          <span class="legend-toggle-check">✓</span>
+        </button>
+        <button class="legend-toggle" data-sev="minor" onclick="toggleSev('minor')">
+          <div class="legend-dot" style="background:#2563eb;"></div>
+          <span class="legend-toggle-label">No injury / unknown</span>
+          <span class="legend-toggle-check">✓</span>
+        </button>
         <div style="font-size:10px;color:var(--text-muted);margin-top:4px;" id="legend-source"></div>
       </div>
     </div>
@@ -297,6 +320,7 @@
     let currentSource = null;
     let clusterLayer  = null;
     let markersByIdx  = new Map();
+    let sevFilter     = { fatal: true, injury: true, minor: true };
 
     // ── source definitions ─────────────────────────────────────────────────────
 
@@ -467,7 +491,8 @@
 
       const filtered = allRecords.filter(r => {
         const ts = r[src.timeField];
-        return ts && new Date(ts) >= cutoff;
+        if (!ts || new Date(ts) < cutoff) return false;
+        return sevFilter[src.severityOf(r)] !== false;
       });
 
       clusterLayer = L.markerClusterGroup({ maxClusterRadius: 40, disableClusteringAtZoom: 15 });
@@ -525,7 +550,8 @@
       cutoff.setDate(cutoff.getDate() - currentDays);
       const filtered = allRecords.filter(r => {
         const ts = r[src.timeField];
-        return ts && new Date(ts) >= cutoff;
+        if (!ts || new Date(ts) < cutoff) return false;
+        return sevFilter[src.severityOf(r)] !== false;
       });
       const r = filtered[idx];
       if (!r) return;
@@ -543,6 +569,17 @@
         document.getElementById("btn-" + d).classList.toggle("active", d === days);
       });
       renderMap(days);
+    }
+
+    function toggleSev(sev) {
+      // Keep at least one severity visible so the map never goes fully empty.
+      const enabled = Object.keys(sevFilter).filter(k => sevFilter[k]);
+      if (sevFilter[sev] && enabled.length === 1) return;
+      sevFilter[sev] = !sevFilter[sev];
+      document.querySelectorAll(".legend-toggle").forEach(b => {
+        b.classList.toggle("off", !sevFilter[b.dataset.sev]);
+      });
+      renderMap(currentDays);
     }
 
     // ── data fetch ─────────────────────────────────────────────────────────────
