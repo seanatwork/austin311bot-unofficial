@@ -23,6 +23,16 @@ from open311_client import og_meta_tags
 
 API_URL = "https://data.austintexas.gov/resource/g5k8-8sud.json"
 GENERAL_FUND_CODE = "1000"
+
+# Retry/backoff for Socrata fetches (matches repo convention — see generate_911_data.py)
+MAX_RETRIES = 3
+RETRY_DELAY = 2.0
+RETRYABLE_ERRORS = (
+    requests.exceptions.ConnectionError,
+    requests.exceptions.Timeout,
+    requests.exceptions.ReadTimeout,
+    requests.exceptions.ChunkedEncodingError,
+)
 ENTERPRISE_FUNDS = {
     "5010": "Austin Energy",
     "5020": "Austin Water — Water Utility Operating",
@@ -197,6 +207,28 @@ def categorize_expense(code: str, name: str) -> str:
 
 # ── fetch + aggregate ──────────────────────────────────────────────────────────
 
+def _get_with_retry(params, headers, retries=0):
+    """GET the budget API with retry/backoff (transient Socrata timeouts are common)."""
+    try:
+        resp = requests.get(API_URL, params=params, headers=headers, timeout=30)
+        resp.raise_for_status()
+        return resp
+    except requests.exceptions.HTTPError as e:
+        if e.response is not None and e.response.status_code >= 500 and retries < MAX_RETRIES:
+            delay = RETRY_DELAY * (2 ** retries)
+            print(f"  HTTP {e.response.status_code}, retrying in {delay:.1f}s ({retries + 1}/{MAX_RETRIES})...", flush=True)
+            time.sleep(delay)
+            return _get_with_retry(params, headers, retries + 1)
+        raise
+    except RETRYABLE_ERRORS as e:
+        if retries < MAX_RETRIES:
+            delay = RETRY_DELAY * (2 ** retries)
+            print(f"  Connection error ({e}), retrying in {delay:.1f}s ({retries + 1}/{MAX_RETRIES})...", flush=True)
+            time.sleep(delay)
+            return _get_with_retry(params, headers, retries + 1)
+        raise
+
+
 def fetch_rows():
     headers = {}
     token = os.getenv("AUSTINAPIKEY")
@@ -205,13 +237,10 @@ def fetch_rows():
 
     rows, offset, limit = [], 0, 10_000
     while True:
-        resp = requests.get(
-            API_URL,
-            params={"fund_code": GENERAL_FUND_CODE, "$limit": limit, "$offset": offset},
-            headers=headers,
-            timeout=30,
+        resp = _get_with_retry(
+            {"fund_code": GENERAL_FUND_CODE, "$limit": limit, "$offset": offset},
+            headers,
         )
-        resp.raise_for_status()
         batch = resp.json()
         rows.extend(batch)
         if len(batch) < limit:
@@ -264,13 +293,10 @@ def fetch_enterprise_rows():
     for fcode in fund_codes:
         rows, offset, limit = [], 0, 10_000
         while True:
-            resp = requests.get(
-                API_URL,
-                params={"fund_code": fcode, "$limit": limit, "$offset": offset},
-                headers=headers,
-                timeout=30,
+            resp = _get_with_retry(
+                {"fund_code": fcode, "$limit": limit, "$offset": offset},
+                headers,
             )
-            resp.raise_for_status()
             batch = resp.json()
             rows.extend(batch)
             if len(batch) < limit:
