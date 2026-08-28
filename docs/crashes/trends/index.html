@@ -116,12 +116,30 @@
     .month-track { flex: 1; background: var(--bar-bg); border-radius: 3px; height: 9px; }
     .month-bar-crash { height: 9px; border-radius: 3px; background: #3b82f6; }
     .month-bar-death { height: 9px; border-radius: 3px; background: #dc2626; }
+    .month-bar-injury { height: 9px; border-radius: 3px; background: #f59e0b; }
     .month-val-crash { flex: 0 0 52px; text-align: right; color: var(--text-muted); font-size: 10px; }
     .month-vals { flex: 0 0 76px; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
     .month-vals .dead-val { color: #dc2626; font-weight: 700; font-size: 11px; }
     .month-vals .rate-hint { color: var(--text-muted); font-size: 9px; }
     .month-series-title { font-size: 11px; font-weight: 700; color: var(--text-head); margin-bottom: 5px; }
     .month-series-title .sub { font-weight: 400; color: var(--text-muted); font-size: 10px; }
+
+    /* ── yearly trend tables ── */
+    .table-scroll { overflow-x: auto; }
+    .yr-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 10px; }
+    .yr-table th, .yr-table td {
+      padding: 3px 7px; text-align: center; white-space: nowrap;
+      border-bottom: 1px solid var(--border); color: var(--text-sub);
+    }
+    .yr-table th { color: var(--text-muted); font-weight: 600; }
+    .yr-table th.yr-mode, .yr-table td.yr-mode {
+      text-align: left; font-weight: 600; color: var(--text);
+      position: sticky; left: 0; background: var(--bg-card);
+    }
+    .yr-table th.yr-mode { z-index: 2; }
+    .yr-table td.yr-mode { z-index: 1; }
+    .yr-table .yr-total { font-weight: 700; color: var(--text-head); }
+    .yr-table .yr-current { background: rgba(245,158,11,0.10); }
 
     .legend-inline { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-sub); }
@@ -199,7 +217,7 @@
     async function loadAll() {
       const el = document.getElementById("content");
       try {
-        const [hourRows, dowRows, streetRows, collsnRows, monthRows, totalsRows, ytdRows, modeRows, latestRows, bikeRows, bikeMonthRows] =
+        const [hourRows, dowRows, streetRows, collsnRows, monthRows, totalsRows, ytdRows, modeRows, latestRows, bikeRows, bikeMonthRows, yearRows] =
           await Promise.all([
             // crashes by hour of day
             fetch(`${BASE}?$select=date_extract_hh(crash_timestamp_ct) as hr,count(*) as cnt&$where=${enc(where90())}&$group=hr&$order=hr&$limit=24`).then(r=>r.json()),
@@ -223,10 +241,12 @@
             fetch(`${BASE}?$select=count(*) as total,sum(bicycle_death_count) as deaths,sum(bicycle_serious_injury_count) as serious&$where=${enc(`crash_timestamp_ct >= '${monthRangeStart}' AND crash_timestamp_ct < '${monthRangeEnd}' AND units_involved like '%Bicycle%'`)}&$limit=1`).then(r=>r.json()),
             // bicycle monthly trend (last 12 complete months)
             fetch(`${BASE}?$select=date_extract_y(crash_timestamp_ct) as yr,date_extract_m(crash_timestamp_ct) as mo,count(*) as cnt,sum(bicycle_death_count) as deaths,sum(bicycle_serious_injury_count) as serious&$where=${enc(`crash_timestamp_ct >= '${monthRangeStart}' AND crash_timestamp_ct < '${monthRangeEnd}' AND units_involved like '%Bicycle%'`)}&$group=yr,mo&$order=yr ASC,mo ASC&$limit=12`).then(r=>r.json()),
+            // yearly road-user trends (full dataset, 2010–present)
+            fetch(`${BASE}?$select=date_extract_y(crash_timestamp_ct) as yr,count(*) as cnt,sum(death_cnt) as deaths,sum(sus_serious_injry_cnt) as serious,sum(motor_vehicle_death_count) as mv_d,sum(motor_vehicle_serious_injury_count) as mv_s,sum(pedestrian_death_count) as ped_d,sum(pedestrian_serious_injury_count) as ped_s,sum(motorcycle_death_count) as moto_d,sum(motorcycle_serious_injury_count) as moto_s,sum(bicycle_death_count) as bike_d,sum(bicycle_serious_injury_count) as bike_s,sum(micromobility_death_count) as micro_d,sum(micromobility_serious_injury_count) as micro_s,sum(other_death_count) as other_d,sum(other_serious_injury_count) as other_s&$group=yr&$order=yr ASC&$limit=30`).then(r=>r.json()),
           ]);
 
         const latestDate = latestRows[0]?.latest ? new Date(latestRows[0].latest) : null;
-        render(hourRows, dowRows, streetRows, collsnRows, monthRows, totalsRows[0]||{}, ytdRows[0]||{}, modeRows[0]||{}, latestDate, bikeRows[0]||{}, bikeMonthRows);
+        render(hourRows, dowRows, streetRows, collsnRows, monthRows, totalsRows[0]||{}, ytdRows[0]||{}, modeRows[0]||{}, latestDate, bikeRows[0]||{}, bikeMonthRows, yearRows);
       } catch(err) {
         el.innerHTML = `<div class="error-msg">Failed to load: ${err.message}</div>`;
       }
@@ -236,7 +256,7 @@
       return `<div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${color};"></div></div>`;
     }
 
-    function render(hourRows, dowRows, streetRows, collsnRows, monthRows, totals, ytd, modes, latestDate, bikeStats, bikeMonthRows) {
+    function render(hourRows, dowRows, streetRows, collsnRows, monthRows, totals, ytd, modes, latestDate, bikeStats, bikeMonthRows, yearRows) {
       const el = document.getElementById("content");
 
       // Build accurate coverage label from actual latest record date
@@ -438,6 +458,84 @@
           </div>
         </div>`;
 
+      // ── yearly trends (full dataset) ───────────────────────────────────────
+      const currentYear = now.getFullYear();
+      const YR_MODES = [
+        { key: "ped",   label: "🚶 Pedestrian" },
+        { key: "moto",  label: "🏍️ Motorcycle" },
+        { key: "bike",  label: "🚲 Bicycle" },
+        { key: "mv",    label: "🚗 Motor vehicle" },
+        { key: "micro", label: "🛴 Micromobility" },
+        { key: "other", label: "Other" },
+      ];
+      const years = (yearRows || []).map(r => {
+        const y = parseInt(r.yr);
+        return {
+          yr: y,
+          label: `${y}${y === currentYear ? "*" : ""}`,
+          cnt:     parseInt(r.cnt     || 0),
+          deaths:  parseInt(r.deaths  || 0),
+          serious: parseInt(r.serious || 0),
+          modes: {
+            ped:   { d: parseInt(r.ped_d   || 0), s: parseInt(r.ped_s   || 0) },
+            moto:  { d: parseInt(r.moto_d  || 0), s: parseInt(r.moto_s  || 0) },
+            bike:  { d: parseInt(r.bike_d  || 0), s: parseInt(r.bike_s  || 0) },
+            mv:    { d: parseInt(r.mv_d    || 0), s: parseInt(r.mv_s    || 0) },
+            micro: { d: parseInt(r.micro_d || 0), s: parseInt(r.micro_s || 0) },
+            other: { d: parseInt(r.other_d || 0), s: parseInt(r.other_s || 0) },
+          },
+        };
+      }).sort((a, b) => a.yr - b.yr);
+
+      const maxYrCnt     = Math.max(...years.map(y => y.cnt), 1);
+      const maxYrDeaths  = Math.max(...years.map(y => y.deaths), 1);
+      const maxYrSerious = Math.max(...years.map(y => y.serious), 1);
+
+      const yrCrashHtml = years.map(y => {
+        const pct = Math.round(y.cnt / maxYrCnt * 100);
+        return `<div class="month-row">
+          <span class="month-lbl">${y.label}</span>
+          <div class="month-track"><div class="month-bar-crash" style="width:${pct}%"></div></div>
+          <span class="month-val-crash">${y.cnt.toLocaleString()}</span>
+        </div>`;
+      }).join("");
+
+      const yrDeathHtml = years.map(y => {
+        const pct = Math.round(y.deaths / maxYrDeaths * 100);
+        return `<div class="month-row">
+          <span class="month-lbl">${y.label}</span>
+          <div class="month-track"><div class="month-bar-death" style="width:${pct}%"></div></div>
+          <span class="month-val-crash" style="color:#dc2626;font-weight:700;">${y.deaths}</span>
+        </div>`;
+      }).join("");
+
+      const yrSeriousHtml = years.map(y => {
+        const pct = Math.round(y.serious / maxYrSerious * 100);
+        return `<div class="month-row">
+          <span class="month-lbl">${y.label}</span>
+          <div class="month-track"><div class="month-bar-injury" style="width:${pct}%"></div></div>
+          <span class="month-val-crash" style="color:#f59e0b;font-weight:700;">${y.serious}</span>
+        </div>`;
+      }).join("");
+
+      const yrHead = `<tr><th class="yr-mode">Road user</th>${years.map(y => `<th${y.yr === currentYear ? ' class="yr-current"' : ""}>${y.label}</th>`).join("")}</tr>`;
+      function yrRows(field) {
+        const modeRows = YR_MODES.map(m => {
+          const cells = years.map(y => {
+            const v = y.modes[m.key][field];
+            return `<td${y.yr === currentYear ? ' class="yr-current"' : ""}>${v || 0}</td>`;
+          }).join("");
+          return `<tr><td class="yr-mode">${m.label}</td>${cells}</tr>`;
+        }).join("");
+        const totalCells = years.map(y => {
+          const v = field === "d" ? y.deaths : y.serious;
+          return `<td${y.yr === currentYear ? ' class="yr-current"' : ""}>${v}</td>`;
+        }).join("");
+        return modeRows + `<tr><td class="yr-mode yr-total">Total</td>${totalCells}</tr>`;
+      }
+      const yrFatalTable   = `<table class="yr-table"><thead>${yrHead}</thead><tbody>${yrRows("d")}</tbody></table>`;
+      const yrSeriousTable = `<table class="yr-table"><thead>${yrHead}</thead><tbody>${yrRows("s")}</tbody></table>`;
+
       // ── road user fatalities ───────────────────────────────────────────────
       const ruserData = [
         { label: "🚗 Motor Vehicle", val: parseInt(modes.mv    || 0) },
@@ -506,6 +604,22 @@
             <div class="month-series-title" style="margin-top:14px;">🚑 Serious injuries / fatalities <span class="sub">scale 0–${maxBikeHarm}</span></div>
             <div class="month-rows">${bikeMonths.length ? bikeHarmMonthHtml : '<div style="font-size:12px;color:var(--text-muted);">No data for this period.</div>'}</div>
           </div>
+        </div>
+
+        <div class="chart-card">
+          <div class="chart-title">📅 Yearly Trends</div>
+          <div class="chart-sub">Full APD dataset · ${years.length ? years[0].yr : ""} – ${currentYear} · * = partial year (through ${latestFmt || "latest record"})</div>
+          <div class="month-series-title">💥 Crashes by year <span class="sub">scale 0–${maxYrCnt.toLocaleString()}</span></div>
+          <div class="month-rows">${yrCrashHtml}</div>
+          <div class="month-series-title" style="margin-top:12px;">☠️ Fatalities by year <span class="sub">scale 0–${maxYrDeaths}</span></div>
+          <div class="month-rows">${yrDeathHtml}</div>
+          <div class="month-series-title" style="margin-top:12px;">🚑 Serious injuries by year <span class="sub">scale 0–${maxYrSerious}</span></div>
+          <div class="month-rows">${yrSeriousHtml}</div>
+          <div class="month-series-title" style="margin-top:16px;">☠️ Fatalities by road user</div>
+          <div class="table-scroll">${yrFatalTable}</div>
+          <div class="month-series-title" style="margin-top:12px;">🚑 Serious injuries by road user</div>
+          <div class="table-scroll">${yrSeriousTable}</div>
+          <div style="font-size:10px;color:var(--text-muted);margin-top:8px;">${currentYear} is partial — data through ${latestFmt}.</div>
         </div>
 
         <footer>
