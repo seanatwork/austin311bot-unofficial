@@ -109,15 +109,19 @@
     .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
     @media (max-width: 600px) { .chart-grid { grid-template-columns: 1fr; } }
 
-    /* ── monthly table ── */
-    .month-rows { display: flex; flex-direction: column; gap: 6px; }
+    /* ── monthly series (crashes & fatalities on separate scales) ── */
+    .month-rows { display: flex; flex-direction: column; gap: 5px; }
     .month-row  { display: flex; align-items: center; gap: 10px; font-size: 11px; }
     .month-lbl  { flex: 0 0 70px; color: var(--text-sub); }
-    .month-track { flex: 1; background: var(--bar-bg); border-radius: 3px; height: 10px; position: relative; }
-    .month-bar-crash { height: 10px; border-radius: 3px; background: #3b82f6; }
-    .month-bar-death { height: 6px; position: absolute; top: 2px; border-radius: 2px; background: #dc2626; }
-    .month-val  { flex: 0 0 38px; text-align: right; color: var(--text-muted); font-size: 10px; }
-    .month-dead { flex: 0 0 50px; text-align: right; color: #dc2626; font-size: 10px; font-weight: 600; }
+    .month-track { flex: 1; background: var(--bar-bg); border-radius: 3px; height: 9px; }
+    .month-bar-crash { height: 9px; border-radius: 3px; background: #3b82f6; }
+    .month-bar-death { height: 9px; border-radius: 3px; background: #dc2626; }
+    .month-val-crash { flex: 0 0 52px; text-align: right; color: var(--text-muted); font-size: 10px; }
+    .month-vals { flex: 0 0 76px; display: flex; flex-direction: column; align-items: flex-end; line-height: 1.1; }
+    .month-vals .dead-val { color: #dc2626; font-weight: 700; font-size: 11px; }
+    .month-vals .rate-hint { color: var(--text-muted); font-size: 9px; }
+    .month-series-title { font-size: 11px; font-weight: 700; color: var(--text-head); margin-bottom: 5px; }
+    .month-series-title .sub { font-weight: 400; color: var(--text-muted); font-size: 10px; }
 
     .legend-inline { display: flex; gap: 14px; margin-bottom: 10px; flex-wrap: wrap; }
     .legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-sub); }
@@ -346,21 +350,32 @@
         cnt:   parseInt(r.cnt || 0),
         deaths:parseInt(r.deaths || 0),
       }));
-      const maxCnt = Math.max(...months.map(m => m.cnt), 1);
-      const maxDead= Math.max(...months.map(m => m.deaths), 1);
-      const monthHtml = months.map(m => {
-        const crashPct = Math.round(m.cnt / maxCnt * 100);
-        // Scale deaths relative to maxDead but cap at crashPct so the red bar
-        // never extends past the blue bar (deaths are a subset of crash outcomes)
-        const deadPct  = Math.min(Math.round(m.deaths / maxDead * 100), crashPct);
+      const maxCnt  = Math.max(...months.map(m => m.cnt), 1);
+      const maxDead = Math.max(...months.map(m => m.deaths), 1);
+
+      // Crashes and fatalities are rendered as two separate series on their own
+      // scales — crashes run in the hundreds/thousands, deaths in single digits,
+      // so a shared axis would make one series unreadable (or misleading).
+      const crashMonthHtml = months.map(m => {
+        const pct = Math.round(m.cnt / maxCnt * 100);
         return `<div class="month-row">
           <span class="month-lbl">${m.label}</span>
-          <div class="month-track">
-            <div class="month-bar-crash" style="width:${crashPct}%"></div>
-            <div class="month-bar-death" style="width:${deadPct}%"></div>
+          <div class="month-track"><div class="month-bar-crash" style="width:${pct}%"></div></div>
+          <span class="month-val-crash">${m.cnt.toLocaleString()}</span>
+        </div>`;
+      }).join("");
+
+      const deadMonthHtml = months.map(m => {
+        const pct  = Math.round(m.deaths / maxDead * 100);
+        const rate = m.cnt > 0 ? m.deaths / m.cnt * 1000 : 0; // per 1,000 crashes
+        const rateTxt = m.deaths > 0 ? `${rate.toFixed(1)}/1k` : "—";
+        return `<div class="month-row">
+          <span class="month-lbl">${m.label}</span>
+          <div class="month-track"><div class="month-bar-death" style="width:${pct}%"></div></div>
+          <div class="month-vals">
+            <span class="dead-val">${m.deaths || 0}</span>
+            <span class="rate-hint">${rateTxt}</span>
           </div>
-          <span class="month-val">${m.cnt.toLocaleString()}</span>
-          <span class="month-dead">${m.deaths > 0 ? m.deaths + " fatal" : "—"}</span>
         </div>`;
       }).join("");
 
@@ -375,24 +390,32 @@
         deaths:  parseInt(r.deaths  || 0),
         serious: parseInt(r.serious || 0),
       }));
-      const maxBikeCnt     = Math.max(...bikeMonths.map(m => m.cnt), 1);
-      const maxBikeSerious = Math.max(...bikeMonths.map(m => m.serious), 1);
-      const bikeMonthHtml = bikeMonths.map(m => {
-        const crashPct   = Math.round(m.cnt     / maxBikeCnt     * 100);
-        // Scale serious/fatal overlay relative to total crash count (maxBikeCnt)
-        // so it visually represents the subset of crashes.
-        const seriousPct = Math.round(m.serious / maxBikeCnt * 100);
-        const sideNote = m.deaths > 0
-          ? `${m.deaths} fatal`
-          : (m.serious > 0 ? `${m.serious} serious` : "—");
+      const maxBikeCnt  = Math.max(...bikeMonths.map(m => m.cnt), 1);
+      const maxBikeHarm = Math.max(...bikeMonths.map(m => Math.max(m.serious, m.deaths)), 1);
+      const bikeCrashMonthHtml = bikeMonths.map(m => {
+        const pct = Math.round(m.cnt / maxBikeCnt * 100);
         return `<div class="month-row">
           <span class="month-lbl">${m.label}</span>
-          <div class="month-track">
-            <div class="month-bar-crash" style="width:${crashPct}%;background:#16a34a;"></div>
-            <div class="month-bar-death" style="width:${seriousPct}%;background:#dc2626;"></div>
+          <div class="month-track"><div class="month-bar-crash" style="width:${pct}%;background:#16a34a;"></div></div>
+          <span class="month-val-crash">${m.cnt.toLocaleString()}</span>
+        </div>`;
+      }).join("");
+
+      const bikeHarmMonthHtml = bikeMonths.map(m => {
+        const harm = Math.max(m.serious, m.deaths); // what the red bar represents
+        const pct  = Math.round(harm / maxBikeHarm * 100);
+        // Breakdown shown under the count so it always matches the bar height.
+        const note = [
+          m.deaths  > 0 ? `${m.deaths} fatal`  : null,
+          m.serious > 0 ? `${m.serious} serious` : null,
+        ].filter(Boolean).join(" · ") || "0";
+        return `<div class="month-row">
+          <span class="month-lbl">${m.label}</span>
+          <div class="month-track"><div class="month-bar-death" style="width:${pct}%;background:#dc2626;"></div></div>
+          <div class="month-vals">
+            <span class="dead-val">${harm}</span>
+            <span class="rate-hint">${note}</span>
           </div>
-          <span class="month-val">${m.cnt.toLocaleString()}</span>
-          <span class="month-dead" style="color:${m.deaths > 0 ? '#dc2626' : 'var(--text-muted)'};">${sideNote}</span>
         </div>`;
       }).join("");
 
@@ -460,12 +483,11 @@
 
         <div class="chart-card">
           <div class="chart-title">📊 Monthly Trend</div>
-          <div class="chart-sub">Last 12 months · blue bar = crashes · red overlay = fatalities</div>
-          <div class="legend-inline">
-            <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div> Crash count</div>
-            <div class="legend-item"><div class="legend-dot" style="background:#dc2626;"></div> Fatalities</div>
-          </div>
-          <div class="month-rows">${monthHtml}</div>
+          <div class="chart-sub">Last 12 complete months · crashes and fatalities plotted on separate scales</div>
+          <div class="month-series-title">💥 Crashes <span class="sub">scale 0–${maxCnt.toLocaleString()}</span></div>
+          <div class="month-rows">${crashMonthHtml}</div>
+          <div class="month-series-title" style="margin-top:14px;">⚰️ Fatalities <span class="sub">scale 0–${maxDead} · rate per 1,000 crashes</span></div>
+          <div class="month-rows">${deadMonthHtml}</div>
         </div>
 
         <div class="chart-card">
@@ -474,12 +496,11 @@
           ${bikeStatsHtml}
           <div style="margin-top:16px;">
             <div style="font-size:13px;font-weight:700;color:var(--text-head);margin-bottom:3px;">Monthly trend</div>
-            <div class="chart-sub" style="margin-bottom:10px;">Last 12 months · green bar = crashes · red overlay = serious injuries</div>
-            <div class="legend-inline">
-              <div class="legend-item"><div class="legend-dot" style="background:#16a34a;"></div> Bike crashes</div>
-              <div class="legend-item"><div class="legend-dot" style="background:#dc2626;"></div> Serious injuries</div>
-            </div>
-            <div class="month-rows">${bikeMonths.length ? bikeMonthHtml : '<div style="font-size:12px;color:var(--text-muted);">No data for this period.</div>'}</div>
+            <div class="chart-sub" style="margin-bottom:10px;">Bike crashes and serious injuries / fatalities plotted on separate scales</div>
+            <div class="month-series-title">🚲 Bike crashes <span class="sub">scale 0–${maxBikeCnt}</span></div>
+            <div class="month-rows">${bikeMonths.length ? bikeCrashMonthHtml : '<div style="font-size:12px;color:var(--text-muted);">No data for this period.</div>'}</div>
+            <div class="month-series-title" style="margin-top:14px;">🚑 Serious injuries / fatalities <span class="sub">scale 0–${maxBikeHarm}</span></div>
+            <div class="month-rows">${bikeMonths.length ? bikeHarmMonthHtml : '<div style="font-size:12px;color:var(--text-muted);">No data for this period.</div>'}</div>
           </div>
         </div>
 
