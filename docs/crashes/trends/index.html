@@ -247,7 +247,7 @@
         ? Math.round((now - latestDate) < 0 ? 0 : (now - cutoff90) / 86400000 - (now - latestDate) / 86400000)
         : 90;
       const coverageLabel = latestFmt
-        ? `data through ${latestFmt} · querying back to ${cutoff90.toLocaleDateString("en-US",{month:"short",day:"numeric"})}`
+        ? `last 90 days · data through ${latestFmt}`
         : "last 90 days";
       const daysLabel = latestFmt
         ? `through ${latestFmt}`
@@ -350,6 +350,9 @@
         cnt:   parseInt(r.cnt || 0),
         deaths:parseInt(r.deaths || 0),
       }));
+      const monthRangeLabel = months.length >= 2
+        ? `${months[0].label} – ${months[months.length - 1].label}`
+        : "";
       const maxCnt  = Math.max(...months.map(m => m.cnt), 1);
       const maxDead = Math.max(...months.map(m => m.deaths), 1);
 
@@ -449,6 +452,7 @@
 
       el.innerHTML = `
         ${statsHtml}
+        <div style="font-size:11px;color:var(--text-muted);text-align:center;">Counts above cover the last 90 days of published APD records.</div>
 
         <div class="chart-card">
           <div class="chart-title">🕐 Crashes by Time of Day</div>
@@ -483,7 +487,7 @@
 
         <div class="chart-card">
           <div class="chart-title">📊 Monthly Trend</div>
-          <div class="chart-sub">Last 12 complete months · crashes and fatalities plotted on separate scales</div>
+          <div class="chart-sub">12-month view (${monthRangeLabel}) · crashes & fatalities on separate scales</div>
           <div class="month-series-title">💥 Crashes <span class="sub">scale 0–${maxCnt.toLocaleString()}</span></div>
           <div class="month-rows">${crashMonthHtml}</div>
           <div class="month-series-title" style="margin-top:14px;">⚰️ Fatalities <span class="sub">scale 0–${maxDead} · rate per 1,000 crashes</span></div>
@@ -492,7 +496,7 @@
 
         <div class="chart-card">
           <div class="chart-title">🚲 Bicycle Crashes</div>
-          <div class="chart-sub">Last 12 complete months · crashes where a bicycle was involved</div>
+          <div class="chart-sub">12-month view (${monthRangeLabel}) · crashes where a bicycle was involved</div>
           ${bikeStatsHtml}
           <div style="margin-top:16px;">
             <div style="font-size:13px;font-weight:700;color:var(--text-head);margin-bottom:3px;">Monthly trend</div>
