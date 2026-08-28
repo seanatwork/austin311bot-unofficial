@@ -1,5 +1,5 @@
 {
-  "generated": "2026-08-27T22:20:25.724351+00:00",
+  "generated": "2026-08-28T17:28:29.094155+00:00",
   "days": {
     "2025-05-01": {
       "parking": {
@@ -19810,8 +19810,8 @@
       },
       "noise": {
         "open": 7,
-        "closed": 0,
-        "total": 7
+        "closed": 1,
+        "total": 8
       },
       "animal": {
         "open": 42,
@@ -19855,6 +19855,11 @@
         "closed": 4,
         "total": 20
       },
+      "noise": {
+        "open": 0,
+        "closed": 16,
+        "total": 16
+      },
       "animal": {
         "open": 3,
         "closed": 1,
@@ -19887,6 +19892,11 @@
       }
     },
     "2026-08-24": {
+      "noise": {
+        "open": 0,
+        "closed": 2,
+        "total": 2
+      },
       "graffiti": {
         "open": 3,
         "closed": 0,
@@ -19899,6 +19909,11 @@
       }
     },
     "2026-08-25": {
+      "noise": {
+        "open": 0,
+        "closed": 1,
+        "total": 1
+      },
       "graffiti": {
         "open": 6,
         "closed": 0,
@@ -19911,53 +19926,72 @@
       }
     },
     "2026-08-26": {
+      "noise": {
+        "open": 0,
+        "closed": 5,
+        "total": 5
+      },
       "graffiti": {
         "open": 2,
         "closed": 0,
         "total": 2
+      }
+    },
+    "2026-08-27": {
+      "noise": {
+        "open": 0,
+        "closed": 3,
+        "total": 3
+      }
+    },
+    "2026-08-28": {
+      "noise": {
+        "open": 22,
+        "closed": 1,
+        "total": 23
       }
     }
   },
   "totals_90d": {
     "homeless": {
       "open": 19,
-      "closed": 530,
-      "total": 549
+      "closed": 527,
+      "total": 546
     },
     "parking": {
       "open": 198,
-      "closed": 5974,
-      "total": 6172
+      "closed": 5920,
+      "total": 6118
     },
     "noise": {
-      "open": 27,
-      "closed": 1076,
-      "total": 1103
+      "open": 49,
+      "closed": 1098,
+      "total": 1147
     },
     "animal": {
-      "open": 1111,
-      "closed": 2867,
-      "total": 3978
+      "open": 1099,
+      "closed": 2841,
+      "total": 3940
     },
     "graffiti": {
       "open": 163,
-      "closed": 92,
-      "total": 255
+      "closed": 91,
+      "total": 254
     },
     "parks": {
-      "open": 833,
-      "closed": 823,
-      "total": 1656
+      "open": 832,
+      "closed": 808,
+      "total": 1640
     },
     "storm": {
       "open": 116,
-      "closed": 894,
-      "total": 1010
+      "closed": 888,
+      "total": 1004
     },
     "traffic": {
-      "open": 2206,
-      "closed": 8883,
-      "total": 11089
+      "open": 2192,
+      "closed": 8834,
+      "total": 11026
     },
     "bicycle": {
       "open": 45,
@@ -19966,25 +20000,25 @@
     },
     "dead_animal": {
       "open": 72,
-      "closed": 1380,
-      "total": 1452
+      "closed": 1363,
+      "total": 1435
     }
   },
   "totals_365d": {
     "homeless": {
       "open": 35,
-      "closed": 1998,
-      "total": 2033
+      "closed": 1997,
+      "total": 2032
     },
     "parking": {
       "open": 199,
-      "closed": 22354,
-      "total": 22553
+      "closed": 22298,
+      "total": 22497
     },
     "noise": {
-      "open": 27,
-      "closed": 5901,
-      "total": 5928
+      "open": 49,
+      "closed": 5889,
+      "total": 5938
     },
     "animal": {
       "open": 1694,
@@ -19993,8 +20027,8 @@
     },
     "graffiti": {
       "open": 169,
-      "closed": 960,
-      "total": 1129
+      "closed": 958,
+      "total": 1127
     },
     "parks": {
       "open": 1117,
@@ -20003,13 +20037,13 @@
     },
     "storm": {
       "open": 117,
-      "closed": 3525,
-      "total": 3642
+      "closed": 3516,
+      "total": 3633
     },
     "traffic": {
       "open": 3258,
-      "closed": 18654,
-      "total": 21912
+      "closed": 18648,
+      "total": 21906
     },
     "bicycle": {
       "open": 87,
@@ -20018,8 +20052,8 @@
     },
     "dead_animal": {
       "open": 73,
-      "closed": 6351,
-      "total": 6424
+      "closed": 6324,
+      "total": 6397
     }
   }
 }
