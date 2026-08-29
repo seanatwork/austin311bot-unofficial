@@ -97,8 +97,8 @@
 
   <div id="panel">
     <div id="panel-title">🏞️ Austin Parks Maintenance Trends</div>
-    <div id="panel-subtitle">Park maintenance 311 requests — last 12 months</div>
-    <div id="last-ran">Last ran: 2026-08-27 05:19 PM CDT</div>
+    <div id="panel-subtitle">Park maintenance 311 requests — last 365 days</div>
+    <div id="last-ran">Last ran: 2026-08-29 12:01 PM CDT</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Parks Map</a>
       <a class="fbtn" href="../../">Austin 311 Home</a>
@@ -108,18 +108,18 @@
   <div id="stats">
     <div class="stats-inner">
       <div class="stat">
-        <div class="stat-value" style="color:#3b82f6;">4,639</div>
+        <div class="stat-value" style="color:#3b82f6;">7,567</div>
         <div class="stat-label">Total reports</div>
-        <div class="stat-sub">last 12 months</div>
+        <div class="stat-sub">last 365 days</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#22c55e;">464</div>
+        <div class="stat-value" style="color:#22c55e;">582</div>
         <div class="stat-label">Avg / month</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#ef4444;">24%</div>
+        <div class="stat-value" style="color:#ef4444;">3%</div>
         <div class="stat-label">Still open</div>
-        <div class="stat-sub">1,117 unresolved</div>
+        <div class="stat-sub">192 unresolved</div>
       </div>
     </div>
   </div>
@@ -145,7 +145,7 @@
   </footer>
 
   <script>
-    const DATA = {"months": ["Nov 2025", "Dec 2025", "Jan 2026", "Feb 2026", "Mar 2026", "Apr 2026", "May 2026", "Jun 2026", "Jul 2026", "Aug 2026"], "monthlyCounts": [121, 138, 167, 633, 632, 573, 756, 742, 492, 385], "monthlyOpenCounts": [0, 0, 7, 52, 48, 120, 59, 266, 340, 225], "monthlyGrounds": [0, 0, 17, 417, 449, 419, 541, 559, 239, 235], "monthlyBuildings": [0, 0, 5, 60, 62, 69, 93, 54, 32, 25], "rollingAvg": [null, null, 142.0, 312.7, 477.3, 612.7, 653.7, 690.3, 663.3, 539.7], "types": [{"name": "Grounds Maintenance", "count": 2227}, {"name": "Parks \u2014 Grounds Maintenance", "count": 1046}, {"name": "Grounds Plumbing", "count": 378}, {"name": "Unknown", "count": 317}, {"name": "Grounds Electrical", "count": 199}, {"name": "Building Plumbing", "count": 176}, {"name": "Building Issues", "count": 136}, {"name": "Commercial Use of Parkland", "count": 67}, {"name": "Building A/C & Heating", "count": 54}]};
+    const DATA = {"months": ["Aug 2025", "Sep 2025", "Oct 2025", "Nov 2025", "Dec 2025", "Jan 2026", "Feb 2026", "Mar 2026", "Apr 2026", "May 2026", "Jun 2026", "Jul 2026", "Aug 2026"], "monthlyCounts": [548, 605, 605, 530, 427, 529, 633, 632, 573, 756, 742, 492, 495], "monthlyOpenCounts": [2, 1, 0, 2, 2, 1, 6, 3, 11, 16, 18, 27, 103], "monthlyGrounds": [508, 562, 570, 487, 392, 481, 573, 570, 504, 663, 688, 442, 453], "monthlyBuildings": [40, 43, 35, 43, 35, 48, 60, 62, 69, 93, 54, 50, 42], "rollingAvg": [null, null, 586.0, 580.0, 520.7, 495.3, 529.7, 598.0, 612.7, 653.7, 690.3, 663.3, 576.3], "types": [{"name": "Grounds Maintenance", "count": 5498}, {"name": "Grounds Plumbing", "count": 724}, {"name": "Grounds Electrical", "count": 514}, {"name": "Building Plumbing", "count": 274}, {"name": "Building Issues", "count": 229}, {"name": "Commercial Use of Parkland", "count": 129}, {"name": "Building A/C & Heating", "count": 107}, {"name": "Building Electric", "count": 64}, {"name": "Park Cemeteries", "count": 28}]};
 
     const isDark = document.documentElement.classList.contains("dark");
     const gridColor  = isDark ? "#252b3b" : "#e8ecf0";
