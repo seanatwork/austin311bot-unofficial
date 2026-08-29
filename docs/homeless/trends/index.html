@@ -24,7 +24,6 @@
       --btn-bg: #e2e8f0; --btn-border: #cbd5e1; --btn-color: #475569;
       --btn-hover-bg: #dbeafe; --btn-hover-color: #1e293b;
       --stat-border: #e2e8f0;
-      --note-bg: #fff7ed; --note-border: #fed7aa; --note-text: #9a3412;
     }
     html.dark {
       --bg: #0f1117; --bg-panel: #1e2230; --bg-card: #161a24;
@@ -33,7 +32,6 @@
       --btn-bg: #252b3b; --btn-border: #3d4868; --btn-color: #94a3b8;
       --btn-hover-bg: #2d3453; --btn-hover-color: #e2e8f0;
       --stat-border: #2d3348;
-      --note-bg: #2d1506; --note-border: #7c2d12; --note-text: #fdba74;
     }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -84,16 +82,6 @@
       display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 600;
       background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-sub);
     }
-    .hso-note {
-      background: var(--note-bg); border: 1px solid var(--note-border);
-      border-left: 4px solid #dc2626; border-radius: 8px; padding: 14px 16px;
-    }
-    .hso-note-title { font-size: 12px; font-weight: 700; color: var(--text-head); margin-bottom: 8px; }
-    .hso-quote {
-      font-size: 12px; font-style: italic; color: var(--note-text);
-      line-height: 1.6; border-left: 3px solid #dc2626; padding-left: 10px; margin: 8px 0;
-    }
-    .hso-note p { font-size: 12px; color: var(--text-sub); line-height: 1.6; margin-top: 8px; }
     footer { font-size: 0.72rem; color: var(--text-muted); text-align: center; margin-top: 8px; }
     footer a { color: var(--text-sub); text-decoration: none; }
   </style>
@@ -114,7 +102,7 @@
     <div id="panel-title">🏕️ Homeless 311 — Complaint Trends</div>
     <div id="panel-sub">Keyword-matched reports across all relevant service codes · last 365 days<br/>
     Austin 311 has no homeless-specific category — complaints are filed under parks, ROW, debris &amp; noise codes</div>
-    <div id="last-ran">Last ran: 2026-08-27 05:19 PM CDT</div>
+    <div id="last-ran">Last ran: 2026-08-28 09:51 PM CDT</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Homeless Map</a>
       <a class="fbtn" href="../../">🏠 Home</a>
@@ -125,15 +113,15 @@
 
     <div class="stats-row">
       <div class="stat">
-        <div class="stat-val" style="color:#3b82f6;">2,108</div>
+        <div class="stat-val" style="color:#3b82f6;">2,772</div>
         <div class="stat-label">Total matched (365d)</div>
       </div>
       <div class="stat">
-        <div class="stat-val" style="color:#f59e0b;">35</div>
+        <div class="stat-val" style="color:#f59e0b;">3</div>
         <div class="stat-label">Currently open</div>
       </div>
       <div class="stat">
-        <div class="stat-val" style="color:#dc2626;">1,034</div>
+        <div class="stat-val" style="color:#dc2626;">1,545</div>
         <div class="stat-label">Closed → HSO</div>
       </div>
     </div>
@@ -150,77 +138,62 @@
         </defs>
         <line x1="44" y1="130.0" x2="548" y2="130.0" stroke="var(--border)" stroke-width="1"/>
 <text x="40" y="133.0" text-anchor="end" font-size="9" fill="var(--text-muted)">0</text>
-<line x1="44" y1="110.3" x2="548" y2="110.3" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
-<text x="40" y="113.3" text-anchor="end" font-size="9" fill="var(--text-muted)">50</text>
-<line x1="44" y1="90.7" x2="548" y2="90.7" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
-<text x="40" y="93.7" text-anchor="end" font-size="9" fill="var(--text-muted)">100</text>
-<line x1="44" y1="71.0" x2="548" y2="71.0" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
-<text x="40" y="74.0" text-anchor="end" font-size="9" fill="var(--text-muted)">150</text>
-<line x1="44" y1="51.3" x2="548" y2="51.3" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
-<text x="40" y="54.3" text-anchor="end" font-size="9" fill="var(--text-muted)">200</text>
-<line x1="44" y1="31.7" x2="548" y2="31.7" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
-<text x="40" y="34.7" text-anchor="end" font-size="9" fill="var(--text-muted)">250</text>
+<line x1="44" y1="113.1" x2="548" y2="113.1" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
+<text x="40" y="116.1" text-anchor="end" font-size="9" fill="var(--text-muted)">50</text>
+<line x1="44" y1="96.3" x2="548" y2="96.3" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
+<text x="40" y="99.3" text-anchor="end" font-size="9" fill="var(--text-muted)">100</text>
+<line x1="44" y1="79.4" x2="548" y2="79.4" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
+<text x="40" y="82.4" text-anchor="end" font-size="9" fill="var(--text-muted)">150</text>
+<line x1="44" y1="62.6" x2="548" y2="62.6" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
+<text x="40" y="65.6" text-anchor="end" font-size="9" fill="var(--text-muted)">200</text>
+<line x1="44" y1="45.7" x2="548" y2="45.7" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
+<text x="40" y="48.7" text-anchor="end" font-size="9" fill="var(--text-muted)">250</text>
+<line x1="44" y1="28.9" x2="548" y2="28.9" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
+<text x="40" y="31.9" text-anchor="end" font-size="9" fill="var(--text-muted)">300</text>
 <line x1="44" y1="12.0" x2="548" y2="12.0" stroke="var(--border)" stroke-width="0.7" stroke-dasharray="3,2"/>
-<text x="40" y="15.0" text-anchor="end" font-size="9" fill="var(--text-muted)">300</text>
+<text x="40" y="15.0" text-anchor="end" font-size="9" fill="var(--text-muted)">350</text>
 
-        <polygon points="44,130 44.0,122.9 77.6,122.9 111.2,123.7 144.8,120.2 178.4,122.1 212.0,114.3 245.6,53.3 279.2,39.1 312.8,45.4 346.4,42.7 380.0,57.2 413.6,59.2 447.2,50.5 480.8,43.5 514.4,62.3 548.0,71.4 548,130" fill="url(#areaGrad)"/>
-        <polyline points="44.0,122.9 77.6,122.9 111.2,123.7 144.8,120.2 178.4,122.1 212.0,114.3 245.6,53.3 279.2,39.1 312.8,45.4 346.4,42.7 380.0,57.2 413.6,59.2 447.2,50.5 480.8,43.5 514.4,62.3 548.0,71.4" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
-        <text x="279.2" y="32.1" text-anchor="middle" font-size="9" font-weight="700" fill="#3b82f6">231</text>
-        <circle cx="44.0" cy="122.9" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>May 2025: 18</title></circle>
-<circle cx="77.6" cy="122.9" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Jun 2025: 18</title></circle>
-<circle cx="111.2" cy="123.7" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Jul 2025: 16</title></circle>
-<circle cx="144.8" cy="120.2" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Aug 2025: 25</title></circle>
-<circle cx="178.4" cy="122.1" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Sep 2025: 20</title></circle>
-<circle cx="212.0" cy="114.3" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Oct 2025: 40</title></circle>
-<circle cx="245.6" cy="53.3" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Nov 2025: 195</title></circle>
-<circle cx="279.2" cy="39.1" r="4.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Dec 2025: 231 (peak)</title></circle>
-<circle cx="312.8" cy="45.4" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Jan 2026: 215</title></circle>
-<circle cx="346.4" cy="42.7" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Feb 2026: 222</title></circle>
-<circle cx="380.0" cy="57.2" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Mar 2026: 185</title></circle>
-<circle cx="413.6" cy="59.2" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Apr 2026: 180</title></circle>
-<circle cx="447.2" cy="50.5" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>May 2026: 202</title></circle>
-<circle cx="480.8" cy="43.5" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Jun 2026: 220</title></circle>
-<circle cx="514.4" cy="62.3" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Jul 2026: 172</title></circle>
-<circle cx="548.0" cy="71.4" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Aug 2026: 149</title></circle>
+        <polygon points="44,130 44.0,57.2 86.0,56.5 128.0,38.0 170.0,64.3 212.0,52.1 254.0,57.5 296.0,54.8 338.0,67.6 380.0,69.3 422.0,61.9 464.0,55.8 506.0,63.6 548.0,56.8 548,130" fill="url(#areaGrad)"/>
+        <polyline points="44.0,57.2 86.0,56.5 128.0,38.0 170.0,64.3 212.0,52.1 254.0,57.5 296.0,54.8 338.0,67.6 380.0,69.3 422.0,61.9 464.0,55.8 506.0,63.6 548.0,56.8" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+        <text x="128.0" y="31.0" text-anchor="middle" font-size="9" font-weight="700" fill="#3b82f6">273</text>
+        <circle cx="44.0" cy="57.2" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Aug 2025: 216</title></circle>
+<circle cx="86.0" cy="56.5" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Sep 2025: 218</title></circle>
+<circle cx="128.0" cy="38.0" r="4.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Oct 2025: 273 (peak)</title></circle>
+<circle cx="170.0" cy="64.3" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Nov 2025: 195</title></circle>
+<circle cx="212.0" cy="52.1" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Dec 2025: 231</title></circle>
+<circle cx="254.0" cy="57.5" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Jan 2026: 215</title></circle>
+<circle cx="296.0" cy="54.8" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Feb 2026: 223</title></circle>
+<circle cx="338.0" cy="67.6" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Mar 2026: 185</title></circle>
+<circle cx="380.0" cy="69.3" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Apr 2026: 180</title></circle>
+<circle cx="422.0" cy="61.9" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>May 2026: 202</title></circle>
+<circle cx="464.0" cy="55.8" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Jun 2026: 220</title></circle>
+<circle cx="506.0" cy="63.6" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Jul 2026: 197</title></circle>
+<circle cx="548.0" cy="56.8" r="3.5" fill="#3b82f6" stroke="var(--bg-card)" stroke-width="1.5"><title>Aug 2026: 217</title></circle>
 
-        <text x="44.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">May</text>
-<text x="77.6" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Jun</text>
-<text x="111.2" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Jul</text>
-<text x="144.8" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Aug</text>
-<text x="178.4" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Sep</text>
-<text x="212.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Oct</text>
-<text x="245.6" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Nov</text>
-<text x="279.2" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Dec</text>
-<text x="312.8" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Jan</text>
-<text x="346.4" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Feb</text>
-<text x="380.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Mar</text>
-<text x="413.6" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Apr</text>
-<text x="447.2" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">May</text>
-<text x="480.8" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Jun</text>
-<text x="514.4" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Jul</text>
+        <text x="44.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Aug</text>
+<text x="86.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Sep</text>
+<text x="128.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Oct</text>
+<text x="170.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Nov</text>
+<text x="212.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Dec</text>
+<text x="254.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Jan</text>
+<text x="296.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Feb</text>
+<text x="338.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Mar</text>
+<text x="380.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Apr</text>
+<text x="422.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">May</text>
+<text x="464.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Jun</text>
+<text x="506.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Jul</text>
 <text x="548.0" y="147" text-anchor="middle" font-size="9" fill="var(--text-muted)">Aug</text>
 
       </svg>
       <div class="trend-badges">
-        <span class="trend-badge">avg 70/mo → 193/mo &nbsp;📈 rising</span>
+        <span class="trend-badge">avg 225/mo → 203/mo &nbsp;📉 falling</span>
       </div>
-    </div>
-
-    <div class="hso-note">
-      <div class="hso-note-title">⚠️ What is an HSO Deflection?</div>
-      <div class="hso-quote">“The Service Request submitted has been reviewed and administratively closed out. All reports related to encampments will be sent to the Homeless Strategy Office to ensure prioritization of the issue.”</div>
-      <p>
-        When a homeless-related 311 report is closed with this note, the ticket exits
-        the standard 311 system and is routed to the Homeless Strategy Office — a separate
-        department with no public-facing ticket tracking. 49% of matched
-        tickets in the last year were closed this way.
-      </p>
     </div>
 
     <footer>
       Data: <a href="https://311.austintexas.gov/open311/v2" target="_blank" rel="noopener">Austin Open311 API</a>
       &nbsp;·&nbsp; Keyword-matched across PRGRDISS, ATCOCIRW, OBSTMIDB, SBDEBROW, DRCHANEL
-      &nbsp;·&nbsp; Generated 2026-08-27 05:19 PM CDT
+      &nbsp;·&nbsp; Generated 2026-08-28 09:51 PM CDT
     </footer>
 
   </div>

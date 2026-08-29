@@ -29,12 +29,6 @@ def _format_central_time() -> str:
     return central_now.strftime(f"%Y-%m-%d %I:%M %p {tz_abbr}")
 
 
-HSO_BOILERPLATE = (
-    "“The Service Request submitted has been reviewed and administratively "
-    "closed out. All reports related to encampments will be sent to the "
-    "Homeless Strategy Office to ensure prioritization of the issue.”"
-)
-
 GA_SNIPPET = """<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
 <script>
@@ -69,7 +63,10 @@ def generate_homeless_trends(days_back: int = 365) -> tuple:
     # single 365-day request only returns the oldest ~90 days before hitting the
     # pagination cap. Month-by-month ensures every period is fully covered.
     months_back = max(1, days_back // 30) + 1
-    records = fetch_encampment_reports_monthly(months_back=months_back)
+    # Bypass the SQLite cache here: the cache is incremental and can be missing
+    # entire months (this page previously undercounted early months ~8x for that
+    # reason). The trends page must always reflect a complete, current fetch.
+    records = fetch_encampment_reports_monthly(months_back=months_back, use_cache=False)
 
     if not records:
         buf = io.BytesIO(b"<p>No data found.</p>")
@@ -195,7 +192,6 @@ def generate_homeless_trends(days_back: int = 365) -> tuple:
         {xlabels_html}
       </svg>"""
 
-    deflection_pct_str = f"{deflection_rate}%" if deflection_rate else "the majority"
     now_str = _format_central_time()
 
     html = f"""<!DOCTYPE html>
@@ -216,7 +212,6 @@ def generate_homeless_trends(days_back: int = 365) -> tuple:
       --btn-bg: #e2e8f0; --btn-border: #cbd5e1; --btn-color: #475569;
       --btn-hover-bg: #dbeafe; --btn-hover-color: #1e293b;
       --stat-border: #e2e8f0;
-      --note-bg: #fff7ed; --note-border: #fed7aa; --note-text: #9a3412;
     }}
     html.dark {{
       --bg: #0f1117; --bg-panel: #1e2230; --bg-card: #161a24;
@@ -225,7 +220,6 @@ def generate_homeless_trends(days_back: int = 365) -> tuple:
       --btn-bg: #252b3b; --btn-border: #3d4868; --btn-color: #94a3b8;
       --btn-hover-bg: #2d3453; --btn-hover-color: #e2e8f0;
       --stat-border: #2d3348;
-      --note-bg: #2d1506; --note-border: #7c2d12; --note-text: #fdba74;
     }}
     body {{
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -276,16 +270,6 @@ def generate_homeless_trends(days_back: int = 365) -> tuple:
       display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 11px; font-weight: 600;
       background: var(--bg-panel); border: 1px solid var(--border); color: var(--text-sub);
     }}
-    .hso-note {{
-      background: var(--note-bg); border: 1px solid var(--note-border);
-      border-left: 4px solid #dc2626; border-radius: 8px; padding: 14px 16px;
-    }}
-    .hso-note-title {{ font-size: 12px; font-weight: 700; color: var(--text-head); margin-bottom: 8px; }}
-    .hso-quote {{
-      font-size: 12px; font-style: italic; color: var(--note-text);
-      line-height: 1.6; border-left: 3px solid #dc2626; padding-left: 10px; margin: 8px 0;
-    }}
-    .hso-note p {{ font-size: 12px; color: var(--text-sub); line-height: 1.6; margin-top: 8px; }}
     footer {{ font-size: 0.72rem; color: var(--text-muted); text-align: center; margin-top: 8px; }}
     footer a {{ color: var(--text-sub); text-decoration: none; }}
   </style>
@@ -329,17 +313,6 @@ def generate_homeless_trends(days_back: int = 365) -> tuple:
       <div class="trend-badges">
         <span class="trend-badge">avg {avg_first}/mo → {avg_second}/mo &nbsp;{vol_arrow}</span>
       </div>
-    </div>
-
-    <div class="hso-note">
-      <div class="hso-note-title">⚠️ What is an HSO Deflection?</div>
-      <div class="hso-quote">{HSO_BOILERPLATE}</div>
-      <p>
-        When a homeless-related 311 report is closed with this note, the ticket exits
-        the standard 311 system and is routed to the Homeless Strategy Office — a separate
-        department with no public-facing ticket tracking. {deflection_pct_str} of matched
-        tickets in the last year were closed this way.
-      </p>
     </div>
 
     <footer>
