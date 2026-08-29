@@ -285,7 +285,7 @@ def _render_html(data: dict, fetched_at: str) -> str:
 
   <div id="panel">
     <div id="panel-title">🅿️ Austin Parking Complaints Trends</div>
-    <div id="panel-subtitle">Resident-reported parking violations — last 12 months</div>
+    <div id="panel-subtitle">Resident-reported parking violations — last 365 days</div>
     <div id="last-ran">Last ran: {fetched_at}</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Parking Map</a>
@@ -298,7 +298,7 @@ def _render_html(data: dict, fetched_at: str) -> str:
       <div class="stat">
         <div class="stat-value" style="color:#3b82f6;">{total:,}</div>
         <div class="stat-label">Total complaints</div>
-        <div class="stat-sub">last 12 months</div>
+        <div class="stat-sub">last 365 days</div>
       </div>
       <div class="stat">
         <div class="stat-value" style="color:#22c55e;">{int(avg_per_month):,}</div>
@@ -584,7 +584,10 @@ def generate_parking_trends(days_back: int = LOOKBACK_DAYS) -> tuple[Optional[io
     # single 365-day request only returns the oldest ~90 days before hitting the
     # pagination cap. Month-by-month ensures every period is fully covered.
     months_back = max(1, days_back // 30) + 1
-    records = fetch_parking_monthly(months_back)
+    # Bypass the SQLite cache here: it is incremental and can be missing or
+    # capped records, and it accumulates history beyond the requested window
+    # (this page showed 16 months while claiming "last 12 months").
+    records = fetch_parking_monthly(months_back, use_cache=False)
     if not records:
         return None, f"🅿️ No parking complaint data found for last {days_back} days."
 

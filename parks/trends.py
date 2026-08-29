@@ -220,7 +220,7 @@ def _render_html(data: dict, fetched_at: str) -> str:
 
   <div id="panel">
     <div id="panel-title">🏞️ Austin Parks Maintenance Trends</div>
-    <div id="panel-subtitle">Park maintenance 311 requests — last 12 months</div>
+    <div id="panel-subtitle">Park maintenance 311 requests — last 365 days</div>
     <div id="last-ran">Last ran: {fetched_at}</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Parks Map</a>
@@ -233,7 +233,7 @@ def _render_html(data: dict, fetched_at: str) -> str:
       <div class="stat">
         <div class="stat-value" style="color:#3b82f6;">{total:,}</div>
         <div class="stat-label">Total reports</div>
-        <div class="stat-sub">last 12 months</div>
+        <div class="stat-sub">last 365 days</div>
       </div>
       <div class="stat">
         <div class="stat-value" style="color:#22c55e;">{int(avg_per_month):,}</div>
@@ -399,7 +399,10 @@ def generate_parks_trends(days_back: int = LOOKBACK_DAYS) -> tuple[Optional[io.B
     from parks.parks_bot import fetch_parks_monthly
 
     months_back = max(1, days_back // 30) + 1
-    records = fetch_parks_monthly(months_back)
+    # Bypass the SQLite cache here: it is incremental and can be missing entire
+    # months (this page undercounted Nov 2025–Jan 2026 by ~5x). Always fetch the
+    # full window so the chart reflects complete data.
+    records = fetch_parks_monthly(months_back, use_cache=False)
     if not records:
         return None, f"🏞️ No park maintenance data found for last {days_back} days."
 
