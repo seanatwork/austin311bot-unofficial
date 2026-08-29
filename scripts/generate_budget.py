@@ -685,52 +685,6 @@ def generate_html(fy, quarter, depts, dept_cats, ae_programs, aw_programs, ae_to
 
     <hr class="section-divider" />
 
-    <div>
-      <div class="section-heading">How Austin&#39;s Budget Works</div>
-      <p class="section-sub">Three separate money pools fund city services — understanding which is which explains why the city can&#39;t simply &#34;move money around.&#34;</p>
-      <div class="fund-grid">
-        <div class="fund-card" style="--accent:#60a5fa;">
-          <span class="fund-icon">🏛️</span>
-          <div class="fund-name">General Fund</div>
-          <div class="fund-source">Property tax &amp; sales tax</div>
-          <ul>
-            <li>Police (APD)</li>
-            <li>Fire &amp; EMS</li>
-            <li>Parks maintenance</li>
-            <li>Libraries</li>
-            <li>Code enforcement</li>
-          </ul>
-          <div class="fund-note"><strong>Where policy happens.</strong> Council allocates this fund — it reflects actual priorities. Operational gaps (staffing, response times) can only be fixed here.</div>
-        </div>
-        <div class="fund-card" style="--accent:#34d399;">
-          <span class="fund-icon">⚡</span>
-          <div class="fund-name">Enterprise Funds</div>
-          <div class="fund-source">User fees &amp; utility bills</div>
-          <ul>
-            <li>Austin Energy</li>
-            <li>Austin Water</li>
-            <li>Airport (AUS)</li>
-            <li>Resource Recovery</li>
-          </ul>
-          <div class="fund-note"><strong>Legally ring-fenced.</strong> Your electric and water bills fund these departments only — they cannot be redirected to police, parks, or anything else.</div>
-        </div>
-        <div class="fund-card" style="--accent:#fbbf24;">
-          <span class="fund-icon">🏗️</span>
-          <div class="fund-name">Bonds</div>
-          <div class="fund-source">Voter-authorized debt</div>
-          <ul>
-            <li>Roads &amp; sidewalks</li>
-            <li>Parks infrastructure</li>
-            <li>Libraries &amp; buildings</li>
-            <li>Trails &amp; bike lanes</li>
-          </ul>
-          <div class="fund-note"><strong>Capital only.</strong> Bonds build and repair physical things — they cannot hire staff, improve response times, or fund any ongoing service.</div>
-        </div>
-      </div>
-    </div>
-
-    <hr class="section-divider" />
-
     <!-- ── Enterprise Funds (Austin Energy + Austin Water) ── -->
     <div>
       <div class="section-heading">⚡ Enterprise Funds — Austin Energy &amp; Austin Water</div>
@@ -787,6 +741,52 @@ def generate_html(fy, quarter, depts, dept_cats, ae_programs, aw_programs, ae_to
 
     <hr class="section-divider" />
 
+    <div>
+      <div class="section-heading">How Austin&#39;s Budget Works</div>
+      <p class="section-sub">Three separate money pools fund city services — understanding which is which explains why the city can&#39;t simply &#34;move money around.&#34;</p>
+      <div class="fund-grid">
+        <div class="fund-card" style="--accent:#60a5fa;">
+          <span class="fund-icon">🏛️</span>
+          <div class="fund-name">General Fund</div>
+          <div class="fund-source">Property tax &amp; sales tax</div>
+          <ul>
+            <li>Police (APD)</li>
+            <li>Fire &amp; EMS</li>
+            <li>Parks maintenance</li>
+            <li>Libraries</li>
+            <li>Code enforcement</li>
+          </ul>
+          <div class="fund-note"><strong>Where policy happens.</strong> Council allocates this fund — it reflects actual priorities. Operational gaps (staffing, response times) can only be fixed here.</div>
+        </div>
+        <div class="fund-card" style="--accent:#34d399;">
+          <span class="fund-icon">⚡</span>
+          <div class="fund-name">Enterprise Funds</div>
+          <div class="fund-source">User fees &amp; utility bills</div>
+          <ul>
+            <li>Austin Energy</li>
+            <li>Austin Water</li>
+            <li>Airport (AUS)</li>
+            <li>Resource Recovery</li>
+          </ul>
+          <div class="fund-note"><strong>Legally ring-fenced.</strong> Your electric and water bills fund these departments only — they cannot be redirected to police, parks, or anything else.</div>
+        </div>
+        <div class="fund-card" style="--accent:#fbbf24;">
+          <span class="fund-icon">🏗️</span>
+          <div class="fund-name">Bonds</div>
+          <div class="fund-source">Voter-authorized debt</div>
+          <ul>
+            <li>Roads &amp; sidewalks</li>
+            <li>Parks infrastructure</li>
+            <li>Libraries &amp; buildings</li>
+            <li>Trails &amp; bike lanes</li>
+          </ul>
+          <div class="fund-note"><strong>Capital only.</strong> Bonds build and repair physical things — they cannot hire staff, improve response times, or fund any ongoing service.</div>
+        </div>
+      </div>
+    </div>
+
+    <hr class="section-divider" />
+
     <div id="data-source">
       <strong>General Fund</strong> — <a href="https://data.austintexas.gov/resource/g5k8-8sud" target="_blank" rel="noopener">City of Austin Operating Budget (g5k8-8sud)</a>
       · Enterprise Funds — same dataset, funds 5010/5020/5025/5029/5030
@@ -830,6 +830,29 @@ def generate_html(fy, quarter, depts, dept_cats, ae_programs, aw_programs, ae_to
     const pct = (a, b) => b ? ((a / b) * 100).toFixed(1) + "%" : "—";
 
     // ── main dept bar chart ──────────────────────────────────────────────────
+    const deptBudgetMax = Math.max(...DEPTS.map(d => d.budget));
+
+    // Inline plugin: draw the total adopted budget at the end of each bar
+    const deptEndLabels = {{
+      id: "deptEndLabels",
+      afterDatasetsDraw(chart) {{
+        const meta = chart.getDatasetMeta(0);
+        const totals = chart.data.datasets[0].data.map((v, i) => v + chart.data.datasets[1].data[i]);
+        const {{ ctx }} = chart;
+        ctx.save();
+        ctx.font = "600 11px -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        ctx.textBaseline = "middle";
+        ctx.textAlign = "left";
+        ctx.fillStyle = isDark ? "#94a3b8" : "#64748b";
+        meta.data.forEach((bar, i) => {{
+          const label = fmt(totals[i]);
+          const x = chart.scales.x.getPixelForValue(totals[i]) + 6;
+          if (x + ctx.measureText(label).width <= chart.chartArea.right) ctx.fillText(label, x, bar.y);
+        }});
+        ctx.restore();
+      }},
+    }};
+
     const deptChart = new Chart(document.getElementById("deptChart"), {{
       type: "bar",
       data: {{
@@ -844,13 +867,14 @@ def generate_html(fy, quarter, depts, dept_cats, ae_programs, aw_programs, ae_to
           }},
           {{
             label: "Remaining budget",
-            data: DEPTS.map(d => d.budget - d.spent),
+            data: DEPTS.map(d => Math.max(0, d.budget - d.spent)),
             backgroundColor: DEPTS.map(d => d.color + "40"),
             borderRadius: 4,
             stack: "budget",
           }},
         ],
       }},
+      plugins: [deptEndLabels],
       options: {{
         indexAxis: "y",
         responsive: true,
@@ -887,6 +911,8 @@ def generate_html(fy, quarter, depts, dept_cats, ae_programs, aw_programs, ae_to
         scales: {{
           x: {{
             stacked: true,
+            min: 0,
+            max: Math.ceil(deptBudgetMax * 1.08 / 25e6) * 25e6,
             ticks: {{ color: tickColor, font: {{ size: 11 }}, callback: v => "$" + (v / 1e6).toFixed(0) + "M" }},
             grid: {{ color: gridColor }},
             beginAtZero: true,
