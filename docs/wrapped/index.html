@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>311 Wrapped — Austin 311</title>
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="311 Wrapped — Your neighborhood's year in complaints" />
+  <meta property="og:description" content="Enter a ZIP code and see what your neighborhood's 311 complaints say about it — top issues, response times, and what sets it apart from the rest of Austin." />
+  <meta property="og:url" content="https://austin311.com/wrapped/" />
+  <meta property="og:image" content="https://austin311.com/og-default.png" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Austin 311" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="311 Wrapped — Your neighborhood's year in complaints" />
+  <meta name="twitter:description" content="Enter a ZIP code and see what your neighborhood's 311 complaints say about it." />
+  <meta name="twitter:image" content="https://austin311.com/og-default.png" />
+  <meta name="description" content="Enter a ZIP code and see what your neighborhood's 311 complaints say about it — top issues, response times, and what sets it apart from the rest of Austin." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script>
+    if (localStorage.getItem("theme") === "dark") document.documentElement.classList.add("dark");
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    /* ── Violet Crown color tokens (matches homepage) ── */
+    :root {
+      --bg:           #F7F5FA;
+      --bg-card:      #FFFFFF;
+      --bg-card-hover:#F3EFF9;
+      --border:       #E3DEEE;
+      --border-hover: #B9A8E0;
+      --text:         #3A3344;
+      --text-head:    #241B3A;
+      --text-tag:     #6B6180;
+      --text-desc:    #7A7189;
+      --text-footer:  #A79FB8;
+      --text-footer-a:#7A6F94;
+      --text-footer-hover: #4C1D95;
+      --text-muted:   #A79FB8;
+      --accent-violet:#5B3FA8;
+      --accent-coral: #E8623D;
+      --accent-gold:  #D9A441;
+      --bar-bg:       #D8CFEB;
+      --bar-fill:     #5B3FA8;
+      --shadow-warm:  rgba(91, 63, 168, 0.12);
+    }
+
+    html.dark {
+      --bg:           #16121F;
+      --bg-card:      #1F1A2E;
+      --bg-card-hover:#282239;
+      --border:       #342B4A;
+      --border-hover: #7A63C4;
+      --text:         #CFC8E0;
+      --text-head:    #F0EBFA;
+      --text-tag:     #9A8FB5;
+      --text-desc:    #8D82A6;
+      --text-footer:  #5C5178;
+      --text-footer-a:#8D82A6;
+      --text-footer-hover: #B9A8E0;
+      --text-muted:   #5C5178;
+      --accent-violet:#8B6FE0;
+      --accent-coral: #F07B54;
+      --accent-gold:  #E6BC6A;
+      --bar-bg:       #3E3358;
+      --bar-fill:     #8B6FE0;
+      --shadow-warm:  rgba(139, 111, 224, 0.10);
+    }
+
+    body {
+      font-family: "Public Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      background-image:
+        radial-gradient(ellipse 60% 40% at 50% 0%, rgba(91,63,168,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 40% 30% at 80% 90%, rgba(232,98,61,0.05) 0%, transparent 60%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2.5rem 1rem 3rem;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    #theme-toggle {
+      position: fixed;
+      top: 14px;
+      right: 16px;
+      z-index: 200;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 5px 10px;
+      font-size: 0.75rem;
+      color: var(--text-desc);
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      user-select: none;
+    }
+    #theme-toggle:hover { color: var(--text); border-color: var(--border-hover); }
+
+    .wrap {
+      width: 100%;
+      max-width: 860px;
+      position: relative;
+      z-index: 1;
+    }
+
+    header { text-align: center; margin-bottom: 1.75rem; }
+    header .home-link {
+      font-size: 0.85rem;
+      color: var(--text-tag);
+      text-decoration: none;
+    }
+    header .home-link:hover { color: var(--text-head); }
+    header h1 {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 2.6rem;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text-head);
+      line-height: 1.15;
+      margin-top: 0.4rem;
+    }
+    header .subtitle {
+      margin-top: 0.5rem;
+      color: var(--text-tag);
+      font-size: 1rem;
+      max-width: 560px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* ── ZIP search ── */
+    .search {
+      display: flex;
+      gap: 0.5rem;
+      max-width: 420px;
+      margin: 0 auto 2rem;
+    }
+    .search input {
+      flex: 1;
+      min-width: 0;
+      padding: 0.7rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 1rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .search input:focus { border-color: var(--border-hover); }
+    .search input::placeholder { color: var(--text-muted); }
+    .search button {
+      padding: 0.7rem 1.1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--accent-violet);
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .search button:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin: 2rem 0 0.75rem;
+    }
+
+    /* ── Cards / grids ── */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.25rem 1.4rem;
+      box-shadow: 0 10px 24px var(--shadow-warm);
+    }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.9rem; }
+    @media (max-width: 640px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    .stat-block { text-align: center; }
+    .stat-value {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.9rem;
+      font-weight: 700;
+      color: var(--text-head);
+      line-height: 1.1;
+    }
+    .stat-value.coral { color: var(--accent-coral); }
+    .stat-value.gold  { color: var(--accent-gold); }
+    .stat-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-top: 0.25rem;
+    }
+
+    .section-title {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-head);
+      margin: 2rem 0 0.9rem;
+    }
+
+    /* ── Issue bars ── */
+    .issue { margin-bottom: 0.8rem; }
+    .issue .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.3rem;
+      font-size: 0.92rem;
+    }
+    .issue .row .pct { color: var(--accent-violet); font-weight: 600; white-space: nowrap; }
+    .issue .bar {
+      height: 8px;
+      border-radius: 999px;
+      background: var(--bar-bg);
+      overflow: hidden;
+    }
+    .issue .bar span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+      background: var(--bar-fill);
+    }
+
+    /* ── Leaderboard rows ── */
+    .lb-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.45rem 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+    .lb-row:last-child { border-bottom: none; }
+    .lb-row .name { color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .lb-row .val { color: var(--text-desc); font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+    /* ── Facts / chips ── */
+    .chips { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    .chip {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+    .chip b { color: var(--accent-violet); }
+
+    /* ── Wrapped hero ── */
+    #wrapped-hero { display: none; }
+    #wrapped-hero.show { display: block; }
+    .hero-card {
+      background: linear-gradient(135deg, rgba(91,63,168,0.08), rgba(232,98,61,0.06));
+      border: 1px solid var(--border-hover);
+      text-align: center;
+      padding: 1.75rem 1.5rem;
+    }
+    .hero-card .big {
+      font-family: "Fraunces", Georgia, serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-head);
+      line-height: 1.15;
+    }
+    .hero-card .big .accent { color: var(--accent-violet); }
+    .hero-card .sub { margin-top: 0.5rem; color: var(--text-desc); }
+    .hero-card .archetype {
+      display: inline-block;
+      margin-top: 0.9rem;
+      padding: 0.35rem 1rem;
+      border-radius: 999px;
+      background: var(--accent-violet);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+    }
+    html.dark .hero-card .archetype { background: #8B6FE0; color: #16121F; }
+    .hero-card .punchline {
+      margin-top: 0.9rem;
+      font-style: italic;
+      color: var(--text-tag);
+    }
+
+    /* ── Share ── */
+    .share-box { margin-top: 1.1rem; display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+    .share-box code {
+      flex: 1;
+      min-width: 0;
+      background: var(--bg-card-hover);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.55rem 0.8rem;
+      font-size: 0.8rem;
+      color: var(--text-desc);
+      overflow-wrap: anywhere;
+    }
+    .share-box button {
+      padding: 0.55rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--accent-violet);
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .share-box button:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
+    .share-box button.copied { color: #2e8b57; border-color: #2e8b57; }
+
+    footer {
+      margin-top: 2.5rem;
+      text-align: center;
+      color: var(--text-footer);
+      font-size: 0.8rem;
+      line-height: 1.7;
+    }
+    footer a { color: var(--text-footer-a); }
+    footer a:hover { color: var(--text-footer-hover); }
+
+    .muted { color: var(--text-muted); font-size: 0.82rem; }
+    .loading { text-align: center; color: var(--text-tag); padding: 2rem 0; }
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+  <button id="theme-toggle" onclick="toggleTheme()" type="button" aria-label="Toggle theme">🌗</button>
+
+  <main class="wrap">
+    <header>
+      <a class="home-link" href="../">← austin311.com</a>
+      <h1>311 Wrapped</h1>
+      <p class="subtitle">Your neighborhood's year in complaints. Enter a ZIP code and see what your area's 311 reports say about it.</p>
+    </header>
+
+    <div class="search">
+      <input id="zip-input" list="zip-list" placeholder="Enter a ZIP code…" autocomplete="off" inputmode="numeric" maxlength="5" />
+      <datalist id="zip-list"></datalist>
+      <button id="zip-go" onclick="goZip()" type="button">Go</button>
+    </div>
+
+    <div id="loading" class="loading">Loading data…</div>
+
+    <!-- ── Citywide ── -->
+    <section id="citywide" class="hidden">
+      <div class="section-label">Citywide · last 365 days</div>
+      <div class="grid-3" style="margin-bottom:0.9rem;">
+        <div class="card stat-block">
+          <div class="stat-value" id="cw-total">—</div>
+          <div class="stat-label">311 complaints</div>
+        </div>
+        <div class="card stat-block">
+          <div class="stat-value" id="cw-median">—</div>
+          <div class="stat-label">median resolution</div>
+        </div>
+        <div class="card stat-block">
+          <div class="stat-value" id="cw-sameday">—</div>
+          <div class="stat-label">resolved same-day</div>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="stat-label" style="margin-bottom:0.6rem;">Top issues citywide</div>
+          <div id="cw-top"></div>
+        </div>
+        <div class="card">
+          <div class="stat-label" style="margin-bottom:0.6rem;">Fastest to resolve</div>
+          <div id="cw-fastest"></div>
+          <div class="stat-label" style="margin:0.9rem 0 0.3rem;">Slowest to resolve</div>
+          <div id="cw-slowest"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:0.9rem;">
+        <div class="stat-label" style="margin-bottom:0.4rem;">The lowlights</div>
+        <p style="font-size:0.92rem;" id="cw-lowlights">—</p>
+      </div>
+    </section>
+
+    <!-- ── Per-ZIP wrapped ── -->
+    <section id="wrapped-hero">
+      <div class="section-label">Your neighborhood</div>
+      <div class="card hero-card">
+        <div class="big" id="wz-title">—</div>
+        <div class="sub" id="wz-stats">—</div>
+        <div class="archetype" id="wz-archetype">—</div>
+        <div class="punchline" id="wz-punchline">—</div>
+        <div class="share-box">
+          <code id="wz-share">—</code>
+          <button onclick="copyShare()" type="button" id="wz-copy">Copy</button>
+        </div>
+      </div>
+
+      <div class="section-title">Top issues</div>
+      <div class="card" id="wz-top"></div>
+
+      <div class="section-title">What sets this ZIP apart</div>
+      <div class="card" id="wz-sets-apart"></div>
+
+      <div class="section-title">How fast does it get fixed here?</div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="stat-label" style="margin-bottom:0.6rem;">This ZIP vs citywide</div>
+          <div id="wz-response"></div>
+        </div>
+        <div class="card">
+          <div class="stat-label" style="margin-bottom:0.6rem;">Activity</div>
+          <div id="wz-activity"></div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:0.9rem;">
+        <div class="stat-label" style="margin-bottom:0.4rem;">Local lowlights</div>
+        <p style="font-size:0.92rem;" id="wz-lowlights">—</p>
+      </div>
+    </section>
+
+    <footer>
+      <p id="updated">Loading…</p>
+      <p>Data: Austin Open311 service requests (10 categories, 365 days). Generated weekly.<br />
+      An unofficial companion to <a href="https://austin311.com">austin311.com</a>. Inspired by <a href="https://311wrapped.com">311wrapped.com</a>.</p>
+    </footer>
+  </main>
+
+  <script>
+    "use strict";
+
+    var DATA = null;
+
+    function toggleTheme() {
+      var d = document.documentElement;
+      var dark = d.classList.toggle("dark");
+      localStorage.setItem("theme", dark ? "dark" : "light");
+    }
+
+    function esc(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+    }
+
+    function fmtDays(v) {
+      if (v == null) return "—";
+      if (v < 1) return Math.round(v * 24) + "h";
+      if (v < 30) return v.toFixed(1) + "d";
+      if (v < 365) return Math.round(v / 30) + "mo";
+      return (v / 365).toFixed(1) + "y";
+    }
+
+    function issueBars(issues) {
+      if (!issues || !issues.length) return '<p class="muted">No data.</p>';
+      var max = issues[0].share || 1;
+      return issues.map(function (t) {
+        return '<div class="issue"><div class="row"><span>' + esc(t.name) +
+          '</span><span class="pct">' + t.share + '%</span></div>' +
+          '<div class="bar"><span style="width:' + Math.max(4, t.share / max * 100) + '%"></span></div></div>';
+      }).join("");
+    }
+
+    function lbRows(rows) {
+      if (!rows || !rows.length) return '<p class="muted">No data.</p>';
+      return rows.map(function (r) {
+        return '<div class="lb-row"><span class="name">' + esc(r.name) +
+          '</span><span class="val">' + fmtDays(r.medianDays) + ' median</span></div>';
+      }).join("");
+    }
+
+    function renderCitywide() {
+      var cw = DATA.citywide;
+      document.getElementById("cw-total").textContent = cw.total.toLocaleString();
+      var resp = cw.response || {};
+      document.getElementById("cw-median").textContent = resp.medianDays != null ? fmtDays(resp.medianDays) : "—";
+      document.getElementById("cw-sameday").textContent = resp.sameDayPct != null ? resp.sameDayPct + "%" : "—";
+      document.getElementById("cw-top").innerHTML = issueBars(cw.topIssues.slice(0, 5));
+      document.getElementById("cw-fastest").innerHTML = lbRows(cw.leaderboard.fastest.slice(0, 5));
+      document.getElementById("cw-slowest").innerHTML = lbRows(cw.leaderboard.slowest.slice(0, 3));
+
+      var low = [];
+      if (cw.worstDay) {
+        low.push("Worst single day: <b>" + esc(cw.worstDay.date) + "</b> (" + cw.worstDay.count.toLocaleString() +
+          " complaints, " + cw.worstDay.xDaily + "× the daily average)");
+      }
+      if (cw.leaderboard.slowest.length) {
+        low.push("Slowest issue citywide: <b>" + esc(cw.leaderboard.slowest[0].name) + "</b> at " +
+          fmtDays(cw.leaderboard.slowest[0].medianDays) + " median");
+      }
+      if (cw.zips) {
+        low.push("Fastest ZIP: <b>" + esc(cw.zips.fastest.zip) + "</b> (" + fmtDays(cw.zips.fastest.medianDays) +
+          ") · Slowest ZIP: <b>" + esc(cw.zips.slowest.zip) + "</b> (" + fmtDays(cw.zips.slowest.medianDays) + ")");
+      }
+      document.getElementById("cw-lowlights").innerHTML = low.join("<br/>") || "—";
+      document.getElementById("citywide").classList.remove("hidden");
+    }
+
+    function renderZip(zip) {
+      var z = DATA.zips[zip];
+      if (!z) { alert("No data for ZIP " + zip); return; }
+
+      document.getElementById("wz-title").innerHTML =
+        esc(z.area) + " <span class='accent'>(" + zip + ")</span>";
+      document.getElementById("wz-stats").textContent =
+        z.volume.toLocaleString() + " complaints · #" + z.rank + " of " + z.zipCount + " Austin areas (" + z.topLabel + " by volume)";
+      document.getElementById("wz-archetype").textContent = z.archetype;
+      document.getElementById("wz-punchline").textContent = "“" + z.punchline + ".”";
+
+      var share = z.shareText || (zip + " 311 wrapped — " + z.punchline + " — austin311.com/wrapped/?zip=" + zip);
+      document.getElementById("wz-share").textContent = share;
+
+      document.getElementById("wz-top").innerHTML = issueBars(z.topIssues);
+
+      if (z.setsApart && z.setsApart.length) {
+        document.getElementById("wz-sets-apart").innerHTML =
+          '<p class="muted" style="margin-bottom:0.6rem;">Complaint types unusually common here, vs the citywide average:</p>' +
+          z.setsApart.map(function (s) {
+            return '<div class="lb-row"><span class="name">' + esc(s.name) +
+              '</span><span class="val"><b>' + s.quotient + '×</b> city avg</span></div>';
+          }).join("") +
+          '<p class="muted" style="margin-top:0.7rem;">× = how much more common than the Austin average.</p>';
+      } else {
+        document.getElementById("wz-sets-apart").innerHTML = '<p class="muted">This ZIP mostly matches the citywide mix.</p>';
+      }
+
+      var resp = z.response;
+      if (resp) {
+        var cwResp = DATA.citywide.response || {};
+        var rows = [
+          ['Median resolution', fmtDays(resp.medianDays), fmtDays(cwResp.medianDays)],
+          ['90th percentile', fmtDays(resp.p90Days), fmtDays(cwResp.p90Days)],
+          ['Resolved same-day', resp.sameDayPct + '%', (cwResp.sameDayPct != null ? cwResp.sameDayPct + '%' : '—')]
+        ];
+        document.getElementById("wz-response").innerHTML =
+          rows.map(function (r) {
+            return '<div class="lb-row"><span class="name">' + r[0] +
+              '</span><span class="val">' + r[1] + ' <span class="muted">(city ' + r[2] + ')</span></span></div>';
+          }).join("");
+      } else {
+        document.getElementById("wz-response").innerHTML = '<p class="muted">Not enough closed tickets.</p>';
+      }
+
+      var act = z.activity;
+      if (act) {
+        document.getElementById("wz-activity").innerHTML =
+          '<div class="lb-row"><span class="name">Peak hour</span><span class="val">' + esc(act.peakHourLabel) + '</span></div>' +
+          '<div class="lb-row"><span class="name">Peak day</span><span class="val">' + esc(act.peakDay) + '</span></div>' +
+          '<div class="lb-row"><span class="name">Weekend activity</span><span class="val">' + act.weekendPct + '%</span></div>' +
+          '<div class="lb-row"><span class="name">Late night (10pm–4am)</span><span class="val">' + act.lateNightCount.toLocaleString() + '</span></div>';
+      } else {
+        document.getElementById("wz-activity").innerHTML = '<p class="muted">No data.</p>';
+      }
+
+      var low = [];
+      if (z.lowlight) {
+        low.push("Slowest issue here: <b>" + esc(z.lowlight.name) + "</b> at " + fmtDays(z.lowlight.medianDays) + " median");
+      }
+      if (z.worstDay) {
+        low.push("Worst single day: <b>" + esc(z.worstDay.date) + "</b> (" + z.worstDay.count + " complaints, " +
+          z.worstDay.xDaily + "× the local daily average)");
+      }
+      document.getElementById("wz-lowlights").innerHTML = low.join("<br/>") || "No notable lowlights.";
+      document.getElementById("wrapped-hero").classList.add("show");
+      document.getElementById("wrapped-hero").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function goZip() {
+      var v = document.getElementById("zip-input").value.trim();
+      if (v && DATA && DATA.zips[v]) {
+        renderZip(v);
+        if (history.replaceState) history.replaceState(null, "", "?zip=" + v);
+      } else if (v) {
+        alert("No data for ZIP " + v + ". Try one from the list (e.g. 78701).");
+      }
+    }
+    document.getElementById("zip-input").addEventListener("keydown", function (e) {
+      if (e.key === "Enter") goZip();
+    });
+
+    function copyShare() {
+      var text = document.getElementById("wz-share").textContent;
+      function done() {
+        var btn = document.getElementById("wz-copy");
+        btn.textContent = "Copied ✓";
+        btn.classList.add("copied");
+        setTimeout(function () { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 1800);
+      }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(done, function () { fallbackCopy(text, done); });
+      } else {
+        fallbackCopy(text, done);
+      }
+    }
+    function fallbackCopy(text, done) {
+      var ta = document.createElement("textarea");
+      ta.value = text;
+      ta.style.position = "fixed"; ta.style.opacity = "0";
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand("copy"); done(); } catch (e) { /* ignore */ }
+      document.body.removeChild(ta);
+    }
+
+    fetch("data.json").then(function (r) { return r.json(); }).then(function (data) {
+      DATA = data;
+      document.getElementById("loading").classList.add("hidden");
+
+      var list = document.getElementById("zip-list");
+      Object.keys(data.zips).sort(function (a, b) {
+        return (data.zips[b].volume - data.zips[a].volume);
+      }).forEach(function (zip) {
+        var z = data.zips[zip];
+        var opt = document.createElement("option");
+        opt.value = zip;
+        opt.label = zip + " — " + z.area + " (" + z.volume.toLocaleString() + ")";
+        list.appendChild(opt);
+      });
+
+      renderCitywide();
+
+      var updated = new Date(data.generated);
+      document.getElementById("updated").textContent =
+        "Updated " + updated.toUTCString() + " · " + data.zipCount + " ZIPs · " +
+        data.totalRecords.toLocaleString() + " records (" + data.windowDays + " days)";
+
+      var params = new URLSearchParams(window.location.search);
+      var zip = params.get("zip");
+      if (zip && data.zips[zip]) {
+        document.getElementById("zip-input").value = zip;
+        renderZip(zip);
+      }
+    }).catch(function (err) {
+      document.getElementById("loading").textContent = "Couldn't load data: " + err.message;
+    });
+  </script>
+</body>
+</html>

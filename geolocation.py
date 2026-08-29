@@ -7,7 +7,8 @@ which district (1-10) a latitude/longitude point falls in.
 
 import json
 import logging
-from typing import Optional, Dict, Tuple
+from pathlib import Path
+from typing import Optional, Dict, List, Tuple
 
 import requests
 
@@ -139,3 +140,119 @@ def get_district_geojson() -> Optional[dict]:
 def get_district_label(district_num: int) -> str:
     """Return a human-readable label for a council district number."""
     return f"District {district_num}"
+
+
+# ── ZIP code (ZCTA5) lookup ─────────────────────────────────────────────────
+# Backed by data/austin_zctas.geojson (committed, trimmed to the Austin MSA),
+# built by scripts/fetch_austin_zctas.py. No runtime HTTP.
+
+# ZIP → well-known area label (optional; only central/notable ZIPs)
+ZIP_NAMES: Dict[str, str] = {
+    "78701": "Downtown",
+    "78702": "East Austin",
+    "78703": "West Austin",
+    "78704": "South Congress / Zilker",
+    "78705": "West Campus",
+    "78721": "East Austin",
+    "78722": "North University",
+    "78723": "Mueller",
+    "78731": "Allandale",
+    "78741": "East Riverside",
+    "78745": "South Austin",
+    "78748": "South Austin",
+    "78751": "Hyde Park",
+    "78752": "North Loop",
+    "78753": "North Austin",
+    "78754": "Northeast Austin",
+    "78756": "Crestview",
+    "78757": "North Shoal Creek",
+    "78758": "North Austin",
+    "78759": "Arboretum",
+    "78653": "Manor",
+    "78660": "Pflugerville",
+    "78664": "Round Rock",
+    "78681": "Round Rock",
+}
+
+_ZIP_DATA: Optional[List[Tuple[str, list, tuple]]] = None  # (zip, ring, bbox)
+_ZIP_BBOX = (-98.3, 29.9, -97.2, 30.7)  # (min_lon, min_lat, max_lon, max_lat)
+
+
+def _all_outer_rings(geometry: dict) -> List[list]:
+    """Return every outer ring for a Polygon/MultiPolygon geometry."""
+    geom_type = geometry.get("type", "")
+    coords = geometry.get("coordinates", []) or []
+    rings: List[list] = []
+    if geom_type == "Polygon":
+        if coords:
+            rings.append(coords[0])
+    elif geom_type == "MultiPolygon":
+        for poly in coords:
+            if poly:
+                rings.append(poly[0])
+    return rings
+
+
+def _ring_bbox(ring: list) -> tuple:
+    lons = [p[0] for p in ring]
+    lats = [p[1] for p in ring]
+    return (min(lons), min(lats), max(lons), max(lats))
+
+
+def load_zips() -> List[Tuple[str, list, tuple]]:
+    """Load Austin ZIP polygons from the committed GeoJSON.
+
+    Returns a list of (zip_code, outer_ring, bbox) tuples.
+    """
+    global _ZIP_DATA
+    if _ZIP_DATA is not None:
+        return _ZIP_DATA
+
+    path = Path(__file__).resolve().parent / "data" / "austin_zctas.geojson"
+    if not path.exists():
+        logger.warning("Missing data/austin_zctas.geojson — ZIP lookup disabled")
+        _ZIP_DATA = []
+        return _ZIP_DATA
+
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        logger.warning(f"Could not parse ZIP GeoJSON — {e}")
+        _ZIP_DATA = []
+        return _ZIP_DATA
+
+    _ZIP_DATA = []
+    for feature in data.get("features", []):
+        props = feature.get("properties", {}) or {}
+        zip_code = str(props.get("zip") or "").strip()
+        if not zip_code:
+            continue
+        for ring in _all_outer_rings(feature.get("geometry", {})):
+            if len(ring) < 4:
+                continue
+            _ZIP_DATA.append((zip_code, ring, _ring_bbox(ring)))
+    logger.info(f"Loaded {len(_ZIP_DATA)} ZIP polygon rings")
+    return _ZIP_DATA
+
+
+def zip_for_point(lat: float, lon: float) -> Optional[str]:
+    """Return the Austin ZIP (ZCTA5) containing a lat/lon point.
+
+    Returns None if the point is outside all loaded ZIP polygons or ZIP data
+    is unavailable.
+    """
+    min_lon, min_lat, max_lon, max_lat = _ZIP_BBOX
+    if not (min_lon < lon < max_lon and min_lat < lat < max_lat):
+        return None
+
+    for zip_code, ring, (r_min_lon, r_min_lat, r_max_lon, r_max_lat) in load_zips():
+        if not (r_min_lon <= lon <= r_max_lon and r_min_lat <= lat <= r_max_lat):
+            continue
+        if _point_in_polygon(lat, lon, ring):
+            return zip_code
+    return None
+
+
+def get_zip_label(zip_code: str) -> str:
+    """Return a human-readable area label for a ZIP, or the ZIP itself."""
+    return ZIP_NAMES.get(zip_code, zip_code)

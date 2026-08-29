@@ -140,6 +140,11 @@ jobs:
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
+      - name: Generate wrapped data (311 Wrapped per-ZIP page)
+        run: python scripts/generate_wrapped_data.py
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
       - name: Save Open311 cache
         uses: actions/cache@v4
         if: always()
@@ -168,6 +173,7 @@ jobs:
             docs/storm/trends/index.html \
             docs/animal/dead/trends/index.html \
             docs/fun/data.json \
+            docs/wrapped/data.json \
             docs/querystore/daily_counts.json \
             docs/querystore/district_counts.json \
             docs/querystore/resolution_stats.json \
