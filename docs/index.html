@@ -1244,10 +1244,21 @@
             var descEl = card.querySelector(".desc");
             if (!descEl) return;
 
+            // These maps regenerate weekly (weekly.yml), so only the count is
+            // daily. Say "count updated daily" so visitors know the map
+            // underneath isn't a live daily map.
+            var weeklyMap = {
+              "parking": true, "noise": true, "graffiti": true,
+              "parks": true, "storm": true,
+            };
+            var suffix = weeklyMap[catKey]
+              ? "count updated daily"
+              : "updated daily";
+
             if (stats.open > 0) {
-              descEl.textContent = stats.open + " open \u00b7 " + stats.total + " total \u00b7 updated daily";
+              descEl.textContent = stats.open + " open \u00b7 " + stats.total + " total \u00b7 " + suffix;
             } else {
-              descEl.textContent = stats.total + " reports \u00b7 updated daily";
+              descEl.textContent = stats.total + " reports \u00b7 " + suffix;
             }
           });
         })
