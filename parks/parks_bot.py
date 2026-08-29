@@ -207,10 +207,16 @@ def fetch_all_park_complaints(days_back: int = 90, use_cache: bool = True) -> li
 
     CATEGORY = "parks"
 
+    # Always honor the requested window when reading from the cache. Previously
+    # the cache read had no `since` filter, so a warm cache returned ALL
+    # historical park records — open tickets accumulate over time, making the
+    # "last N days" hub/map overcount vs. the live 90-day card count.
+    since = _utc_now() - timedelta(days=days_back)
+
     # Initialize cache if using
     if use_cache:
         init_cache()
-        cached_records = get_cached_records(service_codes=list(SERVICE_CODES.keys()))
+        cached_records = get_cached_records(since=since, service_codes=list(SERVICE_CODES.keys()))
         cached_ids = {r.get("service_request_id") for r in cached_records}
         logger.info(f"Loaded {len(cached_records)} cached parks records")
 
