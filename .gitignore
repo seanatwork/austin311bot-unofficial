@@ -77,7 +77,10 @@ htmlcov/
 
 # mypy
 .mypy_cache/
+
+# Virtual environments
 venv/
+.venv/
 
 # Large maps — committed weekly via GitHub Actions
 # docs/traffic/
