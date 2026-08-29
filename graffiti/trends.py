@@ -1,4 +1,4 @@
-"""Graffiti abatement trends — monthly ticket counts over 12 months."""
+"""Graffiti abatement trends — monthly ticket counts over 365 days."""
 
 import io
 import json
@@ -163,7 +163,7 @@ def _render_html(data: dict, fetched_at: str) -> str:
   <button id="theme-toggle" onclick="toggleTheme()">🌙 Dark</button>
   <div id="panel">
     <div id="panel-title">🎨 Austin Graffiti Abatement Trends</div>
-    <div id="panel-subtitle">New reports per month — last 12 months</div>
+    <div id="panel-subtitle">New reports per month — last 365 days</div>
     <div id="last-ran">Last ran: {fetched_at}</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Graffiti Map</a>
@@ -176,7 +176,7 @@ def _render_html(data: dict, fetched_at: str) -> str:
       <div class="stat">
         <div class="stat-value" style="color:#3b82f6;">{total:,}</div>
         <div class="stat-label">Total reports</div>
-        <div class="stat-sub">last 12 months</div>
+        <div class="stat-sub">last 365 days</div>
       </div>
       <div class="stat">
         <div class="stat-value" style="color:#22c55e;">{avg_per_month:.0f}</div>
@@ -271,7 +271,11 @@ def generate_graffiti_trends(
     # single 365-day request only returns the oldest ~90 days before hitting the
     # pagination cap. Month-by-month ensures every period is fully covered.
     months_back = max(1, days_back // 30) + 1
-    records = fetch_graffiti_monthly(months_back)
+    # Bypass the SQLite cache here: the cache is incremental and can be missing
+    # records (the homeless trends page had this exact undercount bug). It also
+    # accumulates history beyond the requested window, which made this page show
+    # 16 months while claiming "last 12 months". Always fetch the full window.
+    records = fetch_graffiti_monthly(months_back, use_cache=False)
     if not records:
         return None, f"🎨 No graffiti data found for last {days_back} days."
 
