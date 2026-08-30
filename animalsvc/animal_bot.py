@@ -162,6 +162,23 @@ def _fetch_code(service_code: str, days_back: int, limit: int = 100) -> list:
     return records
 
 
+def _attach_labels(records: list) -> list:
+    """Ensure every record has _service_label/_service_code derived from service_code.
+
+    Cached records come from raw_json which does NOT include these in-memory
+    fields (only freshly-fetched records have them), so label cached records
+    before returning them to callers (map generator + trends page).
+    """
+    for r in records:
+        code = r.get("service_code") or r.get("_service_code") or ""
+        if code:
+            if not r.get("_service_label"):
+                r["_service_label"] = SERVICE_CODES.get(code, code)
+            if not r.get("_service_code"):
+                r["_service_code"] = code
+    return records
+
+
 def fetch_all_animal_complaints(days_back: int = 90, limit_per_code: int = 100, use_cache: bool = True) -> list:
     """Fetch complaints across all animal service codes with optional caching."""
     from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date
@@ -181,7 +198,7 @@ def fetch_all_animal_complaints(days_back: int = 90, limit_per_code: int = 100, 
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6) and len(cached_records) > 0:
                 logger.info(f"Cache is fresh ({cache_age.days} days old), using cached data")
-                return cached_records
+                return _attach_labels(cached_records)
     else:
         cached_records = []
         cached_ids = set()
@@ -252,7 +269,7 @@ def fetch_animals_monthly(months_back: int = 13, use_cache: bool = True) -> list
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6) and len(cached_records) > 0:
                 logger.info(f"Cache is fresh ({cache_age.days} days old), returning cached data")
-                return cached_records
+                return _attach_labels(cached_records)
     else:
         cached_records = []
         cached_ids = set()

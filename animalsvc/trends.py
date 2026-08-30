@@ -12,6 +12,8 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+from animalsvc.animal_bot import SERVICE_CODES
+
 
 def _format_central_time() -> str:
     """Return current time formatted in US Central Time (CDT/CST)."""
@@ -34,6 +36,7 @@ def _aggregate(records: list) -> dict:
     monthly: dict = defaultdict(int)
     monthly_open: dict = defaultdict(int)
     by_type: dict = defaultdict(int)
+    monthly_by_type: dict = defaultdict(lambda: defaultdict(int))
     total = 0
 
     for r in records:
@@ -51,8 +54,14 @@ def _aggregate(records: list) -> dict:
         if is_open:
             monthly_open[month_key] += 1
 
-        label = r.get("_service_label") or "Unknown"
+        label = (
+            r.get("_service_label")
+            or SERVICE_CODES.get(r.get("service_code"))
+            or r.get("service_name")
+            or "Unknown"
+        )
         by_type[label] += 1
+        monthly_by_type[label][month_key] += 1
         total += 1
 
     months_sorted = sorted(monthly.keys())
@@ -70,6 +79,12 @@ def _aggregate(records: list) -> dict:
     # Sort all incident types by count descending
     top_types = sorted(by_type.items(), key=lambda x: -x[1])
 
+    # Per-type monthly series aligned to months_sorted (same order as top_types)
+    type_monthly = [
+        {"name": label, "data": [monthly_by_type[label].get(m, 0) for m in months_sorted]}
+        for label, _ in top_types
+    ]
+
     return {
         "total": total,
         "months": months_sorted,
@@ -77,6 +92,7 @@ def _aggregate(records: list) -> dict:
         "monthly_open_counts": [monthly_open[m] for m in months_sorted],
         "rolling_avg": rolling,
         "top_types": top_types,
+        "type_monthly": type_monthly,
     }
 
 
@@ -86,6 +102,10 @@ def _render_html(data: dict, fetched_at: str) -> str:
     monthly_counts = data["monthly_counts"]
     monthly_open_counts = data["monthly_open_counts"]
     top_types = data["top_types"]
+    type_monthly = data.get("type_monthly", [])
+
+    top_type_name = top_types[0][0] if top_types else "—"
+    top_type_count = top_types[0][1] if top_types else 0
 
     avg_per_month = round(total / max(1, len(months)), 0) if months else 0
     total_open = sum(monthly_open_counts)
@@ -99,6 +119,7 @@ def _render_html(data: dict, fetched_at: str) -> str:
         "monthlyOpenCounts": monthly_open_counts,
         "rollingAvg": data["rolling_avg"],
         "types": [{"name": t, "count": c} for t, c in top_types],
+        "typeMonthly": type_monthly,
     }
     payload_json = json.dumps(payload)
 
@@ -219,6 +240,11 @@ def _render_html(data: dict, fetched_at: str) -> str:
         <div class="stat-label">Still open</div>
         <div class="stat-sub">{total_open:,} unresolved</div>
       </div>
+      <div class="stat">
+        <div class="stat-value" style="color:#f59e0b;">{top_type_count:,}</div>
+        <div class="stat-label">Top type</div>
+        <div class="stat-sub">{top_type_name}</div>
+      </div>
     </div>
   </div>
 
@@ -226,6 +252,11 @@ def _render_html(data: dict, fetched_at: str) -> str:
     <div class="chart-block">
       <div class="chart-title">Reports per month — total, open &amp; 3-month avg</div>
       <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
+    </div>
+
+    <div class="chart-block">
+      <div class="chart-title">Reports by incident type per month — loose dogs, bites, wildlife, etc.</div>
+      <div class="chart-container" style="height: 400px;"><canvas id="typeMonthlyChart"></canvas></div>
     </div>
 
     <div class="chart-block">
@@ -335,6 +366,33 @@ def _render_html(data: dict, fetched_at: str) -> str:
         ],
       }},
       options: lineOpts,
+    }});
+
+    // Per-type monthly trends — one line per incident type (click legend to isolate)
+    const TYPE_COLORS = ["#dc2626", "#9333ea", "#f97316", "#3b82f6", "#0ea5e9", "#84cc16", "#64748b"];
+    new Chart(document.getElementById("typeMonthlyChart"), {{
+      type: "line",
+      data: {{
+        labels: DATA.months,
+        datasets: DATA.typeMonthly.map((t, i) => ({{
+          label: t.name,
+          data: t.data,
+          borderColor: TYPE_COLORS[i % TYPE_COLORS.length],
+          backgroundColor: TYPE_COLORS[i % TYPE_COLORS.length],
+          borderWidth: 2,
+          pointRadius: 2,
+          pointHoverRadius: 4,
+          tension: 0.3,
+          fill: false,
+        }})),
+      }},
+      options: {{
+        ...lineOpts,
+        plugins: {{
+          legend: {{ labels: {{ color: legColor, font: {{ size: 10 }} }} }},
+          tooltip: TOOLTIP,
+        }},
+      }},
     }});
 
     // Incident type breakdown — horizontal bar
