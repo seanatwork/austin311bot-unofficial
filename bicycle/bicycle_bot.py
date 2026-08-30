@@ -133,7 +133,7 @@ def fetch_bicycle_reports(days_back: int = 90, use_cache: bool = True) -> dict:
         days_back: Number of days to fetch
         use_cache: Whether to use SQLite caching (default True)
     """
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date
+    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date, attach_service_labels
 
     CATEGORY = "bicycle"
 
@@ -150,6 +150,7 @@ def fetch_bicycle_reports(days_back: int = 90, use_cache: bool = True) -> dict:
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6) and len(cached_records) > 0:
                 logger.info(f"Cache is fresh ({cache_age.days} days old), using cached data")
+                cached_records = attach_service_labels(cached_records, SERVICE_CODES)
                 return {
                     "records": cached_records,
                     "total_fetched": len(cached_records),

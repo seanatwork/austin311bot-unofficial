@@ -158,7 +158,7 @@ def fetch_storm_monthly(months_back: int = 13, use_cache: bool = True) -> list:
     Returns:
         A flat list of storm/drainage records across all months and all codes.
     """
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date
+    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date, attach_service_labels
 
     CATEGORY = "storm"
 
@@ -174,7 +174,7 @@ def fetch_storm_monthly(months_back: int = 13, use_cache: bool = True) -> list:
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6) and len(cached_records) > 0:
                 logger.info(f"Cache is fresh ({cache_age.days} days old), returning cached data")
-                return cached_records
+                return attach_service_labels(cached_records, SERVICE_CODES)
     else:
         cached_records = []
         cached_ids = set()
@@ -264,7 +264,7 @@ def fetch_storm_monthly(months_back: int = 13, use_cache: bool = True) -> list:
 
 def fetch_all_storm_reports(days_back: int = 90, use_cache: bool = True) -> list:
     """Fetch reports across all storm/drainage service codes with optional caching."""
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date
+    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date, attach_service_labels
 
     CATEGORY = "storm"
 
@@ -279,7 +279,7 @@ def fetch_all_storm_reports(days_back: int = 90, use_cache: bool = True) -> list
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6) and len(cached_records) > 0:
                 logger.info(f"Cache is fresh ({cache_age.days} days old), using cached data")
-                return cached_records
+                return attach_service_labels(cached_records, SERVICE_CODES)
     else:
         cached_records = []
         cached_ids = set()

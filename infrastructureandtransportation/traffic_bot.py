@@ -177,7 +177,7 @@ def _fetch_code(service_code: str, days_back: int) -> list:
 
 def fetch_all_traffic_complaints(days_back: int = 90, use_cache: bool = True) -> list:
     """Fetch complaints across all traffic/infrastructure service codes with optional caching."""
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date
+    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date, attach_service_labels
 
     CATEGORY = "traffic"
 
@@ -194,7 +194,7 @@ def fetch_all_traffic_complaints(days_back: int = 90, use_cache: bool = True) ->
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6) and len(cached_records) > 0:
                 logger.info(f"Cache is fresh ({cache_age.days} days old), using cached data")
-                return cached_records
+                return attach_service_labels(cached_records, SERVICE_CODES)
     else:
         cached_records = []
         cached_ids = set()

@@ -430,7 +430,7 @@ def generate_storm_trends(days_back: int = LOOKBACK_DAYS) -> tuple[Optional[io.B
     from storm.storm_bot import fetch_storm_monthly
 
     months_back = max(1, days_back // 30) + 1
-    records = fetch_storm_monthly(months_back)
+    records = fetch_storm_monthly(months_back, use_cache=False)
     if not records:
         return None, f"🌧️ No storm/drainage data found for last {days_back} days."
 

@@ -176,6 +176,28 @@ def get_cached_records(
         conn.close()
 
 
+def attach_service_labels(
+    records: List[Dict[str, Any]],
+    service_label_map: Dict[str, str],
+) -> List[Dict[str, Any]]:
+    """Attach _service_label/_service_code to records derived from service_code.
+
+    Cached records are mirrored from raw_json which does NOT include the
+    in-memory _service_label/_service_code fields (only freshly-fetched records
+    have them). Any module that returns cached records should call this so
+    downstream code that groups by code/label works whether the data came from
+    a fresh fetch or the cache.
+    """
+    for r in records:
+        code = r.get("service_code") or r.get("_service_code") or ""
+        if code:
+            if not r.get("_service_label"):
+                r["_service_label"] = service_label_map.get(code, code)
+            if not r.get("_service_code"):
+                r["_service_code"] = code
+    return records
+
+
 def cache_records(category: str, records: List[Dict[str, Any]]):
     """
     Store records in cache.

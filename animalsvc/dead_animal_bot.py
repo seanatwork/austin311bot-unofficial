@@ -96,7 +96,7 @@ def fetch_dead_animal_monthly(months_back: int = 13, use_cache: bool = True) -> 
     Returns:
         A flat list of dead animal collection records across all months.
     """
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date
+    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date, attach_service_labels
 
     CATEGORY = "dead_animal"
 
@@ -112,7 +112,7 @@ def fetch_dead_animal_monthly(months_back: int = 13, use_cache: bool = True) -> 
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6) and len(cached_records) > 0:
                 logger.info(f"Cache is fresh ({cache_age.days} days old), returning cached data")
-                return cached_records
+                return attach_service_labels(cached_records, SERVICE_CODES)
     else:
         cached_records = []
         cached_ids = set()
@@ -201,7 +201,7 @@ def fetch_dead_animal_monthly(months_back: int = 13, use_cache: bool = True) -> 
 
 
 def fetch_dead_animal_reports(days_back: int = 90, use_cache: bool = True) -> list:
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date
+    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date, attach_service_labels
 
     CATEGORY = "dead_animal"
 
@@ -211,7 +211,7 @@ def fetch_dead_animal_reports(days_back: int = 90, use_cache: bool = True) -> li
         last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
         if last_fetch and ((_utc_now() - last_fetch) < timedelta(days=6)) and cached:
             logger.info(f"Using {len(cached)} cached dead-animal records")
-            return cached
+            return attach_service_labels(cached, SERVICE_CODES)
         cached_ids = {r.get("service_request_id") for r in cached}
     else:
         cached = []

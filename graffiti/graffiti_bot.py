@@ -169,7 +169,7 @@ def fetch_graffiti_monthly(months_back: int = 12, use_cache: bool = True) -> lis
     Returns:
         A flat list of graffiti records across all months.
     """
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date
+    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date, attach_service_labels
 
     CATEGORY = "graffiti"
 
@@ -187,7 +187,7 @@ def fetch_graffiti_monthly(months_back: int = 12, use_cache: bool = True) -> lis
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6) and len(cached_records) > 0:
                 logger.info(f"Cache is fresh ({cache_age.days} days old), returning cached data")
-                return cached_records
+                return attach_service_labels(cached_records, {Config.SERVICE_CODE: "Graffiti Abatement"})
     else:
         cached_records = []
         cached_ids = set()

@@ -203,7 +203,7 @@ def _fetch_code(service_code: str, days_back: int, limit: int = 100) -> list:
 
 def fetch_all_park_complaints(days_back: int = 90, use_cache: bool = True) -> list:
     """Fetch complaints across all park service codes with optional caching."""
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date
+    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date, attach_service_labels
 
     CATEGORY = "parks"
 
@@ -226,7 +226,7 @@ def fetch_all_park_complaints(days_back: int = 90, use_cache: bool = True) -> li
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6) and len(cached_records) > 0:
                 logger.info(f"Cache is fresh ({cache_age.days} days old), using cached data")
-                return cached_records
+                return attach_service_labels(cached_records, SERVICE_CODES)
     else:
         cached_records = []
         cached_ids = set()
@@ -279,7 +279,7 @@ def fetch_parks_monthly(months_back: int = 13, use_cache: bool = True) -> list:
     Returns:
         A flat list of park complaint records across all months and service codes.
     """
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date
+    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date, attach_service_labels
 
     CATEGORY = "parks"
 
@@ -294,7 +294,7 @@ def fetch_parks_monthly(months_back: int = 13, use_cache: bool = True) -> list:
             cache_age = _utc_now() - last_fetch
             if cache_age < timedelta(days=6) and len(cached_records) > 0:
                 logger.info(f"Cache is fresh ({cache_age.days} days old), returning cached data")
-                return cached_records
+                return attach_service_labels(cached_records, SERVICE_CODES)
     else:
         cached_records = []
         cached_ids = set()

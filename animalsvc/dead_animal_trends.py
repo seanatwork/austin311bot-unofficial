@@ -446,7 +446,7 @@ def generate_dead_animal_trends(days_back: int = LOOKBACK_DAYS) -> tuple[Optiona
     from animalsvc.dead_animal_bot import fetch_dead_animal_monthly
 
     months_back = max(1, days_back // 30) + 1
-    records = fetch_dead_animal_monthly(months_back)
+    records = fetch_dead_animal_monthly(months_back, use_cache=False)
     if not records:
         return None, f"🐿️ No dead animal collection data found for last {days_back} days."
 
