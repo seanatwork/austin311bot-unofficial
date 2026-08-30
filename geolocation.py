@@ -1,8 +1,9 @@
 """
-Point-in-polygon geolocation for Austin council districts.
+Point-in-polygon geolocation for Austin.
 
-Uses the City of Austin ArcGIS council district GeoJSON to determine
-which district (1-10) a latitude/longitude point falls in.
+- Council districts (1-10) via City of Austin ArcGIS.
+- ZIP / ZCTA5 lookup via committed data/austin_zctas.geojson.
+- Park name lookup via committed data/austin_parks.geojson.
 """
 
 import json
@@ -256,3 +257,89 @@ def zip_for_point(lat: float, lon: float) -> Optional[str]:
 def get_zip_label(zip_code: str) -> str:
     """Return a human-readable area label for a ZIP, or the ZIP itself."""
     return ZIP_NAMES.get(zip_code, zip_code)
+
+
+# ── Austin park name lookup ───────────────────────────────────────────────
+# Backed by data/austin_parks.geojson (committed City of Austin PARD parkland
+# boundaries, built by scripts/fetch_austin_parks.py). No runtime HTTP.
+
+_PARK_DATA: Optional[List[Tuple[str, list, list, tuple]]] = None  # (name, outer, holes, bbox)
+_PARK_BBOX = (-98.0, 30.0, -97.5, 30.5)  # (min_lon, min_lat, max_lon, max_lat)
+
+
+def _polygon_rings(geometry: dict) -> List[Tuple[list, list]]:
+    """Return [(outer_ring, [hole_rings...]), ...] for a Polygon/MultiPolygon."""
+    geom_type = geometry.get("type", "")
+    coords = geometry.get("coordinates", []) or []
+    polys: list = []
+    if geom_type == "Polygon":
+        polys = [coords]
+    elif geom_type == "MultiPolygon":
+        polys = coords
+
+    out: List[Tuple[list, list]] = []
+    for poly in polys:
+        if not poly or len(poly) < 1:
+            continue
+        outer = poly[0]
+        if len(outer) < 4:
+            continue
+        holes = [h for h in poly[1:] if len(h) >= 4]
+        out.append((outer, holes))
+    return out
+
+
+def load_parks() -> List[Tuple[str, list, list, tuple]]:
+    """Load Austin parkland polygons from the committed GeoJSON.
+
+    Returns a list of (name, outer_ring, hole_rings, bbox) tuples.
+    """
+    global _PARK_DATA
+    if _PARK_DATA is not None:
+        return _PARK_DATA
+
+    path = Path(__file__).resolve().parent / "data" / "austin_parks.geojson"
+    if not path.exists():
+        logger.warning("Missing data/austin_parks.geojson — park name lookup disabled")
+        _PARK_DATA = []
+        return _PARK_DATA
+
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as e:
+        logger.warning(f"Could not parse park GeoJSON — {e}")
+        _PARK_DATA = []
+        return _PARK_DATA
+
+    _PARK_DATA = []
+    for feature in data.get("features", []):
+        props = feature.get("properties", {}) or {}
+        name = str(props.get("location_name") or "").strip()
+        if not name:
+            continue
+        for outer, holes in _polygon_rings(feature.get("geometry", {})):
+            _PARK_DATA.append((name, outer, holes, _ring_bbox(outer)))
+    logger.info(f"Loaded {len(_PARK_DATA)} park polygon rings")
+    return _PARK_DATA
+
+
+def park_name_for_point(lat: float, lon: float) -> Optional[str]:
+    """Return the City of Austin park name containing a lat/lon point.
+
+    Returns None if the point is outside all park polygons or park data is
+    unavailable. For overlapping parcels (e.g. a preserve inside a metro park),
+    the first match in the name-sorted list wins.
+    """
+    min_lon, min_lat, max_lon, max_lat = _PARK_BBOX
+    if not (min_lon <= lon <= max_lon and min_lat <= lat <= max_lat):
+        return None
+
+    for name, outer, holes, (r_min_lon, r_min_lat, r_max_lon, r_max_lat) in load_parks():
+        if not (r_min_lon <= lon <= r_max_lon and r_min_lat <= lat <= r_max_lat):
+            continue
+        if not _point_in_polygon(lat, lon, outer):
+            continue
+        if any(_point_in_polygon(lat, lon, h) for h in holes):
+            continue
+        return name
+    return None

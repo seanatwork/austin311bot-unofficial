@@ -137,6 +137,28 @@ def _extract_park_name(address: str) -> str:
     return first_segment.title()
 
 
+def _resolve_park_name(r: dict) -> str:
+    """Resolve a complaint to a real Austin park name when possible.
+
+    Prefers point-in-polygon lookup against City of Austin parkland boundaries
+    (data/austin_parks.geojson); falls back to the address-based extraction
+    (often a street name) when the coordinates aren't inside any park polygon.
+    """
+    from geolocation import park_name_for_point
+
+    lat = r.get("lat")
+    lon = r.get("long")
+    if lat and lon:
+        try:
+            name = park_name_for_point(float(lat), float(lon))
+            if name:
+                return name
+        except (TypeError, ValueError):
+            pass
+    address = (r.get("address") or "").strip()
+    return _extract_park_name(address) if address else "Unknown"
+
+
 def _make_request(params: dict, retries: int = 0) -> list:
     session = _get_session()
     url = f"{OPEN311_BASE_URL}/requests.json"
@@ -405,8 +427,7 @@ def get_park_hotspots(days_back: int = 90) -> dict:
     park_coords: dict = {}  # park_name → (lat, lon)
 
     for r in records:
-        address = (r.get("address") or "").strip()
-        park = _extract_park_name(address) if address else "Unknown"
+        park = _resolve_park_name(r)
         label = r.get("_service_label", "Unknown")
         status = (r.get("status") or "").lower()
         lat = r.get("lat")
@@ -515,7 +536,7 @@ def get_park_detail(park_name: str, days_back: int = 90) -> dict:
     records = fetch_all_park_complaints(days_back)
     park_records = [
         r for r in records
-        if _extract_park_name((r.get("address") or "").strip()) == park_name
+        if _resolve_park_name(r) == park_name
     ]
     # Sort: open first, then by most recently requested
     def _sort_key(r):
@@ -1027,6 +1048,8 @@ def generate_parks_map(days_back: int = 90) -> tuple:
         if cluster_key not in fg_clusters:
             cluster_key = f"closed_{bucket}"
 
+        park_name = _resolve_park_name(r)
+        park_line = f"<b>Park:</b> {park_name}<br/>" if park_name and park_name != "Unknown" else ""
         address_line = f'<b>Address:</b> <a href="https://www.google.com/maps/search/?api=1&query={lat},{lon}" target="_blank">{address}</a><br/>' if address else ""
         updated_line = f"<span style='color:#666;'>Updated: {updated_str}</span><br/>" if updated_str and updated_str != date_str else ""
         desc_text = description or status_notes
@@ -1039,6 +1062,7 @@ def generate_parks_map(days_back: int = 90) -> tuple:
             <b><a href="{ticket_url}" target="_blank" style="color:#0066cc;">Report #{req_id}</a></b><br/>
             <span style="color:#666;">Filed: {date_str}</span><br/>
             {updated_line}
+            {park_line}
             {address_line}
             <br/>
             <b>Status:</b> {'🔴 Open' if status == 'open' else '🟢 Closed'}<br/>

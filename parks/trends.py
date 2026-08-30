@@ -51,7 +51,7 @@ BUILDINGS_LABELS = {
 
 def _aggregate(records: list) -> dict:
     """Bucket records by month, issue type, resolution speed, backlog & season."""
-    from parks.parks_bot import _extract_park_name
+    from parks.parks_bot import _resolve_park_name
 
     monthly: dict = defaultdict(int)
     monthly_open: dict = defaultdict(int)
@@ -171,11 +171,10 @@ def _aggregate(records: list) -> dict:
             requested = datetime.fromisoformat(req_str.replace("Z", "+00:00")).strftime("%b %d, %Y")
         except ValueError:
             requested = req_str[:10]
-        addr = (r.get("address") or "").strip()
         oldest_open.append({
             "id": r.get("service_request_id", ""),
             "label": r.get("_service_label") or "Unknown",
-            "location": _extract_park_name(addr) if addr else "Unknown",
+            "location": _resolve_park_name(r),
             "age_days": age,
             "requested": requested,
         })
