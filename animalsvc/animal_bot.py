@@ -5,6 +5,7 @@ Queries Austin Open311 API live across all animal service codes.
 Provides hotspot (by zipcode), complaint type stats, and response time analysis.
 """
 
+import json
 import io
 import os
 import re
@@ -601,15 +602,22 @@ def generate_animal_map(days_back: int = 90) -> tuple:
     if not records:
         return None, "🐾 No animal services reports with location data found."
 
-    open_count = sum(1 for r in records if (r.get("status") or "").lower() == "open")
-    closed_count = len(records) - open_count
-
     def _age_days(r):
         try:
             dt = datetime.fromisoformat(r.get("requested_datetime", "").replace("Z", "+00:00"))
             return (now_dt - dt).days
         except Exception:
             return days_back
+
+    # The map only shows the days_back window (90d), but the cache can return
+    # far older records. Trim here so counts/summary are accurate AND we don't
+    # waste time scraping 311 details for records that will never be rendered.
+    records = [r for r in records if _age_days(r) <= days_back]
+    if not records:
+        return None, "🐾 No animal services reports with location data found."
+
+    open_count = sum(1 for r in records if (r.get("status") or "").lower() == "open")
+    closed_count = len(records) - open_count
 
     # Count per type × bucket for the summary bar (matches traffic map pattern)
     all_slugs = list(_TYPE_SLUGS.values()) + [_DEFAULT_SLUG]
@@ -627,7 +635,7 @@ def generate_animal_map(days_back: int = 90) -> tuple:
                 b = str(bucket_days)
                 type_bucket_counts["all"][b][s] += 1
                 type_bucket_counts[slug][b][s] += 1
-    counts_js = str(type_bucket_counts).replace("'", '"')
+    counts_js = json.dumps(type_bucket_counts)
 
     # Fetch additional form details from 311 website for all mapped records
     req_ids = [r.get("service_request_id") for r in records if r.get("service_request_id")]
@@ -643,95 +651,66 @@ def generate_animal_map(days_back: int = 90) -> tuple:
     )
     m.get_root().header.add_child(folium.Element(og_meta_tags("animal")))
 
-    # Layer key: {status}_{bucket}_{typeSlug}  — no underscores in slug so split('_') is safe
-    fg_clusters = {}
-    fg_objects = {}
-    for status_key in ("open", "closed"):
-        for bucket in ("30", "60", "90"):
-            for slug in all_slugs:
-                name = f"{status_key}_{bucket}_{slug}"
-                show = (bucket == "90")
-                fg = folium.FeatureGroup(name=name, show=show, overlay=True)
-                cluster = MarkerCluster().add_to(fg)
-                fg.add_to(m)
-                fg_clusters[name] = cluster
-                fg_objects[name] = fg
+    # Single MarkerCluster — markers are built client-side from a compact JSON
+    # blob on demand (Option C) instead of pre-rendering every record into every
+    # 30/60/90-day × open/closed × type bucket (previously ~13 MB page).
+    marker_cluster = MarkerCluster().add_to(m)
 
+    # Serialize records to a compact JSON blob for on-demand client rendering.
+    records_js_list = []
     for r in records:
-        lat = r["_lat"]
-        lon = r["_lon"]
+        age = _age_days(r)
+        # The panel only shows the days_back window (90d); the cache can return
+        # far older records, so skip them to keep the page lean.
+        if age > days_back:
+            continue
         status = (r.get("status") or "").lower()
+        s = "open" if status == "open" else "closed"
         service_label = r.get("_service_label", "Animal Complaint")
         description = (r.get("description") or "").strip()
         status_notes = (r.get("status_notes") or "").strip()
-        date_str = (r.get("requested_datetime") or "").split("T")[0]
-        updated_str = (r.get("updated_datetime") or "").split("T")[0]
-        address = (r.get("address") or "").strip()
         req_id = r.get("service_request_id", "N/A")
+        attrs = r.get("attributes") or []
+        attrs_slim = [
+            {"l": (a.get("label") or "").strip(), "v": (a.get("value") or "").strip()}
+            for a in attrs
+            if a.get("label") and a.get("value")
+        ]
+        records_js_list.append({
+            "lat": r["_lat"],
+            "lon": r["_lon"],
+            "st": s,
+            "age": age,
+            "type": _TYPE_SLUGS.get(service_label, _DEFAULT_SLUG),
+            "label": service_label,
+            "id": req_id,
+            "addr": (r.get("address") or "").strip(),
+            "date": (r.get("requested_datetime") or "").split("T")[0],
+            "upd": (r.get("updated_datetime") or "").split("T")[0],
+            "desc": (description[:200] + "...") if len(description) > 200 else description,
+            "notes": (status_notes[:200] + "...") if len(status_notes) > 200 else status_notes,
+            "attrs": attrs_slim,
+            "details": ticket_details.get(req_id, [])[:12],
+        })
+    records_js = json.dumps(records_js_list, ensure_ascii=False).replace("</", "<\\/")
 
-        age = _age_days(r)
-        bucket = "30" if age <= 30 else ("60" if age <= 60 else "90")
-        slug = _TYPE_SLUGS.get(service_label, _DEFAULT_SLUG)
-        cluster_key = f"{status}_{bucket}_{slug}"
-        if cluster_key not in fg_clusters:
-            cluster_key = f"closed_{bucket}_{slug}"
-
-        address_line = f'<b>Address:</b> <a href="https://www.google.com/maps/search/?api=1&query={lat},{lon}" target="_blank">{address}</a><br/>' if address else ""
-        updated_line = f"<span style='color:#666;'>Updated: {updated_str}</span><br/>" if updated_str and updated_str != date_str else ""
-
-        # API description shown as-is; status_notes labeled "Resolution" for closed tickets
-        desc_block = ""
-        if description:
-            desc_short = (description[:400] + "...") if len(description) > 400 else description
-            desc_block = f"<b>Description:</b><br/><i>{desc_short.replace(chr(10), '<br/>')}</i><br/>"
-        elif status_notes:
-            notes_short = (status_notes[:300] + "...") if len(status_notes) > 300 else status_notes
-            label = "Resolution" if status == "closed" else "Notes"
-            desc_block = f"<b>{label}:</b><br/><i>{notes_short}</i><br/>"
-
-        # Additional form details scraped from the 311 website
-        extra_details = ticket_details.get(req_id, [])
-        extra_block = ""
-        if extra_details:
-            detail_lines = "<br/>".join(f"<span style='color:#444;'>{d}</span>" for d in extra_details)
-            extra_block = f"<b>Additional Details:</b><br/>{detail_lines}<br/>"
-
-        ticket_url = f"https://311.austintexas.gov/tickets/{req_id}"
-        popup_html = f"""
-        <div style="font-family:sans-serif;max-width:320px;font-size:13px;">
-            <b><a href="{ticket_url}" target="_blank" style="color:#0066cc;">Report #{req_id}</a></b><br/>
-            <span style="color:#666;">Filed: {date_str}</span><br/>
-            {updated_line}
-            {address_line}
-            <br/>
-            <b>Status:</b> {'🔴 Open' if status == 'open' else '🟢 Closed'}<br/>
-            <b>Type:</b> {service_label}<br/><br/>
-            {desc_block}
-            {extra_block}
-        </div>
-        """
-        popup = folium.Popup(popup_html, max_width=320)
-
-        if status == "open":
-            color, icon_name = _LABEL_COLOR.get(service_label, _DEFAULT_COLOR)
-        else:
-            color, icon_name = "green", "ok-sign"
-        tooltip = f"{'Open' if status == 'open' else 'Closed'}: {service_label}"
-
-        folium.Marker(
-            location=[lat, lon],
-            popup=popup,
-            icon=folium.Icon(color=color, icon=icon_name, prefix="glyphicon"),
-            tooltip=tooltip,
-        ).add_to(fg_clusters[cluster_key])
+    # JS color map from service label → hex (preserves open-marker type coloring)
+    _FOLIUM_TO_HEX = {
+        "red": "#dc2626", "orange": "#f97316", "blue": "#3b82f6",
+        "purple": "#9333ea", "cadetblue": "#5f9ea0", "green": "#16a34a",
+    }
+    label_colors_js = json.dumps({
+        label: _FOLIUM_TO_HEX.get(color, "#5f9ea0")
+        for label, (color, _) in _LABEL_COLOR.items()
+    }, ensure_ascii=False)
 
     type_options_html = '<option value="all">All Types</option>\n'
     for slug, label in _TYPE_OPTIONS:
         type_options_html += f'<option value="{slug}">{label}</option>\n'
 
     map_var = m.get_name()
-    layer_map_js = "{" + ", ".join(f'"{k}": {fg_objects[k].get_name()}' for k in fg_objects) + "}"
-    panel_html = f"""
+    cluster_var = marker_cluster.get_name()
+    panel_html = """
     <div id="map-panel" style="position:absolute;top:10px;left:50%;transform:translateX(-50%);
                 background:white;padding:10px 16px;border-radius:6px;
                 box-shadow:0 2px 6px rgba(0,0,0,0.3);z-index:9999;
@@ -754,88 +733,135 @@ def generate_animal_map(days_back: int = 90) -> tuple:
         <label for="type-select" style="font-size:11px;font-weight:bold;color:#444;display:block;margin-bottom:4px;">Filter by Type</label>
         <select id="type-select" onchange="setTypeFilter(this.value)"
                 style="font-size:12px;padding:3px 6px;border:1px solid #ccc;border-radius:4px;cursor:pointer;width:100%;">
-            {type_options_html}
+            __TYPE_OPTIONS__
         </select>
     </div>
     <style>
-        .fbtn {{ padding:3px 9px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;cursor:pointer;font-size:12px;color:#444; }}
-        .fbtn.active {{ background:#2563eb;color:white;border-color:#2563eb; }}
-        .fbtn:hover:not(.active) {{ background:#e0e7ff; }}
+        .fbtn { padding:3px 9px;border:1px solid #ccc;border-radius:4px;background:#f5f5f5;cursor:pointer;font-size:12px;color:#444; }
+        .fbtn.active { background:#2563eb;color:white;border-color:#2563eb; }
+        .fbtn:hover:not(.active) { background:#e0e7ff; }
     </style>
     <script>
         var currentDays = 90;
         var showOpen = true;
         var showClosed = true;
         var currentType = 'all';
-        var layerMap = null;
-        var leafletMap = null;
-        var typeBucketCounts = {counts_js};
+        var records = __RECORDS_JS__;
+        var markerCluster = null;
+        var typeBucketCounts = __COUNTS_JS__;
+        var labelColors = __LABEL_COLORS__;
 
-        function updateSummary() {{
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function makeIcon(status, label) {
+            var color = (status === 'open') ? (labelColors[label] || '#5f9ea0') : '#16a34a';
+            return L.divIcon({
+                className: '',
+                html: '<div style="width:14px;height:14px;border-radius:50%;background:' + color +
+                      ';border:2px solid #fff;box-shadow:0 0 4px rgba(0,0,0,0.45);"></div>',
+                iconSize: [14, 14],
+                iconAnchor: [7, 7]
+            });
+        }
+
+        function buildPopup(r) {
+            var addrLine = r.addr ? '<b>Address:</b> <a href="https://www.google.com/maps/search/?api=1&query=' +
+                r.lat + ',' + r.lon + '" target="_blank">' + esc(r.addr) + '</a><br/>' : '';
+            var updLine = (r.upd && r.upd !== r.date) ? '<span style="color:#666;">Updated: ' + esc(r.upd) + '</span><br/>' : '';
+            var descBlock = '';
+            if (r.desc) {
+                descBlock = '<b>Description:</b><br/><i>' + esc(r.desc).replace(/\\n/g, '<br/>') + '</i><br/>';
+            } else if (r.notes) {
+                var noteLabel = (r.st === 'closed') ? 'Resolution' : 'Notes';
+                descBlock = '<b>' + noteLabel + ':</b><br/><i>' + esc(r.notes).replace(/\\n/g, '<br/>') + '</i><br/>';
+            }
+            var extraBlock = (r.details && r.details.length) ? '<b>Additional Details:</b><br/>' +
+                r.details.map(function(d) { return '<span style="color:#444;">' + esc(d) + '</span>'; }).join('<br/>') +
+                '<br/>' : '';
+            var statusText = (r.st === 'open') ? '🔴 Open' : '🟢 Closed';
+            var ticketUrl = 'https://311.austintexas.gov/tickets/' + encodeURIComponent(r.id);
+            return '<div style="font-family:sans-serif;max-width:320px;font-size:13px;">' +
+                '<b><a href="' + ticketUrl + '" target="_blank" style="color:#0066cc;">Report #' + esc(r.id) + '</a></b><br/>' +
+                '<span style="color:#666;">Filed: ' + esc(r.date) + '</span><br/>' + updLine + addrLine +
+                '<br/><b>Status:</b> ' + statusText + '<br/>' +
+                '<b>Type:</b> ' + esc(r.label) + '<br/><br/>' + descBlock + extraBlock + '</div>';
+        }
+
+        function rebuildMarkers() {
+            if (!markerCluster) return;
+            markerCluster.clearLayers();
+            for (var i = 0; i < records.length; i++) {
+                var r = records[i];
+                if (r.age > currentDays) continue;
+                if (currentType !== 'all' && r.type !== currentType) continue;
+                var isOpen = (r.st === 'open');
+                if (isOpen && !showOpen) continue;
+                if (!isOpen && !showClosed) continue;
+                var m = L.marker([r.lat, r.lon], { icon: makeIcon(r.st, r.label) });
+                m.bindPopup(buildPopup(r), { maxWidth: 320 });
+                m.bindTooltip((isOpen ? 'Open' : 'Closed') + ': ' + r.label);
+                markerCluster.addLayer(m);
+            }
+        }
+
+        function updateSummary() {
             var d = String(currentDays);
             var catData = typeBucketCounts[currentType] || typeBucketCounts['all'];
-            var counts = catData[d] || {{}};
+            var counts = catData[d] || {};
             var o = showOpen ? (counts.open || 0) : 0;
             var c = showClosed ? (counts.closed || 0) : 0;
             document.getElementById('map-summary').textContent =
-                'Last ' + d + ' days \u00b7 ' + (o + c) + ' total \u00b7 ' + o + ' open \u00b7 ' + c + ' closed';
-        }}
+                'Last ' + d + ' days · ' + (o + c) + ' total · ' + o + ' open · ' + c + ' closed';
+        }
 
-        function initLayers() {{
-            layerMap = {layer_map_js};
-            leafletMap = {map_var};
-            updateLayers();
+        function updateLayers() {
+            rebuildMarkers();
             updateSummary();
-        }}
+        }
 
-        function updateLayers() {{
-            if (!layerMap || !leafletMap) return;
-            Object.keys(layerMap).forEach(function(key) {{
-                var parts = key.split('_');
-                var status = parts[0];
-                var bucket = parseInt(parts[1]);
-                var typeSlug = parts[2];
-                var timeOk = bucket <= currentDays;
-                var statusOk = (status === 'open' && showOpen) || (status === 'closed' && showClosed);
-                var typeOk = (currentType === 'all') || (typeSlug === currentType);
-                var layer = layerMap[key];
-                if (timeOk && statusOk && typeOk) {{
-                    if (!leafletMap.hasLayer(layer)) leafletMap.addLayer(layer);
-                }} else {{
-                    if (leafletMap.hasLayer(layer)) leafletMap.removeLayer(layer);
-                }}
-            }});
-        }}
+        function initLayers() {
+            markerCluster = __CLUSTER_VAR__;
+            updateLayers();
+        }
 
-        function setDayFilter(days) {{
+        function setDayFilter(days) {
             currentDays = days;
-            [30, 60, 90].forEach(function(d) {{
+            [30, 60, 90].forEach(function(d) {
                 var btn = document.getElementById('btn-' + d);
                 if (btn) btn.classList.toggle('active', d === days);
-            }});
+            });
             updateLayers();
-            updateSummary();
-        }}
+        }
 
-        function toggleStatus(status) {{
+        function toggleStatus(status) {
             if (status === 'open') showOpen = !showOpen;
             else showClosed = !showClosed;
             document.getElementById('btn-' + status).classList.toggle('active');
             updateLayers();
-            updateSummary();
-        }}
+        }
 
-        function setTypeFilter(type) {{
+        function setTypeFilter(type) {
             currentType = type;
             updateLayers();
-            updateSummary();
-        }}
+        }
 
-        document.addEventListener('DOMContentLoaded', function() {{
+        document.addEventListener('DOMContentLoaded', function() {
             setTimeout(initLayers, 1000);
-        }});
+        });
     </script>
     """
+    panel_html = (
+        panel_html.replace("__MAP_VAR__", map_var)
+        .replace("__CLUSTER_VAR__", cluster_var)
+        .replace("__COUNTS_JS__", counts_js)
+        .replace("__LABEL_COLORS__", label_colors_js)
+        .replace("__TYPE_OPTIONS__", type_options_html)
+        .replace("__RECORDS_JS__", records_js)
+    )
     m.get_root().html.add_child(folium.Element(panel_html))
 
     with tempfile.NamedTemporaryFile(mode='w', suffix='.html', delete=False) as tmp:

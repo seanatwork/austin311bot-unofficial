@@ -285,7 +285,7 @@ def main():
 
     generator_func, output_path = CATEGORY_MAPS[category]
     if category == "traffic":
-        days_back = 30
+        days_back = 90
     elif category == "homeless":
         days_back = 180
     elif category.endswith("-trends"):

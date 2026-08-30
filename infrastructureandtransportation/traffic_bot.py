@@ -593,6 +593,9 @@ def generate_traffic_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
         <b style="font-size: 15px;">🚦 Austin Traffic & Infrastructure 311 Reports</b><br/>
         <span id="map-summary" style="font-size: 12px; color: #555;"></span>
         <div style="display: flex; justify-content: center; gap: 4px; margin-top: 7px;">
+            <button id="btn-30" onclick="setDayFilter(30)" class="fbtn active">30d</button>
+            <button id="btn-60" onclick="setDayFilter(60)" class="fbtn">60d</button>
+            <button id="btn-90" onclick="setDayFilter(90)" class="fbtn">90d</button>
             <span style="margin: 0 4px; color: #ccc;">|</span>
             <button id="btn-open" onclick="toggleStatus('open')" class="fbtn active">🔴 Open</button>
             <button id="btn-closed" onclick="toggleStatus('closed')" class="fbtn active">🟢 Closed</button>
@@ -696,6 +699,15 @@ def generate_traffic_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
 
         function initLayers() {
             markerCluster = __CLUSTER_VAR__;
+            updateLayers();
+        }
+
+        function setDayFilter(days) {
+            currentDays = days;
+            [30, 60, 90].forEach(function(d) {
+                var btn = document.getElementById('btn-' + d);
+                if (btn) btn.classList.toggle('active', d === days);
+            });
             updateLayers();
         }
 

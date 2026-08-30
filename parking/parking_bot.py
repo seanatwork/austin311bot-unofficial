@@ -607,34 +607,38 @@ def _extract_violation_type(description: str) -> str:
     return description[:47] + "..."
 
 
+# Known violation types → URL-safe slug. Module-level so the map generator can
+# build a clean in-page dropdown of just these (vs. messy slugified descriptions).
+TYPE_SLUGS = {
+    "Bike Lane": "bikeLane",
+    "Blocking Sidewalk": "blockingSidewalk",
+    "On Sidewalk": "onSidewalk",
+    "Blocking Driveway": "blockingDriveway",
+    "No Parking Zone": "noParkingZone",
+    "Commercial Zone": "commercialZone",
+    "Abandoned Vehicle": "abandonedVehicle",
+    "Illegal Parking": "illegalParking",
+    "Overnight Camping": "overnightCamping",
+    "Overnight Parking": "overnightParking",
+    "Fire Hydrant": "fireHydrant",
+    "Handicap Space": "handicapSpace",
+    "Bus Stop": "busStop",
+    "Crosswalk": "crosswalk",
+    "Sidewalk Ramp": "sidewalkRamp",
+    "Construction Zone": "constructionZone",
+    "Loading Zone": "loadingZone",
+    "Tow Zone": "towZone",
+    "Street Sweeping": "streetSweeping",
+}
+
+
 def _violation_type_slug(violation_type: str) -> str:
     """Map a violation type label to a URL-safe camelCase slug (no underscores).
-    
+
     Used as a layer-key segment so the map can filter by type via ?type= param.
     """
-    _TYPE_SLUGS = {
-        "Bike Lane": "bikeLane",
-        "Blocking Sidewalk": "blockingSidewalk",
-        "On Sidewalk": "onSidewalk",
-        "Blocking Driveway": "blockingDriveway",
-        "No Parking Zone": "noParkingZone",
-        "Commercial Zone": "commercialZone",
-        "Abandoned Vehicle": "abandonedVehicle",
-        "Illegal Parking": "illegalParking",
-        "Overnight Camping": "overnightCamping",
-        "Overnight Parking": "overnightParking",
-        "Fire Hydrant": "fireHydrant",
-        "Handicap Space": "handicapSpace",
-        "Bus Stop": "busStop",
-        "Crosswalk": "crosswalk",
-        "Sidewalk Ramp": "sidewalkRamp",
-        "Construction Zone": "constructionZone",
-        "Loading Zone": "loadingZone",
-        "Tow Zone": "towZone",
-        "Street Sweeping": "streetSweeping",
-    }
-    if violation_type in _TYPE_SLUGS:
-        return _TYPE_SLUGS[violation_type]
+    if violation_type in TYPE_SLUGS:
+        return TYPE_SLUGS[violation_type]
     # Fallback: slugify the type label (lowercase, no spaces, no special chars)
     import re
     slug = re.sub(r'[^a-zA-Z0-9]', '', violation_type) if violation_type else "other"
@@ -758,6 +762,12 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
     # Built with json.dumps so user-supplied labels with quotes/newlines/emoji
     # can't break the embedded JS (a raw f-string here silently killed the panel).
     type_slug_js = json.dumps(type_to_slug_map, ensure_ascii=False).replace("</", "<\\/")
+
+    # In-page violation-type dropdown: only known types present in the data
+    type_options_html = '<option value="all">All Violation Types</option>\n'
+    for label, slug in TYPE_SLUGS.items():
+        if slug in all_slugs:
+            type_options_html += f'<option value="{slug}">{label}</option>\n'
     panel_html = """
     <div id="map-panel" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
                 background: white; padding: 10px 16px; border-radius: 6px;
@@ -775,6 +785,16 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
             <span style="margin: 0 4px; color: #ccc;">|</span>
             <a href="trends/" class="fbtn" style="text-decoration: none; display: inline-block;">📈 Trends</a>
         </div>
+    </div>
+    <div id="type-panel" style="position: absolute; top: 10px; right: 10px;
+                background: white; padding: 8px 12px; border-radius: 6px;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 9999;
+                font-family: sans-serif;">
+        <label for="type-select" style="font-size: 11px; font-weight: bold; color: #444; display: block; margin-bottom: 4px;">Violation Type</label>
+        <select id="type-select" onchange="setTypeFilterFromSelect(this.value)"
+                style="font-size: 12px; padding: 3px 6px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
+            __TYPE_OPTIONS__
+        </select>
     </div>
     <style>
         .fbtn {
@@ -897,7 +917,13 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
 
         function setTypeFilter(slug) {
             currentType = slug;
+            var sel = document.getElementById('type-select');
+            if (sel) sel.value = (currentType === 'all') ? 'all' : currentType;
             updateLayers();
+        }
+
+        function setTypeFilterFromSelect(value) {
+            setTypeFilter(value);
         }
 
         function clearTypeFilter() {
@@ -935,6 +961,7 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
         .replace("__CLUSTER_VAR__", cluster_var)
         .replace("__TYPE_SLUG_MAP__", type_slug_js)
         .replace("__COUNTS_JS__", counts_js)
+        .replace("__TYPE_OPTIONS__", type_options_html)
         .replace("__RECORDS_JS__", records_js)
     )
     m.get_root().html.add_child(folium.Element(panel_html))
