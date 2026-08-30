@@ -2,7 +2,10 @@
 Parks Maintenance Trends — aggregates park-related 311 reports over time.
 
 Tracks monthly volume across all 9 park service codes, split into
-Grounds (outdoor) and Buildings (indoor facility) buckets.
+Grounds (outdoor) and Buildings (indoor facility) buckets, plus:
+- resolution speed (median days to close by issue type),
+- the open backlog (unresolved reports by age, oldest open complaints),
+- seasonality (average reports by calendar month).
 """
 
 import io
@@ -28,6 +31,7 @@ logger = logging.getLogger(__name__)
 
 LOOKBACK_DAYS = 365
 TOP_TYPES = 9
+STUCK_COUNT = 6  # oldest open complaints surfaced on the page
 
 # Grounds codes = outdoor / greenspace; Buildings codes = indoor facility
 GROUNDS_LABELS = {
@@ -46,12 +50,20 @@ BUILDINGS_LABELS = {
 
 
 def _aggregate(records: list) -> dict:
-    """Bucket records by month and issue type."""
+    """Bucket records by month, issue type, resolution speed, backlog & season."""
+    from parks.parks_bot import _extract_park_name
+
     monthly: dict = defaultdict(int)
     monthly_open: dict = defaultdict(int)
     monthly_grounds: dict = defaultdict(int)
     monthly_buildings: dict = defaultdict(int)
     by_type: dict = defaultdict(int)
+    res_by_type: dict = defaultdict(list)
+    res_all: list = []
+    open_ages: list = []  # (age_days, record)
+    season_counts: dict = defaultdict(int)
+    season_months: dict = defaultdict(set)  # calendar month -> distinct YYYY-MM seen
+    now = datetime.now(timezone.utc)
     total = 0
 
     for r in records:
@@ -65,9 +77,7 @@ def _aggregate(records: list) -> dict:
 
         month_key = dt.strftime("%Y-%m")
         monthly[month_key] += 1
-        is_open = (r.get("status") or "").lower() == "open"
-        if is_open:
-            monthly_open[month_key] += 1
+        total += 1
 
         label = r.get("_service_label") or "Unknown"
         by_type[label] += 1
@@ -77,7 +87,24 @@ def _aggregate(records: list) -> dict:
         elif label in BUILDINGS_LABELS:
             monthly_buildings[month_key] += 1
 
-        total += 1
+        season_counts[dt.month] += 1
+        season_months[dt.month].add(month_key)
+
+        status = (r.get("status") or "").lower()
+        if status == "open":
+            monthly_open[month_key] += 1
+            open_ages.append((max(0, (now - dt).days), r))
+        elif status == "closed":
+            upd = r.get("updated_datetime") or ""
+            if upd:
+                try:
+                    upd_dt = datetime.fromisoformat(upd.replace("Z", "+00:00"))
+                    days = (upd_dt - dt).days
+                    if 0 <= days <= 365:
+                        res_by_type[label].append(days)
+                        res_all.append(days)
+                except ValueError:
+                    pass
 
     months_sorted = sorted(monthly.keys())
     counts = [monthly[m] for m in months_sorted]
@@ -93,6 +120,81 @@ def _aggregate(records: list) -> dict:
 
     top_types = sorted(by_type.items(), key=lambda x: -x[1])[:TOP_TYPES]
 
+    def _median(vals: list) -> Optional[float]:
+        if not vals:
+            return None
+        s = sorted(vals)
+        n = len(s)
+        if n % 2:
+            return round(float(s[n // 2]), 1)
+        return round((s[n // 2 - 1] + s[n // 2]) / 2, 1)
+
+    # Resolution speed by issue type (median days to close; types with data)
+    resolution = []
+    for label, days in res_by_type.items():
+        if len(days) >= 5:
+            resolution.append({
+                "type": label,
+                "count": len(days),
+                "median": _median(days),
+                "mean": round(sum(days) / len(days), 1),
+            })
+    resolution.sort(key=lambda x: -(x["median"] or 0))
+
+    overall_median = _median(res_all)
+
+    # Open backlog by age bucket
+    backlog = [
+        {"label": "< 30 days", "count": 0},
+        {"label": "30–60 days", "count": 0},
+        {"label": "60–90 days", "count": 0},
+        {"label": "90–180 days", "count": 0},
+        {"label": "6+ months", "count": 0},
+    ]
+    for age, _r in open_ages:
+        if age < 30:
+            backlog[0]["count"] += 1
+        elif age < 60:
+            backlog[1]["count"] += 1
+        elif age < 90:
+            backlog[2]["count"] += 1
+        elif age < 180:
+            backlog[3]["count"] += 1
+        else:
+            backlog[4]["count"] += 1
+
+    # Oldest open complaints (accountability list)
+    oldest_open = []
+    for age, r in sorted(open_ages, key=lambda x: -x[0])[:STUCK_COUNT]:
+        req_str = r.get("requested_datetime") or ""
+        try:
+            requested = datetime.fromisoformat(req_str.replace("Z", "+00:00")).strftime("%b %d, %Y")
+        except ValueError:
+            requested = req_str[:10]
+        addr = (r.get("address") or "").strip()
+        oldest_open.append({
+            "id": r.get("service_request_id", ""),
+            "label": r.get("_service_label") or "Unknown",
+            "location": _extract_park_name(addr) if addr else "Unknown",
+            "age_days": age,
+            "requested": requested,
+        })
+
+    # Seasonality — average per calendar month (handles months appearing once
+    # vs twice in a rolling 13-month window)
+    month_names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    seasonality = []
+    for m in range(1, 13):
+        occ = max(1, len(season_months.get(m, set())))
+        seasonality.append({
+            "month": month_names[m - 1],
+            "count": season_counts.get(m, 0),
+            "avg": round(season_counts.get(m, 0) / occ, 1),
+        })
+
+    peak_months = [s["month"] for s in sorted(seasonality, key=lambda x: -x["avg"])[:2]]
+
     return {
         "total": total,
         "months": months_sorted,
@@ -102,6 +204,13 @@ def _aggregate(records: list) -> dict:
         "monthly_buildings": [monthly_buildings[m] for m in months_sorted],
         "rolling_avg": rolling,
         "top_types": top_types,
+        "resolution": resolution,
+        "median_resolution": overall_median,
+        "backlog": backlog,
+        "open_total": len(open_ages),
+        "oldest_open": oldest_open,
+        "seasonality": seasonality,
+        "peak_months": peak_months,
     }
 
 
@@ -111,21 +220,68 @@ def _render_html(data: dict, fetched_at: str) -> str:
     monthly_counts = data["monthly_counts"]
     monthly_open_counts = data["monthly_open_counts"]
     top_types = data["top_types"]
+    resolution = data["resolution"]
+    backlog = data["backlog"]
+    oldest_open = data["oldest_open"]
+    seasonality = data["seasonality"]
+    peak_months = data["peak_months"]
+    median_resolution = data["median_resolution"]
 
-    avg_per_month = round(total / max(1, len(months)), 0) if months else 0
     total_open = sum(monthly_open_counts)
-    pct_open = round(total_open / max(1, total) * 100)
+    stuck = sum(b["count"] for b in backlog if b["label"] == "6+ months")
 
     month_labels = [datetime.strptime(m, "%Y-%m").strftime("%b %Y") for m in months]
+
+    median_days_text = f"{median_resolution:g}" if median_resolution is not None else "—"
+    peak_month_label = peak_months[0] if peak_months else "—"
+    peak_avg = max((s["avg"] for s in seasonality), default=0)
+    peak_avg_text = f"{peak_avg:g}"
+
+    # ---- Key findings (computed server-side, rendered as static HTML) ----
+    findings = []
+    if top_types:
+        t_name, t_count = top_types[0]
+        t_pct = round(t_count / max(1, total) * 100)
+        findings.append(
+            f'<div class="finding"><span class="f-ico">📋</span><div>'
+            f'<b>{t_name}</b> is the most common park request — '
+            f'{t_count:,} of {total:,} reports ({t_pct}%).</div></div>'
+        )
+    if median_resolution is not None:
+        findings.append(
+            f'<div class="finding"><span class="f-ico">⚡</span><div>'
+            f'<b>Half of resolved park issues close within {median_resolution:g} days.</b> '
+            f'Some types move much slower — see “How long does it take to fix?”</div></div>'
+        )
+    if seasonality and len(peak_months) >= 2:
+        findings.append(
+            f'<div class="finding"><span class="f-ico">🌦️</span><div>'
+            f'Complaints run hottest in <b>{peak_months[0]}–{peak_months[1]}</b> — '
+            f'grounds maintenance season.</div></div>'
+        )
+    if total_open and stuck:
+        findings.append(
+            f'<div class="finding"><span class="f-ico">⏳</span><div>'
+            f'<b>{stuck} park reports have been open 6+ months.</b> '
+            f'{total_open:,} reports are still unresolved.</div></div>'
+        )
+    findings_block = (
+        f'<div id="findings"><div class="findings-inner">'
+        f'{"".join(findings)}</div></div>'
+        if findings else ""
+    )
 
     payload = {
         "months": month_labels,
         "monthlyCounts": monthly_counts,
-        "monthlyOpenCounts": monthly_open_counts,
         "monthlyGrounds": data["monthly_grounds"],
         "monthlyBuildings": data["monthly_buildings"],
         "rollingAvg": data["rolling_avg"],
         "types": [{"name": t, "count": c} for t, c in top_types],
+        "resolution": resolution,
+        "backlog": backlog,
+        "seasonality": seasonality,
+        "stuck": oldest_open,
     }
     payload_json = json.dumps(payload)
 
@@ -204,6 +360,24 @@ def _render_html(data: dict, fetched_at: str) -> str:
     .chart-block {{ background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }}
     .chart-title {{ font-size: 13px; font-weight: 600; color: var(--chart-title); margin-bottom: 10px; }}
     .chart-container {{ position: relative; height: 320px; }}
+    .chart-grid {{ display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }}
+    @media (max-width: 760px) {{ .chart-grid {{ grid-template-columns: 1fr; }} }}
+
+    #findings {{ border-bottom: 1px solid var(--border); }}
+    .findings-inner {{ max-width: 1100px; width: 100%; margin: 0 auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }}
+    .finding {{ display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text); background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; }}
+    .f-ico {{ font-size: 15px; line-height: 1.3; }}
+    .finding b {{ color: var(--text-head); }}
+
+    .stuck-list {{ display: flex; flex-direction: column; gap: 8px; }}
+    .stuck-row {{ display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }}
+    .stuck-info {{ min-width: 0; }}
+    .stuck-title {{ font-size: 12.5px; font-weight: 600; color: var(--text-head); }}
+    .stuck-loc {{ color: var(--text-sub); font-weight: 500; }}
+    .stuck-meta {{ font-size: 11px; color: var(--text-muted); margin-top: 2px; }}
+    .stuck-link {{ flex-shrink: 0; font-size: 11px; font-weight: 600; color: #ef4444; text-decoration: none; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; }}
+    .stuck-link:hover {{ background: var(--btn-hover-bg); color: #dc2626; }}
+    .stuck-none {{ font-size: 13px; color: var(--text-muted); text-align: center; padding: 16px 8px; }}
 
     footer {{
       text-align: center; padding: 14px 16px;
@@ -236,26 +410,56 @@ def _render_html(data: dict, fetched_at: str) -> str:
         <div class="stat-sub">last 365 days</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#22c55e;">{int(avg_per_month):,}</div>
-        <div class="stat-label">Avg / month</div>
+        <div class="stat-value" style="color:#ef4444;">{total_open:,}</div>
+        <div class="stat-label">Still open</div>
+        <div class="stat-sub">{stuck} open 6+ months</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#ef4444;">{pct_open}%</div>
-        <div class="stat-label">Still open</div>
-        <div class="stat-sub">{total_open:,} unresolved</div>
+        <div class="stat-value" style="color:#22c55e;">{median_days_text}</div>
+        <div class="stat-label">Median days to fix</div>
+        <div class="stat-sub">half close this fast</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" style="color:#f59e0b;">{peak_month_label}</div>
+        <div class="stat-label">Busiest month</div>
+        <div class="stat-sub">avg {peak_avg_text} / month</div>
       </div>
     </div>
   </div>
 
+  {findings_block}
+
   <div id="chart-wrap">
     <div class="chart-block">
-      <div class="chart-title">Reports per month — total, grounds, buildings &amp; 3-month avg</div>
+      <div class="chart-title">📈 Reports per month — total, grounds, buildings &amp; 3-month avg</div>
       <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
     </div>
 
+    <div class="chart-grid">
+      <div class="chart-block">
+        <div class="chart-title">🌦️ When do complaints peak? — avg reports by calendar month</div>
+        <div class="chart-container" style="height:300px;"><canvas id="seasonChart"></canvas></div>
+      </div>
+      <div class="chart-block">
+        <div class="chart-title">📋 Top {TOP_TYPES} issue types</div>
+        <div class="chart-container" style="height:300px;"><canvas id="typesChart"></canvas></div>
+      </div>
+    </div>
+
     <div class="chart-block">
-      <div class="chart-title">Top {TOP_TYPES} issue types</div>
-      <div class="chart-container" style="height: {max(280, len(top_types) * 34)}px;"><canvas id="typesChart"></canvas></div>
+      <div class="chart-title">⚡ How long does it take to fix? — median days to resolve, by issue type</div>
+      <div class="chart-container" style="height: {max(280, len(resolution) * 34)}px;"><canvas id="resolveChart"></canvas></div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-block">
+        <div class="chart-title">⏳ What's still open? — unresolved reports by age</div>
+        <div class="chart-container" style="height:280px;"><canvas id="backlogChart"></canvas></div>
+      </div>
+      <div class="chart-block">
+        <div class="chart-title">🕰️ Stuck the longest — oldest open reports</div>
+        <div id="stuck-list" class="stuck-list"></div>
+      </div>
     </div>
   </div>
 
@@ -307,6 +511,19 @@ def _render_html(data: dict, fetched_at: str) -> str:
       scales: {{
         x: {{ ticks: TICK_X, grid: GRID, beginAtZero: true }},
         y: {{ ticks: TICK_Y, grid: GRID }},
+      }},
+      responsive: true,
+      maintainAspectRatio: false,
+    }};
+
+    const vBarOpts = {{
+      plugins: {{
+        legend: {{ display: false }},
+        tooltip: TOOLTIP,
+      }},
+      scales: {{
+        x: {{ ticks: TICK_X, grid: GRID }},
+        y: {{ ticks: TICK_Y, grid: GRID, beginAtZero: true }},
       }},
       responsive: true,
       maintainAspectRatio: false,
@@ -370,6 +587,23 @@ def _render_html(data: dict, fetched_at: str) -> str:
       options: lineOpts,
     }});
 
+    // Seasonality — average reports per calendar month
+    const seasonAvgs = DATA.seasonality.map(s => s.avg);
+    const seasonMax = Math.max(...seasonAvgs);
+    new Chart(document.getElementById("seasonChart"), {{
+      type: "bar",
+      data: {{
+        labels: DATA.seasonality.map(s => s.month),
+        datasets: [{{
+          label: "Avg reports",
+          data: seasonAvgs,
+          backgroundColor: DATA.seasonality.map(s => s.avg === seasonMax ? "#f59e0b" : "#22c55e"),
+          borderRadius: 4,
+        }}],
+      }},
+      options: vBarOpts,
+    }});
+
     // Top issue types — horizontal bar
     new Chart(document.getElementById("typesChart"), {{
       type: "bar",
@@ -384,6 +618,68 @@ def _render_html(data: dict, fetched_at: str) -> str:
       }},
       options: hBarOpts,
     }});
+
+    // Resolution time — median days to close by issue type
+    new Chart(document.getElementById("resolveChart"), {{
+      type: "bar",
+      data: {{
+        labels: DATA.resolution.map(r => r.type),
+        datasets: [{{
+          label: "Median days",
+          data: DATA.resolution.map(r => r.median),
+          backgroundColor: "#f59e0b",
+          borderRadius: 4,
+        }}],
+      }},
+      options: {{
+        ...hBarOpts,
+        plugins: {{
+          legend: {{ display: false }},
+          tooltip: {{
+            ...TOOLTIP,
+            callbacks: {{
+              label: (ctx) => {{
+                const r = DATA.resolution[ctx.dataIndex];
+                return `Median ${{r.median}} days · ${{r.count}} resolved · avg ${{r.mean}} days`;
+              }},
+            }},
+          }},
+        }},
+      }},
+    }});
+
+    // Backlog — open complaints by age bucket
+    const backlogColors = ["#22c55e", "#84cc16", "#facc15", "#f97316", "#ef4444"];
+    new Chart(document.getElementById("backlogChart"), {{
+      type: "bar",
+      data: {{
+        labels: DATA.backlog.map(b => b.label),
+        datasets: [{{
+          label: "Open reports",
+          data: DATA.backlog.map(b => b.count),
+          backgroundColor: DATA.backlog.map((_, i) => backlogColors[i]),
+          borderRadius: 4,
+        }}],
+      }},
+      options: vBarOpts,
+    }});
+
+    // Stuck the longest — oldest open reports with ticket links
+    const stuckEl = document.getElementById("stuck-list");
+    if (stuckEl) {{
+      if (DATA.stuck.length) {{
+        stuckEl.innerHTML = DATA.stuck.map(s => `
+          <div class="stuck-row">
+            <div class="stuck-info">
+              <div class="stuck-title">${{s.label}} <span class="stuck-loc">${{s.location}}</span></div>
+              <div class="stuck-meta">Opened ${{s.requested}} · Ticket #${{s.id}}</div>
+            </div>
+            <a class="stuck-link" href="https://311.austintexas.gov/tickets/${{s.id}}" target="_blank" rel="noopener">${{s.age_days}}d open →</a>
+          </div>`).join("");
+      }} else {{
+        stuckEl.innerHTML = '<div class="stuck-none">No open complaints right now 🎉</div>';
+      }}
+    }}
   </script>
 </body>
 </html>
@@ -420,9 +716,12 @@ def generate_parks_trends(days_back: int = LOOKBACK_DAYS) -> tuple[Optional[io.B
     buf = io.BytesIO(html.encode("utf-8"))
     buf.seek(0)
 
+    med = data["median_resolution"]
+    med_text = f"{med:g}" if med is not None else "—"
     summary = (
         f"🏞️ *Parks Maintenance Trends*\n"
         f"_Last {days_back} days · {data['total']:,} reports across "
-        f"{len(data['months'])} months_"
+        f"{len(data['months'])} months_\n"
+        f"⚡ Median {med_text} days to resolve · {data['open_total']:,} still open"
     )
     return buf, summary

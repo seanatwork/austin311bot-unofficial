@@ -73,6 +73,24 @@
     .chart-block { background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 14px; }
     .chart-title { font-size: 13px; font-weight: 600; color: var(--chart-title); margin-bottom: 10px; }
     .chart-container { position: relative; height: 320px; }
+    .chart-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media (max-width: 760px) { .chart-grid { grid-template-columns: 1fr; } }
+
+    #findings { border-bottom: 1px solid var(--border); }
+    .findings-inner { max-width: 1100px; width: 100%; margin: 0 auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+    .finding { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--text); background: var(--bg-card); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; }
+    .f-ico { font-size: 15px; line-height: 1.3; }
+    .finding b { color: var(--text-head); }
+
+    .stuck-list { display: flex; flex-direction: column; gap: 8px; }
+    .stuck-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--bg-panel); border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px; }
+    .stuck-info { min-width: 0; }
+    .stuck-title { font-size: 12.5px; font-weight: 600; color: var(--text-head); }
+    .stuck-loc { color: var(--text-sub); font-weight: 500; }
+    .stuck-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+    .stuck-link { flex-shrink: 0; font-size: 11px; font-weight: 600; color: #ef4444; text-decoration: none; white-space: nowrap; background: var(--bg-card); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; }
+    .stuck-link:hover { background: var(--btn-hover-bg); color: #dc2626; }
+    .stuck-none { font-size: 13px; color: var(--text-muted); text-align: center; padding: 16px 8px; }
 
     footer {
       text-align: center; padding: 14px 16px;
@@ -82,14 +100,6 @@
     footer a:hover { color: var(--text); }
     @media (max-width: 520px) { .stat-value { font-size: 1rem; } .chart-container { height: 260px; } }
   </style>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-TS158R7XSN');
-</script>
 </head>
 <body>
 
@@ -98,7 +108,7 @@
   <div id="panel">
     <div id="panel-title">🏞️ Austin Parks Maintenance Trends</div>
     <div id="panel-subtitle">Park maintenance 311 requests — last 365 days</div>
-    <div id="last-ran">Last ran: 2026-08-29 12:01 PM CDT</div>
+    <div id="last-ran">Last ran: 2026-08-30 11:26 AM CDT</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Parks Map</a>
       <a class="fbtn" href="../../">Austin 311 Home</a>
@@ -108,31 +118,61 @@
   <div id="stats">
     <div class="stats-inner">
       <div class="stat">
-        <div class="stat-value" style="color:#3b82f6;">7,567</div>
+        <div class="stat-value" style="color:#3b82f6;">7,577</div>
         <div class="stat-label">Total reports</div>
         <div class="stat-sub">last 365 days</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#22c55e;">582</div>
-        <div class="stat-label">Avg / month</div>
+        <div class="stat-value" style="color:#ef4444;">395</div>
+        <div class="stat-label">Still open</div>
+        <div class="stat-sub">37 open 6+ months</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#ef4444;">3%</div>
-        <div class="stat-label">Still open</div>
-        <div class="stat-sub">192 unresolved</div>
+        <div class="stat-value" style="color:#22c55e;">3</div>
+        <div class="stat-label">Median days to fix</div>
+        <div class="stat-sub">half close this fast</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" style="color:#f59e0b;">May</div>
+        <div class="stat-label">Busiest month</div>
+        <div class="stat-sub">avg 756 / month</div>
       </div>
     </div>
   </div>
 
+  <div id="findings"><div class="findings-inner"><div class="finding"><span class="f-ico">📋</span><div><b>Grounds Maintenance</b> is the most common park request — 5,500 of 7,577 reports (73%).</div></div><div class="finding"><span class="f-ico">⚡</span><div><b>Half of resolved park issues close within 3 days.</b> Some types move much slower — see “How long does it take to fix?”</div></div><div class="finding"><span class="f-ico">🌦️</span><div>Complaints run hottest in <b>May–Jun</b> — grounds maintenance season.</div></div><div class="finding"><span class="f-ico">⏳</span><div><b>37 park reports have been open 6+ months.</b> 395 reports are still unresolved.</div></div></div></div>
+
   <div id="chart-wrap">
     <div class="chart-block">
-      <div class="chart-title">Reports per month — total, grounds, buildings &amp; 3-month avg</div>
+      <div class="chart-title">📈 Reports per month — total, grounds, buildings &amp; 3-month avg</div>
       <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
     </div>
 
+    <div class="chart-grid">
+      <div class="chart-block">
+        <div class="chart-title">🌦️ When do complaints peak? — avg reports by calendar month</div>
+        <div class="chart-container" style="height:300px;"><canvas id="seasonChart"></canvas></div>
+      </div>
+      <div class="chart-block">
+        <div class="chart-title">📋 Top 9 issue types</div>
+        <div class="chart-container" style="height:300px;"><canvas id="typesChart"></canvas></div>
+      </div>
+    </div>
+
     <div class="chart-block">
-      <div class="chart-title">Top 9 issue types</div>
-      <div class="chart-container" style="height: 306px;"><canvas id="typesChart"></canvas></div>
+      <div class="chart-title">⚡ How long does it take to fix? — median days to resolve, by issue type</div>
+      <div class="chart-container" style="height: 306px;"><canvas id="resolveChart"></canvas></div>
+    </div>
+
+    <div class="chart-grid">
+      <div class="chart-block">
+        <div class="chart-title">⏳ What's still open? — unresolved reports by age</div>
+        <div class="chart-container" style="height:280px;"><canvas id="backlogChart"></canvas></div>
+      </div>
+      <div class="chart-block">
+        <div class="chart-title">🕰️ Stuck the longest — oldest open reports</div>
+        <div id="stuck-list" class="stuck-list"></div>
+      </div>
     </div>
   </div>
 
@@ -145,7 +185,7 @@
   </footer>
 
   <script>
-    const DATA = {"months": ["Aug 2025", "Sep 2025", "Oct 2025", "Nov 2025", "Dec 2025", "Jan 2026", "Feb 2026", "Mar 2026", "Apr 2026", "May 2026", "Jun 2026", "Jul 2026", "Aug 2026"], "monthlyCounts": [548, 605, 605, 530, 427, 529, 633, 632, 573, 756, 742, 492, 495], "monthlyOpenCounts": [2, 1, 0, 2, 2, 1, 6, 3, 11, 16, 18, 27, 103], "monthlyGrounds": [508, 562, 570, 487, 392, 481, 573, 570, 504, 663, 688, 442, 453], "monthlyBuildings": [40, 43, 35, 43, 35, 48, 60, 62, 69, 93, 54, 50, 42], "rollingAvg": [null, null, 586.0, 580.0, 520.7, 495.3, 529.7, 598.0, 612.7, 653.7, 690.3, 663.3, 576.3], "types": [{"name": "Grounds Maintenance", "count": 5498}, {"name": "Grounds Plumbing", "count": 724}, {"name": "Grounds Electrical", "count": 514}, {"name": "Building Plumbing", "count": 274}, {"name": "Building Issues", "count": 229}, {"name": "Commercial Use of Parkland", "count": 129}, {"name": "Building A/C & Heating", "count": 107}, {"name": "Building Electric", "count": 64}, {"name": "Park Cemeteries", "count": 28}]};
+    const DATA = {"months": ["Jul 2025", "Aug 2025", "Sep 2025", "Oct 2025", "Nov 2025", "Dec 2025", "Jan 2026", "Feb 2026", "Mar 2026", "Apr 2026", "May 2026", "Jun 2026", "Jul 2026", "Aug 2026"], "monthlyCounts": [6, 548, 605, 605, 530, 427, 529, 633, 632, 573, 756, 742, 492, 499], "monthlyGrounds": [4, 508, 562, 570, 487, 392, 481, 573, 570, 504, 663, 688, 442, 457], "monthlyBuildings": [2, 40, 43, 35, 43, 35, 48, 60, 62, 69, 93, 54, 50, 42], "rollingAvg": [null, null, 386.3, 586.0, 580.0, 520.7, 495.3, 529.7, 598.0, 612.7, 653.7, 690.3, 663.3, 577.7], "types": [{"name": "Grounds Maintenance", "count": 5500}, {"name": "Grounds Plumbing", "count": 727}, {"name": "Grounds Electrical", "count": 517}, {"name": "Building Plumbing", "count": 275}, {"name": "Building Issues", "count": 229}, {"name": "Commercial Use of Parkland", "count": 129}, {"name": "Building A/C & Heating", "count": 108}, {"name": "Building Electric", "count": 64}, {"name": "Park Cemeteries", "count": 28}], "resolution": [{"type": "Park Cemeteries", "count": 28, "median": 139.5, "mean": 124.2}, {"type": "Commercial Use of Parkland", "count": 89, "median": 29.0, "mean": 30.8}, {"type": "Grounds Plumbing", "count": 682, "median": 8.0, "mean": 15.6}, {"type": "Grounds Electrical", "count": 482, "median": 6.0, "mean": 15.2}, {"type": "Building Electric", "count": 59, "median": 5.0, "mean": 16.1}, {"type": "Building Plumbing", "count": 263, "median": 4.0, "mean": 10.6}, {"type": "Building Issues", "count": 212, "median": 3.0, "mean": 10.1}, {"type": "Building A/C & Heating", "count": 107, "median": 3.0, "mean": 5.4}, {"type": "Grounds Maintenance", "count": 5260, "median": 2.0, "mean": 8.3}], "backlog": [{"label": "< 30 days", "count": 108}, {"label": "30\u201360 days", "count": 89}, {"label": "60\u201390 days", "count": 86}, {"label": "90\u2013180 days", "count": 75}, {"label": "6+ months", "count": 37}], "seasonality": [{"month": "Jan", "count": 529, "avg": 529.0}, {"month": "Feb", "count": 633, "avg": 633.0}, {"month": "Mar", "count": 632, "avg": 632.0}, {"month": "Apr", "count": 573, "avg": 573.0}, {"month": "May", "count": 756, "avg": 756.0}, {"month": "Jun", "count": 742, "avg": 742.0}, {"month": "Jul", "count": 498, "avg": 249.0}, {"month": "Aug", "count": 1047, "avg": 523.5}, {"month": "Sep", "count": 605, "avg": 605.0}, {"month": "Oct", "count": 605, "avg": 605.0}, {"month": "Nov", "count": 530, "avg": 530.0}, {"month": "Dec", "count": 427, "avg": 427.0}], "stuck": [{"id": "25-00283848", "label": "Grounds Plumbing", "location": "Jain Ln", "age_days": 374, "requested": "Aug 21, 2025"}, {"id": "25-00282949", "label": "Grounds Maintenance", "location": "Cumberland Rd", "age_days": 374, "requested": "Aug 20, 2025"}, {"id": "25-00305737", "label": "Grounds Maintenance", "location": "S Pleasant Valley Rd", "age_days": 355, "requested": "Sep 09, 2025"}, {"id": "25-00308522", "label": "Grounds Maintenance", "location": "Far View Cv", "age_days": 353, "requested": "Sep 11, 2025"}, {"id": "25-00374153", "label": "Grounds Electrical", "location": "Hermitage Dr", "age_days": 297, "requested": "Nov 05, 2025"}, {"id": "25-00376139", "label": "Grounds Electrical", "location": "Lyndhurst St", "age_days": 296, "requested": "Nov 07, 2025"}]};
 
     const isDark = document.documentElement.classList.contains("dark");
     const gridColor  = isDark ? "#252b3b" : "#e8ecf0";
@@ -184,6 +224,19 @@
       scales: {
         x: { ticks: TICK_X, grid: GRID, beginAtZero: true },
         y: { ticks: TICK_Y, grid: GRID },
+      },
+      responsive: true,
+      maintainAspectRatio: false,
+    };
+
+    const vBarOpts = {
+      plugins: {
+        legend: { display: false },
+        tooltip: TOOLTIP,
+      },
+      scales: {
+        x: { ticks: TICK_X, grid: GRID },
+        y: { ticks: TICK_Y, grid: GRID, beginAtZero: true },
       },
       responsive: true,
       maintainAspectRatio: false,
@@ -247,6 +300,23 @@
       options: lineOpts,
     });
 
+    // Seasonality — average reports per calendar month
+    const seasonAvgs = DATA.seasonality.map(s => s.avg);
+    const seasonMax = Math.max(...seasonAvgs);
+    new Chart(document.getElementById("seasonChart"), {
+      type: "bar",
+      data: {
+        labels: DATA.seasonality.map(s => s.month),
+        datasets: [{
+          label: "Avg reports",
+          data: seasonAvgs,
+          backgroundColor: DATA.seasonality.map(s => s.avg === seasonMax ? "#f59e0b" : "#22c55e"),
+          borderRadius: 4,
+        }],
+      },
+      options: vBarOpts,
+    });
+
     // Top issue types — horizontal bar
     new Chart(document.getElementById("typesChart"), {
       type: "bar",
@@ -261,6 +331,68 @@
       },
       options: hBarOpts,
     });
+
+    // Resolution time — median days to close by issue type
+    new Chart(document.getElementById("resolveChart"), {
+      type: "bar",
+      data: {
+        labels: DATA.resolution.map(r => r.type),
+        datasets: [{
+          label: "Median days",
+          data: DATA.resolution.map(r => r.median),
+          backgroundColor: "#f59e0b",
+          borderRadius: 4,
+        }],
+      },
+      options: {
+        ...hBarOpts,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            ...TOOLTIP,
+            callbacks: {
+              label: (ctx) => {
+                const r = DATA.resolution[ctx.dataIndex];
+                return `Median ${r.median} days · ${r.count} resolved · avg ${r.mean} days`;
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Backlog — open complaints by age bucket
+    const backlogColors = ["#22c55e", "#84cc16", "#facc15", "#f97316", "#ef4444"];
+    new Chart(document.getElementById("backlogChart"), {
+      type: "bar",
+      data: {
+        labels: DATA.backlog.map(b => b.label),
+        datasets: [{
+          label: "Open reports",
+          data: DATA.backlog.map(b => b.count),
+          backgroundColor: DATA.backlog.map((_, i) => backlogColors[i]),
+          borderRadius: 4,
+        }],
+      },
+      options: vBarOpts,
+    });
+
+    // Stuck the longest — oldest open reports with ticket links
+    const stuckEl = document.getElementById("stuck-list");
+    if (stuckEl) {
+      if (DATA.stuck.length) {
+        stuckEl.innerHTML = DATA.stuck.map(s => `
+          <div class="stuck-row">
+            <div class="stuck-info">
+              <div class="stuck-title">${s.label} <span class="stuck-loc">${s.location}</span></div>
+              <div class="stuck-meta">Opened ${s.requested} · Ticket #${s.id}</div>
+            </div>
+            <a class="stuck-link" href="https://311.austintexas.gov/tickets/${s.id}" target="_blank" rel="noopener">${s.age_days}d open →</a>
+          </div>`).join("");
+      } else {
+        stuckEl.innerHTML = '<div class="stuck-none">No open complaints right now 🎉</div>';
+      }
+    }
   </script>
 </body>
 </html>
