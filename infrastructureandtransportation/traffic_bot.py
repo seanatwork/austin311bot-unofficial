@@ -5,6 +5,7 @@ Queries Austin Open311 API live across road, signal, and infrastructure service 
 Provides hotspot (by street), complaint type stats, and response time analysis.
 """
 
+import json
 import time
 import logging
 import requests
@@ -521,7 +522,7 @@ def generate_traffic_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
                 b = str(bucket_days)
                 cat_bucket_counts["all"][b][s] += 1
                 cat_bucket_counts[cat][b][s] += 1
-    counts_js = str(cat_bucket_counts).replace("'", '"')
+    counts_js = json.dumps(cat_bucket_counts)
 
     # Create map centered on Austin
     m = folium.Map(
@@ -532,94 +533,59 @@ def generate_traffic_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
     )
     m.get_root().header.add_child(folium.Element(og_meta_tags("traffic")))
 
-    # 30 FeatureGroups: open/closed × 30/60/90-day buckets × 5 categories
-    fg_clusters = {}
-    fg_objects = {}
-    for status_key in ("open", "closed"):
-        for bucket in ("30", "60", "90"):
-            for cat_key in cat_keys:
-                name = f"{status_key}_{bucket}_{cat_key}"
-                show = (bucket == "30")
-                fg = folium.FeatureGroup(name=name, show=show, overlay=True)
-                cluster = MarkerCluster().add_to(fg)
-                fg.add_to(m)
-                fg_clusters[name] = cluster
-                fg_objects[name] = fg
+    # Single MarkerCluster — markers are built client-side from a compact JSON
+    # blob on demand (Option C) instead of pre-rendering every record into every
+    # 30/60/90-day × open/closed × category bucket (previously ~24k markers / 57 MB).
+    marker_cluster = MarkerCluster().add_to(m)
 
-    # Add markers to the appropriate group
+    # Serialize records to a compact JSON blob for on-demand client rendering.
+    # Descriptions/notes are trimmed to keep the page lean; the full ticket text
+    # is one click away on the 311 site.
+    records_js_list = []
     for r in records:
-        lat = r["_lat"]
-        lon = r["_lon"]
+        age = _age_days(r)
+        # The panel only ever shows the days_back window (30d for traffic); the
+        # cache can return far older records, so skip them to keep the page lean.
+        if age > days_back:
+            continue
         status = (r.get("status") or "").lower()
-        service_label = r.get("_service_label", "Unknown")
+        s = "open" if status == "open" else "closed"
         description = (r.get("description") or "").strip()
         status_notes = (r.get("status_notes") or "").strip()
-        date_str = (r.get("requested_datetime") or "").split("T")[0]
-        updated_str = (r.get("updated_datetime") or "").split("T")[0]
-        address = (r.get("address") or "").strip()
-        req_id = r.get("service_request_id", "N/A")
-
-        age = _age_days(r)
-        bucket = "30" if age <= 30 else "60" if age <= 60 else "90"
-        cat = _get_category(r.get("_service_code", ""))
-
-        cluster_key = f"{status}_{bucket}_{cat}"
-        if cluster_key not in fg_clusters:
-            cluster_key = f"closed_{bucket}_{cat}"
-        target_cluster = fg_clusters[cluster_key]
-
-        address_line = f'<b>Address:</b> <a href="https://www.google.com/maps/search/?api=1&query={lat},{lon}" target="_blank">{address}</a><br/>' if address else ""
-        updated_line = f"<span style='color: #666;'>Updated: {updated_str}</span><br/>" if updated_str and updated_str != date_str else ""
-
         attrs = r.get("attributes") or []
-        attrs_html = "".join(f"<b>{a['label']}:</b> {a['value']}<br/>" for a in attrs if a.get("label") and a.get("value"))
-        attrs_block = f"<b>Additional Details:</b><br/>{attrs_html}" if attrs_html else ""
-
-        desc_short = (description[:500] + "...") if len(description) > 500 else description
-        desc_short = desc_short.replace("\n", "<br/>")
-        desc_block = f"<b>Description:</b><br/><i>{desc_short}</i><br/>" if desc_short else ""
-
-        notes_short = (status_notes[:500] + "...") if len(status_notes) > 500 else status_notes
-        notes_short = notes_short.replace("\n", "<br/>")
-        notes_block = f"<b>Resolution Notes:</b><br/><i>{notes_short}</i><br/>" if notes_short else ""
-
-        ticket_url = f"https://311.austintexas.gov/tickets/{req_id}"
-        popup_html = f"""
-        <div style="font-family: sans-serif; max-width: 300px;">
-            <b><a href="{ticket_url}" target="_blank" style="color: #0066cc;">Report #{req_id}</a></b><br/>
-            <span style="color: #666;">Filed: {date_str}</span><br/>
-            {updated_line}
-            {address_line}
-            <br/>
-            <b>Status:</b> {'🔴 Open' if status == 'open' else '🟢 Closed'}<br/>
-            <b>Category:</b> {service_label}<br/><br/>
-            {attrs_block}
-            {desc_block}
-            {notes_block}
-        </div>
-        """
-
-        popup = folium.Popup(popup_html, max_width=300)
-
-        if status == "open":
-            icon = folium.Icon(color="red", icon="exclamation-sign", prefix="glyphicon")
-            tooltip = f"Open: {service_label}"
-        else:
-            icon = folium.Icon(color="green", icon="ok-sign", prefix="glyphicon")
-            tooltip = f"Closed: {service_label}"
-
-        folium.Marker(location=[lat, lon], popup=popup, icon=icon, tooltip=tooltip).add_to(target_cluster)
+        attrs_slim = [
+            {"l": (a.get("label") or "").strip(), "v": (a.get("value") or "").strip()}
+            for a in attrs
+            if a.get("label") and a.get("value")
+        ]
+        records_js_list.append({
+            "lat": r["_lat"],
+            "lon": r["_lon"],
+            "st": s,
+            "age": age,
+            "cat": _get_category(r.get("_service_code", "")),
+            "label": r.get("_service_label", "Unknown"),
+            "id": r.get("service_request_id", "N/A"),
+            "addr": (r.get("address") or "").strip(),
+            "date": (r.get("requested_datetime") or "").split("T")[0],
+            "upd": (r.get("updated_datetime") or "").split("T")[0],
+            "desc": (description[:200] + "...") if len(description) > 200 else description,
+            "notes": (status_notes[:200] + "...") if len(status_notes) > 200 else status_notes,
+            "attrs": attrs_slim,
+        })
+    records_js = json.dumps(records_js_list, ensure_ascii=False).replace("</", "<\\/")
 
     # Build category options HTML for the dropdown
     cat_options_html = '<option value="all">All Categories</option>\n'
     for cat_key, cat in CATEGORY_GROUPS.items():
         cat_options_html += f'<option value="{cat_key}">{cat["label"]}</option>\n'
 
+    # Control panel + client-side renderer. Markers are built only for the
+    # currently visible filter combo (Option C), keeping the page tiny and
+    # responsive instead of embedding ~24k pre-built markers.
     map_var = m.get_name()
-    layer_map_js = "{" + ", ".join(
-        f'"{k}": {fg_objects[k].get_name()}' for k in fg_objects
-    ) + "}"
-    panel_html = f"""
+    cluster_var = marker_cluster.get_name()
+    panel_html = """
     <div id="map-panel" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
                 background: white; padding: 10px 16px; border-radius: 6px;
                 box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 9999;
@@ -639,81 +605,124 @@ def generate_traffic_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
         <label for="cat-select" style="font-size: 11px; font-weight: bold; color: #444; display: block; margin-bottom: 4px;">Filter by Category</label>
         <select id="cat-select" onchange="setCategoryFilter(this.value)"
                 style="font-size: 12px; padding: 3px 6px; border: 1px solid #ccc; border-radius: 4px; cursor: pointer;">
-            {cat_options_html}
+            __CAT_OPTIONS__
         </select>
     </div>
     <style>
-        .fbtn {{
+        .fbtn {
             padding: 3px 9px; border: 1px solid #ccc; border-radius: 4px;
             background: #f5f5f5; cursor: pointer; font-size: 12px; color: #444;
-        }}
-        .fbtn.active {{ background: #2563eb; color: white; border-color: #2563eb; }}
-        .fbtn:hover:not(.active) {{ background: #e0e7ff; }}
+        }
+        .fbtn.active { background: #2563eb; color: white; border-color: #2563eb; }
+        .fbtn:hover:not(.active) { background: #e0e7ff; }
     </style>
     <script>
         var currentDays = 30;
         var showOpen = true;
         var showClosed = true;
         var currentCategory = 'all';
-        var layerMap = null;
-        var leafletMap = null;
-        var catBucketCounts = {counts_js};
+        var records = __RECORDS_JS__;
+        var markerCluster = null;
+        var catBucketCounts = __COUNTS_JS__;
 
-        function updateSummary() {{
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function makeIcon(status) {
+            var color = (status === 'open') ? '#dc2626' : '#16a34a';
+            return L.divIcon({
+                className: '',
+                html: '<div style="width:14px;height:14px;border-radius:50%;background:' + color +
+                      ';border:2px solid #fff;box-shadow:0 0 4px rgba(0,0,0,0.45);"></div>',
+                iconSize: [14, 14],
+                iconAnchor: [7, 7]
+            });
+        }
+
+        function buildPopup(r) {
+            var addrLine = r.addr ? '<b>Address:</b> <a href="https://www.google.com/maps/search/?api=1&query=' +
+                r.lat + ',' + r.lon + '" target="_blank">' + esc(r.addr) + '</a><br/>' : '';
+            var updLine = (r.upd && r.upd !== r.date) ? '<span style="color: #666;">Updated: ' + esc(r.upd) + '</span><br/>' : '';
+            var attrsHtml = (r.attrs || []).map(function(a) {
+                return '<b>' + esc(a.l) + ':</b> ' + esc(a.v) + '<br/>';
+            }).join('');
+            var attrsBlock = attrsHtml ? '<b>Additional Details:</b><br/>' + attrsHtml : '';
+            var descBlock = r.desc ? '<b>Description:</b><br/><i>' + esc(r.desc).replace(/\\n/g, '<br/>') + '</i><br/>' : '';
+            var notesBlock = r.notes ? '<b>Resolution Notes:</b><br/><i>' + esc(r.notes).replace(/\\n/g, '<br/>') + '</i><br/>' : '';
+            var statusText = (r.st === 'open') ? '🔴 Open' : '🟢 Closed';
+            var ticketUrl = 'https://311.austintexas.gov/tickets/' + encodeURIComponent(r.id);
+            return '<div style="font-family: sans-serif; max-width: 300px;">' +
+                '<b><a href="' + ticketUrl + '" target="_blank" style="color: #0066cc;">Report #' + esc(r.id) + '</a></b><br/>' +
+                '<span style="color: #666;">Filed: ' + esc(r.date) + '</span><br/>' + updLine + addrLine +
+                '<br/><b>Status:</b> ' + statusText + '<br/>' +
+                '<b>Category:</b> ' + esc(r.label) + '<br/><br/>' +
+                attrsBlock + descBlock + notesBlock + '</div>';
+        }
+
+        function rebuildMarkers() {
+            if (!markerCluster) return;
+            markerCluster.clearLayers();
+            for (var i = 0; i < records.length; i++) {
+                var r = records[i];
+                if (r.age > currentDays) continue;
+                if (currentCategory !== 'all' && r.cat !== currentCategory) continue;
+                var isOpen = (r.st === 'open');
+                if (isOpen && !showOpen) continue;
+                if (!isOpen && !showClosed) continue;
+                var m = L.marker([r.lat, r.lon], { icon: makeIcon(r.st) });
+                m.bindPopup(buildPopup(r), { maxWidth: 300 });
+                m.bindTooltip((isOpen ? 'Open' : 'Closed') + ': ' + r.label);
+                markerCluster.addLayer(m);
+            }
+        }
+
+        function updateSummary() {
             var d = String(currentDays);
             var catData = catBucketCounts[currentCategory] || catBucketCounts['all'];
-            var counts = catData[d] || {{}};
+            var counts = catData[d] || {};
             var o = showOpen ? (counts.open || 0) : 0;
             var c = showClosed ? (counts.closed || 0) : 0;
             document.getElementById('map-summary').textContent =
                 'Last ' + d + ' days · ' + (o + c) + ' total · ' + o + ' open · ' + c + ' closed';
-        }}
+        }
 
-        function initLayers() {{
-            layerMap = {layer_map_js};
-            leafletMap = {map_var};
-            updateLayers();
+        function updateLayers() {
+            rebuildMarkers();
             updateSummary();
-        }}
+        }
 
-        function updateLayers() {{
-            if (!layerMap || !leafletMap) return;
-            Object.keys(layerMap).forEach(function(key) {{
-                var parts = key.split('_');
-                var status = parts[0];
-                var bucket = parseInt(parts[1]);
-                var category = parts[2];
-                var timeOk = bucket <= currentDays;
-                var statusOk = (status === 'open' && showOpen) || (status === 'closed' && showClosed);
-                var categoryOk = (currentCategory === 'all') || (category === currentCategory);
-                var layer = layerMap[key];
-                if (timeOk && statusOk && categoryOk) {{
-                    if (!leafletMap.hasLayer(layer)) leafletMap.addLayer(layer);
-                }} else {{
-                    if (leafletMap.hasLayer(layer)) leafletMap.removeLayer(layer);
-                }}
-            }});
-        }}
+        function initLayers() {
+            markerCluster = __CLUSTER_VAR__;
+            updateLayers();
+        }
 
-        function toggleStatus(status) {{
+        function toggleStatus(status) {
             if (status === 'open') showOpen = !showOpen;
             else showClosed = !showClosed;
             document.getElementById('btn-' + status).classList.toggle('active');
             updateLayers();
-            updateSummary();
-        }}
+        }
 
-        function setCategoryFilter(cat) {{
+        function setCategoryFilter(cat) {
             currentCategory = cat;
             updateLayers();
-            updateSummary();
-        }}
+        }
 
-        document.addEventListener('DOMContentLoaded', function() {{
+        document.addEventListener('DOMContentLoaded', function() {
             setTimeout(initLayers, 1000);
-        }});
+        });
     </script>
     """
+    panel_html = (
+        panel_html.replace("__MAP_VAR__", map_var)
+        .replace("__CLUSTER_VAR__", cluster_var)
+        .replace("__COUNTS_JS__", counts_js)
+        .replace("__CAT_OPTIONS__", cat_options_html)
+        .replace("__RECORDS_JS__", records_js)
+    )
     m.get_root().html.add_child(folium.Element(panel_html))
 
     # Save to buffer
