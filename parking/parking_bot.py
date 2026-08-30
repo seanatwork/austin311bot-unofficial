@@ -4,6 +4,7 @@ Parking Enforcement — data layer and formatters.
 Queries Austin Open311 API live for PARKINGV (Parking Violation Enforcement) service requests.
 """
 
+import json
 import time
 import logging
 import os
@@ -697,7 +698,7 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
         if age <= 90:
             bucket_counts["90"][s] += 1
             type_bucket_counts[slug]["90"][s] += 1
-    counts_js = str(type_bucket_counts).replace("'", '"')
+    counts_js = json.dumps(type_bucket_counts)
 
     # Create map centered on Austin
     m = folium.Map(
@@ -708,102 +709,56 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
     )
     m.get_root().header.add_child(folium.Element(og_meta_tags("parking")))
 
-    # FeatureGroups: open/closed × 30/60/90-day × violation type slug
-    fg_clusters = {}
-    fg_objects = {}
-    for status_key in ("open", "closed"):
-        for bucket in ("30", "60", "90"):
-            for slug in all_slugs:
-                name = f"{status_key}_{bucket}_{slug}"
-                show = (bucket == "30")
-                fg = folium.FeatureGroup(name=name, show=show, overlay=True)
-                cluster = MarkerCluster().add_to(fg)
-                fg.add_to(m)
-                fg_clusters[name] = cluster
-                fg_objects[name] = fg
+    # Single MarkerCluster — markers are built client-side from a compact JSON
+    # blob on demand (Option C) instead of pre-rendering every record into every
+    # 30/60/90-day × open/closed bucket (previously ~28k markers / 91 MB).
+    marker_cluster = MarkerCluster().add_to(m)
 
-    # Add markers to the appropriate bucket
+    # Serialize records to a compact JSON blob for on-demand client rendering.
+    # Descriptions/notes are trimmed to keep the page lean; the full ticket text
+    # is one click away on the 311 site.
+    records_js_list = []
     for r in records:
-        lat = r["_lat"]
-        lon = r["_lon"]
         status = (r.get("status") or "").lower()
-        service_label = "Parking Violation Enforcement"
+        s = "open" if status == "open" else "closed"
         description = (r.get("description") or "").strip()
         status_notes = (r.get("status_notes") or "").strip()
-        date_str = (r.get("requested_datetime") or "").split("T")[0]
-        updated_str = (r.get("updated_datetime") or "").split("T")[0]
-        address = (r.get("address") or "").strip()
-        req_id = r.get("service_request_id", "N/A")
-
-        # Determine time bucket
-        age = _age_days(r)
-        if age <= 30:
-            bucket = "30"
-        elif age <= 60:
-            bucket = "60"
-        else:
-            bucket = "90"
-
         vt = _extract_violation_type(description)
         slug = type_to_slug_map.get(vt, _violation_type_slug(vt))
         if slug not in all_slugs:
             slug = _violation_type_slug("")
-        cluster_key = f"{status}_{bucket}_{slug}"
-        target_cluster = fg_clusters[cluster_key]
-
-        address_line = f'<b>Address:</b> <a href="https://www.google.com/maps/search/?api=1&query={lat},{lon}" target="_blank">{address}</a><br/>' if address else ""
-        updated_line = f"<span style='color: #666;'>Updated: {updated_str}</span><br/>" if updated_str and updated_str != date_str else ""
-
-        # Build structured attributes block (includes violation type + any other attrs)
         attrs = r.get("attributes") or []
-        attrs_html = "".join(f"<b>{a['label']}:</b> {a['value']}<br/>" for a in attrs if a.get("label") and a.get("value"))
-        attrs_block = f"<b>Additional Details:</b><br/>{attrs_html}" if attrs_html else ""
+        attrs_slim = [
+            {"l": (a.get("label") or "").strip(), "v": (a.get("value") or "").strip()}
+            for a in attrs
+            if a.get("label") and a.get("value")
+        ]
+        records_js_list.append({
+            "lat": r["_lat"],
+            "lon": r["_lon"],
+            "st": s,
+            "age": _age_days(r),
+            "type": slug,
+            "id": r.get("service_request_id", "N/A"),
+            "addr": (r.get("address") or "").strip(),
+            "date": (r.get("requested_datetime") or "").split("T")[0],
+            "upd": (r.get("updated_datetime") or "").split("T")[0],
+            "desc": (description[:200] + "...") if len(description) > 200 else description,
+            "notes": (status_notes[:200] + "...") if len(status_notes) > 200 else status_notes,
+            "attrs": attrs_slim,
+        })
+    records_js = json.dumps(records_js_list, ensure_ascii=False).replace("</", "<\\/")
 
-        desc_short = (description[:500] + "...") if len(description) > 500 else description
-        desc_short = desc_short.replace("\n", "<br/>")
-        desc_block = f"<b>Description:</b><br/><i>{desc_short}</i><br/>" if desc_short else ""
-
-        notes_short = (status_notes[:500] + "...") if len(status_notes) > 500 else status_notes
-        notes_short = notes_short.replace("\n", "<br/>")
-        notes_block = f"<b>Resolution Notes:</b><br/><i>{notes_short}</i><br/>" if notes_short else ""
-
-        ticket_url = f"https://311.austintexas.gov/tickets/{req_id}"
-        popup_html = f"""
-        <div style="font-family: sans-serif; max-width: 300px;">
-            <b><a href="{ticket_url}" target="_blank" style="color: #0066cc;">Report #{req_id}</a></b><br/>
-            <span style="color: #666;">Filed: {date_str}</span><br/>
-            {updated_line}
-            {address_line}
-            <br/>
-            <b>Status:</b> {'🔴 Open' if status == 'open' else '🟢 Closed'}<br/>
-            <b>Category:</b> {service_label}<br/><br/>
-            {attrs_block}
-            {desc_block}
-            {notes_block}
-        </div>
-        """
-
-        popup = folium.Popup(popup_html, max_width=300)
-
-        if status == "open":
-            icon = folium.Icon(color="red", icon="exclamation-sign", prefix="glyphicon")
-            tooltip = f"Open: {service_label}"
-        else:
-            icon = folium.Icon(color="green", icon="ok-sign", prefix="glyphicon")
-            tooltip = f"Closed: {service_label}"
-
-        folium.Marker(location=[lat, lon], popup=popup, icon=icon, tooltip=tooltip).add_to(target_cluster)
-
-    # Single centered control panel: title + summary + filters
+    # Control panel + client-side renderer. Markers are built only for the
+    # currently visible filter combo (Option C), keeping the page tiny and
+    # responsive instead of embedding ~28k pre-built markers.
     map_var = m.get_name()
-    layer_map_js = "{" + ", ".join(
-        f'"{k}": {fg_objects[k].get_name()}' for k in fg_objects
-    ) + "}"
-    # JS map: violation type label -> slug for ?type= URL param lookup
-    type_slug_js = "{" + ", ".join(
-        f'"{vt}": "{slug}"' for vt, slug in type_to_slug_map.items()
-    ) + "}"
-    panel_html = f"""
+    cluster_var = marker_cluster.get_name()
+    # JS map: violation type label -> slug for ?type= URL param lookup.
+    # Built with json.dumps so user-supplied labels with quotes/newlines/emoji
+    # can't break the embedded JS (a raw f-string here silently killed the panel).
+    type_slug_js = json.dumps(type_to_slug_map, ensure_ascii=False).replace("</", "<\\/")
+    panel_html = """
     <div id="map-panel" style="position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
                 background: white; padding: 10px 16px; border-radius: 6px;
                 box-shadow: 0 2px 6px rgba(0,0,0,0.3); z-index: 9999;
@@ -822,100 +777,141 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
         </div>
     </div>
     <style>
-        .fbtn {{
+        .fbtn {
             padding: 3px 9px; border: 1px solid #ccc; border-radius: 4px;
             background: #f5f5f5; cursor: pointer; font-size: 12px; color: #444;
-        }}
-        .fbtn.active {{ background: #2563eb; color: white; border-color: #2563eb; }}
-        .fbtn:hover:not(.active) {{ background: #e0e7ff; }}
+        }
+        .fbtn.active { background: #2563eb; color: white; border-color: #2563eb; }
+        .fbtn:hover:not(.active) { background: #e0e7ff; }
     </style>
     <script>
         var currentDays = 30;
         var showOpen = true;
         var showClosed = true;
         var currentType = 'all';
-        var layerMap = null;
-        var leafletMap = null;
-        var typeSlugMap = {type_slug_js};
-        var typeBucketCounts = {counts_js};
+        var records = __RECORDS_JS__;
+        var markerCluster = null;
+        var typeSlugMap = __TYPE_SLUG_MAP__;
+        var typeBucketCounts = __COUNTS_JS__;
 
-        function updateSummary() {{
+        function esc(s) {
+            return String(s == null ? '' : s)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
+        function makeIcon(status) {
+            var color = (status === 'open') ? '#dc2626' : '#16a34a';
+            return L.divIcon({
+                className: '',
+                html: '<div style="width:14px;height:14px;border-radius:50%;background:' + color +
+                      ';border:2px solid #fff;box-shadow:0 0 4px rgba(0,0,0,0.45);"></div>',
+                iconSize: [14, 14],
+                iconAnchor: [7, 7]
+            });
+        }
+
+        function buildPopup(r) {
+            var addrLine = r.addr ? '<b>Address:</b> <a href="https://www.google.com/maps/search/?api=1&query=' +
+                r.lat + ',' + r.lon + '" target="_blank">' + esc(r.addr) + '</a><br/>' : '';
+            var updLine = (r.upd && r.upd !== r.date) ? '<span style="color: #666;">Updated: ' + esc(r.upd) + '</span><br/>' : '';
+            var attrsHtml = (r.attrs || []).map(function(a) {
+                return '<b>' + esc(a.l) + ':</b> ' + esc(a.v) + '<br/>';
+            }).join('');
+            var attrsBlock = attrsHtml ? '<b>Additional Details:</b><br/>' + attrsHtml : '';
+            var descBlock = r.desc ? '<b>Description:</b><br/><i>' + esc(r.desc).replace(/\\n/g, '<br/>') + '</i><br/>' : '';
+            var notesBlock = r.notes ? '<b>Resolution Notes:</b><br/><i>' + esc(r.notes).replace(/\\n/g, '<br/>') + '</i><br/>' : '';
+            var statusText = (r.st === 'open') ? '🔴 Open' : '🟢 Closed';
+            var ticketUrl = 'https://311.austintexas.gov/tickets/' + encodeURIComponent(r.id);
+            return '<div style="font-family: sans-serif; max-width: 300px;">' +
+                '<b><a href="' + ticketUrl + '" target="_blank" style="color: #0066cc;">Report #' + esc(r.id) + '</a></b><br/>' +
+                '<span style="color: #666;">Filed: ' + esc(r.date) + '</span><br/>' + updLine + addrLine +
+                '<br/><b>Status:</b> ' + statusText + '<br/>' +
+                '<b>Category:</b> Parking Violation Enforcement<br/><br/>' +
+                attrsBlock + descBlock + notesBlock + '</div>';
+        }
+
+        function rebuildMarkers() {
+            if (!markerCluster) return;
+            markerCluster.clearLayers();
+            for (var i = 0; i < records.length; i++) {
+                var r = records[i];
+                if (r.age > currentDays) continue;
+                if (currentType !== 'all' && r.type !== currentType) continue;
+                var isOpen = (r.st === 'open');
+                if (isOpen && !showOpen) continue;
+                if (!isOpen && !showClosed) continue;
+                var m = L.marker([r.lat, r.lon], { icon: makeIcon(r.st) });
+                m.bindPopup(buildPopup(r), { maxWidth: 300 });
+                m.bindTooltip((isOpen ? 'Open' : 'Closed') + ': Parking Violation Enforcement');
+                markerCluster.addLayer(m);
+            }
+        }
+
+        function updateSummary() {
             var d = String(currentDays);
             var o = 0, c = 0;
-            if (currentType === 'all') {{
-                Object.keys(typeBucketCounts).forEach(function(slug) {{
-                    var counts = (typeBucketCounts[slug] || {{}})[d] || {{}};
+            if (currentType === 'all') {
+                Object.keys(typeBucketCounts).forEach(function(slug) {
+                    var counts = (typeBucketCounts[slug] || {})[d] || {};
                     if (showOpen) o += (counts.open || 0);
                     if (showClosed) c += (counts.closed || 0);
-                }});
-            }} else {{
+                });
+            } else {
                 var catData = typeBucketCounts[currentType];
-                if (catData) {{
-                    var counts = catData[d] || {{}};
+                if (catData) {
+                    var counts = catData[d] || {};
                     o = showOpen ? (counts.open || 0) : 0;
                     c = showClosed ? (counts.closed || 0) : 0;
-                }}
-            }}
+                }
+            }
             document.getElementById('map-summary').textContent =
                 'Last ' + d + ' days · ' + (o + c) + ' total · ' + o + ' open · ' + c + ' closed';
-        }}
+        }
 
-        function initLayers() {{
-            layerMap = {layer_map_js};
-            leafletMap = {map_var};
-            updateLayers();
+        function updateLayers() {
+            rebuildMarkers();
             updateSummary();
-        }}
+        }
 
-        function updateLayers() {{
-            if (!layerMap || !leafletMap) return;
-            Object.keys(layerMap).forEach(function(key) {{
-                var parts = key.split('_');
-                var status = parts[0];
-                var bucket = parseInt(parts[1]);
-                var typeSlug = parts.slice(2).join('_');
-                var timeOk = bucket <= currentDays;
-                var statusOk = (status === 'open' && showOpen) || (status === 'closed' && showClosed);
-                var typeOk = (currentType === 'all') || (typeSlug === currentType);
-                var layer = layerMap[key];
-                if (timeOk && statusOk && typeOk) {{
-                    if (!leafletMap.hasLayer(layer)) leafletMap.addLayer(layer);
-                }} else {{
-                    if (leafletMap.hasLayer(layer)) leafletMap.removeLayer(layer);
-                }}
-            }});
-        }}
+        function initLayers() {
+            markerCluster = __CLUSTER_VAR__;
+            updateLayers();
+        }
 
-        function setDayFilter(days) {{
+        function setDayFilter(days) {
             currentDays = days;
-            [30, 60, 90].forEach(function(d) {{
+            [30, 60, 90].forEach(function(d) {
                 var btn = document.getElementById('btn-' + d);
                 if (btn) btn.classList.toggle('active', d === days);
-            }});
+            });
             updateLayers();
-            updateSummary();
-        }}
+        }
 
-        function toggleStatus(status) {{
+        function toggleStatus(status) {
             if (status === 'open') showOpen = !showOpen;
             else showClosed = !showClosed;
             document.getElementById('btn-' + status).classList.toggle('active');
             updateLayers();
-            updateSummary();
-        }}
+        }
 
-        function setTypeFilter(slug) {{
+        function setTypeFilter(slug) {
             currentType = slug;
             updateLayers();
-            updateSummary();
-        }}
+        }
 
-        document.addEventListener('DOMContentLoaded', function() {{
+        function clearTypeFilter() {
+            setTypeFilter('all');
+            var b = document.getElementById('type-filter-banner');
+            if (b) b.remove();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
             setTimeout(initLayers, 1000);
             var typeFilter = new URLSearchParams(window.location.search).get('type');
-            if (typeFilter) {{
+            if (typeFilter) {
                 var slug = typeSlugMap[typeFilter];
-                if (slug) {{
+                if (slug) {
                     setTypeFilter(slug);
                     var banner = document.createElement('div');
                     banner.id = 'type-filter-banner';
@@ -926,14 +922,21 @@ def generate_parking_map(days_back: int = 30) -> tuple[Optional[io.BytesIO], str
                     banner.innerHTML = '🔍 Filtering: <strong>' + typeFilter + '</strong>' +
                         ' &nbsp;<a href="." style="color:#93c5fd;font-size:11px;">show all</a>' +
                         ' &nbsp;<a href="trends/" style="color:#93c5fd;font-size:11px;">← back to trends</a>' +
-                        ' &nbsp;<span onclick="setTypeFilter(\'all\');document.getElementById(\'type-filter-banner\').remove()" ' +
+                        ' &nbsp;<span onclick="clearTypeFilter()" ' +
                         'style="cursor:pointer;opacity:0.7;font-size:14px;">✕</span>';
                     document.body.appendChild(banner);
-                }}
-            }}
-        }});
+                }
+            }
+        });
     </script>
     """
+    panel_html = (
+        panel_html.replace("__MAP_VAR__", map_var)
+        .replace("__CLUSTER_VAR__", cluster_var)
+        .replace("__TYPE_SLUG_MAP__", type_slug_js)
+        .replace("__COUNTS_JS__", counts_js)
+        .replace("__RECORDS_JS__", records_js)
+    )
     m.get_root().html.add_child(folium.Element(panel_html))
 
     # Save to buffer
