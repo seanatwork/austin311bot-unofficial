@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-02T16:01:48.887897+00:00",
+  "generated": "2026-09-03T15:53:40.161652+00:00",
   "days": {
     "2025-05-01": {
       "parking": {
@@ -20167,6 +20167,11 @@
         "closed": 14,
         "total": 32
       },
+      "noise": {
+        "open": 0,
+        "closed": 9,
+        "total": 9
+      },
       "animal": {
         "open": 17,
         "closed": 5,
@@ -20204,6 +20209,11 @@
       }
     },
     "2026-08-30": {
+      "noise": {
+        "open": 0,
+        "closed": 19,
+        "total": 19
+      },
       "graffiti": {
         "open": 3,
         "closed": 0,
@@ -20211,6 +20221,11 @@
       }
     },
     "2026-08-31": {
+      "noise": {
+        "open": 0,
+        "closed": 3,
+        "total": 3
+      },
       "graffiti": {
         "open": 1,
         "closed": 0,
@@ -20218,6 +20233,11 @@
       }
     },
     "2026-09-01": {
+      "noise": {
+        "open": 0,
+        "closed": 3,
+        "total": 3
+      },
       "graffiti": {
         "open": 2,
         "closed": 0,
@@ -20228,75 +20248,89 @@
         "closed": 1,
         "total": 1
       }
+    },
+    "2026-09-02": {
+      "noise": {
+        "open": 0,
+        "closed": 2,
+        "total": 2
+      }
+    },
+    "2026-09-03": {
+      "noise": {
+        "open": 1,
+        "closed": 0,
+        "total": 1
+      }
     }
   },
   "totals_90d": {
     "homeless": {
       "open": 22,
-      "closed": 526,
-      "total": 548
+      "closed": 520,
+      "total": 542
     },
     "parking": {
       "open": 217,
-      "closed": 6058,
-      "total": 6275
+      "closed": 5979,
+      "total": 6196
     },
     "noise": {
-      "open": 49,
-      "closed": 1085,
-      "total": 1134
+      "open": 50,
+      "closed": 1108,
+      "total": 1158
     },
     "animal": {
-      "open": 1055,
-      "closed": 2944,
-      "total": 3999
+      "open": 1042,
+      "closed": 2917,
+      "total": 3959
     },
     "graffiti": {
-      "open": 182,
-      "closed": 85,
-      "total": 267
+      "open": 178,
+      "closed": 83,
+      "total": 261
     },
     "parks": {
-      "open": 873,
-      "closed": 754,
-      "total": 1627
+      "open": 872,
+      "closed": 736,
+      "total": 1608
     },
     "storm": {
       "open": 125,
-      "closed": 851,
-      "total": 976
+      "closed": 832,
+      "total": 957
     },
     "traffic": {
-      "open": 2318,
-      "closed": 9036,
-      "total": 11354
+      "open": 2283,
+      "closed": 8925,
+      "total": 11208
     },
     "bicycle": {
       "open": 45,
-      "closed": 59,
-      "total": 104
+      "closed": 58,
+      "total": 103
     },
     "dead_animal": {
       "open": 77,
-      "closed": 1343,
-      "total": 1420
+      "closed": 1325,
+      "total": 1402
     }
   },
   "totals_365d": {
     "homeless": {
       "open": 38,
-      "closed": 2039,
-      "total": 2077
+      "closed": 2038,
+      "total": 2076
     },
     "parking": {
       "open": 218,
-      "closed": 22528,
-      "total": 22746
+      "closed": 22484,
+      "total": 22702
     },
     "noise": {
-      "open": 49,
-      "closed": 5545,
-      "total": 5594
+      "open": 50,
+      "closed": 5580,
+      "total": 5630
     },
     "animal": {
       "open": 1754,
@@ -20305,8 +20339,8 @@
     },
     "graffiti": {
       "open": 189,
-      "closed": 946,
-      "total": 1135
+      "closed": 939,
+      "total": 1128
     },
     "parks": {
       "open": 1165,
@@ -20315,13 +20349,13 @@
     },
     "storm": {
       "open": 126,
-      "closed": 3529,
-      "total": 3655
+      "closed": 3513,
+      "total": 3639
     },
     "traffic": {
       "open": 3502,
-      "closed": 19392,
-      "total": 22894
+      "closed": 19383,
+      "total": 22885
     },
     "bicycle": {
       "open": 90,
@@ -20330,8 +20364,8 @@
     },
     "dead_animal": {
       "open": 78,
-      "closed": 6342,
-      "total": 6420
+      "closed": 6316,
+      "total": 6394
     }
   }
 }
