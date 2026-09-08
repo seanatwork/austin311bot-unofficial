@@ -271,11 +271,10 @@ def generate_graffiti_trends(
     # single 365-day request only returns the oldest ~90 days before hitting the
     # pagination cap. Month-by-month ensures every period is fully covered.
     months_back = max(1, days_back // 30) + 1
-    # Bypass the SQLite cache here: the cache is incremental and can be missing
-    # records (the homeless trends page had this exact undercount bug). It also
-    # accumulates history beyond the requested window, which made this page show
-    # 16 months while claiming "last 12 months". Always fetch the full window.
-    records = fetch_graffiti_monthly(months_back, use_cache=False)
+    # Cache-aware fetch: always refreshes the current month and backfills past
+    # months that aren't already cached end-to-end, so the chart shows a full,
+    # accurate rolling 12 months without re-downloading the whole year weekly.
+    records = fetch_graffiti_monthly(months_back, use_cache=True)
     if not records:
         return None, f"🎨 No graffiti data found for last {days_back} days."
 

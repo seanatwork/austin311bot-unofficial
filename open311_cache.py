@@ -8,6 +8,7 @@ Reduces API calls by storing fetched records and only querying for new data.
 import os
 import json
 import sqlite3
+import time
 import logging
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -550,3 +551,228 @@ def get_all_categories() -> list:
         return [row[0] for row in cursor.fetchall()]
     finally:
         conn.close()
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Cache-aware month-by-month fetching (shared by trends + map fetchers)
+#
+# Why this exists: Open311 returns records oldest-first, so one big request only
+# returns the oldest part of the window. The old "cache is fresh" shortcut also
+# let a shallow cache pass as complete and undercount months (the reason trends
+# used to bypass the cache entirely and re-download a full year every week).
+# Cache-aware fetches instead:
+#   * always fetch the current (in-progress) month so data stays fresh to today,
+#   * only re-fetch a past month when it has NOT been fetched end-to-end before
+#     (tracked with a per-code-set month marker), and
+#   * return only the requested trailing window (the cache may hold more history).
+# ─────────────────────────────────────────────────────────────────────────────
+
+MONTHLY_MAX_PAGES = 10   # default per-(code, month) page cap
+MONTHLY_PAGE_SIZE = 100  # Open311 max per_page
+
+
+def _month_key(dt) -> str:
+    return dt.strftime("%Y-%m")
+
+
+def _month_shift(dt, delta):
+    """Shift a month-start datetime by `delta` months (may be negative)."""
+    month_index = dt.year * 12 + (dt.month - 1) + delta
+    year, month0 = divmod(month_index, 12)
+    return dt.replace(year=year, month=month0 + 1)
+
+
+def _month_end(month_start, now) -> datetime:
+    if month_start.year == now.year and month_start.month == now.month:
+        return now
+    return _month_shift(month_start, 1)
+
+
+def _isoformat_z(dt) -> str:
+    return dt.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+
+
+def _month_complete_meta_key(service_codes, month_key) -> str:
+    codes = ",".join(sorted(service_codes))
+    return f"month_complete::{codes}::{month_key}"
+
+
+def mark_month_complete(service_codes, month_start):
+    """Record that a calendar month was fetched end-to-end (all pages, no
+    errors) for `service_codes`, so future cache-aware fetches skip it."""
+    set_cache_metadata(_month_complete_meta_key(service_codes, _month_key(month_start)), "1")
+
+
+def is_month_complete(service_codes, month_start) -> bool:
+    return get_cache_metadata(_month_complete_meta_key(service_codes, _month_key(month_start))) == "1"
+
+
+def window_months(months_back, now=None):
+    """Month-start datetimes (newest first) covering the trailing `months_back`
+    months, up to and including the month of `now`."""
+    now = now or datetime.now(timezone.utc)
+    current = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    first = (now - timedelta(days=30 * months_back)).replace(
+        day=1, hour=0, minute=0, second=0, microsecond=0
+    )
+    months = []
+    m = current
+    while m >= first:
+        months.append(m)
+        m = _month_shift(m, -1)
+    return months
+
+
+def missing_months(service_codes, months_back, now=None):
+    """window_months that still need fetching. The current (in-progress) month
+    is always included; past months are included only when they have not been
+    fetched end-to-end before (see mark_month_complete)."""
+    now = now or datetime.now(timezone.utc)
+    current = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    return [
+        m for m in window_months(months_back, now)
+        if m == current or not is_month_complete(service_codes, m)
+    ]
+
+
+def slice_records_to_window(records, months_back, now=None):
+    """Keep only records whose requested_datetime falls inside the trailing
+    window (`now` minus 30 days * months_back). Records without a parseable
+    date are kept defensively."""
+    now = now or datetime.now(timezone.utc)
+    cutoff = now - timedelta(days=30 * months_back)
+    kept = []
+    for r in records:
+        ts = r.get("requested_datetime")
+        if ts:
+            try:
+                if datetime.fromisoformat(ts.replace("Z", "+00:00")) < cutoff:
+                    continue
+            except ValueError:
+                pass
+        kept.append(r)
+    return kept
+
+
+def fetch_monthly_with_cache(
+    *,
+    category,
+    service_codes,
+    label_map,
+    months_back,
+    use_cache,
+    make_request,
+    keep=None,
+    extra_params=None,
+    max_pages=MONTHLY_MAX_PAGES,
+    page_delay=0.6,
+    code_delay=1.0,
+    now=None,
+):
+    """Fetch Open311 records month-by-month for `service_codes` across the last
+    `months_back` months.
+
+    Args:
+        category: Cache provenance tag.
+        service_codes: Service codes to fetch and to filter cached rows by.
+        label_map: {service_code: human label} attached to returned records.
+        months_back: Number of months to fetch.
+        use_cache: When True, read/write the SQLite cache and skip past months
+            that were already fetched end-to-end. When False, fetch the whole
+            window fresh and leave the cache untouched.
+        make_request: Callable(params) -> list of records for one API page.
+        keep: Optional predicate; only records passing it are returned (the
+            cache still stores everything that was fetched).
+        extra_params: Extra query params added to every request.
+        max_pages: Cap on pages per (code, month).
+        page_delay / code_delay: Throttle sleeps between pages / months.
+        now: Override the clock (used by tests).
+    """
+    if use_cache:
+        init_cache()
+        cached_records = get_cached_records(service_codes=service_codes)
+        logger.info(f"Loaded {len(cached_records)} cached {category} records")
+    else:
+        cached_records = []
+
+    now = now or datetime.now(timezone.utc)
+    current_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    months_to_fetch = (
+        missing_months(service_codes, months_back, now)
+        if use_cache
+        else window_months(months_back, now)
+    )
+    logger.info(f"Will fetch {len(months_to_fetch)} month(s) of {category} data")
+
+    cached_ids = {r.get("service_request_id") for r in cached_records}
+    seen_ids = set(cached_ids)
+    new_records: list = []
+    fresh_records: list = []
+
+    for month_start in months_to_fetch:  # newest first
+        month_end = _month_end(month_start, now)
+        month_ok = True
+        for code in service_codes:
+            finished = False
+            try:
+                page = 1
+                while page <= max_pages:
+                    params = {
+                        "service_code": code,
+                        "start_date": _isoformat_z(month_start),
+                        "end_date": _isoformat_z(month_end),
+                        "per_page": MONTHLY_PAGE_SIZE,
+                        "page": page,
+                    }
+                    if extra_params:
+                        params.update(extra_params)
+                    batch = make_request(params)
+                    if not batch:
+                        finished = True
+                        break
+                    for r in batch:
+                        sid = r.get("service_request_id")
+                        if sid and sid not in seen_ids:
+                            seen_ids.add(sid)
+                            r["_service_code"] = code
+                            if label_map and code in label_map:
+                                r["_service_label"] = label_map[code]
+                            new_records.append(r)
+                            fresh_records.append(r)
+                    if len(batch) < MONTHLY_PAGE_SIZE:
+                        finished = True
+                        break
+                    page += 1
+                    time.sleep(page_delay)
+            except Exception as e:
+                logger.warning(
+                    f"Monthly {category} fetch failed {code} {_month_key(month_start)}: {e}"
+                )
+            if not finished:
+                month_ok = False
+        # Never mark the current (still-accumulating) month complete — it must
+        # be re-fetched every run so cached data stays fresh to today.
+        if use_cache and month_ok and month_start != current_month:
+            mark_month_complete(service_codes, month_start)
+        time.sleep(code_delay)
+
+    if use_cache and new_records:
+        cache_records(category, new_records)
+        logger.info(f"Cached {len(new_records)} new {category} records")
+
+    if use_cache:
+        combined = {r.get("service_request_id"): r for r in cached_records}
+        for r in fresh_records:
+            combined[r.get("service_request_id")] = r
+        result = list(combined.values())
+        logger.info(
+            f"Returning {len(result)} total {category} records "
+            f"({len(cached_records)} cached + {len(new_records)} new)"
+        )
+    else:
+        result = fresh_records
+
+    result = slice_records_to_window(result, months_back, now)
+    if keep is not None:
+        result = [r for r in result if keep(r)]
+    return attach_service_labels(result, label_map)

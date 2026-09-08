@@ -20,7 +20,9 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # 120 min headroom: trends fetch month-by-month and the first run after a
+    # cache change backfills a full year per category before markers kick in.
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
 

@@ -63,10 +63,10 @@ def generate_homeless_trends(days_back: int = 365) -> tuple:
     # single 365-day request only returns the oldest ~90 days before hitting the
     # pagination cap. Month-by-month ensures every period is fully covered.
     months_back = max(1, days_back // 30) + 1
-    # Bypass the SQLite cache here: the cache is incremental and can be missing
-    # entire months (this page previously undercounted early months ~8x for that
-    # reason). The trends page must always reflect a complete, current fetch.
-    records = fetch_encampment_reports_monthly(months_back=months_back, use_cache=False)
+    # Cache-aware fetch: always refreshes the current month and backfills past
+    # months that aren't already cached end-to-end, so the chart shows a full,
+    # accurate rolling 12 months without re-downloading the whole year weekly.
+    records = fetch_encampment_reports_monthly(months_back=months_back, use_cache=True)
 
     if not records:
         buf = io.BytesIO(b"<p>No data found.</p>")

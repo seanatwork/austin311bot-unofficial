@@ -26,6 +26,9 @@ TIMEOUT = 45
 MAX_RETRIES = 8
 RETRY_DELAY = 1.0
 
+# API key from environment (higher Open311 rate limit when set in CI)
+API_KEY = os.getenv("AUSTINAPIKEY")
+
 # Service codes and human-readable labels
 SERVICE_CODES = {
     "ACLONAG":  "Loose Dog",
@@ -57,6 +60,8 @@ def _get_session() -> requests.Session:
             "Accept": "application/json",
             "User-Agent": "austin311bot/0.1 (Open311 animal queries)",
         })
+        if API_KEY:
+            _session.headers["X-Api-Key"] = API_KEY
     return _session
 
 
@@ -251,118 +256,20 @@ def fetch_animals_monthly(months_back: int = 13, use_cache: bool = True) -> list
     Returns:
         A flat list of animal complaint records across all months and service codes.
     """
-    import os
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date
+    from open311_cache import fetch_monthly_with_cache
 
-    CATEGORY = "animal"
-    MAX_PAGES = 10
     api_key = os.getenv("AUSTINAPIKEY")
-
-    if use_cache:
-        init_cache()
-        cached_records = get_cached_records(service_codes=list(SERVICE_CODES.keys()))
-        cached_ids = {r.get("service_request_id") for r in cached_records}
-        logger.info(f"Loaded {len(cached_records)} cached animal records")
-
-        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
-        if last_fetch:
-            cache_age = _utc_now() - last_fetch
-            if cache_age < timedelta(days=6) and len(cached_records) > 0:
-                logger.info(f"Cache is fresh ({cache_age.days} days old), returning cached data")
-                return _attach_labels(cached_records)
-    else:
-        cached_records = []
-        cached_ids = set()
-
-    now = _utc_now()
-    all_records: list = []
-    seen_ids: set = cached_ids.copy()
-    new_records: list = []
-
-    # Determine fetch window
-    if use_cache and cached_records:
-        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
-        if last_fetch:
-            fetch_start = last_fetch - timedelta(days=1)
-        else:
-            fetch_start = now - timedelta(days=30 * months_back)
-    else:
-        fetch_start = now - timedelta(days=30 * months_back)
-
-    logger.info(f"Fetching animal records from {fetch_start} to {now}")
-
-    # Build month list
-    current_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    start_month = fetch_start.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-
-    months_to_fetch = []
-    while start_month <= current_month:
-        months_to_fetch.append(start_month)
-        if start_month.month == 12:
-            start_month = start_month.replace(year=start_month.year + 1, month=1)
-        else:
-            start_month = start_month.replace(month=start_month.month + 1)
-
-    logger.info(f"Will fetch {len(months_to_fetch)} months of animal data")
-
-    for month_start in reversed(months_to_fetch):  # Newest first
-        if month_start.year == now.year and month_start.month == now.month:
-            month_end = now
-        else:
-            if month_start.month == 12:
-                month_end = month_start.replace(year=month_start.year + 1, month=1)
-            else:
-                month_end = month_start.replace(month=month_start.month + 1)
-
-        for code in SERVICE_CODES:
-            try:
-                page = 1
-                monthly_count = 0
-                while page <= MAX_PAGES:
-                    params = {
-                        "service_code": code,
-                        "start_date": _isoformat_z(month_start),
-                        "end_date": _isoformat_z(month_end),
-                        "per_page": 100,
-                        "page": page,
-                    }
-                    records = _make_request(params)
-                    if not records:
-                        break
-                    for r in records:
-                        sid = r.get("service_request_id")
-                        if sid and sid not in seen_ids:
-                            seen_ids.add(sid)
-                            r["_service_label"] = SERVICE_CODES.get(code, code)
-                            r["_service_code"] = code
-                            all_records.append(r)
-                            new_records.append(r)
-                            monthly_count += 1
-                    if len(records) < 100:
-                        break
-                    page += 1
-                    time.sleep(0.5 if api_key else 1.0)
-                if monthly_count > 0:
-                    logger.info(f"  {code} {month_start.strftime('%Y-%m')}: {monthly_count} new records")
-            except Exception as e:
-                logger.warning(f"Monthly animal fetch failed {code} {month_start.strftime('%Y-%m')}: {e}")
-        time.sleep(1.0 if api_key else 2.0)
-
-    # Cache new records
-    if use_cache and new_records:
-        cache_records(CATEGORY, new_records)
-        logger.info(f"Cached {len(new_records)} new animal records")
-
-    # Merge with existing cache
-    if use_cache and cached_records:
-        combined = {r.get("service_request_id"): r for r in cached_records}
-        for r in all_records:
-            combined[r.get("service_request_id")] = r
-        result = list(combined.values())
-        logger.info(f"Returning {len(result)} total animal records ({len(cached_records)} cached + {len(new_records)} new)")
-        return result
-
-    return all_records
+    return fetch_monthly_with_cache(
+        category="animal",
+        service_codes=list(SERVICE_CODES.keys()),
+        label_map=SERVICE_CODES,
+        months_back=months_back,
+        use_cache=use_cache,
+        make_request=_make_request,
+        max_pages=10,
+        page_delay=0.5 if api_key else 1.0,
+        code_delay=1.0 if api_key else 2.0,
+    )
 
 
 # =============================================================================

@@ -398,9 +398,10 @@ def generate_noise_trends(
 ) -> tuple[Optional[io.BytesIO], str]:
     # Fetch month by month — the Open311 API returns records oldest-first, so a
     # single 365-day request only returns the oldest ~90 days before hitting the
-    # pagination cap. Month-by-month ensures every period is fully covered.
+    # pagination cap. Cache-aware fetching backfills any months not already
+    # cached end-to-end, so we get a full year without re-downloading it weekly.
     months_back = max(1, days_back // 30) + 1
-    all_records = fetch_noise_monthly(months_back, use_cache=False)
+    all_records = fetch_noise_monthly(months_back, use_cache=True)
 
     if not all_records:
         return None, f"🔊 No noise data found for last {days_back} days."

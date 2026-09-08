@@ -424,7 +424,9 @@ def generate_animal_trends(days_back: int = LOOKBACK_DAYS) -> tuple[Optional[io.
     from animalsvc.animal_bot import fetch_animals_monthly
 
     months_back = max(1, days_back // 30) + 1
-    records = fetch_animals_monthly(months_back, use_cache=False)
+    # Cache-aware fetch: always refreshes the current month and backfills past
+    # months not already cached end-to-end (see open311_cache.fetch_monthly_with_cache).
+    records = fetch_animals_monthly(months_back, use_cache=True)
     if not records:
         return None, f"🐾 No animal services data found for last {days_back} days."
 

@@ -298,127 +298,20 @@ def fetch_encampment_reports_monthly(months_back: int = 12, use_cache: bool = Tr
     Returns:
         A flat list of matched records across all months and all codes.
     """
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date, attach_service_labels
+    from open311_cache import fetch_monthly_with_cache
 
-    CATEGORY = "homeless"
-
-    # Initialize cache if using
-    if use_cache:
-        init_cache()
-        # Read raw cached records by service code (any category may have
-        # cached them), then apply the keyword filter at read time.
-        raw_cached = get_cached_records(service_codes=list(SERVICE_CODES.keys()))
-        cached_ids = {r.get("service_request_id") for r in raw_cached}
-        cached_records = [r for r in raw_cached if _is_encampment_report(r)]
-        logger.info(f"Loaded {len(raw_cached)} cached records ({len(cached_records)} keyword matches)")
-
-        # Check if we have recent cache
-        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
-        if last_fetch:
-            logger.info(f"Last fetch was at {last_fetch}")
-            # If cache is less than 6 days old and we have data, use it
-            cache_age = _utc_now() - last_fetch
-            if cache_age < timedelta(days=6) and len(cached_records) > 0:
-                logger.info(f"Cache is fresh ({cache_age.days} days old), returning cached data")
-                return attach_service_labels(cached_records, SERVICE_CODES)
-    else:
-        cached_records = []
-        cached_ids = set()
-
-    now = _utc_now()
-    all_matched: list = []
-    seen_ids: set = cached_ids.copy()  # Start with cached IDs to avoid duplicates
-    new_records: list = []
-
-    # Calculate how far back we need to fetch
-    # If we have cache, only fetch from last fetch date
-    if use_cache and cached_records:
-        last_fetch = get_last_fetch_date(service_codes=list(SERVICE_CODES.keys()))
-        if last_fetch:
-            # Fetch from 1 day before last fetch to catch any missed records
-            fetch_start = last_fetch - timedelta(days=1)
-        else:
-            fetch_start = now - timedelta(days=30 * months_back)
-    else:
-        fetch_start = now - timedelta(days=30 * months_back)
-
-    logger.info(f"Fetching records from {fetch_start} to {now}")
-
-    # Calculate months to fetch
-    current_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    start_month = fetch_start.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-
-    months_to_fetch = []
-    while start_month <= current_month:
-        months_to_fetch.append(start_month)
-        if start_month.month == 12:
-            start_month = start_month.replace(year=start_month.year + 1, month=1)
-        else:
-            start_month = start_month.replace(month=start_month.month + 1)
-
-    logger.info(f"Will fetch {len(months_to_fetch)} months of data")
-
-    for month_start in reversed(months_to_fetch):  # Newest first
-        # Determine month end
-        if month_start.year == now.year and month_start.month == now.month:
-            month_end = now
-        else:
-            if month_start.month == 12:
-                month_end = month_start.replace(year=month_start.year + 1, month=1)
-            else:
-                month_end = month_start.replace(month=month_start.month + 1)
-
-        for code in SERVICE_CODES:
-            try:
-                page = 1
-                monthly_records = 0
-                while page <= MAX_PAGES:
-                    params = {
-                        "service_code": code,
-                        "start_date": _isoformat_z(month_start),
-                        "end_date":   _isoformat_z(month_end),
-                        "per_page":   100,
-                        "page":       page,
-                    }
-                    records = _make_request(params)
-                    if not records:
-                        break
-                    for r in records:
-                        sid = r.get("service_request_id")
-                        if sid and sid not in seen_ids:
-                            seen_ids.add(sid)
-                            r["_service_label"] = SERVICE_CODES.get(code, code)
-                            r["_service_code"]  = code
-                            new_records.append(r)  # cache raw; filter at read time
-                            if _is_encampment_report(r):
-                                all_matched.append(r)
-                                monthly_records += 1
-                    if len(records) < 100:
-                        break
-                    page += 1
-                    time.sleep(1.0 if API_KEY else 2.0)
-                if monthly_records > 0:
-                    logger.info(f"  {code} {month_start.strftime('%Y-%m')}: {monthly_records} new matches")
-            except Exception as e:
-                logger.warning(f"Monthly fetch failed {code} {month_start.strftime('%Y-%m')}: {e}")
-        time.sleep(2.0 if API_KEY else 4.0)
-
-    # Cache new records
-    if use_cache and new_records:
-        cache_records(CATEGORY, new_records)
-        logger.info(f"Cached {len(new_records)} new records")
-
-    # Return combined cached + new (if we had partial cache)
-    if use_cache and cached_records:
-        # Combine and remove duplicates
-        combined = {r.get("service_request_id"): r for r in cached_records}
-        for r in all_matched:
-            combined[r.get("service_request_id")] = r
-        result = list(combined.values())
-        logger.info(f"Returning {len(result)} total records ({len(cached_records)} cached + {len(new_records)} new)")
-        return result
-
-    return all_matched
+    return fetch_monthly_with_cache(
+        category="homeless",
+        service_codes=list(SERVICE_CODES.keys()),
+        label_map=SERVICE_CODES,
+        months_back=months_back,
+        use_cache=use_cache,
+        make_request=_make_request,
+        keep=_is_encampment_report,
+        max_pages=MAX_PAGES,
+        page_delay=1.0 if API_KEY else 2.0,
+        code_delay=2.0 if API_KEY else 4.0,
+    )
 
 
 def fetch_encampment_reports(days_back: int = 90, max_pages: int = MAX_PAGES) -> dict:

@@ -169,128 +169,22 @@ def fetch_graffiti_monthly(months_back: int = 12, use_cache: bool = True) -> lis
     Returns:
         A flat list of graffiti records across all months.
     """
-    from open311_cache import init_cache, get_cached_records, cache_records, get_last_fetch_date, attach_service_labels
+    from open311_cache import fetch_monthly_with_cache
 
-    CATEGORY = "graffiti"
-
-    # Initialize cache if using
-    if use_cache:
-        init_cache()
-        cached_records = get_cached_records(service_codes=[Config.SERVICE_CODE])
-        cached_ids = {r.get("service_request_id") for r in cached_records}
-        logger.info(f"Loaded {len(cached_records)} cached records")
-
-        # Check if we have recent cache
-        last_fetch = get_last_fetch_date(service_codes=[Config.SERVICE_CODE])
-        if last_fetch:
-            logger.info(f"Last fetch was at {last_fetch}")
-            cache_age = _utc_now() - last_fetch
-            if cache_age < timedelta(days=6) and len(cached_records) > 0:
-                logger.info(f"Cache is fresh ({cache_age.days} days old), returning cached data")
-                return attach_service_labels(cached_records, {Config.SERVICE_CODE: "Graffiti Abatement"})
-    else:
-        cached_records = []
-        cached_ids = set()
-
-    now = _utc_now()
-    all_records: list = []
-    seen_ids: set = cached_ids.copy()
-    new_records: list = []
-
-    # Calculate how far back we need to fetch
-    if use_cache and cached_records:
-        last_fetch = get_last_fetch_date(service_codes=[Config.SERVICE_CODE])
-        if last_fetch:
-            fetch_start = last_fetch - timedelta(days=1)
-        else:
-            fetch_start = now - timedelta(days=30 * months_back)
-    else:
-        fetch_start = now - timedelta(days=30 * months_back)
-
-    logger.info(f"Fetching records from {fetch_start} to {now}")
-
-    # Calculate months to fetch
-    current_month = now.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    start_month = fetch_start.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-
-    months_to_fetch = []
-    while start_month <= current_month:
-        months_to_fetch.append(start_month)
-        if start_month.month == 12:
-            start_month = start_month.replace(year=start_month.year + 1, month=1)
-        else:
-            start_month = start_month.replace(month=start_month.month + 1)
-
-    logger.info(f"Will fetch {len(months_to_fetch)} months of data")
-
-    url = f"{OPEN311_BASE_URL}/requests.json"
-    session = _get_session()
-
-    for month_start in reversed(months_to_fetch):  # Newest first
-        # Determine month end
-        if month_start.year == now.year and month_start.month == now.month:
-            month_end = now
-        else:
-            if month_start.month == 12:
-                month_end = month_start.replace(year=month_start.year + 1, month=1)
-            else:
-                month_end = month_start.replace(month=month_start.month + 1)
-
-        page = 1
-        monthly_records = 0
-        while page <= MAX_PAGES:
-            params = {
-                "service_code": Config.SERVICE_CODE,
-                "start_date": _isoformat_z(month_start),
-                "end_date": _isoformat_z(month_end),
-                "per_page": 100,
-                "page": page,
-                "extensions": "true",
-            }
-
-            try:
-                data = open311_get(session, url, params)
-            except Exception as e:
-                logger.warning(f"API error for {month_start}: {e}")
-                break
-
-            if not isinstance(data, list) or not data:
-                break
-
-            for r in data:
-                sid = r.get("service_request_id")
-                if sid and sid not in seen_ids:
-                    seen_ids.add(sid)
-                    r["_service_label"] = "Graffiti Abatement"
-                    r["_service_code"] = Config.SERVICE_CODE
-                    all_records.append(r)
-                    new_records.append(r)
-                    monthly_records += 1
-
-            if len(data) < 100:
-                break
-
-            page += 1
-            time.sleep(0.5 if API_KEY else 1.0)
-
-        if monthly_records > 0:
-            logger.info(f"  {month_start.strftime('%Y-%m')}: {monthly_records} new records")
-
-    # Cache new records
-    if use_cache and new_records:
-        cache_records(CATEGORY, new_records)
-        logger.info(f"Cached {len(new_records)} new records")
-
-    # Return combined cached + new
-    if use_cache and cached_records:
-        combined = {r.get("service_request_id"): r for r in cached_records}
-        for r in all_records:
-            combined[r.get("service_request_id")] = r
-        result = list(combined.values())
-        logger.info(f"Returning {len(result)} total records ({len(cached_records)} cached + {len(new_records)} new)")
-        return result
-
-    return all_records
+    return fetch_monthly_with_cache(
+        category="graffiti",
+        service_codes=[Config.SERVICE_CODE],
+        label_map={Config.SERVICE_CODE: "Graffiti Abatement"},
+        months_back=months_back,
+        use_cache=use_cache,
+        make_request=lambda params: open311_get(
+            _get_session(), f"{OPEN311_BASE_URL}/requests.json", params
+        ),
+        extra_params={"extensions": "true"},
+        max_pages=MAX_PAGES,
+        page_delay=0.5 if API_KEY else 1.0,
+        code_delay=1.0 if API_KEY else 2.0,
+    )
 
 
 # =============================================================================

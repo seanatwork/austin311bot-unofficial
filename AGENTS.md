@@ -124,6 +124,8 @@ Five+ packages have a `trends.py` for historical aggregation, all following `gen
 
 Common pattern: fetch month-by-month (30-day windows) to avoid the Open311 pagination gotcha, aggregate into monthly buckets, emit a standalone HTML page with dark mode/responsive layout to `docs/<category>/trends/index.html`.
 
+All Open311 trend fetchers (`fetch_*_monthly` in graffiti, homeless, noise, parking, parks, storm, animalsvc) delegate to **`open311_cache.fetch_monthly_with_cache()`** — a shared cache-aware driver. It always fetches the current month (fresh to today) and only backfills past months that aren't already cached end-to-end (tracked per code-set + month). Do **not** switch trend generators back to `use_cache=False` full-year refetches: doing so re-downloads a 365-day window for every category each week, which repeatedly blew the CI `timeout-minutes` cap and froze the trend pages.
+
 ### Shared utilities
 
 **`open311_client.py`**
@@ -133,6 +135,7 @@ Common pattern: fetch month-by-month (30-day windows) to avoid the Open311 pagin
 
 **`open311_cache.py`** — SQLite caching layer for Open311 data. The cache mirrors raw Open311 records (one row per `service_request_id`, full record in `raw_json`); category semantics are applied at read/aggregation time, not at storage time. First run fetches everything; later runs only fetch new records since the last fetch. Cache lives at `.cache/open311_cache.db` (gitignored, persisted in CI via GitHub Actions cache with 7-day retention).
 - API: `init_cache()`, `get_cached_records(service_codes, since)`, `cache_records(category, records)`, `get_last_fetch_date(service_codes)`, `should_refresh_cache(category, max_age_hours=24)`, `get_cache_stats(category)`, `clear_cache(category)`
+- **`fetch_monthly_with_cache(...)`** — the shared cache-aware month-by-month fetcher used by every `fetch_*_monthly` (and therefore every Open311 trends page). Handles the rolling window, per-code-set month coverage markers (`mark_month_complete`/`missing_months`), always-refresh current month, dedupe, and slicing returned records to the requested window. `make_request` is a module callback; `keep` optionally filters returned records (used by homeless's encampment keyword filter — the cache still stores everything fetched).
 - The `category` column on a row is only a provenance tag (which module cached it first) — service codes overlap across categories (e.g. `OBSTMIDB` is bicycle + homeless + traffic), so **never filter reads by category**; filter by `service_codes` instead.
 
 **`categories.py`** — canonical reporting taxonomy: `CATEGORY_CODES` (category → Open311 service codes) and `CATEGORY_NAMES`. Single source of truth for the aggregation scripts (`generate_query_data.py`, `generate_card_stats.py`). Map packages keep their own broader code lists for their map's domain — e.g. the bicycle *map* shows 5 cycling-relevant ROW codes, but the Bicycle *reporting category* counts `PWBICYCL` only so volume comparisons stay honest. Categories are not a partition: the same ticket can count toward multiple categories. The `homeless` reporting category additionally applies the encampment keyword filter (`homeless.homeless_bot.is_encampment_report`) at aggregation time.
@@ -272,7 +275,7 @@ Socrata: `$where` SoQL filtering, `$group`/`$select` aggregation.
 
 **The API returns records in chronological order (oldest first).** A single request with `start_date` 365 days ago and `end_date` today returns the *oldest* records first — with `MAX_PAGES=10` (1,000 records) you only see records from the start of the window, never recent months.
 
-**Fix (see `homeless/trends.py`):** fetch month by month — one 30-day window per API call — so each request is small enough that all records for that period are returned.
+**Fix (see `open311_cache.fetch_monthly_with_cache()`):** fetch month by month — one 30-day window per API call — so each request is small enough that all records for that period are returned. Trends reuse the SQLite cache and only backfill months that aren't already cached end-to-end, so steady-state weekly runs only fetch the current month instead of re-downloading a full year.
 
 **Applies to:** any `_fetch_code`-style function across bicycle, graffiti, homeless, noise, parking, parks, storm modules if they ever need historical data beyond 90 days.
 

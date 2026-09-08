@@ -694,10 +694,10 @@ def generate_parks_trends(days_back: int = LOOKBACK_DAYS) -> tuple[Optional[io.B
     from parks.parks_bot import fetch_parks_monthly
 
     months_back = max(1, days_back // 30) + 1
-    # Bypass the SQLite cache here: it is incremental and can be missing entire
-    # months (this page undercounted Nov 2025–Jan 2026 by ~5x). Always fetch the
-    # full window so the chart reflects complete data.
-    records = fetch_parks_monthly(months_back, use_cache=False)
+    # Cache-aware fetch: always refreshes the current month and backfills past
+    # months that aren't already cached end-to-end, so the chart shows a full,
+    # accurate rolling 12 months without re-downloading the whole year weekly.
+    records = fetch_parks_monthly(months_back, use_cache=True)
     if not records:
         return None, f"🏞️ No park maintenance data found for last {days_back} days."
 
