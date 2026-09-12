@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-11T15:58:28.565176+00:00",
+  "generated": "2026-09-12T15:05:43.167623+00:00",
   "months": {
     "2025-05": {
       "homeless": {
@@ -805,19 +805,19 @@
         "closed": 3
       },
       "parks": {
-        "total": 155,
-        "open": 101,
-        "closed": 54
+        "total": 163,
+        "open": 107,
+        "closed": 56
       },
       "storm": {
-        "total": 91,
-        "open": 33,
+        "total": 94,
+        "open": 36,
         "closed": 58
       },
       "traffic": {
-        "total": 996,
-        "open": 329,
-        "closed": 667
+        "total": 1023,
+        "open": 349,
+        "closed": 674
       },
       "bicycle": {
         "total": 6,
@@ -1018,10 +1018,15 @@
       }
     },
     "parks": {
+      "Sat": {
+        "total": 996,
+        "open": 195,
+        "closed": 801
+      },
       "Fri": {
-        "total": 1073,
-        "open": 204,
-        "closed": 869
+        "total": 1080,
+        "open": 209,
+        "closed": 871
       },
       "Thu": {
         "total": 1132,
@@ -1047,17 +1052,17 @@
         "total": 924,
         "open": 163,
         "closed": 761
-      },
-      "Sat": {
-        "total": 995,
-        "open": 194,
-        "closed": 801
       }
     },
     "storm": {
+      "Sat": {
+        "total": 883,
+        "open": 58,
+        "closed": 825
+      },
       "Fri": {
-        "total": 1101,
-        "open": 82,
+        "total": 1103,
+        "open": 84,
         "closed": 1019
       },
       "Thu": {
@@ -1084,18 +1089,18 @@
         "total": 569,
         "open": 22,
         "closed": 547
-      },
-      "Sat": {
-        "total": 882,
-        "open": 57,
-        "closed": 825
       }
     },
     "traffic": {
+      "Sat": {
+        "total": 4530,
+        "open": 502,
+        "closed": 4028
+      },
       "Fri": {
-        "total": 6464,
-        "open": 696,
-        "closed": 5768
+        "total": 6485,
+        "open": 710,
+        "closed": 5775
       },
       "Thu": {
         "total": 7021,
@@ -1121,11 +1126,6 @@
         "total": 3910,
         "open": 334,
         "closed": 3576
-      },
-      "Sat": {
-        "total": 4524,
-        "open": 496,
-        "closed": 4028
       }
     },
     "bicycle": {
