@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-08T18:34:30.243445+00:00",
+  "updated": "2026-09-14T17:57:22.391709+00:00",
   "bars": {
     "top10": [
       {
@@ -55,18 +55,6 @@
     ],
     "top5movers": [
       {
-        "name": "Levy At Austin Fc",
-        "address": "10414 Mckalla Pl",
-        "delta": 210632.0,
-        "pct": 702.2
-      },
-      {
-        "name": "The Roosevelt Room & The Eleanor",
-        "address": "307 W 5th St # 307b",
-        "delta": 109696.0,
-        "pct": 65.8
-      },
-      {
         "name": "Mama Lin's Soup And Leaves",
         "address": "13450 N Highway 183 Ste 112",
         "delta": 106321.0,
@@ -83,6 +71,18 @@
         "address": "310 W 2nd St",
         "delta": 73427.0,
         "pct": 28.6
+      },
+      {
+        "name": "75 1/2 Rainey Street",
+        "address": "75 1/2 Rainey St",
+        "delta": 71891.0,
+        "pct": 33.2
+      },
+      {
+        "name": "Matt's El Rancho, Inc.",
+        "address": "2613 S Lamar Blvd",
+        "delta": 62678.0,
+        "pct": 9.8
       }
     ],
     "curDate": "2026-07-31",
@@ -91,15 +91,15 @@
     "prevLabel": "June 2026"
   },
   "coyotes": {
-    "total": 118,
+    "total": 120,
     "pupping": 0,
     "puppingPct": 0,
     "isPeak": false,
     "months": [
       {
         "label": "Dec 2025",
-        "count": 15,
-        "pct": 38,
+        "count": 25,
+        "pct": 64,
         "isPupping": false
       },
       {
@@ -116,16 +116,16 @@
       },
       {
         "label": "Sep 2025",
-        "count": 30,
-        "pct": 77,
+        "count": 22,
+        "pct": 56,
         "isPupping": false
       }
     ]
   },
   "graffiti": {
-    "total": 251,
-    "uniqueLocations": 242,
-    "repeatRate": 4,
+    "total": 237,
+    "uniqueLocations": 230,
+    "repeatRate": 3,
     "winner": {
       "address": "1130 W 6th St",
       "count": 2,
@@ -149,25 +149,11 @@
         "lon": -97.7572127
       },
       {
-        "address": "815 W Cesar Chavez St",
-        "count": 2,
-        "status": "\u2705 Cleaned",
-        "lat": 30.265929528632192,
-        "lon": -97.75354125628412
-      },
-      {
         "address": "6103 Manor Rd",
         "count": 2,
         "status": "\u2705 Cleaned",
         "lat": 30.307426285402236,
         "lon": -97.67840607763249
-      },
-      {
-        "address": "4630 West Gate Blvd",
-        "count": 2,
-        "status": "\u2705 Cleaned",
-        "lat": 30.23001464357288,
-        "lon": -97.80127539138277
       },
       {
         "address": "2006 S 6th St",
@@ -203,6 +189,20 @@
         "status": "\u2705 Cleaned",
         "lat": 30.307258504575582,
         "lon": -97.72691930604827
+      },
+      {
+        "address": "301 Nelray Blvd",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.320500678909333,
+        "lon": -97.72366008061576
+      },
+      {
+        "address": "1401 Sunset Ln",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.247837593807088,
+        "lon": -97.7442121692912
       },
       {
         "address": "300 E 2nd St",
@@ -244,172 +244,162 @@
   "parking": {
     "total": 300,
     "peakHour": "4pm",
-    "peakCount": 48,
+    "peakCount": 31,
     "hours": [
       {
-        "hour": 0,
-        "label": "12am",
+        "hour": 1,
+        "label": "1am",
         "count": 1,
-        "pct": 2,
+        "pct": 3,
         "isPeak": false
       },
       {
         "hour": 6,
         "label": "6am",
-        "count": 1,
-        "pct": 2,
+        "count": 3,
+        "pct": 10,
         "isPeak": false
       },
       {
         "hour": 7,
         "label": "7am",
-        "count": 5,
-        "pct": 10,
+        "count": 11,
+        "pct": 35,
         "isPeak": false
       },
       {
         "hour": 8,
         "label": "8am",
-        "count": 12,
-        "pct": 25,
+        "count": 19,
+        "pct": 61,
         "isPeak": false
       },
       {
         "hour": 9,
         "label": "9am",
-        "count": 21,
-        "pct": 44,
+        "count": 28,
+        "pct": 90,
         "isPeak": false
       },
       {
         "hour": 10,
         "label": "10am",
-        "count": 22,
-        "pct": 46,
+        "count": 26,
+        "pct": 84,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
-        "count": 20,
-        "pct": 42,
+        "count": 12,
+        "pct": 39,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
-        "count": 22,
-        "pct": 46,
+        "count": 17,
+        "pct": 55,
         "isPeak": false
       },
       {
         "hour": 13,
         "label": "1pm",
-        "count": 22,
-        "pct": 46,
+        "count": 9,
+        "pct": 29,
         "isPeak": false
       },
       {
         "hour": 14,
         "label": "2pm",
-        "count": 16,
-        "pct": 33,
+        "count": 12,
+        "pct": 39,
         "isPeak": false
       },
       {
         "hour": 15,
         "label": "3pm",
-        "count": 17,
-        "pct": 35,
+        "count": 22,
+        "pct": 71,
         "isPeak": false
       },
       {
         "hour": 16,
         "label": "4pm",
-        "count": 48,
+        "count": 31,
         "pct": 100,
         "isPeak": true
       },
       {
         "hour": 17,
         "label": "5pm",
-        "count": 21,
-        "pct": 44,
+        "count": 27,
+        "pct": 87,
         "isPeak": false
       },
       {
         "hour": 18,
         "label": "6pm",
-        "count": 16,
-        "pct": 33,
+        "count": 17,
+        "pct": 55,
         "isPeak": false
       },
       {
         "hour": 19,
         "label": "7pm",
-        "count": 15,
-        "pct": 31,
+        "count": 27,
+        "pct": 87,
         "isPeak": false
       },
       {
         "hour": 20,
         "label": "8pm",
-        "count": 22,
-        "pct": 46,
+        "count": 16,
+        "pct": 52,
         "isPeak": false
       },
       {
         "hour": 21,
         "label": "9pm",
-        "count": 14,
-        "pct": 29,
+        "count": 8,
+        "pct": 26,
         "isPeak": false
       },
       {
         "hour": 22,
         "label": "10pm",
-        "count": 3,
-        "pct": 6,
+        "count": 9,
+        "pct": 29,
         "isPeak": false
       },
       {
         "hour": 23,
         "label": "11pm",
-        "count": 2,
-        "pct": 4,
+        "count": 5,
+        "pct": 16,
         "isPeak": false
       }
     ],
     "violationTypes": [
       {
         "type": "Other",
-        "count": 78,
+        "count": 81,
         "pct": 100
       },
       {
         "type": "Sidewalk",
-        "count": 19,
-        "pct": 24
-      },
-      {
-        "type": "Bike Lane",
-        "count": 19,
-        "pct": 24
+        "count": 22,
+        "pct": 27
       },
       {
         "type": "No Parking Zone",
-        "count": 12,
-        "pct": 15
+        "count": 14,
+        "pct": 17
       },
       {
-        "type": "Fire Hydrant",
-        "count": 10,
-        "pct": 13
-      },
-      {
-        "type": "Driveway",
-        "count": 7,
-        "pct": 9
+        "type": "Blocking",
+        "count": 8,
+        "pct": 10
       },
       {
         "type": "Oversized Vehicle",
@@ -417,16 +407,26 @@
         "pct": 9
       },
       {
-        "type": "Handicap",
+        "type": "Bike Lane",
+        "count": 7,
+        "pct": 9
+      },
+      {
+        "type": "Fire Hydrant",
         "count": 6,
-        "pct": 8
+        "pct": 7
+      },
+      {
+        "type": "Driveway",
+        "count": 3,
+        "pct": 4
       }
     ]
   },
   "graffitiSpeedrun": {
-    "totalClosed": 251,
-    "avgDays": 69.8,
-    "medianDays": 7.0,
+    "totalClosed": 237,
+    "avgDays": 71.8,
+    "medianDays": 7.7,
     "fastestDays": [
       0.0,
       0.1,
@@ -444,23 +444,23 @@
         "label": "1\u20136 hours"
       },
       "6hTo24h": {
-        "count": 20,
+        "count": 17,
         "label": "6\u201324 hours"
       },
       "1dTo3d": {
-        "count": 41,
+        "count": 35,
         "label": "1\u20133 days"
       },
       "3dTo7d": {
-        "count": 52,
+        "count": 50,
         "label": "3\u20137 days"
       },
       "7dTo30d": {
-        "count": 46,
+        "count": 45,
         "label": "7\u201330 days"
       },
       "over30d": {
-        "count": 82,
+        "count": 80,
         "label": "Over 30 days"
       }
     },
