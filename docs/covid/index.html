@@ -141,61 +141,115 @@
       letter-spacing: 0.04em;
     }
 
-    /* ── carousel card ── */
-    .carousel-card {
+    /* ── toolbar ── */
+    .toolbar {
       width: 100%;
       max-width: 900px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 0.9rem;
+    }
+    .search-wrap { flex: 1; min-width: 200px; position: relative; }
+    .search-wrap input {
+      width: 100%;
       background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.4rem 1.5rem 1.1rem;
-      margin-bottom: 1rem;
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.9rem;
+      padding: 0.55rem 2.1rem 0.55rem 0.85rem;
+      outline: none;
+      transition: border-color 0.15s;
     }
+    .search-wrap input:focus { border-color: var(--border-hover); }
+    .search-wrap input::placeholder { color: var(--text-muted); }
+    #search-clear {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1;
+      padding: 3px 4px;
+      cursor: pointer;
+    }
+    #search-clear:hover { color: var(--text); }
+    .toolbar select {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-tag);
+      font-size: 0.82rem;
+      padding: 0.55rem 0.6rem;
+      cursor: pointer;
+      outline: none;
+    }
+    .toolbar select:focus { border-color: var(--border-hover); }
 
-    .carousel-content {
-      min-height: 120px;
+    .list-meta {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 10px;
+      flex-wrap: wrap;
+      font-size: 0.8rem;
+      color: var(--text-sub);
+      margin-bottom: 0.6rem;
+    }
+    #match-note { color: var(--accent); font-weight: 600; }
+
+    /* ── complaint list ── */
+    .complaint-list {
+      width: 100%;
+      max-width: 900px;
+      list-style: none;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      gap: 12px;
+      gap: 10px;
+      margin-bottom: 1.25rem;
     }
-
-    .carousel-quote {
-      font-size: 1.1rem;
-      line-height: 1.65;
+    .complaint {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.9rem 1.1rem;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .complaint:hover { border-color: var(--border-hover); background: var(--bg-card-hover); }
+    .complaint .num {
+      float: right;
+      margin-left: 10px;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+    }
+    .complaint-text {
+      font-size: 1rem;
+      line-height: 1.55;
       color: var(--text-head);
-      font-style: italic;
-      padding: 0 4px;
-      position: relative;
+      margin-bottom: 0.5rem;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
     }
-    .carousel-quote::before {
-      content: "\201C";
-      font-size: 2rem;
-      line-height: 0;
-      color: var(--text-muted);
-      vertical-align: -0.4em;
-      margin-right: 2px;
-      opacity: 0.5;
-    }
-    .carousel-quote::after {
-      content: "\201D";
-      font-size: 2rem;
-      line-height: 0;
-      color: var(--text-muted);
-      vertical-align: -0.3em;
-      margin-left: 2px;
-      opacity: 0.5;
-    }
-
-    .carousel-meta {
-      font-size: 0.8rem;
+    .complaint-text a { color: inherit; text-decoration: none; }
+    .complaint-text a:hover { text-decoration: underline; text-decoration-color: var(--text-muted); }
+    .complaint-meta {
+      font-size: 0.78rem;
       color: var(--text-sub);
       display: flex;
       gap: 10px;
       align-items: center;
       flex-wrap: wrap;
     }
-    .carousel-badge {
+    .complaint-badge {
       background: var(--accent-light);
       border: 1px solid var(--accent-border);
       border-radius: 4px;
@@ -206,63 +260,96 @@
       text-transform: uppercase;
       letter-spacing: 0.03em;
     }
-    .carousel-addr { color: var(--text-sub); }
-    .carousel-addr::before { content: "\2022"; margin-right: 6px; color: var(--text-muted); }
-    .carousel-date { color: var(--text-muted); }
-    .carousel-date::before { content: "\2022"; margin-right: 6px; color: var(--text-muted); }
+    .complaint-addr::before,
+    .complaint-date::before { content: "\2022"; margin-right: 6px; color: var(--text-muted); }
+    .complaint-date { color: var(--text-muted); }
 
-    /* ── nav row ── */
-    .carousel-nav-row {
+    .empty-state {
+      width: 100%;
+      max-width: 900px;
+      background: var(--bg-card);
+      border: 1px dashed var(--border-hover);
+      border-radius: 10px;
+      padding: 2rem 1rem;
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 0.9rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ── pagination ── */
+    .pagination {
+      width: 100%;
+      max-width: 900px;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      margin-top: 14px;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
     }
-    .nav-btn {
+    .page-btn {
       background: var(--btn-bg);
       border: 1px solid var(--btn-border);
       border-radius: 6px;
       color: var(--btn-color);
-      font-size: 1rem;
-      width: 34px;
+      font-size: 0.82rem;
+      min-width: 34px;
       height: 34px;
+      padding: 0 9px;
       cursor: pointer;
+      font-variant-numeric: tabular-nums;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .page-btn:hover:not(:disabled) {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+      color: var(--text);
+    }
+    .page-btn:disabled { opacity: 0.4; cursor: default; }
+    .page-btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      cursor: default;
+    }
+    .page-ellipsis { color: var(--text-muted); font-size: 0.82rem; padding: 0 1px; }
+    .page-jump {
       display: flex;
       align-items: center;
-      justify-content: center;
-      transition: background 0.15s, border-color 0.15s;
-      flex-shrink: 0;
+      gap: 6px;
+      margin-left: 6px;
+      font-size: 0.8rem;
+      color: var(--text-sub);
     }
-    .nav-btn:hover { background: var(--bg-card-hover); border-color: var(--border-hover); }
-
-    .nav-counter {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      min-width: 80px;
+    .page-jump input {
+      width: 64px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.82rem;
+      padding: 0.4rem 0.4rem;
       text-align: center;
+      outline: none;
     }
-    .nav-progress {
-      flex: 1;
-      max-width: 300px;
-      height: 3px;
-      background: var(--bar-bg);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .nav-progress-fill {
-      height: 100%;
-      background: var(--bar-fill);
-      border-radius: 2px;
-      transition: width 0.3s ease;
-      width: 0%;
-    }
+    .page-jump input:focus { border-color: var(--border-hover); }
 
-    .carousel-sub {
-      font-size: 0.78rem;
+    .list-hint {
+      font-size: 0.75rem;
       color: var(--text-muted);
       text-align: center;
-      margin-top: 4px;
+      margin-bottom: 0.5rem;
+    }
+    .list-hint kbd {
+      background: var(--btn-bg);
+      border: 1px solid var(--btn-border);
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: inherit;
+      font-size: 0.72rem;
+      color: var(--btn-color);
     }
 
     /* ── transparency note ── */
@@ -324,25 +411,37 @@
     the COVID-19 pandemic. Language is unedited.
   </div>
 
-  <div class="carousel-card" id="carousel-card">
-    <div class="carousel-content">
-      <div class="carousel-quote" id="carousel-text">Loading complaints…</div>
-      <div class="carousel-meta">
-        <span class="carousel-badge" id="carousel-badge">COVID-19 Austin Code</span>
-        <span class="carousel-addr" id="carousel-addr"></span>
-        <span class="carousel-date" id="carousel-date"></span>
-      </div>
+  <div class="toolbar">
+    <div class="search-wrap">
+      <input type="search" id="search" placeholder="Search complaints or addresses…" autocomplete="off" aria-label="Search complaints" />
+      <button id="search-clear" type="button" title="Clear search" aria-label="Clear search">✕</button>
     </div>
-
-    <div class="carousel-nav-row">
-      <button class="nav-btn" id="nav-prev" title="Previous (←)" aria-label="Previous">‹</button>
-      <div class="nav-progress"><div class="nav-progress-fill" id="nav-fill"></div></div>
-      <span class="nav-counter" id="nav-counter">— / —</span>
-      <button class="nav-btn" id="nav-next" title="Next (→)" aria-label="Next">›</button>
-    </div>
+    <select id="sort" aria-label="Sort order">
+      <option value="newest" selected>Newest first</option>
+      <option value="oldest">Oldest first</option>
+    </select>
+    <select id="per-page" aria-label="Complaints per page">
+      <option value="25">25 / page</option>
+      <option value="50" selected>50 / page</option>
+      <option value="100">100 / page</option>
+      <option value="250">250 / page</option>
+    </select>
   </div>
 
-  <div class="carousel-sub" id="carousel-sub">Loading…</div>
+  <div class="list-meta">
+    <span id="range-label">Loading…</span>
+    <span id="match-note"></span>
+  </div>
+
+  <ol class="complaint-list" id="list"></ol>
+
+  <div class="empty-state" id="empty-state" hidden>No complaints match that search.</div>
+
+  <nav class="pagination" id="pagination" aria-label="Pagination"></nav>
+
+  <div class="list-hint">
+    <kbd>←</kbd> <kbd>→</kbd> change pages &nbsp;·&nbsp; <kbd>/</kbd> search &nbsp;·&nbsp; <kbd>Home</kbd> <kbd>End</kbd> jump
+  </div>
 
   <footer>
     <a href="../">austin311.com</a> &nbsp;·&nbsp;
@@ -363,8 +462,10 @@
       localStorage.setItem("theme", isDark ? "dark" : "light");
     });
 
-    // ── carousel ──
-    (function loadCarousel() {
+    // ── paged complaint list ──
+    (function loadList() {
+      var PER_PAGE_DEFAULT = 50;
+
       fetch("data.json")
         .then(function(r) {
           if (!r.ok) throw new Error("HTTP " + r.status);
@@ -380,121 +481,213 @@
           document.getElementById("stat-dates").textContent = dateRange;
 
           var items = data.items || [];
-          if (!items.length) {
-            document.getElementById("carousel-text").textContent = "No records found.";
-            return;
-          }
 
-          // Shuffle for variety on each page load
-          for (var i = items.length - 1; i > 0; i--) {
-            var j = Math.floor(Math.random() * (i + 1));
-            var tmp = items[i]; items[i] = items[j]; items[j] = tmp;
-          }
+          // data.json is already sorted newest-first
+          var allItems = items;
+          var view = allItems.slice();
+          var page = pageFromUrl();
+          var perPage = PER_PAGE_DEFAULT;
+          var sortOrder = "newest";
+          var query = "";
 
-          var currentIndex = 0;
-          var paused = false;
-          var timer = null;
-          var BASE_DURATION = 8000;
-          var MS_PER_CHAR = 12;
-          var MAX_DURATION = 14000;
-
-          var elText    = document.getElementById("carousel-text");
-          var elAddr    = document.getElementById("carousel-addr");
-          var elDate    = document.getElementById("carousel-date");
-          var elCounter = document.getElementById("nav-counter");
-          var elFill    = document.getElementById("nav-fill");
-          var elSub     = document.getElementById("carousel-sub");
-
-          elSub.textContent = (data.withDescription || items.length).toLocaleString() +
-            " complaints filed by Austin residents, 2020–2021";
-
-          function getDuration(text) {
-            return Math.min(BASE_DURATION + (text || "").length * MS_PER_CHAR, MAX_DURATION);
-          }
-
-          function showItem(index) {
-            var item = items[index];
-            var text = item.text || "";
-            var ticketUrl = item.id
-              ? "https://311.austintexas.gov/tickets/" + item.id
-              : null;
-
-            if (ticketUrl) {
-              elText.innerHTML = "<a href=\"" + ticketUrl + "\" target=\"_blank\" rel=\"noopener\" style=\"color:inherit;text-decoration:none;\">" +
-                escHtml(text) + "</a>";
-            } else {
-              elText.textContent = text;
-            }
-
-            elAddr.textContent = item.address || "";
-            elDate.textContent = item.date || "";
-            elCounter.textContent = (index + 1) + " / " + items.length;
-            elFill.style.width = ((index + 1) / items.length * 100).toFixed(1) + "%";
-          }
+          var elList       = document.getElementById("list");
+          var elPagination = document.getElementById("pagination");
+          var elRange      = document.getElementById("range-label");
+          var elMatchNote  = document.getElementById("match-note");
+          var elEmpty      = document.getElementById("empty-state");
+          var elSearch     = document.getElementById("search");
+          var elClear      = document.getElementById("search-clear");
+          var elSort       = document.getElementById("sort");
+          var elPerPage    = document.getElementById("per-page");
 
           function escHtml(s) {
-            return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
-                    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+            return String(s)
+              .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+              .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
           }
 
-          function nextItem() {
-            if (paused) return;
-            currentIndex = (currentIndex + 1) % items.length;
-            showItem(currentIndex);
-            scheduleNext();
+          function pageFromUrl() {
+            var m = /[?&]page=(\d+)/.exec(location.search);
+            var p = m ? parseInt(m[1], 10) : 1;
+            return (isNaN(p) || p < 1) ? 1 : p;
           }
 
-          function prevItem() {
-            currentIndex = (currentIndex - 1 + items.length) % items.length;
-            showItem(currentIndex);
-            scheduleNext();
+          function syncUrl(p) {
+            try {
+              if (!history.replaceState) return;
+              history.replaceState(null, "", location.pathname + (p > 1 ? "?page=" + p : ""));
+            } catch (e) {
+              /* file:// or sandboxed context — ignore */
+            }
           }
 
-          function scheduleNext() {
-            if (timer) clearTimeout(timer);
-            if (paused) return;
-            timer = setTimeout(nextItem, getDuration(items[currentIndex].text));
+          function pageCount() {
+            return Math.max(1, Math.ceil(view.length / perPage));
           }
 
-          document.getElementById("nav-next").addEventListener("click", function() {
-            currentIndex = (currentIndex + 1) % items.length;
-            showItem(currentIndex);
-            scheduleNext();
-          });
-          document.getElementById("nav-prev").addEventListener("click", function() {
-            prevItem();
+          function applyFilters() {
+            view = allItems.slice();
+            if (query) {
+              var q = query.toLowerCase();
+              view = view.filter(function(it) {
+                return (it.text || "").toLowerCase().indexOf(q) !== -1 ||
+                       (it.address || "").toLowerCase().indexOf(q) !== -1;
+              });
+            }
+            if (sortOrder === "oldest") view.reverse();
+            elMatchNote.textContent = query
+              ? view.length.toLocaleString() + (view.length === 1 ? " match" : " matches")
+              : "";
+            elClear.style.display = query ? "block" : "none";
+          }
+
+          function button(label, target, disabled, active) {
+            return '<button type="button" class="page-btn' + (active ? " active" : "") + '"' +
+              ' data-page="' + target + '"' + (disabled ? " disabled" : "") +
+              (active ? ' aria-current="page"' : "") + ">" + label + "</button>";
+          }
+
+          // Compact page list: 1 … 4 5 [6] 7 8 … 15
+          function pageNumbers(current, pages) {
+            var out = [];
+            var last = 0;
+            var span = 2;
+            for (var p = 1; p <= pages; p++) {
+              if (p === 1 || p === pages || Math.abs(p - current) <= span) {
+                if (last && p - last > 1) out.push("…");
+                out.push(p);
+                last = p;
+              }
+            }
+            return out;
+          }
+
+          function renderPagination(pages) {
+            var parts = [];
+            parts.push(button("« First", 1, page === 1));
+            parts.push(button("‹ Prev", page - 1, page === 1));
+            pageNumbers(page, pages).forEach(function(p) {
+              parts.push(p === "…" ? '<span class="page-ellipsis">…</span>' : button(String(p), p, false, p === page));
+            });
+            parts.push(button("Next ›", page + 1, page === pages));
+            parts.push(button("Last »", pages, page === pages));
+            parts.push('<span class="page-jump">Go to <input type="number" id="jump" min="1" max="' +
+              pages + '" value="' + page + '" aria-label="Go to page" /></span>');
+            elPagination.innerHTML = parts.join("");
+
+            Array.prototype.forEach.call(elPagination.querySelectorAll(".page-btn"), function(b) {
+              b.addEventListener("click", function() {
+                goTo(parseInt(b.getAttribute("data-page"), 10));
+              });
+            });
+            var jump = document.getElementById("jump");
+            jump.addEventListener("change", function() {
+              var p = parseInt(jump.value, 10);
+              if (isNaN(p)) { jump.value = page; return; }
+              goTo(p);
+            });
+          }
+
+          function render() {
+            var total = view.length;
+            var pages = pageCount();
+            if (page > pages) page = pages;
+
+            var start = (page - 1) * perPage;
+            var slice = view.slice(start, start + perPage);
+
+            elList.innerHTML = slice.map(function(item, i) {
+              var url = item.id ? "https://311.austintexas.gov/tickets/" + item.id : null;
+              var text = escHtml(item.text || "");
+              var body = url
+                ? '<a href="' + url + '" target="_blank" rel="noopener">' + text + "</a>"
+                : text;
+              return '<li class="complaint">' +
+                '<span class="num">#' + (start + i + 1) + "</span>" +
+                '<div class="complaint-text">' + body + "</div>" +
+                '<div class="complaint-meta">' +
+                  '<span class="complaint-badge">COVID-19 Austin Code</span>' +
+                  (item.address ? '<span class="complaint-addr">' + escHtml(item.address) + "</span>" : "") +
+                  (item.date ? '<span class="complaint-date">' + escHtml(item.date) + "</span>" : "") +
+                "</div></li>";
+            }).join("");
+
+            elEmpty.hidden = total !== 0;
+
+            if (total === 0) {
+              elRange.textContent = "Nothing to show";
+              elPagination.innerHTML = "";
+              return;
+            }
+
+            var end = Math.min(start + perPage, total);
+            elRange.textContent = "Showing " + (start + 1).toLocaleString() + "–" +
+              end.toLocaleString() + " of " + total.toLocaleString() +
+              " complaints · page " + page + " of " + pages;
+
+            renderPagination(pages);
+          }
+
+          function goTo(p) {
+            p = Math.min(Math.max(1, p), pageCount());
+            if (p === page) return;
+            page = p;
+            syncUrl(page);
+            render();
+            elRange.scrollIntoView({ behavior: "smooth", block: "start" });
+            window.scrollBy(0, -16);
+          }
+
+          elSearch.addEventListener("input", function() {
+            query = elSearch.value.trim();
+            applyFilters();
+            page = 1;
+            syncUrl(1);
+            render();
           });
 
-          var card = document.getElementById("carousel-card");
-          card.addEventListener("mouseenter", function() {
-            paused = true;
-            if (timer) clearTimeout(timer);
-            timer = null;
+          elClear.addEventListener("click", function() {
+            elSearch.value = "";
+            query = "";
+            applyFilters();
+            page = 1;
+            syncUrl(1);
+            render();
+            elSearch.focus();
           });
-          card.addEventListener("mouseleave", function() {
-            paused = false;
-            scheduleNext();
+
+          elSort.addEventListener("change", function() {
+            sortOrder = elSort.value;
+            applyFilters();
+            page = 1;
+            syncUrl(1);
+            render();
           });
-          card.addEventListener("touchstart", function() {
-            paused = true;
-            if (timer) clearTimeout(timer);
-            timer = null;
-          });
-          card.addEventListener("touchend", function() {
-            paused = false;
-            scheduleNext();
+
+          elPerPage.addEventListener("change", function() {
+            perPage = parseInt(elPerPage.value, 10) || PER_PAGE_DEFAULT;
+            page = 1;
+            syncUrl(1);
+            render();
           });
 
           document.addEventListener("keydown", function(e) {
-            if (e.key === "ArrowLeft")  { prevItem(); }
-            if (e.key === "ArrowRight") { nextItem(); }
+            var tag = e.target && e.target.tagName;
+            if (tag === "INPUT" || tag === "SELECT" || tag === "TEXTAREA") return;
+            if (e.key === "ArrowLeft")       { goTo(page - 1); }
+            else if (e.key === "ArrowRight") { goTo(page + 1); }
+            else if (e.key === "Home")       { e.preventDefault(); goTo(1); }
+            else if (e.key === "End")        { e.preventDefault(); goTo(pageCount()); }
+            else if (e.key === "/")          { e.preventDefault(); elSearch.focus(); }
           });
 
-          showItem(0);
-          scheduleNext();
+          applyFilters();
+          if (page > pageCount()) page = pageCount();
+          render();
+          syncUrl(page);
         })
         .catch(function(err) {
-          document.getElementById("carousel-text").textContent = "Failed to load: " + err.message;
+          document.getElementById("range-label").textContent = "Failed to load: " + err.message;
         });
     })();
   </script>
