@@ -1,65 +1,65 @@
 {
-  "generated": "2026-09-20T15:32:45.064752+00:00",
+  "generated": "2026-09-21T18:08:09.916426+00:00",
   "90d": {
     "homeless": {
       "avg_days": 0.4,
       "median_days": 0.0,
       "p90_days": 1,
-      "count": 484
+      "count": 488
     },
     "parking": {
       "avg_days": 0.0,
-      "median_days": 0.0,
+      "median_days": 0,
       "p90_days": 0,
-      "count": 6000
+      "count": 6433
     },
     "noise": {
       "avg_days": 0.1,
       "median_days": 0,
       "p90_days": 0,
-      "count": 1193
+      "count": 1195
     },
     "animal": {
-      "avg_days": 1.1,
+      "avg_days": 1.0,
       "median_days": 1,
       "p90_days": 3,
-      "count": 2959
+      "count": 3177
     },
     "graffiti": {
       "avg_days": 0.9,
-      "median_days": 0.0,
+      "median_days": 0,
       "p90_days": 3,
-      "count": 74
+      "count": 73
     },
     "parks": {
       "avg_days": 0.8,
-      "median_days": 0,
-      "p90_days": 2,
-      "count": 541
-    },
-    "storm": {
-      "avg_days": 0.7,
       "median_days": 0.0,
       "p90_days": 2,
-      "count": 730
+      "count": 550
+    },
+    "storm": {
+      "avg_days": 0.6,
+      "median_days": 0.0,
+      "p90_days": 2,
+      "count": 736
     },
     "traffic": {
       "avg_days": 0.8,
-      "median_days": 0.0,
+      "median_days": 0,
       "p90_days": 2,
-      "count": 8508
+      "count": 8383
     },
     "bicycle": {
       "avg_days": 1.0,
-      "median_days": 0.0,
+      "median_days": 0,
       "p90_days": 3,
-      "count": 58
+      "count": 59
     },
     "dead_animal": {
       "avg_days": 0.0,
       "median_days": 0.0,
       "p90_days": 0,
-      "count": 1342
+      "count": 1422
     }
   }
 }
