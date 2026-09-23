@@ -1,5 +1,5 @@
 {
-  "updated": "2026-09-23T09:34:45.674071+00:00",
+  "updated": "2026-09-23T09:41:09.413853+00:00",
   "bars": {
     "top10": [
       {
@@ -90,8 +90,380 @@
     "curLabel": "August 2026",
     "prevLabel": "July 2026"
   },
-  "coyotes": null,
-  "graffiti": null,
-  "parking": null,
-  "graffitiSpeedrun": null
+  "coyotes": {
+    "total": 123,
+    "pupping": 0,
+    "puppingPct": 0,
+    "isPeak": false,
+    "months": [
+      {
+        "label": "Dec 2025",
+        "count": 33,
+        "pct": 85,
+        "isPupping": false
+      },
+      {
+        "label": "Nov 2025",
+        "count": 39,
+        "pct": 100,
+        "isPupping": false
+      },
+      {
+        "label": "Oct 2025",
+        "count": 34,
+        "pct": 87,
+        "isPupping": false
+      },
+      {
+        "label": "Sep 2025",
+        "count": 17,
+        "pct": 44,
+        "isPupping": false
+      }
+    ]
+  },
+  "graffiti": {
+    "total": 222,
+    "uniqueLocations": 216,
+    "repeatRate": 3,
+    "winner": {
+      "address": "1130 W 6th St",
+      "count": 2,
+      "status": "\u2705 Cleaned",
+      "lat": 30.27283761,
+      "lon": -97.75692741
+    },
+    "top15": [
+      {
+        "address": "1130 W 6th St",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.27283761,
+        "lon": -97.75692741
+      },
+      {
+        "address": "1200 W 6th St",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.27284215,
+        "lon": -97.7572127
+      },
+      {
+        "address": "6103 Manor Rd",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.307426285402236,
+        "lon": -97.67840607763249
+      },
+      {
+        "address": "2006 S 6th St",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.247534544950053,
+        "lon": -97.76448198333323
+      },
+      {
+        "address": "8618 N Mopac Expy Svrd Sb",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.373685692764564,
+        "lon": -97.74088304489851
+      },
+      {
+        "address": "5377 Freidrich Ln",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.200508370753546,
+        "lon": -97.75606401264668
+      },
+      {
+        "address": "4410 Avenue C",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.307258504575582,
+        "lon": -97.72691930604827
+      },
+      {
+        "address": "1333 S Congress Ave",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.24988012127947,
+        "lon": -97.74947579533395
+      },
+      {
+        "address": "1502 W 5th St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.27339251,
+        "lon": -97.76204528
+      },
+      {
+        "address": "301 Nelray Blvd",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.320500678909333,
+        "lon": -97.72366008061576
+      },
+      {
+        "address": "1401 Sunset Ln",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.247837593807088,
+        "lon": -97.7442121692912
+      },
+      {
+        "address": "300 E 2nd St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.26372214543454,
+        "lon": -97.74158551345283
+      },
+      {
+        "address": "1612 S Congress Ave",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.247047380355234,
+        "lon": -97.75065013051902
+      },
+      {
+        "address": "309 W 8th St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.27069990276558,
+        "lon": -97.745067961514
+      },
+      {
+        "address": "4001 Speedway",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.303071544317714,
+        "lon": -97.73149968604012
+      }
+    ]
+  },
+  "parking": {
+    "total": 300,
+    "peakHour": "4pm",
+    "peakCount": 36,
+    "hours": [
+      {
+        "hour": 3,
+        "label": "3am",
+        "count": 1,
+        "pct": 3,
+        "isPeak": false
+      },
+      {
+        "hour": 5,
+        "label": "5am",
+        "count": 1,
+        "pct": 3,
+        "isPeak": false
+      },
+      {
+        "hour": 6,
+        "label": "6am",
+        "count": 2,
+        "pct": 6,
+        "isPeak": false
+      },
+      {
+        "hour": 7,
+        "label": "7am",
+        "count": 5,
+        "pct": 14,
+        "isPeak": false
+      },
+      {
+        "hour": 8,
+        "label": "8am",
+        "count": 12,
+        "pct": 33,
+        "isPeak": false
+      },
+      {
+        "hour": 9,
+        "label": "9am",
+        "count": 28,
+        "pct": 78,
+        "isPeak": false
+      },
+      {
+        "hour": 10,
+        "label": "10am",
+        "count": 25,
+        "pct": 69,
+        "isPeak": false
+      },
+      {
+        "hour": 11,
+        "label": "11am",
+        "count": 16,
+        "pct": 44,
+        "isPeak": false
+      },
+      {
+        "hour": 12,
+        "label": "12pm",
+        "count": 20,
+        "pct": 56,
+        "isPeak": false
+      },
+      {
+        "hour": 13,
+        "label": "1pm",
+        "count": 22,
+        "pct": 61,
+        "isPeak": false
+      },
+      {
+        "hour": 14,
+        "label": "2pm",
+        "count": 17,
+        "pct": 47,
+        "isPeak": false
+      },
+      {
+        "hour": 15,
+        "label": "3pm",
+        "count": 21,
+        "pct": 58,
+        "isPeak": false
+      },
+      {
+        "hour": 16,
+        "label": "4pm",
+        "count": 36,
+        "pct": 100,
+        "isPeak": true
+      },
+      {
+        "hour": 17,
+        "label": "5pm",
+        "count": 16,
+        "pct": 44,
+        "isPeak": false
+      },
+      {
+        "hour": 18,
+        "label": "6pm",
+        "count": 25,
+        "pct": 69,
+        "isPeak": false
+      },
+      {
+        "hour": 19,
+        "label": "7pm",
+        "count": 20,
+        "pct": 56,
+        "isPeak": false
+      },
+      {
+        "hour": 20,
+        "label": "8pm",
+        "count": 14,
+        "pct": 39,
+        "isPeak": false
+      },
+      {
+        "hour": 21,
+        "label": "9pm",
+        "count": 9,
+        "pct": 25,
+        "isPeak": false
+      },
+      {
+        "hour": 22,
+        "label": "10pm",
+        "count": 10,
+        "pct": 28,
+        "isPeak": false
+      }
+    ],
+    "violationTypes": [
+      {
+        "type": "Other",
+        "count": 63,
+        "pct": 100
+      },
+      {
+        "type": "Sidewalk",
+        "count": 23,
+        "pct": 37
+      },
+      {
+        "type": "No Parking Zone",
+        "count": 19,
+        "pct": 30
+      },
+      {
+        "type": "Bike Lane",
+        "count": 18,
+        "pct": 29
+      },
+      {
+        "type": "Oversized Vehicle",
+        "count": 12,
+        "pct": 19
+      },
+      {
+        "type": "Handicap",
+        "count": 7,
+        "pct": 11
+      },
+      {
+        "type": "Abandoned",
+        "count": 7,
+        "pct": 11
+      },
+      {
+        "type": "Fire Hydrant",
+        "count": 7,
+        "pct": 11
+      }
+    ]
+  },
+  "graffitiSpeedrun": {
+    "totalClosed": 222,
+    "avgDays": 66.0,
+    "medianDays": 8.0,
+    "fastestDays": [
+      0.0,
+      0.1,
+      0.1,
+      0.1,
+      0.1
+    ],
+    "buckets": {
+      "under1h": {
+        "count": 1,
+        "label": "Under 1 hour"
+      },
+      "1hTo6h": {
+        "count": 9,
+        "label": "1\u20136 hours"
+      },
+      "6hTo24h": {
+        "count": 12,
+        "label": "6\u201324 hours"
+      },
+      "1dTo3d": {
+        "count": 27,
+        "label": "1\u20133 days"
+      },
+      "3dTo7d": {
+        "count": 52,
+        "label": "3\u20137 days"
+      },
+      "7dTo30d": {
+        "count": 50,
+        "label": "7\u201330 days"
+      },
+      "over30d": {
+        "count": 71,
+        "label": "Over 30 days"
+      }
+    },
+    "longestOpen": null
+  }
 }
