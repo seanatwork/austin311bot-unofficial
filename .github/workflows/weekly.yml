@@ -1,8 +1,23 @@
 name: Weekly data refresh
 
+# Everything that doesn't need to be fresher than the Open311 cache gates
+# (~6 days) lives here: point maps, the crime choropleth, every trends page,
+# fun data and 311 Wrapped.
+#
+# The day-sensitive output is in daily.yml: homepage card stats, pools, fire,
+# shelter, court cache and querystore. Don't move maps back into daily.yml —
+# those generators skip refetching while the cache is under 6 days old, so a
+# daily re-render mostly just rewrites the same page.
+#
+# Scheduled for Monday 14:00 UTC, two hours after daily.yml, so the two jobs
+# don't race on the shared Open311 cache or on git pushes.
+#
+# Every generator step is `continue-on-error` so a single flaky data source
+# can't discard the whole run; ci_report_failures.py reports them at the end.
+
 on:
   schedule:
-    - cron: "0 12 * * 1"  # weekly Monday at noon UTC
+    - cron: "0 14 * * 1"  # weekly Monday at 14:00 UTC (after the daily run)
   workflow_dispatch:
     inputs:
       categories:
@@ -43,106 +58,223 @@ jobs:
             open311-
 
       - name: Generate graffiti map
+        id: graffiti_map
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'graffiti')
         run: python scripts/generate_map.py graffiti
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate noise map
+        id: noise_map
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'noise')
         run: python scripts/generate_map.py noise
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate parking map
+        id: parking_map
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'parking')
         run: python scripts/generate_map.py parking
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate parks map
+        id: parks_map
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'parks')
         run: python scripts/generate_map.py parks
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate parks hub
+        id: parks_hub
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'parks')
         run: python scripts/generate_map.py parks-hub
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate storm map
+        id: storm_map
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'storm')
         run: python scripts/generate_map.py storm
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate trees map
+        id: trees_map
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'trees')
         run: python scripts/generate_map.py trees
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
+      # ── moved out of daily.yml ──────────────────────────────────────────────
+
+      - name: Generate bicycle map
+        id: bicycle_map
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'bicycle')
+        run: python scripts/generate_map.py bicycle
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate traffic map
+        id: traffic_map
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'traffic')
+        run: python scripts/generate_map.py traffic
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate animal map
+        id: animal_map
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'animal')
+        run: python scripts/generate_map.py animal
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate homeless map
+        id: homeless_map
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'homeless')
+        run: python scripts/generate_map.py homeless
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate crime map
+        id: crime_map
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'crime')
+        run: python scripts/generate_map.py crime
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate water map
+        id: water_map
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'water')
+        run: python scripts/generate_map.py water
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate childcare map
+        id: childcare_map
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'childcare')
+        run: python scripts/generate_map.py childcare
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate traffic cameras map
+        id: cameras_map
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'cameras')
+        run: python scripts/generate_map.py cameras
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate budget page
+        id: budget_page
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'budget')
+        run: python scripts/generate_map.py budget
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate hate crime page
+        id: hate_crime
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'hate-crime')
+        run: python scripts/generate_map.py hate-crime
+
       - name: Generate graffiti trends
+        id: graffiti_trends
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'graffiti')
         run: python scripts/generate_map.py graffiti-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate noise trends
+        id: noise_trends
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'noise')
         run: python scripts/generate_map.py noise-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate homeless trends
+        id: homeless_trends
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'homeless')
         run: python scripts/generate_map.py homeless-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate parking trends
+        id: parking_trends
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'parking')
         run: python scripts/generate_map.py parking-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate parks trends
+        id: parks_trends
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'parks')
         run: python scripts/generate_map.py parks-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate animal trends
+        id: animal_trends
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'animal')
         run: python scripts/generate_map.py animal-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate storm trends
+        id: storm_trends
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'storm')
         run: python scripts/generate_map.py storm-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
       - name: Generate dead animal trends
+        id: dead_animal_trends
+        continue-on-error: true
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'dead-animal')
         run: python scripts/generate_map.py dead-animal-trends
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
+      - name: Generate crime trends
+        id: crime_trends
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'crime-trends')
+        run: python scripts/generate_map.py crime-trends
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
       - name: Generate fun data
+        id: fun_data
+        continue-on-error: true
         run: python scripts/generate_fun_data.py
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
-      - name: Generate query data (pre-computed datasets)
-        run: python scripts/generate_query_data.py
-        env:
-          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
-
       - name: Generate wrapped data (311 Wrapped per-ZIP page)
+        id: wrapped_data
+        continue-on-error: true
         run: python scripts/generate_wrapped_data.py
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
@@ -155,6 +287,7 @@ jobs:
           key: open311-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Commit and push weekly updates
+        if: always() && !cancelled()
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -166,6 +299,16 @@ jobs:
             docs/parks/map/index.html \
             docs/storm/index.html \
             docs/trees/index.html \
+            docs/bicycle/index.html \
+            docs/traffic/index.html \
+            docs/animal/index.html \
+            docs/homeless/index.html \
+            docs/crime/index.html \
+            docs/water/index.html \
+            docs/childcare/index.html \
+            docs/cameras/index.html \
+            docs/budget/index.html \
+            docs/crime/hatecrime/index.html \
             docs/graffiti/trends/index.html \
             docs/noise/trends/index.html \
             docs/homeless/trends/index.html \
@@ -174,13 +317,17 @@ jobs:
             docs/animal/trends/index.html \
             docs/storm/trends/index.html \
             docs/animal/dead/trends/index.html \
+            docs/crime/trends/index.html \
             docs/fun/data.json \
-            docs/wrapped/data.json \
-            docs/querystore/daily_counts.json \
-            docs/querystore/district_counts.json \
-            docs/querystore/resolution_stats.json \
-            docs/querystore/monthly_aggregates.json \
-            docs/querystore/service_codes.json
+            docs/wrapped/data.json
           git diff --cached --quiet || git commit -m "chore: refresh weekly data [skip ci]"
           git pull --rebase origin main
           git push
+
+      # Runs after the commit so partial results are never discarded, then fails
+      # the run so a broken generator is still visible in Actions.
+      - name: Report generator failures
+        if: always() && !cancelled()
+        env:
+          STEP_RESULTS: ${{ toJSON(steps) }}
+        run: python scripts/ci_report_failures.py

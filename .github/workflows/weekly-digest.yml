@@ -2,7 +2,7 @@ name: Generate Weekly 311 Digest
 
 on:
   schedule:
-    - cron: "30 12 * * 1"  # Monday 12:30 UTC (after daily/weekly maps refresh)
+    - cron: "30 12 * * 1"  # Monday 12:30 UTC (daily.yml runs at noon; weekly maps land at 14:00)
   workflow_dispatch:
 
 concurrency:

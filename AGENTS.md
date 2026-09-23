@@ -57,12 +57,14 @@ No app server to deploy — "deployment" means regenerating the static output. W
 
 | Workflow | Schedule | Generates |
 |----------|----------|-----------|
-| `daily.yml` | Daily noon UTC | bicycle, traffic, animal, homeless, crime (+trends), water, childcare, budget, hate-crime maps; pools, fire, shelter, court, traffic cameras, homepage card stats |
-| `weekly.yml` | Monday noon UTC | graffiti, noise, parking, parks (+hub), storm, trees maps; all trends pages; fun data |
+| `daily.yml` | Daily noon UTC | Homepage card stats, pools, fire, shelter, court cache, querystore — the day-sensitive output only |
+| `weekly.yml` | Monday 14:00 UTC | Every point/choropleth map (bicycle, graffiti, homeless, traffic, parking, crime, noise, parks + hub, water, childcare, animal, storm, trees, cameras), budget + hate-crime pages, all trends pages, fun data, 311 Wrapped |
 | `weekly-digest.yml` | Monday 12:30 UTC | Weekly 311 digest (`generate_weekly_digest.py`) |
 | `quarterly.yml` | 1st of Jan/Apr/Jul/Oct | 911 data |
 
-All workflows support `workflow_dispatch` with an optional `categories` input, restore the Open311 cache from GitHub Actions cache, and commit results back to `main`. `AUSTINAPIKEY` must be set as a GitHub Actions secret for rate-limit headroom (429s during local runs without it are normal).
+**Split rule:** day-sensitive output goes in `daily.yml`; anything whose generators gate on the ~6-day Open311 cache (`cache_age < timedelta(days=6)` in bicycle, traffic, animal, dead-animal, parks, storm) belongs in `weekly.yml` — re-rendering those daily just rewrites a page built from a 6-day-old cache. `weekly.yml` runs two hours after `daily.yml` so the two never race on the shared cache or on git pushes.
+
+Every generator step in both workflows is `continue-on-error: true` with a unique `id`, and the commit step is `if: always() && !cancelled()`, so one flaky data source can't discard the other twenty steps' work. The final step runs `scripts/ci_report_failures.py`, which turns failed step outcomes into a job summary and exits non-zero — the run goes red *after* the good data has been committed. `weekly.yml` (not `daily.yml`) supports `workflow_dispatch` with the optional `categories` input. Both restore the Open311 cache from GitHub Actions cache and commit results back to `main`. `AUSTINAPIKEY` must be set as a GitHub Actions secret for rate-limit headroom (429s during local runs without it are normal).
 
 ## Architecture
 

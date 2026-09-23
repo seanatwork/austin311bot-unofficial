@@ -769,7 +769,7 @@
       <a class="card" href="homeless/">
         <span class="icon">🏕️</span>
         <span class="label">Homeless</span>
-        <span class="desc">Encampment &amp; trash 311 reports — updated daily</span>
+        <span class="desc">Encampment &amp; trash 311 reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="homeless/trends/">📈 Trends</a>
     </div>
@@ -782,7 +782,7 @@
       <a class="card" href="crime/">
         <span class="icon">🚔</span>
         <span class="label">Crime</span>
-        <span class="desc">APD incidents by council district — updated daily</span>
+        <span class="desc">APD incidents by council district — updated weekly</span>
       </a>
       <a class="trends-pill" href="crime/trends/">📈 Trends</a>
     </div>
@@ -790,7 +790,7 @@
       <a class="card" href="parks/">
         <span class="icon">🏞️</span>
         <span class="label">Parks</span>
-        <span class="desc">Park maintenance requests — updated daily</span>
+        <span class="desc">Park maintenance requests — updated weekly</span>
       </a>
       <a class="trends-pill" href="parks/trends/">📈 Trends</a>
     </div>
@@ -798,7 +798,7 @@
       <a class="card" href="traffic/">
         <span class="icon">🚦</span>
         <span class="label">Traffic</span>
-        <span class="desc">Traffic &amp; infrastructure issues — updated daily</span>
+        <span class="desc">Traffic &amp; infrastructure issues — updated weekly</span>
       </a>
       <a class="trends-pill" href="crashes/">💥 Crashes</a>
     </div>
@@ -837,7 +837,7 @@
       <a class="card" href="parking/">
         <span class="icon">🅿️</span>
         <span class="label">Parking</span>
-        <span class="desc">Parking enforcement reports — updated daily</span>
+        <span class="desc">Parking enforcement reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="parking/trends/">📈 Trends</a>
     </div>
@@ -845,7 +845,7 @@
       <a class="card" href="animal/">
         <span class="icon">🐾</span>
         <span class="label">Animal Services</span>
-        <span class="desc">Loose animals, bites &amp; wildlife reports — updated daily</span>
+        <span class="desc">Loose animals, bites &amp; wildlife reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="animal/trends/">📈 Trends</a>
     </div>
@@ -889,7 +889,7 @@
       <a class="card" href="noise/">
         <span class="icon">🔊</span>
         <span class="label">Noise</span>
-        <span class="desc">Noise complaint reports — updated daily</span>
+        <span class="desc">Noise complaint reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="noise/trends/">📈 Trends</a>
     </div>
@@ -905,7 +905,7 @@
       <a class="card" href="graffiti/">
         <span class="icon">🎨</span>
         <span class="label">Graffiti</span>
-        <span class="desc">Graffiti abatement reports — updated daily</span>
+        <span class="desc">Graffiti abatement reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="graffiti/trends/">📈 Trends</a>
     </div>
@@ -918,7 +918,7 @@
       <a class="card" href="storm/">
         <span class="icon">🌧️</span>
         <span class="label">Storm &amp; Drainage</span>
-        <span class="desc">Storm debris, drainage &amp; flooding reports — updated daily</span>
+        <span class="desc">Storm debris, drainage &amp; flooding reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="storm/trends/">📈 Trends</a>
     </div>
@@ -1249,16 +1249,10 @@
             var descEl = card.querySelector(".desc");
             if (!descEl) return;
 
-            // These maps regenerate weekly (weekly.yml), so only the count is
-            // daily. Say "count updated daily" so visitors know the map
-            // underneath isn't a live daily map.
-            var weeklyMap = {
-              "parking": true, "noise": true, "graffiti": true,
-              "parks": true, "storm": true,
-            };
-            var suffix = weeklyMap[catKey]
-              ? "count updated daily"
-              : "updated daily";
+            // Every map regenerates weekly (weekly.yml) while the counts come
+            // from the daily card-stats job — say "count updated daily" so
+            // visitors know the map underneath isn't a live daily map.
+            var suffix = "count updated daily";
 
             if (stats.open > 0) {
               descEl.textContent = stats.open + " open \u00b7 " + stats.total + " total \u00b7 " + suffix;
