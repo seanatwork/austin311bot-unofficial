@@ -3,7 +3,6 @@
 import io
 import json
 import logging
-import time
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Optional
@@ -24,7 +23,6 @@ def _format_central_time() -> str:
 logger = logging.getLogger(__name__)
 
 LOOKBACK_DAYS = 365
-OPEN311_URL = "https://311.austintexas.gov/open311/v2/requests.json"
 
 CODE_LABELS = {
     "APDNONNO": "Non-Emergency Noise",
@@ -32,36 +30,6 @@ CODE_LABELS = {
     "AFDFIREW": "Fireworks",
 }
 TYPE_COLORS = ["#3b82f6", "#22c55e", "#f59e0b"]
-
-
-def _fetch_code_paginated(service_code: str, days_back: int) -> list:
-    session = _get_session()
-    end = _utc_now()
-    start = end - timedelta(days=days_back)
-    params = {
-        "service_code": service_code,
-        "start_date": _isoformat_z(start),
-        "end_date": _isoformat_z(end),
-        "per_page": 100,
-        "page": 1,
-    }
-    records = []
-    while True:
-        try:
-            resp = session.get(OPEN311_URL, params=params, timeout=45)
-            resp.raise_for_status()
-            batch = resp.json()
-        except Exception as e:
-            logger.warning(f"fetch {service_code} p{params['page']}: {e}")
-            break
-        if not isinstance(batch, list) or not batch:
-            break
-        records.extend(batch)
-        if len(batch) < 100:
-            break
-        params["page"] += 1
-        time.sleep(1.0)
-    return records
 
 
 def _rolling_avg(counts: list, window: int = 3) -> list:

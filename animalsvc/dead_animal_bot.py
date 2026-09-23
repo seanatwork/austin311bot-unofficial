@@ -250,7 +250,7 @@ def generate_dead_animal_map(days_back: int = 90) -> tuple:
         tiles="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_2du8_1_a49e4774820276874a1a5b33",
         attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     )
-    m.get_root().header.add_child(folium.Element(og_meta_tags("animal")))
+    m.get_root().header.add_child(folium.Element(og_meta_tags("animal/dead")))
 
     # Layer key: {status}_{bucket}
     fg_clusters: dict = {}

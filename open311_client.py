@@ -78,6 +78,8 @@ _OG_PAGES = {
                     "Live maps and trends across 311 reports, APD crime, crashes, parking, courts, and more — refreshed weekly."),
     "animal":      ("Austin 311 — Animal Services Map",
                     "Loose dogs, bites, and wildlife reports across Austin — last 30/60/90 days, refreshed weekly."),
+    "animal/dead": ("Austin 311 — Dead Animal Pickup Map",
+                    "Dead animal collection requests across Austin — last 30/60/90 days, refreshed weekly."),
     "bicycle":     ("Austin 311 — Bicycle Infrastructure Map",
                     "Bike lane issues, debris hazards, and obstructions across Austin's bike network — last 30/60/90 days."),
     "budget":      ("Austin 311 — General Fund Budget FY2026",
