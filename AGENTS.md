@@ -49,7 +49,7 @@ python -m pytest graffiti/tests/
 - Trends: `parking-trends`, `crime-trends`, `noise-trends`, `graffiti-trends`, `homeless-trends`, `storm-trends`, `parks-trends`, `animal-trends`, `dead-animal-trends`
 - Other: `hate-crime`, `budget`, `nearby`, `shelter`
 
-Other standalone generators: `scripts/generate_911_data.py`, `generate_capmetro_data.py`, `generate_card_stats.py`, `generate_court_data.py`, `generate_covid_data.py`, `generate_fire_data.py`, `generate_fun_data.py`, `generate_og_image.py`, `generate_pool_data.py`, `generate_pulse.py`, `generate_weekly_digest.py`.
+Other standalone generators: `scripts/generate_911_data.py`, `generate_capmetro_data.py`, `generate_court_data.py`, `generate_covid_data.py`, `generate_fire_data.py`, `generate_fun_data.py`, `generate_og_image.py`, `generate_pool_data.py`, `generate_pulse.py`, `generate_weekly_digest.py`.
 
 ## Data Refresh (Deployment)
 
@@ -57,14 +57,13 @@ No app server to deploy — "deployment" means regenerating the static output. W
 
 | Workflow | Schedule | Generates |
 |----------|----------|-----------|
-| `daily.yml` | Daily noon UTC | Homepage card stats, pools, fire, shelter, court cache, querystore — the day-sensitive output only |
-| `weekly.yml` | Monday 14:00 UTC | Every point/choropleth map (bicycle, graffiti, homeless, traffic, parking, crime, noise, parks + hub, water, childcare, animal, storm, trees, cameras), budget + hate-crime pages, all trends pages, fun data, 311 Wrapped |
+| `weekly.yml` | Monday 14:00 UTC | Everything: every point/choropleth map (bicycle, graffiti, homeless, traffic, parking, crime, noise, parks + hub, water, childcare, animal, storm, trees, cameras), budget + hate-crime pages, all trends pages, pools, fire, shelter, court cache, querystore, fun data, 311 Wrapped |
 | `weekly-digest.yml` | Monday 12:30 UTC | Weekly 311 digest (`generate_weekly_digest.py`) |
 | `quarterly.yml` | 1st of Jan/Apr/Jul/Oct | 911 data |
 
-**Split rule:** day-sensitive output goes in `daily.yml`; anything whose generators gate on the ~6-day Open311 cache (`cache_age < timedelta(days=6)` in bicycle, traffic, animal, dead-animal, parks, storm) belongs in `weekly.yml` — re-rendering those daily just rewrites a page built from a 6-day-old cache. `weekly.yml` runs two hours after `daily.yml` so the two never race on the shared cache or on git pushes.
+**Why one weekly job:** the Open311-backed generators gate their fetches on a ~6-day cache (`cache_age < timedelta(days=6)` in bicycle, traffic, animal, dead-animal, parks, storm, query data), so a daily re-render mostly rewrote pages built from a week-old cache. The genuinely day-sensitive leftovers (pools, fire, shelter, court, querystore) are cheap — querystore is the slowest at ~2 min — so they ride along in the same job. `querystore` runs last on purpose: it refreshes the shared Open311 cache, and running it earlier would make the maps' 6-day gates skip their own refetch. Monday 14:00 UTC keeps the run clear of the 12:30 weekly-digest push. Note the Actions cache entry is evicted after 7 days idle, so a weekly cadence sits on that boundary — if the cache is lost, the next run backfills a full year (~76 min observed).
 
-Every generator step in both workflows is `continue-on-error: true` with a unique `id`, and the commit step is `if: always() && !cancelled()`, so one flaky data source can't discard the other twenty steps' work. The final step runs `scripts/ci_report_failures.py`, which turns failed step outcomes into a job summary and exits non-zero — the run goes red *after* the good data has been committed. `weekly.yml` (not `daily.yml`) supports `workflow_dispatch` with the optional `categories` input. Both restore the Open311 cache from GitHub Actions cache and commit results back to `main`. `AUSTINAPIKEY` must be set as a GitHub Actions secret for rate-limit headroom (429s during local runs without it are normal).
+Every generator step is `continue-on-error: true` with a unique `id`, and the commit step is `if: always() && !cancelled()`, so one flaky data source can't discard the other twenty steps' work. The final step runs `scripts/ci_report_failures.py`, which turns failed step outcomes into a job summary and exits non-zero — the run goes red *after* the good data has been committed. `weekly.yml` supports `workflow_dispatch` with the optional `categories` input (only the `generate_map.py` categories are guarded; the shared steps always run). It restores the Open311 cache from GitHub Actions cache and commits results back to `main`. `AUSTINAPIKEY` must be set as a GitHub Actions secret for rate-limit headroom (429s during local runs without it are normal).
 
 ## Architecture
 
@@ -140,7 +139,7 @@ All Open311 trend fetchers (`fetch_*_monthly` in graffiti, homeless, noise, park
 - **`fetch_monthly_with_cache(...)`** — the shared cache-aware month-by-month fetcher used by every `fetch_*_monthly` (and therefore every Open311 trends page). Handles the rolling window, per-code-set month coverage markers (`mark_month_complete`/`missing_months`), always-refresh current month, dedupe, and slicing returned records to the requested window. `make_request` is a module callback; `keep` optionally filters returned records (used by homeless's encampment keyword filter — the cache still stores everything fetched).
 - The `category` column on a row is only a provenance tag (which module cached it first) — service codes overlap across categories (e.g. `OBSTMIDB` is bicycle + homeless + traffic), so **never filter reads by category**; filter by `service_codes` instead.
 
-**`categories.py`** — canonical reporting taxonomy: `CATEGORY_CODES` (category → Open311 service codes) and `CATEGORY_NAMES`. Single source of truth for the aggregation scripts (`generate_query_data.py`, `generate_card_stats.py`). Map packages keep their own broader code lists for their map's domain — e.g. the bicycle *map* shows 5 cycling-relevant ROW codes, but the Bicycle *reporting category* counts `PWBICYCL` only so volume comparisons stay honest. Categories are not a partition: the same ticket can count toward multiple categories. The `homeless` reporting category additionally applies the encampment keyword filter (`homeless.homeless_bot.is_encampment_report`) at aggregation time.
+**`categories.py`** — canonical reporting taxonomy: `CATEGORY_CODES` (category → Open311 service codes) and `CATEGORY_NAMES`. Single source of truth for the aggregation script (`generate_query_data.py`). Map packages keep their own broader code lists for their map's domain — e.g. the bicycle *map* shows 5 cycling-relevant ROW codes, but the Bicycle *reporting category* counts `PWBICYCL` only so volume comparisons stay honest. Categories are not a partition: the same ticket can count toward multiple categories. The `homeless` reporting category additionally applies the encampment keyword filter (`homeless.homeless_bot.is_encampment_report`) at aggregation time.
 
 ### Common code patterns
 
@@ -187,7 +186,6 @@ def _fetch_code(service_code: str, days_back: int) -> list:
 | `generate_map.py` | Generic map/trends generator — `python scripts/generate_map.py <category>` |
 | `generate_budget.py` | City budget visualization |
 | `generate_capmetro_data.py` | MetroBike trip analytics |
-| `generate_card_stats.py` | Homepage card stats JSON (`docs/homepage/`) |
 | `generate_court_data.py` | Court caseload data |
 | `generate_covid_data.py` | COVID data page |
 | `generate_fire_data.py` | Fire data snapshots |

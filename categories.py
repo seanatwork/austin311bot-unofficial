@@ -1,7 +1,7 @@
 """Canonical reporting taxonomy: category -> Open311 service codes.
 
 Single source of truth for the reporting/aggregation layer
-(`scripts/generate_query_data.py`, `scripts/generate_card_stats.py`).
+(`scripts/generate_query_data.py`).
 Individual map packages (bicycle, homeless, traffic, ...) keep their own
 code lists tuned to their map's domain — those may be broader than the
 reporting taxonomy. For example the bicycle *map* shows five cycling-relevant

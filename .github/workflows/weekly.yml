@@ -1,23 +1,24 @@
 name: Weekly data refresh
 
-# Everything that doesn't need to be fresher than the Open311 cache gates
-# (~6 days) lives here: point maps, the crime choropleth, every trends page,
-# fun data and 311 Wrapped.
+# The one refresh job for the whole site: point maps, the crime choropleth,
+# every trends page, the day-sensitive snapshots (pools, fire, shelter, court,
+# querystore), fun data and 311 Wrapped.
 #
-# The day-sensitive output is in daily.yml: homepage card stats, pools, fire,
-# shelter, court cache and querystore. Don't move maps back into daily.yml —
-# those generators skip refetching while the cache is under 6 days old, so a
-# daily re-render mostly just rewrites the same page.
+# There is deliberately no daily job. Generators gate their fetches on the
+# ~6-day Open311 cache (`cache_age < timedelta(days=6)` in bicycle, traffic,
+# animal, dead-animal, parks, storm, query data), so a daily re-render mostly
+# just rewrote pages built from a week-old cache. The day-sensitive steps that
+# remain are cheap (querystore is the slowest at ~2 min) and ride along here.
 #
-# Scheduled for Monday 14:00 UTC, two hours after daily.yml, so the two jobs
-# don't race on the shared Open311 cache or on git pushes.
+# Scheduled Monday 14:00 UTC, which keeps it clear of the Monday 12:30
+# weekly-digest push.
 #
 # Every generator step is `continue-on-error` so a single flaky data source
 # can't discard the whole run; ci_report_failures.py reports them at the end.
 
 on:
   schedule:
-    - cron: "0 14 * * 1"  # weekly Monday at 14:00 UTC (after the daily run)
+    - cron: "0 14 * * 1"  # Monday 14:00 UTC, clear of the 12:30 weekly digest
   workflow_dispatch:
     inputs:
       categories:
@@ -35,9 +36,10 @@ permissions:
 jobs:
   refresh:
     runs-on: ubuntu-latest
-    # 120 min headroom: trends fetch month-by-month and the first run after a
-    # cache change backfills a full year per category before markers kick in.
-    timeout-minutes: 120
+    # 180 min headroom: trends fetch month-by-month, and if the GitHub Actions
+    # cache entry (evicted after 7 days idle) is gone, the first run backfills
+    # a full year per category — a 76 min run has been observed.
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
 
@@ -112,8 +114,6 @@ jobs:
         run: python scripts/generate_map.py trees
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
-
-      # ── moved out of daily.yml ──────────────────────────────────────────────
 
       - name: Generate bicycle map
         id: bicycle_map
@@ -279,6 +279,57 @@ jobs:
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
+      # Shared / day-sensitive output (this used to be a separate daily job).
+
+      - name: Generate pool data
+        id: pool_data
+        continue-on-error: true
+        run: python scripts/generate_pool_data.py
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate fire data snapshots
+        id: fire_data
+        continue-on-error: true
+        # The script exits 2 when Socrata is down and skips the write — we
+        # treat that as success so the workflow stays green during outages.
+        run: |
+          set +e
+          python scripts/generate_fire_data.py
+          rc=$?
+          set -e
+          if [ "$rc" = "2" ]; then
+            echo "::warning::Socrata is down — fire snapshot preserved, no changes to commit."
+            exit 0
+          fi
+          exit "$rc"
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate court data cache
+        id: court_data
+        continue-on-error: true
+        run: python scripts/generate_court_data.py
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      - name: Generate shelter data
+        id: shelter_data
+        continue-on-error: true
+        run: python scripts/generate_map.py shelter
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      # Deliberately last: this refreshes the Open311 cache for the shared
+      # taxonomy codes, and running it earlier would make the maps above skip
+      # their own refetch via their 6-day cache gates.
+      - name: Generate query data (pre-computed datasets)
+        id: query_data
+        continue-on-error: true
+        run: python scripts/generate_query_data.py
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
       - name: Save Open311 cache
         uses: actions/cache@v4
         if: always()
@@ -319,7 +370,18 @@ jobs:
             docs/animal/dead/trends/index.html \
             docs/crime/trends/index.html \
             docs/fun/data.json \
-            docs/wrapped/data.json
+            docs/wrapped/data.json \
+            docs/pools/pool-data.json \
+            docs/fire/data.json \
+            docs/fire/trends/data.json \
+            docs/court/data.json \
+            docs/court/index.html \
+            docs/shelter/data.json \
+            docs/querystore/daily_counts.json \
+            docs/querystore/district_counts.json \
+            docs/querystore/resolution_stats.json \
+            docs/querystore/monthly_aggregates.json \
+            docs/querystore/service_codes.json
           git diff --cached --quiet || git commit -m "chore: refresh weekly data [skip ci]"
           git pull --rebase origin main
           git push

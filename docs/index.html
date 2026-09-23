@@ -1206,66 +1206,6 @@
       resetTimers();
     }
 
-    // ── Card stats: inject open/total counts into map card descriptions ──────
-
-    (function loadCardStats() {
-      fetch("homepage/card-stats.json")
-        .then(function(r) { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
-        .then(function(data) {
-          if (!data.categories) return;
-          var cats = data.categories;
-
-          // Map link href patterns to category keys
-          var linkMap = {
-            "homeless/": "homeless",
-            "parking/": "parking",
-            "noise/": "noise",
-            "animal/": "animal",
-            "graffiti/": "graffiti",
-            "parks/": "parks",
-            "storm/": "storm",
-            "traffic/": "traffic",
-            "bicycle/": "bicycle",
-            "animal/dead/": "deadAnimal",
-          };
-
-          // Walk all card links and inject stats where we have data
-          // Check longer href prefixes first to avoid "animal/" matching "animal/dead/"
-          var cards = document.querySelectorAll(".card");
-          cards.forEach(function(card) {
-            var href = card.getAttribute("href") || "";
-            var catKey = null;
-            // Order matters: check most specific prefixes first
-            var prefixes = ["animal/dead/", "homeless/", "parking/", "noise/", "animal/", "graffiti/", "parks/", "storm/", "traffic/", "bicycle/"];
-            for (var i = 0; i < prefixes.length; i++) {
-              if (href.startsWith(prefixes[i])) {
-                catKey = linkMap[prefixes[i]];
-                break;
-              }
-            }
-            if (!catKey || !cats[catKey]) return;
-
-            var stats = cats[catKey];
-            var descEl = card.querySelector(".desc");
-            if (!descEl) return;
-
-            // Every map regenerates weekly (weekly.yml) while the counts come
-            // from the daily card-stats job — say "count updated daily" so
-            // visitors know the map underneath isn't a live daily map.
-            var suffix = "count updated daily";
-
-            if (stats.open > 0) {
-              descEl.textContent = stats.open + " open \u00b7 " + stats.total + " total \u00b7 " + suffix;
-            } else {
-              descEl.textContent = stats.total + " reports \u00b7 " + suffix;
-            }
-          });
-        })
-        .catch(function() {
-          // Silently skip — cards keep their default descriptions
-        });
-    })();
-
     // ── pulse bar fetch (disabled until counters are working) ──
     /*
     (function loadPulse() {
