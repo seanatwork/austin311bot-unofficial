@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 OPEN311_BASE_URL = "https://311.austintexas.gov/open311/v2"
 SERVICE_CODE     = "WWREPORT"
+API_KEY          = os.getenv("AUSTINAPIKEY")
 
 _session: Optional[requests.Session] = None
 
@@ -30,10 +31,15 @@ def _get_session() -> requests.Session:
     global _session
     if _session is None:
         _session = requests.Session()
-        _session.headers.update({
+        headers = {
             "Accept": "application/json",
             "User-Agent": "austin311bot/0.1 (Open311 water conservation queries)",
-        })
+        }
+        # Without this header the 311 API/WAF answers 403 and the whole water
+        # step dies — every other Open311 module sends it (see bicycle_bot).
+        if API_KEY:
+            headers["X-Api-Key"] = API_KEY
+        _session.headers.update(headers)
     return _session
 
 
