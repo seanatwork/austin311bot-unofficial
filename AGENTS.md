@@ -63,7 +63,11 @@ No app server to deploy — "deployment" means regenerating the static output. W
 
 **Why one weekly job:** the Open311-backed generators gate their fetches on a ~6-day cache (`cache_age < timedelta(days=6)` in bicycle, traffic, animal, dead-animal, parks, storm, query data), so a daily re-render mostly rewrote pages built from a week-old cache. The genuinely day-sensitive leftovers (pools, fire, shelter, court, querystore) are cheap — querystore is the slowest at ~2 min — so they ride along in the same job. `querystore` runs last on purpose: it refreshes the shared Open311 cache, and running it earlier would make the maps' 6-day gates skip their own refetch. Monday 14:00 UTC keeps the run clear of the 12:30 weekly-digest push. Note the Actions cache entry is evicted after 7 days idle, so a weekly cadence sits on that boundary — if the cache is lost, the next run backfills a full year (~76 min observed).
 
-Every generator step is `continue-on-error: true` with a unique `id`, and the commit step is `if: always() && !cancelled()`, so one flaky data source can't discard the other twenty steps' work. The final step runs `scripts/ci_report_failures.py`, which turns failed step outcomes into a job summary and exits non-zero — the run goes red *after* the good data has been committed. `weekly.yml` supports `workflow_dispatch` with the optional `categories` input (only the `generate_map.py` categories are guarded; the shared steps always run). It restores the Open311 cache from GitHub Actions cache and commits results back to `main`. `AUSTINAPIKEY` must be set as a GitHub Actions secret for rate-limit headroom (429s during local runs without it are normal).
+Every generator step is `continue-on-error: true` with a unique `id`, and the commit step is `if: always() && !cancelled()`, so one flaky data source can't discard the other twenty steps' work. The final step runs `scripts/ci_report_failures.py`, which turns failed step outcomes into a job summary and exits non-zero — the run goes red *after* the good data has been committed. `weekly.yml` supports `workflow_dispatch` with the optional `categories` input (only the `generate_map.py` categories are guarded; the shared steps always run). It commits results back to `main`. `AUSTINAPIKEY` must be set as a GitHub Actions secret for rate-limit headroom (429s during local runs without it are normal).
+
+The Open311 cache uses `actions/cache/restore@v4` + `actions/cache/save@v4`, not plain `actions/cache@v4`: the action saves in a **post step gated on `success()`** (`post-if: "success()"` in its `action.yml`), so on any red run the refreshed cache was silently discarded and the next run backfilled from an ever-older snapshot — more requests, more 403 throttling, another red run. `cache/save` writes the entry inline, so it survives a failing run.
+
+`quarterly.yml` keeps a generous `timeout-minutes`: the 911 dataset holds ~4.16M rows and `generate_911_data.py` pages through all of it (5,000 rows per request, ~1s between chunks), so a 30-min cap cancels the job mid-fetch and writes nothing.
 
 ## Architecture
 
@@ -85,7 +89,7 @@ Each package is independent and owns one data domain. Its `__init__.py` re-expor
 | `trees/` | Open311 tree service codes | `generate_tree_map`, `get_tree_stats` |
 | `trafficcameras/` | Austin traffic camera feeds | `generate_cameras_map`, `fetch_cameras`, `get_camera_stats` |
 | `restaurants/` | Socrata `ecmv-9xxi` (health inspections) | `get_restaurant_stats`, `format_restaurant_stats` |
-| `waterconservation/` | Socrata water conservation violations | `generate_water_map`, `get_water_conservation_stats` |
+| `waterconservation/` | Open311 `WWREPORT` | `generate_water_map`, `get_water_conservation_stats` |
 | `childcare/` | Socrata childcare facility inspections | `generate_childcare_map`, `get_childcare_stats` |
 | `crime/` | Socrata `fdj4-gpfu` (APD), `i7fg-wrk5` (NIBRS), `t99n-5ib4` (hate crime) | `generate_crime_map`, `generate_hate_crime` |
 | `capmetro/` | Socrata `tyfh-5r8s` (MetroBike trips) | `get_electric_vs_classic`, `get_kiosk_flow`, `get_membership_breakdown`, `KIOSK_LOCATIONS` |
@@ -131,6 +135,7 @@ All Open311 trend fetchers (`fetch_*_monthly` in graffiti, homeless, noise, park
 
 **`open311_client.py`**
 - `open311_get(session, url, params, retries=0)` — GET with exponential backoff (up to 8 retries; 15s starting delay for 429, respects `Retry-After`)
+- **Throttling shows up as 403, not 429.** When the 311 API/WAF throttles a burst of requests from a datacenter IP, every in-flight request gets a 403 for a couple of minutes and then recovers (the same URLs return 200 from other networks; observed window: ~3 min, ~257 requests across ~45 service codes in one CI run). `open311_get` treats 403 as retryable with a shorter bounded backoff (15s/30s/60s/120s). If that budget is exhausted the API is blocking for longer than a burst, so it fails fast for `THROTTLE_COOLDOWN` seconds instead of making every later request pay the same 225s — callers tolerate a failed code, and an unbounded per-request wait could hit the job timeout and lose the commit.
 - `og_meta_tags(slug="")` — Open Graph + Twitter Card meta tags for a docs page
 - `SITE_BASE_URL` — `https://austin311.com`
 
@@ -138,6 +143,7 @@ All Open311 trend fetchers (`fetch_*_monthly` in graffiti, homeless, noise, park
 - API: `init_cache()`, `get_cached_records(service_codes, since)`, `cache_records(category, records)`, `get_last_fetch_date(service_codes)`, `should_refresh_cache(category, max_age_hours=24)`, `get_cache_stats(category)`, `clear_cache(category)`
 - **`fetch_monthly_with_cache(...)`** — the shared cache-aware month-by-month fetcher used by every `fetch_*_monthly` (and therefore every Open311 trends page). Handles the rolling window, per-code-set month coverage markers (`mark_month_complete`/`missing_months`), always-refresh current month, dedupe, and slicing returned records to the requested window. `make_request` is a module callback; `keep` optionally filters returned records (used by homeless's encampment keyword filter — the cache still stores everything fetched).
 - The `category` column on a row is only a provenance tag (which module cached it first) — service codes overlap across categories (e.g. `OBSTMIDB` is bicycle + homeless + traffic), so **never filter reads by category**; filter by `service_codes` instead.
+- The water map is the one generator that also uses the cache as a *fallback data source* (`waterconservation/water_conservation_bot.py` caches its `WWREPORT` records and falls back to them when a throttled fetch returns nothing). `WWREPORT` belongs to no reporting category, so those rows are inert for every other reader.
 
 **`categories.py`** — canonical reporting taxonomy: `CATEGORY_CODES` (category → Open311 service codes) and `CATEGORY_NAMES`. Single source of truth for the aggregation script (`generate_query_data.py`). Map packages keep their own broader code lists for their map's domain — e.g. the bicycle *map* shows 5 cycling-relevant ROW codes, but the Bicycle *reporting category* counts `PWBICYCL` only so volume comparisons stay honest. Categories are not a partition: the same ticket can count toward multiple categories. The `homeless` reporting category additionally applies the encampment keyword filter (`homeless.homeless_bot.is_encampment_report`) at aggregation time.
 

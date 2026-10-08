@@ -65,13 +65,19 @@ def _fetch_violations(days_back: int, limit: int = 100) -> list:
     page = 1
 
     while True:
-        batch = _make_request({
-            "service_code": SERVICE_CODE,
-            "start_date":   _isoformat_z(start),
-            "end_date":     _isoformat_z(end),
-            "per_page":     limit,
-            "page":         page,
-        })
+        try:
+            batch = _make_request({
+                "service_code": SERVICE_CODE,
+                "start_date":   _isoformat_z(start),
+                "end_date":     _isoformat_z(end),
+                "per_page":     limit,
+                "page":         page,
+            })
+        except requests.exceptions.RequestException as e:
+            # Keep the pages already fetched rather than losing the whole map
+            # when the 311 API throttles a single page.
+            logger.warning(f"Water conservation fetch failed (page {page}): {e}")
+            break
         if not batch:
             break
         results.extend(batch)
@@ -80,6 +86,32 @@ def _fetch_violations(days_back: int, limit: int = 100) -> list:
         page += 1
 
     return results
+
+
+def _cached_violations(days_back: int) -> list:
+    """Last-resort source when the live fetch returns nothing."""
+    try:
+        from open311_cache import init_cache, get_cached_records
+        init_cache()
+        records = get_cached_records(
+            service_codes=[SERVICE_CODE],
+            since=_utc_now() - timedelta(days=days_back),
+        )
+    except Exception as e:
+        logger.warning(f"Could not read cached water records: {e}")
+        return []
+    if records:
+        logger.warning("Falling back to %s cached water records", len(records))
+    return records
+
+
+def _store_violations(records: list):
+    try:
+        from open311_cache import init_cache, cache_records
+        init_cache()
+        cache_records("water", records)
+    except Exception as e:
+        logger.warning(f"Could not cache water records: {e}")
 
 
 # Map status_notes prefixes → readable outcome labels
@@ -242,6 +274,10 @@ def generate_water_map(days_back: int = 90) -> tuple:
         return None, "❌ Map generation requires 'folium'. Install: pip install folium"
 
     records_raw = _fetch_violations(days_back)
+    if records_raw:
+        _store_violations(records_raw)
+    else:
+        records_raw = _cached_violations(days_back)
 
     now_dt = _utc_now()
     records = []

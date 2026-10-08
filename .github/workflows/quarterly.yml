@@ -16,7 +16,10 @@ permissions:
 jobs:
   generate:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    # The 911 dataset is ~4.16M rows and the script pages through all of it
+    # (5,000 rows per request, ~1s inter-chunk delay): 30 min only reached
+    # ~1.99M rows before the job was cancelled mid-fetch.
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v4
 

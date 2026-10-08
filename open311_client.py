@@ -8,6 +8,8 @@ Improvements over per-module implementations:
 """
 import time
 import logging
+from typing import Optional
+
 import requests
 
 logger = logging.getLogger(__name__)
@@ -20,6 +22,51 @@ RETRYABLE_ERRORS = (
     requests.exceptions.ConnectionError,
 )
 
+# The 311 API/WAF answers 403 — not 429 — when it throttles a burst of requests
+# from a datacenter IP: every in-flight request 403s for a couple of minutes and
+# then recovers (the same URLs return 200 from other networks). Treat it as a
+# throttle with a shorter, bounded backoff so a blocked window can't kill a
+# generator step: 15s + 30s + 60s + 120s rides out the observed ~3 min burst
+# without burning MAX_RETRIES' much longer 429 schedule on every affected code.
+THROTTLE_403_RETRIES = 4
+THROTTLE_403_DELAY = 15.0
+
+# If a 403 outlives the whole retry budget the API is blocking us for longer
+# than a burst. Pause retrying for a cooldown instead of letting every later
+# request burn its own budget — callers already tolerate a failed code, and
+# without this a long block could consume the run's timeout and lose the commit.
+THROTTLE_COOLDOWN = 180.0
+_throttled_until = 0.0
+
+
+def _throttle_cooldown_active() -> bool:
+    return time.monotonic() < _throttled_until
+
+
+def _mark_throttled():
+    global _throttled_until
+    _throttled_until = time.monotonic() + THROTTLE_COOLDOWN
+
+
+def _retry_delay(
+    status: int, retries: int, retry_after: Optional[str]
+) -> Optional[float]:
+    """Seconds to wait before retrying, or None when the response is final."""
+    if status == 403:
+        if retries >= THROTTLE_403_RETRIES:
+            return None
+        return THROTTLE_403_DELAY * (2 ** retries)
+    if status not in RETRYABLE_HTTP_CODES or retries >= MAX_RETRIES:
+        return None
+    if retry_after:
+        try:
+            return float(retry_after)
+        except ValueError:
+            pass
+    if status in {423, 429}:
+        return 15.0 * (2 ** retries)
+    return RETRY_DELAY * (2 ** retries)
+
 
 def open311_get(
     session: requests.Session,
@@ -31,6 +78,8 @@ def open311_get(
 
     On a 429, checks the Retry-After response header first; falls back to
     exponential backoff (15s, 30s, 60s, 120s, 240s, 480s) if not present.
+    On a 403 (throttling), backs off 15s, 30s, 60s, 120s; if the budget runs
+    out, further 403s fail fast for THROTTLE_COOLDOWN seconds.
     Retries up to MAX_RETRIES times before re-raising.
     """
     try:
@@ -39,24 +88,22 @@ def open311_get(
         data = resp.json()
         return data if isinstance(data, list) else []
     except requests.exceptions.HTTPError as e:
-        status = e.response.status_code
-        if status in RETRYABLE_HTTP_CODES and retries < MAX_RETRIES:
-            retry_after = e.response.headers.get("Retry-After")
-            if retry_after:
-                try:
-                    delay = float(retry_after)
-                except ValueError:
-                    delay = 15.0 * (2 ** retries)
-            elif status in {423, 429}:
-                delay = 15.0 * (2 ** retries)
-            else:
-                delay = RETRY_DELAY * (2 ** retries)
-            logger.warning(
-                f"HTTP {status}, retrying in {delay:.1f}s ({retries + 1}/{MAX_RETRIES})"
-            )
-            time.sleep(delay)
-            return open311_get(session, url, params, retries + 1)
-        raise
+        response = e.response
+        status = response.status_code if response is not None else None
+        if status == 403 and _throttle_cooldown_active():
+            raise
+        retry_after = None
+        if response is not None:
+            retry_after = response.headers.get("Retry-After")
+        delay = _retry_delay(status, retries, retry_after)
+        if delay is None:
+            if status == 403:
+                _mark_throttled()
+            raise
+        cap = THROTTLE_403_RETRIES if status == 403 else MAX_RETRIES
+        logger.warning(f"HTTP {status}, retrying in {delay:.1f}s ({retries + 1}/{cap})")
+        time.sleep(delay)
+        return open311_get(session, url, params, retries + 1)
     except RETRYABLE_ERRORS as e:
         if retries < MAX_RETRIES:
             delay = RETRY_DELAY * (2 ** retries)

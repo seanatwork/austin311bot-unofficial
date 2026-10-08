@@ -52,7 +52,7 @@ jobs:
         run: pip install -e .
 
       - name: Restore Open311 cache
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
           path: .cache/open311_cache.db
           key: open311-${{ github.run_id }}
@@ -340,8 +340,13 @@ jobs:
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
+      # actions/cache saves in a post step gated on success(), so on a red run
+      # (any failed generator) the refreshed cache was silently discarded and
+      # the next run had to backfill from an ever-older snapshot — which meant
+      # more requests and more throttling 403s. cache/save writes the entry
+      # inline, so it survives a failing run.
       - name: Save Open311 cache
-        uses: actions/cache@v4
+        uses: actions/cache/save@v4
         if: always()
         with:
           path: .cache/open311_cache.db
