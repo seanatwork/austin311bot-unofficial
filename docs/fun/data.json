@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-05T21:31:41.445759+00:00",
+  "updated": "2026-10-08T19:39:17.574608+00:00",
   "bars": {
     "top10": [
       {
@@ -61,6 +61,12 @@
         "pct": 139.3
       },
       {
+        "name": "San Jacinto Beverage Company Llc",
+        "address": "98 San Jacinto Blvd",
+        "delta": 183147.0,
+        "pct": 88.9
+      },
+      {
         "name": "Jw Marriott Austin",
         "address": "110 E 2nd St",
         "delta": 105441.0,
@@ -71,12 +77,6 @@
         "address": "3504 Montopolis Dr",
         "delta": 104444.0,
         "pct": 215.2
-      },
-      {
-        "name": "Wls Beverage Company",
-        "address": "304 E Cesar Chavez St",
-        "delta": 77807.0,
-        "pct": 18.0
       },
       {
         "name": "Boa Steakhouse",
@@ -90,8 +90,404 @@
     "curLabel": "August 2026",
     "prevLabel": "July 2026"
   },
-  "coyotes": null,
-  "graffiti": null,
-  "parking": null,
-  "graffitiSpeedrun": null
+  "coyotes": {
+    "total": 109,
+    "pupping": 0,
+    "puppingPct": 0,
+    "isPeak": false,
+    "months": [
+      {
+        "label": "Jan 2026",
+        "count": 5,
+        "pct": 13,
+        "isPupping": false
+      },
+      {
+        "label": "Dec 2025",
+        "count": 38,
+        "pct": 97,
+        "isPupping": false
+      },
+      {
+        "label": "Nov 2025",
+        "count": 39,
+        "pct": 100,
+        "isPupping": false
+      },
+      {
+        "label": "Oct 2025",
+        "count": 27,
+        "pct": 69,
+        "isPupping": false
+      }
+    ]
+  },
+  "graffiti": {
+    "total": 229,
+    "uniqueLocations": 223,
+    "repeatRate": 3,
+    "winner": {
+      "address": "1130 W 6th St",
+      "count": 2,
+      "status": "\u2705 Cleaned",
+      "lat": 30.27283761,
+      "lon": -97.75692741
+    },
+    "top15": [
+      {
+        "address": "1130 W 6th St",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.27283761,
+        "lon": -97.75692741
+      },
+      {
+        "address": "1200 W 6th St",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.27284215,
+        "lon": -97.7572127
+      },
+      {
+        "address": "300 Rock Hollow Ln",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.36276376,
+        "lon": -97.69051608
+      },
+      {
+        "address": "2448 S 1st St",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.240519541416656,
+        "lon": -97.75995374336078
+      },
+      {
+        "address": "6103 Manor Rd",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.307426285402236,
+        "lon": -97.67840607763249
+      },
+      {
+        "address": "2006 S 6th St",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.247534544950053,
+        "lon": -97.76448198333323
+      },
+      {
+        "address": "4410 Avenue C",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.307258504575582,
+        "lon": -97.72691930604827
+      },
+      {
+        "address": "200 E 32nd St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.296126462407663,
+        "lon": -97.73550648728599
+      },
+      {
+        "address": "137 S Lamar Blvd",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.26503343132795,
+        "lon": -97.75681301110987
+      },
+      {
+        "address": "36 S 1st St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.2630727242187,
+        "lon": -97.74807055977608
+      },
+      {
+        "address": "66 Guadalupe St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.26408347405884,
+        "lon": -97.74796726358362
+      },
+      {
+        "address": "665 W Cesar Chavez St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.265328696194565,
+        "lon": -97.75142392502228
+      },
+      {
+        "address": "100 E 27th St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.29257591,
+        "lon": -97.73771003
+      },
+      {
+        "address": "206 Nueces St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.266911297584628,
+        "lon": -97.75075939554416
+      },
+      {
+        "address": "701 W 2nd St",
+        "count": 1,
+        "status": "\u2705 Cleaned",
+        "lat": 30.266188597103636,
+        "lon": -97.75093303668766
+      }
+    ]
+  },
+  "parking": {
+    "total": 300,
+    "peakHour": "4pm",
+    "peakCount": 33,
+    "hours": [
+      {
+        "hour": 0,
+        "label": "12am",
+        "count": 1,
+        "pct": 3,
+        "isPeak": false
+      },
+      {
+        "hour": 1,
+        "label": "1am",
+        "count": 1,
+        "pct": 3,
+        "isPeak": false
+      },
+      {
+        "hour": 3,
+        "label": "3am",
+        "count": 1,
+        "pct": 3,
+        "isPeak": false
+      },
+      {
+        "hour": 4,
+        "label": "4am",
+        "count": 1,
+        "pct": 3,
+        "isPeak": false
+      },
+      {
+        "hour": 6,
+        "label": "6am",
+        "count": 3,
+        "pct": 9,
+        "isPeak": false
+      },
+      {
+        "hour": 7,
+        "label": "7am",
+        "count": 11,
+        "pct": 33,
+        "isPeak": false
+      },
+      {
+        "hour": 8,
+        "label": "8am",
+        "count": 32,
+        "pct": 97,
+        "isPeak": false
+      },
+      {
+        "hour": 9,
+        "label": "9am",
+        "count": 19,
+        "pct": 58,
+        "isPeak": false
+      },
+      {
+        "hour": 10,
+        "label": "10am",
+        "count": 25,
+        "pct": 76,
+        "isPeak": false
+      },
+      {
+        "hour": 11,
+        "label": "11am",
+        "count": 21,
+        "pct": 64,
+        "isPeak": false
+      },
+      {
+        "hour": 12,
+        "label": "12pm",
+        "count": 25,
+        "pct": 76,
+        "isPeak": false
+      },
+      {
+        "hour": 13,
+        "label": "1pm",
+        "count": 25,
+        "pct": 76,
+        "isPeak": false
+      },
+      {
+        "hour": 14,
+        "label": "2pm",
+        "count": 18,
+        "pct": 55,
+        "isPeak": false
+      },
+      {
+        "hour": 15,
+        "label": "3pm",
+        "count": 12,
+        "pct": 36,
+        "isPeak": false
+      },
+      {
+        "hour": 16,
+        "label": "4pm",
+        "count": 33,
+        "pct": 100,
+        "isPeak": true
+      },
+      {
+        "hour": 17,
+        "label": "5pm",
+        "count": 20,
+        "pct": 61,
+        "isPeak": false
+      },
+      {
+        "hour": 18,
+        "label": "6pm",
+        "count": 20,
+        "pct": 61,
+        "isPeak": false
+      },
+      {
+        "hour": 19,
+        "label": "7pm",
+        "count": 16,
+        "pct": 48,
+        "isPeak": false
+      },
+      {
+        "hour": 20,
+        "label": "8pm",
+        "count": 5,
+        "pct": 15,
+        "isPeak": false
+      },
+      {
+        "hour": 21,
+        "label": "9pm",
+        "count": 7,
+        "pct": 21,
+        "isPeak": false
+      },
+      {
+        "hour": 22,
+        "label": "10pm",
+        "count": 3,
+        "pct": 9,
+        "isPeak": false
+      },
+      {
+        "hour": 23,
+        "label": "11pm",
+        "count": 1,
+        "pct": 3,
+        "isPeak": false
+      }
+    ],
+    "violationTypes": [
+      {
+        "type": "Other",
+        "count": 75,
+        "pct": 100
+      },
+      {
+        "type": "Sidewalk",
+        "count": 18,
+        "pct": 24
+      },
+      {
+        "type": "No Parking Zone",
+        "count": 15,
+        "pct": 20
+      },
+      {
+        "type": "Bike Lane",
+        "count": 13,
+        "pct": 17
+      },
+      {
+        "type": "Fire Hydrant",
+        "count": 9,
+        "pct": 12
+      },
+      {
+        "type": "Alley",
+        "count": 7,
+        "pct": 9
+      },
+      {
+        "type": "Oversized Vehicle",
+        "count": 7,
+        "pct": 9
+      },
+      {
+        "type": "Driveway",
+        "count": 5,
+        "pct": 7
+      }
+    ]
+  },
+  "graffitiSpeedrun": {
+    "totalClosed": 228,
+    "avgDays": 69.8,
+    "medianDays": 10.5,
+    "fastestDays": [
+      0.0,
+      0.0,
+      0.1,
+      0.1,
+      0.1
+    ],
+    "buckets": {
+      "under1h": {
+        "count": 2,
+        "label": "Under 1 hour"
+      },
+      "1hTo6h": {
+        "count": 5,
+        "label": "1\u20136 hours"
+      },
+      "6hTo24h": {
+        "count": 12,
+        "label": "6\u201324 hours"
+      },
+      "1dTo3d": {
+        "count": 24,
+        "label": "1\u20133 days"
+      },
+      "3dTo7d": {
+        "count": 56,
+        "label": "3\u20137 days"
+      },
+      "7dTo30d": {
+        "count": 44,
+        "label": "7\u201330 days"
+      },
+      "over30d": {
+        "count": 85,
+        "label": "Over 30 days"
+      }
+    },
+    "longestOpen": {
+      "days": 282.1,
+      "address": "4632 S Lamar Blvd Sb, Austin"
+    }
+  }
 }
