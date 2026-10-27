@@ -161,11 +161,14 @@ def fetch_weekly_descriptions() -> list:
                     text = desc if len(desc) > 15 else (notes if len(notes) > 10 else "")
                     if not text:
                         continue
+                    clean = _censor(text)
+                    truncated = len(clean) > 400
                     all_records.append({
                         "id": sid,
                         "code": code,
                         "category": label,
-                        "text": _censor(text)[:400],
+                        "text": (clean[:397] + "…") if truncated else clean,
+                        "truncated": truncated,
                         "address": (r.get("address") or "").strip(),
                         "date": (r.get("requested_datetime") or "")[:10],
                     })
@@ -349,6 +352,7 @@ def _generate_digest(citizen_complaints: list) -> dict:
             "ticketId": record["id"],
             "date": record["date"],
             "dedupCount": record.get("_dedupCount", 1),
+            "truncated": record.get("truncated", False),
         })
 
     return {
