@@ -388,6 +388,7 @@
       var CITY = [];
       var ALL = [];
       var CATEGORIES = [];
+      var PICK_IDS = {};
       var showAll = false;
       var currentCategory = "__all__";
       var currentQuery = "";
@@ -403,6 +404,10 @@
           CITIZEN = d.citizenComplaints || [];
           CITY = d.cityResponses || [];
           ALL = CITIZEN.concat(CITY);
+          PICK_IDS = {};
+          (d.picks || []).forEach(function (p) {
+            if (p.ticketId) PICK_IDS[p.ticketId] = true;
+          });
 
           renderPicks(d);
           renderFooter(d);
@@ -431,11 +436,17 @@
         if (cat && cat !== "__all__") {
           pool = pool.filter(function (i) { return i.category === cat; });
         }
+        // The picks section already shows these; don't list them a second time
+        // unless the visitor has narrowed the list deliberately.
+        if ((!cat || cat === "__all__") && !q) {
+          pool = pool.filter(function (i) { return !PICK_IDS[i.id]; });
+        }
         if (q) {
           pool = pool.filter(function (i) {
             return (i.text || "").toLowerCase().indexOf(q) !== -1
                 || (i.address || "").toLowerCase().indexOf(q) !== -1
-                || (i.category || "").toLowerCase().indexOf(q) !== -1;
+                || (i.category || "").toLowerCase().indexOf(q) !== -1
+                || (i.id || "").toLowerCase().indexOf(q) !== -1;
           });
         }
         return pool.slice().sort(function (a, b) {
@@ -444,14 +455,6 @@
       }
 
       function render() {
-        // Lede
-        var pool = activePool();
-        var meta = null;
-        try { meta = JSON.parse(document.querySelector('script[type="application/json"]') ? "" : "{}") || {}; } catch(e) {}
-        document.getElementById("lede").textContent =
-          (showAll ? ALL.length + " total reports" : CITIZEN.length + " citizen-written complaints")
-          + " filed this week in Austin.";
-
         // Category counts from the active pool (citizen or all)
         var pool = activePool();
         var counts = {};
@@ -471,7 +474,9 @@
         // Activate current
         var chipEls = chips.querySelectorAll(".chip");
         chipEls.forEach(function (c) {
-          c.classList.toggle("active", c.dataset.value === currentCategory);
+          var on = c.dataset.value === currentCategory;
+          c.classList.toggle("active", on);
+          c.setAttribute("aria-pressed", on ? "true" : "false");
         });
 
         refreshList();
@@ -482,13 +487,16 @@
         el.className = "chip";
         el.type = "button";
         el.dataset.value = value;
+        el.setAttribute("aria-pressed", value === currentCategory ? "true" : "false");
         el.innerHTML = '<span>' + escapeHtml(label) + '</span>'
           + '<span class="chip-count">' + count + '</span>';
         el.addEventListener("click", function () {
           currentCategory = value;
           // Re-highlight chips
           document.querySelectorAll(".chip").forEach(function (c) {
-            c.classList.toggle("active", c.dataset.value === value);
+            var on = c.dataset.value === value;
+            c.classList.toggle("active", on);
+            c.setAttribute("aria-pressed", on ? "true" : "false");
           });
           refreshList();
           window.scrollTo({ top: document.getElementById("list").offsetTop - 80, behavior: "smooth" });
@@ -498,6 +506,10 @@
 
       function refreshList() {
         var items = visibleItems();
+        var noun = showAll ? "report" : "citizen-written complaint";
+        document.getElementById("lede").textContent =
+          items.length + " " + noun + (items.length === 1 ? "" : "s")
+          + " filed this week in Austin.";
         document.getElementById("list-title").textContent =
           currentCategory === "__all__" ? "Complaints" : currentCategory;
         document.getElementById("list-count").textContent =
@@ -618,13 +630,19 @@
       document.getElementById("toggle-citizen").addEventListener("click", function () {
         showAll = false;
         this.classList.add("active");
-        document.getElementById("toggle-all").classList.remove("active");
+        this.setAttribute("aria-pressed", "true");
+        var other = document.getElementById("toggle-all");
+        other.classList.remove("active");
+        other.setAttribute("aria-pressed", "false");
         render();
       });
       document.getElementById("toggle-all").addEventListener("click", function () {
         showAll = true;
         this.classList.add("active");
-        document.getElementById("toggle-citizen").classList.remove("active");
+        this.setAttribute("aria-pressed", "true");
+        var other = document.getElementById("toggle-citizen");
+        other.classList.remove("active");
+        other.setAttribute("aria-pressed", "false");
         render();
       });
 
