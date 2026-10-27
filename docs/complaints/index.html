@@ -134,11 +134,14 @@
       word-wrap: break-word;
       font-weight: 500;
     }
-    .pick-text a {
-      color: inherit;
+    .read-more {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--accent);
       text-decoration: none;
+      white-space: nowrap;
     }
-    .pick-text a:hover { color: var(--accent); }
+    .read-more:hover { text-decoration: underline; }
     .pick-meta {
       display: flex;
       flex-wrap: wrap;
@@ -307,8 +310,6 @@
       white-space: pre-wrap;
       word-wrap: break-word;
     }
-    .item-text a { color: inherit; text-decoration: none; }
-    .item-text a:hover { color: var(--accent); }
     .item-meta {
       display: flex;
       flex-wrap: wrap;
@@ -505,6 +506,13 @@
         renderList(items);
       }
 
+      function fmtDate(d) {
+        var parsed = new Date(d + "T12:00:00");
+        return isNaN(parsed.getTime())
+          ? d
+          : parsed.toLocaleDateString("en-US", { month: "short", day: "numeric" });
+      }
+
       function renderList(items) {
         var list = document.getElementById("list");
         if (!items.length) {
@@ -520,21 +528,20 @@
           var ticketUrl = it.id
             ? "https://311.austintexas.gov/tickets/" + encodeURIComponent(it.id)
             : null;
-          var textHtml = escapeHtml(it.text || "");
-          if (ticketUrl) {
-            textHtml = '<a href="' + ticketUrl + '" target="_blank" rel="noopener">' + textHtml + '</a>';
-          }
           var metaParts = [];
           if (it.address) metaParts.push('<span>' + escapeHtml(it.address) + '</span>');
-          if (it.date) metaParts.push('<span>' + escapeHtml(it.date) + '</span>');
+          if (it.date) metaParts.push('<span>' + escapeHtml(fmtDate(it.date)) + '</span>');
           if (it.category) metaParts.push('<span>' + escapeHtml(it.category) + '</span>');
           if (it.id) {
-            metaParts.push('<span><a href="https://311.austintexas.gov/tickets/'
-              + encodeURIComponent(it.id) + '" target="_blank" rel="noopener">'
+            metaParts.push('<span><a href="' + ticketUrl + '" target="_blank" rel="noopener">'
               + escapeHtml(it.id) + '</a></span>');
           }
           html += '<div class="item">'
-            + '<div class="item-text">' + textHtml + '</div>'
+            + '<div class="item-text">' + escapeHtml(it.text || "")
+            + (it.truncated && ticketUrl
+                ? ' <a class="read-more" href="' + ticketUrl + '" target="_blank" rel="noopener">Read full report \u2192</a>'
+                : "")
+            + '</div>'
             + '<div class="item-meta">' + metaParts.join(" · ") + '</div>'
             + '</div>';
         }
@@ -557,17 +564,17 @@
           html += '<div class="pick-card" style="border-left-color:' + color + '">';
 
           // Complaint text
-          var textHtml = escapeHtml(pick.text || "");
-          if (ticketUrl) {
-            textHtml = '<a href="' + ticketUrl + '" target="_blank" rel="noopener">' + textHtml + '</a>';
-          }
-          html += '<div class="pick-text">' + textHtml + '</div>';
+          html += '<div class="pick-text">' + escapeHtml(pick.text || "")
+            + (pick.truncated && ticketUrl
+                ? ' <a class="read-more" href="' + ticketUrl + '" target="_blank" rel="noopener">Read full report \u2192</a>'
+                : "")
+            + '</div>';
 
           // Meta line
           html += '<div class="pick-meta">';
           if (pick.address) html += '<span>📍 ' + escapeHtml(pick.address) + '</span>';
           if (pick.category) html += '<span>📂 ' + escapeHtml(pick.category) + '</span>';
-          if (pick.date) html += '<span>📅 ' + escapeHtml(pick.date) + '</span>';
+          if (pick.date) html += '<span>📅 ' + escapeHtml(fmtDate(pick.date)) + '</span>';
           if (pick.ticketId) {
             html += '<span>🎫 <a href="' + ticketUrl + '" target="_blank" rel="noopener">'
               + escapeHtml(pick.ticketId) + '</a></span>';
@@ -597,7 +604,7 @@
           html += ". ";
         }
         if (meta.generated) {
-          html += "Generated " + meta.generated.slice(0, 10) + ". ";
+          html += "Generated " + escapeHtml(fmtDate(meta.generated.slice(0, 10))) + ". ";
         }
         html += 'Data: <a href="https://311.austintexas.gov/open311/v2" target="_blank">Austin Open311 API</a>.';
         el.innerHTML = html;
