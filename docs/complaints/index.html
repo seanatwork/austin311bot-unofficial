@@ -342,11 +342,13 @@
     }
   </style>
 </head>
-<body>
+<body id="top">
   <main>
     <a class="back" href="../">← Austin 311</a>
     <div class="page-header">
-      <h1 id="lede">Loading…</h1>
+      <h1>Weekly 311 Digest</h1>
+      <p class="subtitle">The most notable citizen-written complaints filed with Austin 311 this week, ranked by a readability heuristic. City-authored status updates are shown under “All reports”.</p>
+      <p class="subtitle" id="lede">Loading…</p>
     </div>
 
 <!-- Notable complaints -->
@@ -359,20 +361,20 @@
     </div>
 
     <div class="search-wrap">
-      <input type="text" class="search-input" id="search-input" placeholder="Search complaints…" />
+      <input type="text" class="search-input" id="search-input" placeholder="Search complaints…" aria-label="Search complaints" />
     </div>
 
     <div class="toggle-row">
       <span>Show:</span>
-      <button class="toggle-btn active" id="toggle-citizen">Citizen-written</button>
-      <button class="toggle-btn" id="toggle-all">All reports</button>
+      <button class="toggle-btn active" id="toggle-citizen" aria-pressed="true">Citizen-written</button>
+      <button class="toggle-btn" id="toggle-all" aria-pressed="false">All reports</button>
     </div>
 
     <div class="chips" id="chips"></div>
 
     <div class="list-header">
       <div class="title" id="list-title">Complaints</div>
-      <div class="count" id="list-count"></div>
+      <div class="count" id="list-count" aria-live="polite"></div>
     </div>
 
     <div class="list" id="list">
@@ -380,6 +382,7 @@
     </div>
 
     <div class="footer-note" id="footer-note"></div>
+    <a class="to-top" href="#top">↑ Back to top</a>
   </main>
 
   <script>
