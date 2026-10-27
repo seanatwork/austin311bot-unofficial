@@ -8,7 +8,17 @@ Unofficial civic data site for Austin, TX — **[austin311.com](https://austin31
 
 Python generator scripts pull from the Open311 and Socrata APIs and produce **static HTML pages** (Folium maps, Chart.js trends, JSON snapshots) in `docs/`, which is served directly by **GitHub Pages**. GitHub Actions workflows regenerate the data on a schedule and commit the output back to the repo. There is no server-side application — the site is fully static (a few pages fetch live JSON client-side).
 
-Note: several service modules keep historical `*_bot.py` filenames (e.g. `graffiti/graffiti_bot.py`). They are plain data modules for the site — treat the filename as an artifact, not a description.
+Note: several service modules keep historical `*_bot.py` filenames (e.g. `graffiti/graffiti_bot.py`). They are plain data modules for the site — treat the filename as an artifact, not a description. The Telegram bot and `austin311_bot.py` are gone; do not reintroduce bot code or bot-only env vars.
+
+## Invariants
+
+Break these and a weekly refresh silently produces wrong or empty pages:
+
+1. **Never filter Open311 cache reads by the `category` column** — it is a provenance tag; filter by `service_codes`.
+2. **Never switch trend fetchers back to `use_cache=False` full-year refetches** — use `open311_cache.fetch_monthly_with_cache()`.
+3. **Never replace `actions/cache/restore` + `actions/cache/save` with `actions/cache@v4`** — the plain action discards the cache on red runs.
+4. **Never hardcode API keys or tokens**; `AUSTINAPIKEY` and `CLOUDFLARE_API_TOKEN` come from secrets/env.
+5. **Never commit generated `docs/` output by hand** — let the workflows write it.
 
 ## Commit & Push Policy
 
@@ -23,7 +33,7 @@ Note: several service modules keep historical `*_bot.py` filenames (e.g. `graffi
 - Changes to config files that don't affect functionality
 
 **Process:**
-1. Verify the change is correct (read the file, check for syntax errors)
+1. Verify the change: `.venv/bin/python -m compileall -q .` plus regenerating the affected page (there is no test suite)
 2. Commit with a conventional prefix: `feat:` for new features, `fix:` for bug fixes, `docs:` for docs
 3. Push
 
@@ -34,22 +44,26 @@ Note: several service modules keep historical `*_bot.py` filenames (e.g. `graffi
 python -m venv .venv && source .venv/bin/activate
 pip install -e .
 
-# Regenerate a page locally
+# Regenerate a page locally (writes docs/<category>/index.html)
 python scripts/generate_map.py <category>
-
-# Run the unit tests (only graffiti/ has tests)
-python -m pytest graffiti/tests/
 ```
 
 `.venv/` is the working virtualenv (system Python is externally managed).
+
+**There is no test suite.** `graffiti/tests/` holds only `__init__.py` (`pytest graffiti/tests/` collects zero tests) and `pytest` is not a declared dependency. Verify a change by compiling and by regenerating the affected page:
+
+```bash
+.venv/bin/python -m compileall -q .            # syntax check
+.venv/bin/python scripts/generate_map.py <category>   # then inspect the output + summary
+```
 
 **Categories** (keys of `CATEGORY_MAPS` in `scripts/generate_map.py`):
 
 - Maps: `bicycle`, `graffiti`, `homeless`, `traffic`, `parking`, `crime`, `noise`, `parks`, `parks-hub`, `water`, `childcare`, `animal`, `dead-animal`, `storm`, `trees`, `cameras`
 - Trends: `parking-trends`, `crime-trends`, `noise-trends`, `graffiti-trends`, `homeless-trends`, `storm-trends`, `parks-trends`, `animal-trends`, `dead-animal-trends`
-- Other: `hate-crime`, `budget`, `nearby`, `shelter`
+- Other: `hate-crime`, `budget`, `shelter` (writes `docs/shelter/data.json`), `nearby` (maps to `docs/nearby/index.html`, which **no workflow generates** — the directory does not exist on the site)
 
-Other standalone generators: `scripts/generate_911_data.py`, `generate_capmetro_data.py`, `generate_court_data.py`, `generate_covid_data.py`, `generate_fire_data.py`, `generate_fun_data.py`, `generate_og_image.py`, `generate_pool_data.py`, `generate_pulse.py`, `generate_weekly_digest.py`.
+Other standalone generators: `scripts/generate_911_data.py`, `generate_capmetro_data.py`, `generate_court_data.py`, `generate_covid_data.py`, `generate_fire_data.py`, `generate_fun_data.py`, `generate_nearby_page.py`, `generate_og_image.py`, `generate_pool_data.py`, `generate_pulse.py` (retired), `generate_query_data.py`, `generate_shelter_data.py`, `generate_weekly_digest.py`, `generate_wrapped_data.py`, plus the helpers `ci_report_failures.py`, `fetch_austin_parks.py`, `fetch_austin_zctas.py`.
 
 ## Data Refresh (Deployment)
 
@@ -60,14 +74,15 @@ No app server to deploy — "deployment" means regenerating the static output. W
 | `weekly.yml` | Monday 14:00 UTC | Everything: every point/choropleth map (bicycle, graffiti, homeless, traffic, parking, crime, noise, parks + hub, water, childcare, animal, storm, trees, cameras), budget + hate-crime pages, all trends pages, pools, fire, shelter, court cache, querystore, fun data, 311 Wrapped |
 | `weekly-digest.yml` | Monday 12:30 UTC | Weekly 311 digest (`generate_weekly_digest.py`) |
 | `quarterly.yml` | 1st of Jan/Apr/Jul/Oct | 911 data |
+| `deploy-worker.yml` | On push to `workers/query-gateway/**` | Cloudflare Worker (`workers/query-gateway`), needs `CLOUDFLARE_API_TOKEN` |
 
-**Why one weekly job:** the Open311-backed generators gate their fetches on a ~6-day cache (`cache_age < timedelta(days=6)` in bicycle, traffic, animal, dead-animal, parks, storm, query data), so a daily re-render mostly rewrote pages built from a week-old cache. The genuinely day-sensitive leftovers (pools, fire, shelter, court, querystore) are cheap — querystore is the slowest at ~2 min — so they ride along in the same job. `querystore` runs last on purpose: it refreshes the shared Open311 cache, and running it earlier would make the maps' 6-day gates skip their own refetch. Monday 14:00 UTC keeps the run clear of the 12:30 weekly-digest push. Note the Actions cache entry is evicted after 7 days idle, so a weekly cadence sits on that boundary — if the cache is lost, the next run backfills a full year (~76 min observed).
+**Why one weekly job:** the Open311 generators gate on a ~6-day cache, so daily re-renders mostly rewrote week-old data. Day-sensitive leftovers (pools, fire, shelter, court, querystore) are cheap. `querystore` runs **last** on purpose: it refreshes the shared Open311 cache, so running it earlier would make the maps' 6-day gates skip their own refetch. Monday 14:00 UTC clears the 12:30 digest push. Actions cache expires after 7 days idle, so a lost cache means the next run backfills a full year (~76 min observed).
 
-Every generator step is `continue-on-error: true` with a unique `id`, and the commit step is `if: always() && !cancelled()`, so one flaky data source can't discard the other twenty steps' work. The final step runs `scripts/ci_report_failures.py`, which turns failed step outcomes into a job summary and exits non-zero — the run goes red *after* the good data has been committed. `weekly.yml` supports `workflow_dispatch` with the optional `categories` input (only the `generate_map.py` categories are guarded; the shared steps always run). It commits results back to `main`. `AUSTINAPIKEY` must be set as a GitHub Actions secret for rate-limit headroom (429s during local runs without it are normal).
+Each generator step is `continue-on-error: true` with a unique `id`, and the commit step is `if: always() && !cancelled()`, so one flaky source can't discard the other twenty steps' work. `scripts/ci_report_failures.py` runs last: it turns failed step outcomes into a job summary and exits non-zero, so the run goes red **after** good data is committed. `weekly.yml` accepts a `workflow_dispatch` `categories` input that guards only the `generate_map.py` steps; shared steps always run. `AUSTINAPIKEY` must be set as an Actions secret (429/403 throttling during keyless local runs is normal).
 
-The Open311 cache uses `actions/cache/restore@v4` + `actions/cache/save@v4`, not plain `actions/cache@v4`: the action saves in a **post step gated on `success()`** (`post-if: "success()"` in its `action.yml`), so on any red run the refreshed cache was silently discarded and the next run backfilled from an ever-older snapshot — more requests, more 403 throttling, another red run. `cache/save` writes the entry inline, so it survives a failing run.
+The Open311 cache uses `actions/cache/restore@v4` + `actions/cache/save@v4`, not plain `actions/cache@v4`: the plain action saves in a post step gated on `success()`, so a red run silently discarded the refreshed cache. `cache/save` writes inline and survives failures.
 
-`quarterly.yml` keeps a generous `timeout-minutes`: the 911 dataset holds ~4.16M rows and `generate_911_data.py` pages through all of it (5,000 rows per request, ~1s between chunks), so a 30-min cap cancels the job mid-fetch and writes nothing.
+`quarterly.yml` needs a generous `timeout-minutes`: the 911 dataset is ~4.16M rows paged 5,000 at a time (~1s between chunks), so a 30-min cap cancels mid-fetch and writes nothing.
 
 ## Architecture
 
@@ -103,7 +118,7 @@ generate_<category>_map(days_back: int = 90) -> tuple[Optional[io.BytesIO], str]
 # Returns (BytesIO buffer with HTML, summary message). None buffer = failure.
 ```
 
-`generate_map.py` picks `days_back` by category: 30 for traffic, 180 for homeless, 365 for `*-trends`, 90 otherwise; it injects a "Last ran" timestamp and writes the result to `docs/<category>/index.html`.
+`generate_map.py` picks `days_back` by category: 180 for `homeless`, 365 for any `*-trends`, 90 for everything else (including `traffic`); it injects a "Last ran" timestamp and writes the result to the path in `CATEGORY_MAPS`.
 
 Each generator:
 1. Fetches records (with optional SQLite caching)
@@ -113,11 +128,11 @@ Each generator:
 5. Includes `og_meta_tags()` in `<head>`
 6. Returns `(BytesIO buffer, summary string)`
 
-Map features (all point maps): 90 days of data with 30d/60d/90d filter buttons, open/closed toggles, dynamic count in the title bar, popups with clickable ticket link/address/dates/description, mobile-friendly viewport.
+Map features (all point maps): 90 days of data (180 for homeless) with 30d/60d/90d filter buttons, open/closed toggles, dynamic count in the title bar, popups with clickable ticket link/address/dates/description, mobile-friendly viewport.
 
 ### Trends modules
 
-Five+ packages have a `trends.py` for historical aggregation, all following `generate_<category>_trends(days_back=365)`:
+Eight packages ship trend pages (nine modules), all following `generate_<category>_trends(days_back=365)`:
 
 | Module | Data Source | Output |
 |--------|-------------|--------|
@@ -125,17 +140,21 @@ Five+ packages have a `trends.py` for historical aggregation, all following `gen
 | `homeless/trends.py` | Open311 5 codes via `fetch_encampment_reports_monthly()` | HTML with SVG line chart |
 | `noisecomplaints/trends.py` | Open311 3 codes via `fetch_noise_monthly()` | HTML with Chart.js bar/doughnut charts |
 | `parking/trends.py` | Open311 PARKINGV via `fetch_parking_monthly()` | HTML with Chart.js + drill-down |
+| `parks/trends.py` | Open311 park codes via `fetch_parks_monthly()` | HTML with Chart.js |
+| `storm/trends.py` | Open311 8 codes via `fetch_storm_monthly()` | HTML with Chart.js |
+| `animalsvc/trends.py` | Open311 animal codes via `fetch_animals_monthly()` | HTML with Chart.js |
+| `animalsvc/dead_animal_trends.py` | Open311 dead-animal codes via `fetch_dead_animal_monthly()` | HTML with Chart.js |
 | `crime/trends.py` | Socrata `fdj4-gpfu` via SoQL aggregation | HTML with Chart.js line charts |
 
 Common pattern: fetch month-by-month (30-day windows) to avoid the Open311 pagination gotcha, aggregate into monthly buckets, emit a standalone HTML page with dark mode/responsive layout to `docs/<category>/trends/index.html`.
 
-All Open311 trend fetchers (`fetch_*_monthly` in graffiti, homeless, noise, parking, parks, storm, animalsvc) delegate to **`open311_cache.fetch_monthly_with_cache()`** — a shared cache-aware driver. It always fetches the current month (fresh to today) and only backfills past months that aren't already cached end-to-end (tracked per code-set + month). Do **not** switch trend generators back to `use_cache=False` full-year refetches: doing so re-downloads a 365-day window for every category each week, which repeatedly blew the CI `timeout-minutes` cap and froze the trend pages.
+All Open311 trend fetchers (`fetch_*_monthly` in graffiti, homeless, noise, parking, parks, storm, animalsvc and `animalsvc/dead_animal_bot.py`) delegate to **`open311_cache.fetch_monthly_with_cache()`** — a shared cache-aware driver. It always fetches the current month (fresh to today) and only backfills past months that aren't already cached end-to-end (tracked per code-set + month). Do **not** switch trend generators back to `use_cache=False` full-year refetches: doing so re-downloads a 365-day window for every category each week, which repeatedly blew the CI `timeout-minutes` cap and froze the trend pages.
 
 ### Shared utilities
 
 **`open311_client.py`**
-- `open311_get(session, url, params, retries=0)` — GET with exponential backoff (up to 8 retries; 15s starting delay for 429, respects `Retry-After`)
-- **Throttling shows up as 403, not 429.** When the 311 API/WAF throttles a burst of requests from a datacenter IP, every in-flight request gets a 403 for a couple of minutes and then recovers (the same URLs return 200 from other networks; observed window: ~3 min, ~257 requests across ~45 service codes in one CI run). `open311_get` treats 403 as retryable with a shorter bounded backoff (15s/30s/60s/120s). If that budget is exhausted the API is blocking for longer than a burst, so it fails fast for `THROTTLE_COOLDOWN` seconds instead of making every later request pay the same 225s — callers tolerate a failed code, and an unbounded per-request wait could hit the job timeout and lose the commit.
+- `open311_get(session, url, params, retries=0)` — GET with exponential backoff (up to 8 retries; 15s starting delay for 429, respects `Retry-After`).
+- **Throttling shows up as 403, not 429.** A datacenter-IP burst gets 403 on every request for ~2–3 min, then recovers. `open311_get` retries 403 on a bounded 15s/30s/60s/120s ladder, then fails fast for `THROTTLE_COOLDOWN` rather than burning the job timeout. Callers tolerate a failed code.
 - `og_meta_tags(slug="")` — Open Graph + Twitter Card meta tags for a docs page
 - `SITE_BASE_URL` — `https://austin311.com`
 
@@ -185,6 +204,14 @@ def _fetch_code(service_code: str, days_back: int) -> list:
 
 **Date/time helpers** (consistent across modules): `_utc_now()`, `_isoformat_z(dt)`, `_format_central_time()`, `_age_days(record)`.
 
+### Adding a page
+
+1. Write `generate_<x>_page(days_back: int = 90) -> tuple[Optional[io.BytesIO], str]` in the owning package.
+2. Register it in `scripts/generate_map.py`'s `CATEGORY_MAPS` (key → `(func, "docs-relative/path")`).
+3. Add a `weekly.yml` step with a unique `id`, `continue-on-error: true`, and the same `categories`-input guard as its neighbours.
+4. Add the page to the `docs/` table and the `scripts/` table here, and to the README page list.
+5. Regenerate locally and confirm the returned summary is non-empty before pushing.
+
 ### Scripts (`scripts/`)
 
 | Script | Purpose |
@@ -200,9 +227,14 @@ def _fetch_code(service_code: str, days_back: int) -> list:
 | `generate_nearby_page.py` | "311 Near You" dynamic map |
 | `generate_og_image.py` | Open Graph preview images |
 | `generate_pool_data.py` | Pool data |
-| `generate_pulse.py` | Real-time pulse JSON (`docs/pulse.json`) |
+| `generate_pulse.py` | Real-time pulse JSON (`docs/pulse.json`) — **retired**, not wired into any workflow |
 | `generate_shelter_data.py` | Shelter data JSON |
-| `generate_weekly_digest.py` | Weekly 311 digest (`docs/complaints/`) |
+| `generate_weekly_digest.py` | Weekly 311 digest (`docs/complaints/`) + homepage ticker (`docs/homepage/ticker.json`) |
+| `generate_query_data.py` | Pre-computed datasets for `docs/querystore/` (runs near-last in CI; slowest ~2 min) |
+| `generate_wrapped_data.py` | 311 Wrapped per-ZIP page (`docs/wrapped/`) |
+| `ci_report_failures.py` | Turns failed workflow step outcomes into a job summary; exits non-zero |
+| `fetch_austin_parks.py` | Refreshes cached Austin parks GeoJSON |
+| `fetch_austin_zctas.py` | Refreshes cached ZIP (ZCTA) boundaries |
 
 ### Tools (`tools/`)
 
@@ -223,11 +255,11 @@ The `docs/` folder is the GitHub Pages site at https://austin311.com/.
 | `bicycle/` | Bicycle infrastructure map | `bicycle.bicycle_bot.generate_bicycle_map()` |
 | `budget/` | City budget spending | `scripts.generate_budget.main()` |
 | `cameras/` | Traffic cameras map | `trafficcameras.cameras_bot.generate_cameras_map()` |
-| `capmetro/` | MetroBike trip analytics | `scripts.generate_capmetro_data.main()` |
+| `capmetro/` | MetroBike trip analytics | `scripts.generate_capmetro_data.main()` — **not run by any workflow** |
 | `childcare/` | Childcare compliance map | `childcare.childcare_bot.generate_childcare_map()` |
 | `complaints/` | Weekly 311 digest | `scripts.generate_weekly_digest.main()` |
 | `court/` | Court caseloads (+trends) | `scripts.generate_court_data.main()` |
-| `covid/` | COVID data | `scripts.generate_covid_data.main()` |
+| `covid/` | COVID data | `scripts.generate_covid_data.main()` — **not run by any workflow** |
 | `crashes/` | Crash map (client-side only) | Fetches live from Socrata `y2wy-tgr5` |
 | `crime/` | Crime choropleth (+trends, hate crime) | `crime.crime_map.generate_crime_map()` |
 | `environment/` | TCEQ spills + water quality | Manual (hand-written HTML) |
@@ -245,8 +277,19 @@ The `docs/` folder is the GitHub Pages site at https://austin311.com/.
 | `traffic/` | Traffic & infrastructure map | `infrastructureandtransportation.traffic_bot.generate_traffic_map()` |
 | `trees/` | Tree service map | `trees.trees_bot.generate_tree_map()` |
 | `water/` | Water conservation map | `waterconservation.water_conservation_bot.generate_water_map()` |
-| `911/` | 911 call data | `scripts.generate_911_data.main()` |
-| `pulse.json` | Real-time pulse data | `scripts.generate_pulse.main()` |
+| `911/` | 911 call data | `scripts.generate_911_data.main()` (quarterly) |
+| `pulse.json` | Real-time pulse counters | **Retired.** `scripts.generate_pulse.main()` still exists but no workflow runs it; the homepage consumer is commented out ("disabled until counters are working") in `docs/index.html` |
+| `ask/` | Question/answer page | Hand-written — **not regenerated by CI** |
+| `homepage/ticker.json` | Homepage carousel | `scripts.generate_weekly_digest.main()` (via `weekly-digest.yml`) |
+| `querystore/` | Pre-computed JSON datasets for the query engine | `scripts.generate_query_data.main()` |
+| `wrapped/` | 311 Wrapped per-ZIP page | `scripts.generate_wrapped_data.main()` |
+| `query-engine.js` | Client-side query engine consuming `querystore/` | Hand-written |
+
+Rows flagged **not run by any workflow** or **retired** are hand-refreshed or dead; don't assume a weekly run updates them, and don't build on them without wiring a workflow step first.
+
+## Query worker (`workers/query-gateway/`)
+
+A Cloudflare Worker (`src/index.js`, `src/categories.js`, `wrangler.toml`) serving the query API behind `docs/ask/` and the `querystore` datasets. Deployed only by `deploy-worker.yml` on changes under that path, with `CLOUDFLARE_API_TOKEN`. `AUSTINAPIKEY` and `CLOUDFLARE_API_TOKEN` are the only secrets this repo needs.
 
 ## Data Sources
 
@@ -277,13 +320,9 @@ Socrata: `$where` SoQL filtering, `$group`/`$select` aggregation.
 
 **Environment variables:** `AUSTINAPIKEY` (used for both the Socrata app token and the Open311 API key — same value, same GitHub Actions secret). No other secrets are required for site generation.
 
-## Open311 API — Known Pagination Gotcha
+## Open311 API — Pagination Gotcha
 
-**The API returns records in chronological order (oldest first).** A single request with `start_date` 365 days ago and `end_date` today returns the *oldest* records first — with `MAX_PAGES=10` (1,000 records) you only see records from the start of the window, never recent months.
-
-**Fix (see `open311_cache.fetch_monthly_with_cache()`):** fetch month by month — one 30-day window per API call — so each request is small enough that all records for that period are returned. Trends reuse the SQLite cache and only backfill months that aren't already cached end-to-end, so steady-state weekly runs only fetch the current month instead of re-downloading a full year.
-
-**Applies to:** any `_fetch_code`-style function across bicycle, graffiti, homeless, noise, parking, parks, storm modules if they ever need historical data beyond 90 days.
+The API returns records **oldest first**, so a single 365-day request with `MAX_PAGES=10` only ever yields the newest 1,000 records at the *start* of the window — recent months go missing. Any `_fetch_code`-style fetch spanning more than ~90 days must go month-by-month through `open311_cache.fetch_monthly_with_cache()` (see the trends section).
 
 ## Richer Map Popups
 
