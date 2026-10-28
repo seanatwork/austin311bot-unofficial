@@ -217,123 +217,6 @@
       cursor: pointer;
     }
 
-    /* ── "311 Near You" search hero ── */
-    .nearby-hero {
-      width: 100%;
-      max-width: 900px;
-      background: linear-gradient(135deg, #4C1D95 0%, var(--accent-violet) 40%, var(--accent-coral) 110%);
-      border-radius: 16px;
-      padding: 2rem 2rem 1.8rem;
-      margin-bottom: 2rem;
-      text-align: center;
-      box-shadow: 0 4px 20px var(--shadow-warm);
-      position: relative;
-      z-index: 1;
-    }
-    html.dark .nearby-hero {
-      box-shadow: 0 4px 20px rgba(139, 111, 224, 0.15);
-    }
-    .nearby-hero h2 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #ffffff;
-      margin-bottom: 0.3rem;
-    }
-    .nearby-hero p {
-      font-size: 0.9rem;
-      color: rgba(255,255,255,0.85);
-      margin-bottom: 1rem;
-    }
-    .nearby-search-row {
-      display: flex;
-      gap: 8px;
-      max-width: 600px;
-      margin: 0 auto;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .nearby-search-row input {
-      flex: 1;
-      min-width: 180px;
-      padding: 10px 14px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      background: rgba(255,255,255,0.95);
-      color: #1e293b;
-      outline: none;
-      transition: background 0.15s;
-    }
-    .nearby-search-row input:focus { background: #ffffff; }
-    .nearby-search-row input::placeholder { color: #94a3b8; }
-    .nearby-search-row button {
-      padding: 10px 18px;
-      border: none;
-      border-radius: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s;
-      background: rgba(255,255,255,0.2);
-      color: #ffffff;
-      backdrop-filter: blur(4px);
-    }
-    .nearby-search-row button:hover { background: rgba(255,255,255,0.3); }
-    .nearby-search-row button.primary {
-      background: #ffffff;
-      color: var(--accent-violet);
-    }
-    .nearby-search-row button.primary:hover { background: #F0EBFA; }
-    .nearby-hero .nearby-stats {
-      margin-top: 1rem;
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.7);
-    }
-    .nearby-hero .nearby-stats span { display: inline-block; margin: 0 6px; }
-    .nearby-hero .nearby-stats strong { color: #ffffff; }
-
-    /* ── "Ask the data" banner ── */
-    .ask-banner {
-      width: 100%;
-      max-width: 900px;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      background: linear-gradient(120deg, #4C1D95 0%, var(--accent-violet) 55%, var(--accent-coral) 130%);
-      border-radius: 16px;
-      padding: 1.4rem 1.75rem;
-      margin: 0 auto 1.5rem;
-      text-decoration: none;
-      color: #ffffff;
-      box-shadow: 0 6px 24px rgba(91, 63, 168, 0.25);
-      transition: transform 0.15s, box-shadow 0.2s;
-      position: relative;
-      z-index: 1;
-    }
-    .ask-banner:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(91, 63, 168, 0.35);
-    }
-    .ask-banner .ask-icon { font-size: 1.9rem; line-height: 1; }
-    .ask-banner .ask-text { display: flex; flex-direction: column; gap: 0.2rem; min-width: 0; }
-    .ask-banner .ask-title {
-      font-family: "Fraunces", Georgia, serif;
-      font-size: 1.25rem;
-      font-weight: 700;
-      letter-spacing: -0.2px;
-    }
-    .ask-banner .ask-sub {
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.82);
-    }
-    .ask-banner .ask-arrow {
-      margin-left: auto;
-      font-size: 1.3rem;
-      font-weight: 600;
-      opacity: 0.9;
-      flex-shrink: 0;
-    }
-
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -476,6 +359,15 @@
     }
     .more-btn:focus-visible { box-shadow: 0 0 0 2px var(--border-cta-hover); }
 
+    .ticker-link-row { text-align: center; margin-top: 0.5rem; }
+    .ticker-link {
+      font-size: 0.85rem;
+      color: var(--text-desc);
+      text-decoration: none;
+      border-bottom: 1px dashed var(--border);
+    }
+    .footer-tag { font-size: 0.7rem; }
+
     #more-grid { margin-top: 1.25rem; }
     #more-grid[hidden] { display: none; }
 
@@ -598,72 +490,6 @@
       margin-top: 6px;
     }
 
-    /* ── pulse bar ── */
-    #pulse-bar {
-      display: flex;
-      gap: 1.25rem;
-      width: 100%;
-      max-width: 900px;
-      margin-bottom: 1.5rem;
-      flex-wrap: wrap;
-    }
-    #pulse-bar[hidden] { display: none; }
-
-    .pulse-counter {
-      flex: 1;
-      min-width: 150px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 1rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.15rem;
-      transition: border-color 0.15s;
-    }
-    .pulse-value {
-      font-size: 1.8rem;
-      font-weight: 700;
-      letter-spacing: -0.5px;
-      color: var(--text-head);
-      line-height: 1.2;
-    }
-    .pulse-value a {
-      color: inherit;
-      text-decoration: none;
-    }
-    .pulse-value a:hover {
-      text-decoration: underline;
-    }
-    .pulse-value.pulse-na {
-      font-size: 1.1rem;
-      font-weight: 500;
-      color: var(--text-desc);
-    }
-    .pulse-label {
-      font-size: 0.76rem;
-      color: var(--text-desc);
-      line-height: 1.35;
-    }
-    .pulse-source {
-      font-size: 0.68rem;
-      color: var(--text-footer);
-      margin-top: 0.1rem;
-    }
-    .pulse-source a {
-      color: var(--text-footer-a);
-      text-decoration: none;
-    }
-    .pulse-source a:hover {
-      color: var(--text-footer-hover);
-      text-decoration: underline;
-    }
-    .pulse-loading {
-      color: var(--text-desc);
-      font-size: 0.78rem;
-      font-weight: 400;
-    }
-
     /* ── sunset glow ticker loading ── */
     .ticker-loading {
       animation: sunsetPulse 2s ease-in-out infinite;
@@ -674,7 +500,7 @@
     }
 
     /* z-index layering for content above bg pattern */
-    .grid, header, .nearby-hero, #pulse-bar, .disclaimer, footer { position: relative; z-index: 1; }
+    .grid, header, .disclaimer, footer { position: relative; z-index: 1; }
   </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
@@ -701,48 +527,6 @@
     </form>
   </header>
 
-  <!-- ── Ask the data (hidden until feature is fully working) ── -->
-  <a class="ask-banner" id="ask-banner" href="ask/" style="display:none !important;">
-    <span class="ask-icon">💬</span>
-    <span class="ask-text">
-      <span class="ask-title">Ask the 311 data anything</span>
-      <span class="ask-sub">“How many graffiti complaints this month?” · “Potholes in district 3” · “Noise complaint trend”</span>
-    </span>
-    <span class="ask-arrow">→</span>
-  </a>
-
-  <!-- ── 311 Near You (hidden until feature is fully working) ── -->
-  <div class="nearby-hero" style="display:none !important;">
-    <h2>📍 311 Near You</h2>
-    <p>Enter your address or neighborhood to see recent 311 requests on a map.</p>
-    <div class="nearby-search-row">
-      <input type="text" id="nearby-address" placeholder="e.g. Downtown Austin, 78701, Zilker…" autocomplete="address-level2" />
-      <button class="primary" onclick="searchNearby()">Search</button>
-      <button onclick="locateNearby()" title="Use my location">📍</button>
-    </div>
-    <div class="nearby-stats">
-      <span>Radius: <strong id="nearby-radius-display">1.5 mi</strong></span>
-      <span>·</span>
-      <span>Visible: <strong id="nearby-count">—</strong> requests</span>
-    </div>
-    <div id="nearby-error" style="display:none; margin-top:8px; font-size:0.82rem; color:#fca5a5;"></div>
-  </div>
-
-  <div id="pulse-bar" hidden style="display:none !important;">
-    <div class="pulse-counter" id="pulse-311">
-      <span class="pulse-value pulse-loading">…</span>
-      <span class="pulse-label">new 311 reports in the last 24h</span>
-    </div>
-    <div class="pulse-counter" id="pulse-fatal">
-      <span class="pulse-value pulse-loading">…</span>
-      <span class="pulse-label">fatal crashes in the last 90 days</span>
-    </div>
-    <div class="pulse-counter" id="pulse-violent">
-      <span class="pulse-value pulse-loading">…</span>
-      <span class="pulse-label">violent crime incidents in the last 7 days</span>
-    </div>
-  </div>
-
   <!-- ── 311 Descriptions Ticker ── -->
   <div class="card ticker-card" id="funny-card" style="margin-bottom:1.25rem;max-width:900px;width:100%;">
     <div id="funny-content">
@@ -762,8 +546,8 @@
       </div>
     </div>
     <div class="ticker-sub" id="ticker-sub">Loading…</div>
-    <div style="text-align:center;margin-top:0.5rem;">
-      <a href="complaints/" style="font-size:0.85rem;color:var(--text-desc);text-decoration:none;border-bottom:1px dashed var(--border);">Browse all complaints by category →</a>
+    <div class="ticker-link-row">
+      <a class="ticker-link" href="complaints/">Browse all complaints by category →</a>
     </div>
   </div>
 
@@ -975,7 +759,7 @@
   <footer>
     <a href="https://github.com/seanatwork" target="_blank" rel="noopener">Vibecoded with ❤️</a>
     <br />
-    <span style="font-size:0.7rem;">🤘 Keep Austin Weird</span>
+    <span class="footer-tag">🤘 Keep Austin Weird</span>
   </footer>
 
   <script>
@@ -1010,7 +794,7 @@
     if (dark) { html.classList.add("dark"); btn.textContent = "☀️ Light"; }
 
     // ── Zen mode ──────────────────────────────────────────────────────────────
-    const ZEN_TARGETS = ["main-grid", "more-btn", "more-grid", "funny-card", "ask-banner"]
+    const ZEN_TARGETS = ["main-grid", "more-btn", "more-grid", "funny-card"]
       .map(id => document.getElementById(id));
     const zenBtn = document.getElementById("zen-toggle");
 
@@ -1032,57 +816,6 @@
       const isDark = html.classList.toggle("dark");
       btn.textContent = isDark ? "☀️ Light" : "🌙 Dark";
       localStorage.setItem("theme", isDark ? "dark" : "light");
-    });
-
-    // ── nearby search ──
-    function searchNearby() {
-      var q = document.getElementById("nearby-address").value.trim();
-      if (!q) return;
-      var err = document.getElementById("nearby-error");
-      err.style.display = "none";
-      // Geocode via Nominatim (free, no key needed)
-      var url = "https://nominatim.openstreetmap.org/search?format=json&q=" +
-        encodeURIComponent(q) + "&countrycodes=us&limit=1";
-      fetch(url, { headers: { "User-Agent": "austin311.com/1.0" } })
-        .then(function (r) { if (!r.ok) throw new Error("Geocode failed"); return r.json(); })
-        .then(function (data) {
-          if (!data || !data.length) throw new Error("Location not found");
-          var lat = parseFloat(data[0].lat);
-          var lon = parseFloat(data[0].lon);
-          window.location.href = "nearby/?lat=" + lat.toFixed(5) + "&lon=" + lon.toFixed(5) + "&q=" + encodeURIComponent(q);
-        })
-        .catch(function (e) {
-          err.textContent = "Could not find that location. Try a different search.";
-          err.style.display = "block";
-        });
-    }
-
-    function locateNearby() {
-      if (!navigator.geolocation) return;
-      var err = document.getElementById("nearby-error");
-      err.style.display = "none";
-      navigator.geolocation.getCurrentPosition(
-        function (pos) {
-          var lat = pos.coords.latitude;
-          var lon = pos.coords.longitude;
-          window.location.href = "nearby/?lat=" + lat.toFixed(5) + "&lon=" + lon.toFixed(5);
-        },
-        function () {
-          err.textContent = "Could not get your location. Try typing an address.";
-          err.style.display = "block";
-        },
-        { enableHighAccuracy: true, timeout: 10000 }
-      );
-    }
-
-    // Enter key in the address input triggers search
-    document.addEventListener("DOMContentLoaded", function () {
-      var input = document.getElementById("nearby-address");
-      if (input) {
-        input.addEventListener("keydown", function (e) {
-          if (e.key === "Enter") { e.preventDefault(); searchNearby(); }
-        });
-      }
     });
 
     // ── 311 Descriptions Ticker ────────────────────────────────────────────────
@@ -1209,44 +942,6 @@
       resetTimers();
     }
 
-    // ── pulse bar fetch (disabled until counters are working) ──
-    /*
-    (function loadPulse() {
-      const bar = document.getElementById("pulse-bar");
-      fetch("pulse.json")
-        .then(function (r) {
-          if (!r.ok) throw new Error("HTTP " + r.status);
-          return r.json();
-        })
-        .then(function (data) {
-          if (!data || !data.counters || !data.counters.length) throw new Error("no counters");
-          data.counters.forEach(function (c) {
-            var el = document.getElementById("pulse-" + c.id.split("_")[0]);
-            if (!el) return;
-            var valueEl = el.querySelector(".pulse-value");
-            var hasSourceEl = el.querySelector(".pulse-source");
-            if (c.value !== null && c.value !== undefined) {
-              valueEl.className = "pulse-value";
-              valueEl.innerHTML = '<a href="' + c.link + '" target="_blank" rel="noopener">' +
-                c.value.toLocaleString() + "</a>";
-            } else {
-              valueEl.className = "pulse-value pulse-na";
-              valueEl.textContent = "N/A";
-            }
-            if (!hasSourceEl && c.link) {
-              var src = document.createElement("div");
-              src.className = "pulse-source";
-              src.innerHTML = '<a href="' + c.link + '" target="_blank" rel="noopener">' + c.source + "</a>";
-              el.appendChild(src);
-            }
-          });
-          bar.hidden = false;
-        })
-        .catch(function () {
-          bar.hidden = true;
-        });
-    })();
-    */
   </script>
 </body>
 </html>
