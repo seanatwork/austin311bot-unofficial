@@ -132,12 +132,7 @@
       border-left: 4px solid var(--accent);
       transition: border-color 0.15s ease;
     }
-    .pick-card:hover { border-left-color: var(--border-hover); }
-    .pick-card:nth-child(5n+1) { border-left-color: var(--pick-border-1); }
-    .pick-card:nth-child(5n+2) { border-left-color: var(--pick-border-2); }
-    .pick-card:nth-child(5n+3) { border-left-color: var(--pick-border-3); }
-    .pick-card:nth-child(5n+4) { border-left-color: var(--pick-border-4); }
-    .pick-card:nth-child(5n+5) { border-left-color: var(--pick-border-5); }
+    .pick-card:hover { border-color: var(--border-hover); }
     .pick-text {
       font-size: 1.05rem;
       color: var(--text);
@@ -224,8 +219,8 @@
       color: var(--text-desc);
     }
     .toggle-btn {
-      padding: 0.35rem 0.85rem;
-      border-radius: 999px;
+      padding: 0.55rem 0.85rem;
+      border-radius: 8px;
       border: 1px solid var(--chip-border);
       background: var(--chip-bg);
       color: var(--chip-text);
@@ -261,12 +256,13 @@
       }
       .chips::-webkit-scrollbar { display: none; }
       .chip { flex: 0 0 auto; }
+      .chip, .toggle-btn { min-height: 44px; }
     }
     .chip {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      padding: 0.35rem 0.7rem;
+      padding: 0.55rem 0.7rem;
       border-radius: 999px;
       border: 1px solid var(--chip-border);
       background: var(--chip-bg);
@@ -370,6 +366,9 @@
 <body id="top">
   <main>
     <a class="back" href="../">← Austin 311</a>
+    <noscript>
+      <p class="subtitle">This digest is rendered from <code>digest.json</code> and needs JavaScript. You can read the raw data directly: <a href="digest.json">digest.json</a>.</p>
+    </noscript>
     <div class="page-header">
       <h1>Weekly 311 Digest</h1>
       <p class="subtitle">The most notable citizen-written complaints filed with Austin 311 this week, ranked by a readability heuristic. City-authored status updates are shown under “All reports”.</p>
@@ -381,12 +380,12 @@
 
     <!-- Browse all (divider + search + chips + list) -->
     <div class="browse-divider">
-      <h2>🔍 Browse all reports</h2>
+      <h2>🔍 Browse reports</h2>
       <div class="divider-line"></div>
     </div>
 
     <div class="search-wrap">
-      <input type="text" class="search-input" id="search-input" placeholder="Search complaints…" aria-label="Search complaints" />
+      <input type="search" class="search-input" id="search-input" placeholder="Search complaints…" aria-label="Search complaints" />
     </div>
 
     <div class="toggle-row">
@@ -615,7 +614,7 @@
           el.innerHTML = "";
           return;
         }
-        var html = '<div class="picks-label">📋 Notable complaints this week</div>';
+        var html = '<h2 class="picks-label">📋 Notable complaints this week</h2>';
         d.picks.forEach(function (pick, idx) {
           var ticketUrl = pick.ticketId
             ? "https://311.austintexas.gov/tickets/" + encodeURIComponent(pick.ticketId)
