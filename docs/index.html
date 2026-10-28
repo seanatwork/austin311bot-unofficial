@@ -344,6 +344,14 @@
 
     /* ── descriptions ticker ── */
     .ticker-card { grid-column: 1 / -1; position: relative; }
+    /* the ticker is not a link — don't give it a link card's hover affordance */
+    .ticker-card:hover {
+      transform: none;
+      background: var(--bg-card);
+      border-color: var(--border);
+      box-shadow: none;
+    }
+    .ticker-card:hover::before { background: var(--border); }
     .ticker-content {
       min-height: 100px;
       min-width: 0;
