@@ -23,6 +23,9 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    /* form controls default to the UA font (Arial); inherit the page face instead */
+    button, input, select, textarea { font-family: inherit; }
+
     /* ── Violet Crown color tokens ── */
     :root {
       --bg:           #F7F5FA;
