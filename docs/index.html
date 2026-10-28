@@ -221,7 +221,7 @@
     .nearby-hero {
       width: 100%;
       max-width: 900px;
-      background: linear-gradient(135deg, #4C1D95 0%, #5B3FA8 40%, #E8623D 110%);
+      background: linear-gradient(135deg, #4C1D95 0%, var(--accent-violet) 40%, var(--accent-coral) 110%);
       border-radius: 16px;
       padding: 2rem 2rem 1.8rem;
       margin-bottom: 2rem;
@@ -281,7 +281,7 @@
     .nearby-search-row button:hover { background: rgba(255,255,255,0.3); }
     .nearby-search-row button.primary {
       background: #ffffff;
-      color: #5B3FA8;
+      color: var(--accent-violet);
     }
     .nearby-search-row button.primary:hover { background: #F0EBFA; }
     .nearby-hero .nearby-stats {
@@ -299,7 +299,7 @@
       display: flex;
       align-items: center;
       gap: 1rem;
-      background: linear-gradient(120deg, #4C1D95 0%, #5B3FA8 55%, #E8623D 130%);
+      background: linear-gradient(120deg, #4C1D95 0%, var(--accent-violet) 55%, var(--accent-coral) 130%);
       border-radius: 16px;
       padding: 1.4rem 1.75rem;
       margin: 0 auto 1.5rem;
@@ -377,6 +377,11 @@
       box-shadow: 0 6px 20px var(--shadow-warm);
     }
     .card:hover::before { background: var(--bar-fill); }
+
+    /* accent card variants keep their border colour on hover */
+    .card-fun,     .card-fun:hover     { border-color: var(--accent-gold); }
+    .card-wrapped, .card-wrapped:hover { border-color: var(--accent-coral); }
+    .card-covid,   .card-covid:hover   { border-color: #D9A0C0; }
 
     .card .icon  { font-size: 2.4rem; line-height: 1; }
     .card .label {
@@ -859,12 +864,12 @@
       <span class="label">911 Response</span>
       <span class="desc">APD dispatch response times across years, priorities &amp; districts</span>
     </a>
-    <a class="card" href="fun/" style="border-color:#D9A441;">
+    <a class="card card-fun" href="fun/">
       <span class="icon">🎉</span>
       <span class="label">Fun Data!</span>
       <span class="desc">Bar of the month · coyote sightings · graffiti hall of fame &amp; more</span>
     </a>
-    <a class="card" href="wrapped/" style="border-color:#E8623D;">
+    <a class="card card-wrapped" href="wrapped/">
       <span class="icon">🎁</span>
       <span class="label">311 Wrapped</span>
       <span class="desc">Your neighborhood's year in complaints — enter a ZIP code</span>
@@ -943,7 +948,7 @@
       <span class="label">Code Enforcement</span>
       <span class="desc">City of Austin code enforcement dashboard — violations &amp; inspections</span>
     </a>
-    <a class="card" href="covid/" style="border-color:#D9A0C0;">
+    <a class="card card-covid" href="covid/">
       <span class="icon">😷</span>
       <span class="label">COVID-19 Complaints</span>
       <span class="desc">All 964 COVID non-compliance reports filed via 311 — in Austinites' own words</span>
