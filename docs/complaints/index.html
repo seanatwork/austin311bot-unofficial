@@ -284,6 +284,7 @@
       color: var(--chip-text-active);
       border-color: var(--chip-bg-active);
     }
+    .chip.zero { opacity: 0.45; }
     .chip-count {
       font-size: 0.72rem;
       opacity: 0.65;
@@ -420,6 +421,21 @@
       var currentCategory = "__all__";
       var currentQuery = "";
 
+      // Restore filter state from the URL so a filtered view can be linked.
+      var pendingCatValidation = false;
+      (function readUrlState() {
+        var params = new URLSearchParams(location.search);
+        var q = params.get("q");
+        var cat = params.get("cat");
+        if (q) currentQuery = q;
+        if (cat) { currentCategory = cat; pendingCatValidation = true; }
+        if (params.get("all") === "1") showAll = true;
+        if (currentQuery) {
+          var input = document.getElementById("search-input");
+          if (input) input.value = currentQuery;
+        }
+      })();
+
       var PICK_COLORS = [
         "var(--pick-border-1)", "var(--pick-border-2)", "var(--pick-border-3)",
         "var(--pick-border-4)", "var(--pick-border-5)"
@@ -477,6 +493,13 @@
         return showAll ? ALL : CITIZEN;
       }
 
+      function matchesQuery(item, q) {
+        return (item.text || "").toLowerCase().indexOf(q) !== -1
+            || (item.address || "").toLowerCase().indexOf(q) !== -1
+            || (item.category || "").toLowerCase().indexOf(q) !== -1
+            || (item.id || "").toLowerCase().indexOf(q) !== -1;
+      }
+
       function visibleItems() {
         var pool = activePool();
         var cat = currentCategory;
@@ -491,12 +514,7 @@
           pool = pool.filter(function (i) { return !PICK_IDS[i.id]; });
         }
         if (q) {
-          pool = pool.filter(function (i) {
-            return (i.text || "").toLowerCase().indexOf(q) !== -1
-                || (i.address || "").toLowerCase().indexOf(q) !== -1
-                || (i.category || "").toLowerCase().indexOf(q) !== -1
-                || (i.id || "").toLowerCase().indexOf(q) !== -1;
-          });
+          pool = pool.filter(function (i) { return matchesQuery(i, q); });
         }
         return pool.slice().sort(function (a, b) {
           return (b.date || "").localeCompare(a.date || "");
@@ -504,31 +522,65 @@
       }
 
       function render() {
-        // Category counts from the active pool (citizen or all)
+        // Chip order comes from the whole pool so it stays stable while typing;
+        // the numbers themselves come from updateChipCounts() and do follow the
+        // query, so a search that matches nothing shows zeroes rather than
+        // advertising 370 results next to an empty list.
         var pool = activePool();
-        var counts = {};
+        var all = {};
         pool.forEach(function (i) {
-          counts[i.category] = (counts[i.category] || 0) + 1;
+          all[i.category] = (all[i.category] || 0) + 1;
         });
-        CATEGORIES = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
+        CATEGORIES = Object.keys(all).sort(function (a, b) { return all[b] - all[a]; });
 
-        // Chips
+        // A ?cat= that no longer exists (stale link) must not select nothing.
+        if (pendingCatValidation) {
+          pendingCatValidation = false;
+          if (currentCategory !== "__all__" && CATEGORIES.indexOf(currentCategory) === -1) {
+            currentCategory = "__all__";
+          }
+        }
+
         var chips = document.getElementById("chips");
         chips.innerHTML = "";
-        chips.appendChild(buildChip("__all__", "All categories", pool.length));
+        chips.appendChild(buildChip("__all__", "All categories", 0));
         CATEGORIES.forEach(function (cat) {
-          chips.appendChild(buildChip(cat, cat, counts[cat]));
+          chips.appendChild(buildChip(cat, cat, 0));
         });
 
-        // Activate current
-        var chipEls = chips.querySelectorAll(".chip");
-        chipEls.forEach(function (c) {
-          var on = c.dataset.value === currentCategory;
+        syncToggles();
+        updateChipCounts();
+        refreshList();
+      }
+
+      function updateChipCounts() {
+        var q = currentQuery.trim().toLowerCase();
+        var counted = q
+          ? activePool().filter(function (i) { return matchesQuery(i, q); })
+          : activePool();
+        var counts = {};
+        counted.forEach(function (i) {
+          counts[i.category] = (counts[i.category] || 0) + 1;
+        });
+        document.querySelectorAll(".chip").forEach(function (c) {
+          var value = c.dataset.value;
+          var n = value === "__all__" ? counted.length : (counts[value] || 0);
+          var badge = c.querySelector(".chip-count");
+          if (badge) badge.textContent = n;
+          c.classList.toggle("zero", n === 0);
+          var on = value === currentCategory;
           c.classList.toggle("active", on);
           c.setAttribute("aria-pressed", on ? "true" : "false");
         });
+      }
 
-        refreshList();
+      function syncToggles() {
+        var cit = document.getElementById("toggle-citizen");
+        var allBtn = document.getElementById("toggle-all");
+        cit.classList.toggle("active", !showAll);
+        allBtn.classList.toggle("active", showAll);
+        cit.setAttribute("aria-pressed", showAll ? "false" : "true");
+        allBtn.setAttribute("aria-pressed", showAll ? "true" : "false");
       }
 
       function buildChip(value, label, count) {
@@ -541,16 +593,25 @@
           + '<span class="chip-count">' + count + '</span>';
         el.addEventListener("click", function () {
           currentCategory = value;
-          // Re-highlight chips
-          document.querySelectorAll(".chip").forEach(function (c) {
-            var on = c.dataset.value === value;
-            c.classList.toggle("active", on);
-            c.setAttribute("aria-pressed", on ? "true" : "false");
-          });
+          updateChipCounts();
           refreshList();
-          window.scrollTo({ top: document.getElementById("list").offsetTop - 80, behavior: "smooth" });
+          // Keep the chips in view on a phone; only jump on wider screens.
+          if (window.innerWidth > 640) {
+            window.scrollTo({ top: document.getElementById("list").offsetTop - 80, behavior: "smooth" });
+          }
         });
         return el;
+      }
+
+      function writeUrlState() {
+        var params = new URLSearchParams();
+        if (currentQuery.trim()) params.set("q", currentQuery.trim());
+        if (currentCategory !== "__all__") params.set("cat", currentCategory);
+        if (showAll) params.set("all", "1");
+        var qs = params.toString();
+        try {
+          history.replaceState(null, "", qs ? "?" + qs : location.pathname);
+        } catch (e) { /* file:// or sandboxed contexts */ }
       }
 
       function refreshList() {
@@ -563,6 +624,7 @@
           currentCategory === "__all__" ? "Complaints" : currentCategory;
         document.getElementById("list-count").textContent =
           items.length + (items.length === 1 ? " result" : " results");
+        writeUrlState();
         renderList(items);
       }
 
@@ -579,7 +641,22 @@
           var msg = currentQuery
             ? 'No complaints match "' + escapeHtml(currentQuery) + '".'
             : "No complaints in this category this week.";
-          list.innerHTML = '<div class="empty">' + msg + '</div>';
+          var canClear = currentQuery || currentCategory !== "__all__";
+          list.innerHTML = '<div class="empty">' + msg
+            + (canClear
+                ? ' <button type="button" class="toggle-btn" id="clear-filters">Clear filters</button>'
+                : "")
+            + '</div>';
+          var clearBtn = document.getElementById("clear-filters");
+          if (clearBtn) {
+            clearBtn.addEventListener("click", function () {
+              currentQuery = "";
+              currentCategory = "__all__";
+              var input = document.getElementById("search-input");
+              if (input) input.value = "";
+              render();
+            });
+          }
           return;
         }
         var html = "";
@@ -677,6 +754,7 @@
         var self = this;
         searchDebounce = setTimeout(function () {
           currentQuery = self.value;
+          updateChipCounts();
           refreshList();
         }, 250);
       });
