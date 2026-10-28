@@ -208,6 +208,10 @@
       cursor: pointer;
     }
 
+    /* main is a flex item of the centred body: without an explicit width it
+       shrink-wraps to its widest child and overflows the viewport */
+    main { width: 100%; max-width: 900px; }
+
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -551,24 +555,25 @@
     </form>
   </header>
 
-  <div class="grid" id="main-grid">
+  <main>
+  <section class="grid" id="main-grid" aria-label="All categories">
     <div class="card-group">
       <a class="card" href="homeless/">
         <span class="icon">🏕️</span>
-        <span class="label">Homeless</span>
+        <h2 class="label">Homeless</h2>
         <span class="desc">Encampment &amp; trash 311 reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="homeless/trends/">📈 Trends</a>
     </div>
     <a class="card" href="budget/">
       <span class="icon">💰</span>
-      <span class="label">Budget</span>
+      <h2 class="label">Budget</h2>
       <span class="desc">General Fund breakdown by department — FY2026</span>
     </a>
     <div class="card-group">
       <a class="card" href="crime/">
         <span class="icon">🚔</span>
-        <span class="label">Crime</span>
+        <h2 class="label">Crime</h2>
         <span class="desc">APD incidents by council district — updated weekly</span>
       </a>
       <a class="trends-pill" href="crime/trends/">📈 Trends</a>
@@ -576,7 +581,7 @@
     <div class="card-group">
       <a class="card" href="parks/">
         <span class="icon">🏞️</span>
-        <span class="label">Parks</span>
+        <h2 class="label">Parks</h2>
         <span class="desc">Park maintenance requests — updated weekly</span>
       </a>
       <a class="trends-pill" href="parks/trends/">📈 Trends</a>
@@ -584,20 +589,20 @@
     <div class="card-group">
       <a class="card" href="traffic/">
         <span class="icon">🚦</span>
-        <span class="label">Traffic</span>
+        <h2 class="label">Traffic</h2>
         <span class="desc">Traffic &amp; infrastructure issues — updated weekly</span>
       </a>
       <a class="trends-pill" href="crashes/">💥 Crashes</a>
     </div>
     <a class="card" href="cameras/">
       <span class="icon">📷</span>
-      <span class="label">Traffic Cameras</span>
+      <h2 class="label">Traffic Cameras</h2>
       <span class="desc">800+ live camera snapshots citywide — refreshes every few seconds</span>
     </a>
     <div class="card-group">
       <a class="card" href="fire/">
         <span class="icon">🚒</span>
-        <span class="label">Fire &amp; Rescue</span>
+        <h2 class="label">Fire &amp; Rescue</h2>
         <span class="desc">Live AFD incidents — fires, rescues, alarms &amp; hazmat, updated every few minutes</span>
       </a>
       <a class="trends-pill" href="fire/trends/">📈 Trends</a>
@@ -605,25 +610,25 @@
     <div class="card-group">
       <a class="card" href="court/">
         <span class="icon">⚖️</span>
-        <span class="label">Courts</span>
+        <h2 class="label">Courts</h2>
         <span class="desc">Municipal &amp; community court caseloads — live data</span>
       </a>
       <a class="trends-pill" href="court/trends/">📈 Trends</a>
     </div>
     <a class="card" href="pools/">
       <span class="icon">🏊</span>
-      <span class="label">Pools &amp; Splash Pads</span>
+      <h2 class="label">Pools &amp; Splash Pads</h2>
       <span class="desc">46 city pools &amp; splash pads with status, hours &amp; phone</span>
     </a>
     <a class="card" href="environment/">
       <span class="icon">🌍</span>
-      <span class="label">Environment</span>
+      <h2 class="label">Environment</h2>
       <span class="desc">Water conservation, environmental spills &amp; harmful algae</span>
     </a>
     <div class="card-group">
       <a class="card" href="parking/">
         <span class="icon">🅿️</span>
-        <span class="label">Parking</span>
+        <h2 class="label">Parking</h2>
         <span class="desc">Parking enforcement reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="parking/trends/">📈 Trends</a>
@@ -631,7 +636,7 @@
     <div class="card-group">
       <a class="card" href="animal/">
         <span class="icon">🐾</span>
-        <span class="label">Animal Services</span>
+        <h2 class="label">Animal Services</h2>
         <span class="desc">Loose animals, bites &amp; wildlife reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="animal/trends/">📈 Trends</a>
@@ -639,23 +644,23 @@
     <div class="card-group">
       <a class="card" href="shelter/">
         <span class="icon">🏠</span>
-        <span class="label">Animal Shelter</span>
+        <h2 class="label">Animal Shelter</h2>
         <span class="desc">Intakes, outcomes &amp; live-release rate — lost &amp; found pet search</span>
       </a>
     </div>
     <a class="card" href="911/">
       <span class="icon">🚨</span>
-      <span class="label">911 Response</span>
+      <h2 class="label">911 Response</h2>
       <span class="desc">APD dispatch response times across years, priorities &amp; districts</span>
     </a>
     <a class="card card-fun" href="fun/">
       <span class="icon">🎉</span>
-      <span class="label">Fun Data!</span>
+      <h2 class="label">Fun Data!</h2>
       <span class="desc">Bar of the month · coyote sightings · graffiti hall of fame &amp; more</span>
     </a>
     <a class="card card-wrapped" href="wrapped/">
       <span class="icon">🎁</span>
-      <span class="label">311 Wrapped</span>
+      <h2 class="label">311 Wrapped</h2>
       <span class="desc">Your neighborhood's year in complaints — enter a ZIP code</span>
     </a>
     <button class="card more-btn" id="more-btn" onclick="toggleMore()" aria-expanded="false" type="button">
@@ -664,18 +669,18 @@
       <span class="desc">CapMetro · Noise · Hate Crimes · Graffiti · Storm &amp; Drainage · Bicycle · Child Care · Restaurants · Dead Animal · Code · Micromobility · COVID</span>
       
     </button>
-  </div>
+  </section>
 
-  <div class="grid" id="more-grid" hidden>
+  <section class="grid" id="more-grid" aria-label="More categories" hidden>
     <a class="card" href="capmetro/">
       <span class="icon">🚌</span>
-      <span class="label">CapMetro</span>
+      <h2 class="label">CapMetro</h2>
       <span class="desc">Bikeshare, routes &amp; transit data — coming soon</span>
     </a>
     <div class="card-group">
       <a class="card" href="noise/">
         <span class="icon">🔊</span>
-        <span class="label">Noise</span>
+        <h2 class="label">Noise</h2>
         <span class="desc">Noise complaint reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="noise/trends/">📈 Trends</a>
@@ -683,7 +688,7 @@
     <div class="card-group">
       <a class="card" href="crime/hatecrime/">
         <span class="icon">⚠️</span>
-        <span class="label">Hate Crimes</span>
+        <h2 class="label">Hate Crimes</h2>
         <span class="desc">APD hate crime incidents — bias, offense &amp; trend data</span>
       </a>
       <a class="trends-pill" href="crime/trends/">📈 Crime Trends</a>
@@ -691,53 +696,53 @@
     <div class="card-group">
       <a class="card" href="graffiti/">
         <span class="icon">🎨</span>
-        <span class="label">Graffiti</span>
+        <h2 class="label">Graffiti</h2>
         <span class="desc">Graffiti abatement reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="graffiti/trends/">📈 Trends</a>
     </div>
     <a class="card" href="https://public.ridereport.com/austin" target="_blank" rel="noopener">
       <span class="icon">🛴</span>
-      <span class="label">Micromobility</span>
+      <h2 class="label">Micromobility</h2>
       <span class="desc">Real-time scooter &amp; bike share availability across Austin</span>
     </a>
     <div class="card-group">
       <a class="card" href="storm/">
         <span class="icon">🌧️</span>
-        <span class="label">Storm &amp; Drainage</span>
+        <h2 class="label">Storm &amp; Drainage</h2>
         <span class="desc">Storm debris, drainage &amp; flooding reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="storm/trends/">📈 Trends</a>
     </div>
     <a class="card" href="childcare/">
       <span class="icon">🧒</span>
-      <span class="label">Child Care</span>
+      <h2 class="label">Child Care</h2>
       <span class="desc">Childcare facility compliance — updated weekly</span>
     </a>
     <a class="card" href="restaurants/">
       <span class="icon">🍽️</span>
-      <span class="label">Restaurants</span>
+      <h2 class="label">Restaurants</h2>
       <span class="desc">Health inspection scores — search by name & live data</span>
     </a>
     <div class="card-group">
       <a class="card" href="animal/dead/">
         <span class="icon">🐿️</span>
-        <span class="label">Dead Animal</span>
+        <h2 class="label">Dead Animal</h2>
         <span class="desc">Dead animal pickup reports — updated weekly</span>
       </a>
       <a class="trends-pill" href="animal/dead/trends/">📈 Trends</a>
     </div>
     <a class="card" href="https://citizenconnect-acd.austintexas.gov/#!/dashboard?shapeGroupId=jcrc-4uuy" target="_blank" rel="noopener">
       <span class="icon">🏛️</span>
-      <span class="label">Code Enforcement</span>
+      <h2 class="label">Code Enforcement</h2>
       <span class="desc">City of Austin code enforcement dashboard — violations &amp; inspections</span>
     </a>
     <a class="card card-covid" href="covid/">
       <span class="icon">😷</span>
-      <span class="label">COVID-19 Complaints</span>
+      <h2 class="label">COVID-19 Complaints</h2>
       <span class="desc">All 964 COVID non-compliance reports filed via 311 — in Austinites' own words</span>
     </a>
-  </div>
+  </section>
 
   <!-- ── 311 Descriptions Ticker ── -->
   <div class="card ticker-card" id="funny-card">
@@ -762,6 +767,7 @@
       <a class="ticker-link" href="complaints/">Browse all complaints by category →</a>
     </div>
   </div>
+</main>
 
   <div class="disclaimer">
     <strong>Not a city government-run website.</strong> I'm a concerned citizen.<br />
