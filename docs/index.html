@@ -267,10 +267,37 @@
     }
     .card .desc  { font-size: 0.875rem; color: var(--text-tag); line-height: 1.4; }
 
-    .card-group { display: flex; flex-direction: column; }
-    .card-group .card { border-radius: 16px 16px 0 0; }
-    .card-group .card::before { border-radius: 16px 16px 0 0; }
-    .card-group .card:hover { transform: none; }
+    /* A grouped card is one card with a footer slot: the group owns the surface,
+       border, radius and hover, and the .card / .trends-pill inside it are
+       content only. Previously they were two stacked bordered boxes, so the
+       pill sat wherever the card's content ended and the group never lifted. */
+    .card-group {
+      display: flex;
+      flex-direction: column;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      transition: background 0.15s, border-color 0.15s, transform 0.15s, box-shadow 0.2s;
+    }
+    .card-group:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--shadow-warm);
+    }
+    .card-group:hover .card::before { background: var(--bar-fill); }
+
+    .card-group .card {
+      flex: 1; /* the card fills the group, so every pill sits at the same line */
+      background: transparent;
+      border: none;
+      border-radius: 0;
+    }
+    .card-group .card:hover { background: transparent; transform: none; box-shadow: none; }
+    .card-group .card::before { border-radius: 0; }
+
     .trends-pill {
       display: block;
       text-align: center;
@@ -278,17 +305,13 @@
       font-size: 0.75rem;
       color: var(--text-tag);
       text-decoration: none;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-top: none;
-      border-radius: 0 0 16px 16px;
+      background: transparent;
+      border: none;
+      border-top: 1px solid var(--border);
+      border-radius: 0;
       transition: background 0.15s, color 0.15s, border-color 0.15s;
     }
-    .trends-pill:hover {
-      background: var(--bg-card-hover);
-      color: var(--text);
-      border-color: var(--border-hover);
-    }
+    .card-group:hover .trends-pill { color: var(--text); border-top-color: var(--border-hover); }
 
     .disclaimer {
       margin-top: 2rem;
