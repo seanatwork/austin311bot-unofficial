@@ -346,7 +346,13 @@
     #more-grid[hidden] { display: none; }
 
     /* ── descriptions ticker ── */
-    .ticker-card { grid-column: 1 / -1; position: relative; }
+    .ticker-card {
+      position: relative;
+      width: 100%;
+      max-width: 900px;
+      margin-top: 2rem;
+      align-items: stretch; /* .card is flex-start; the ticker needs full-width children */
+    }
     /* the ticker is not a link — don't give it a link card's hover affordance */
     .ticker-card:hover {
       transform: none;
@@ -364,11 +370,17 @@
       gap: 12px;
     }
     .ticker-quote {
-      font-size: 1.125rem;
+      font-size: 1rem;
       line-height: 1.5;
+      height: 4.5em; /* always three lines, so a long quote can't reflow the page */
+      overflow: hidden;
       color: var(--text-head);
       font-style: italic;
       padding: 0 12px;
+      max-width: 44rem; /* ~66ch measure */
+      width: 100%;
+      align-self: center;
+      margin: 0 auto;
       transition: opacity 0.3s ease;
       position: relative;
       overflow-wrap: anywhere;
@@ -433,7 +445,9 @@
     .ticker-nav { display: contents; }
     .ticker-arrow {
       position: absolute;
-      top: 50%;
+      /* centred on the quote band, not the whole card: card padding (1.5rem)
+         + half the quote's fixed 4.5rem height */
+      top: calc(1.5rem + 2.25rem);
       transform: translateY(-50%);
       background: var(--bar-bg);
       border: none;
@@ -513,30 +527,6 @@
       <button type="submit">Look up</button>
     </form>
   </header>
-
-  <!-- ── 311 Descriptions Ticker ── -->
-  <div class="card ticker-card" id="funny-card" style="margin-bottom:1.25rem;max-width:900px;width:100%;">
-    <div id="funny-content">
-      <div class="ticker-content">
-        <div class="ticker-quote ticker-loading" id="ticker-text">Loading 311 descriptions…</div>
-        <div class="ticker-meta">
-          <span class="ticker-badge" id="ticker-badge">—</span>
-          <span class="ticker-addr" id="ticker-address"></span>
-          <span class="ticker-date" id="ticker-date"></span>
-          <span class="ticker-count" id="ticker-count"></span>
-        </div>
-
-        <div class="ticker-nav" id="ticker-nav">
-          <button class="ticker-arrow" id="ticker-prev" aria-label="Previous">&lt;</button>
-          <button class="ticker-arrow" id="ticker-next" aria-label="Next">&gt;</button>
-        </div>
-      </div>
-    </div>
-    <div class="ticker-sub" id="ticker-sub">Loading…</div>
-    <div class="ticker-link-row">
-      <a class="ticker-link" href="complaints/">Browse all complaints by category →</a>
-    </div>
-  </div>
 
   <div class="grid" id="main-grid">
     <div class="card-group">
@@ -724,6 +714,30 @@
       <span class="label">COVID-19 Complaints</span>
       <span class="desc">All 964 COVID non-compliance reports filed via 311 — in Austinites' own words</span>
     </a>
+  </div>
+
+  <!-- ── 311 Descriptions Ticker ── -->
+  <div class="card ticker-card" id="funny-card">
+    <div id="funny-content">
+      <div class="ticker-content">
+        <div class="ticker-quote ticker-loading" id="ticker-text">Loading 311 descriptions…</div>
+        <div class="ticker-meta">
+          <span class="ticker-badge" id="ticker-badge">—</span>
+          <span class="ticker-addr" id="ticker-address"></span>
+          <span class="ticker-date" id="ticker-date"></span>
+          <span class="ticker-count" id="ticker-count"></span>
+        </div>
+
+        <div class="ticker-nav" id="ticker-nav">
+          <button class="ticker-arrow" id="ticker-prev" aria-label="Previous">&lt;</button>
+          <button class="ticker-arrow" id="ticker-next" aria-label="Next">&gt;</button>
+        </div>
+      </div>
+    </div>
+    <div class="ticker-sub" id="ticker-sub">Loading…</div>
+    <div class="ticker-link-row">
+      <a class="ticker-link" href="complaints/">Browse all complaints by category →</a>
+    </div>
   </div>
 
   <div class="disclaimer">
