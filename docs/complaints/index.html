@@ -310,6 +310,26 @@
       color: var(--text-desc);
       font-variant-numeric: tabular-nums;
     }
+    .list-tools {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .sort-label {
+      font-size: 0.8rem;
+      color: var(--text-desc);
+    }
+    .sort-select {
+      padding: 0.35rem 0.5rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--bg-card);
+      color: var(--text);
+      font-size: 0.8rem;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .sort-select:focus { border-color: var(--accent); }
     .list {
       display: flex;
       flex-direction: column;
@@ -399,7 +419,15 @@
 
     <div class="list-header">
       <div class="title" id="list-title">Complaints</div>
-      <div class="count" id="list-count" aria-live="polite"></div>
+      <div class="list-tools">
+        <div class="count" id="list-count" aria-live="polite"></div>
+        <label class="sort-label" for="sort-select">Sort</label>
+        <select class="sort-select" id="sort-select">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="category">Category</option>
+        </select>
+      </div>
     </div>
 
     <div class="list" id="list">
@@ -420,6 +448,7 @@
       var showAll = false;
       var currentCategory = "__all__";
       var currentQuery = "";
+      var currentSort = "newest";
 
       // Restore filter state from the URL so a filtered view can be linked.
       var pendingCatValidation = false;
@@ -427,8 +456,10 @@
         var params = new URLSearchParams(location.search);
         var q = params.get("q");
         var cat = params.get("cat");
+        var sort = params.get("sort");
         if (q) currentQuery = q;
         if (cat) { currentCategory = cat; pendingCatValidation = true; }
+        if (sort === "oldest" || sort === "category") currentSort = sort;
         if (params.get("all") === "1") showAll = true;
         if (currentQuery) {
           var input = document.getElementById("search-input");
@@ -516,9 +547,7 @@
         if (q) {
           pool = pool.filter(function (i) { return matchesQuery(i, q); });
         }
-        return pool.slice().sort(function (a, b) {
-          return (b.date || "").localeCompare(a.date || "");
-        });
+        return pool.slice().sort(comparator());
       }
 
       function render() {
@@ -603,11 +632,25 @@
         return el;
       }
 
+      function comparator() {
+        if (currentSort === "oldest") {
+          return function (a, b) { return (a.date || "").localeCompare(b.date || ""); };
+        }
+        if (currentSort === "category") {
+          return function (a, b) {
+            return (a.category || "").localeCompare(b.category || "")
+                || (b.date || "").localeCompare(a.date || "");
+          };
+        }
+        return function (a, b) { return (b.date || "").localeCompare(a.date || ""); };
+      }
+
       function writeUrlState() {
         var params = new URLSearchParams();
         if (currentQuery.trim()) params.set("q", currentQuery.trim());
         if (currentCategory !== "__all__") params.set("cat", currentCategory);
         if (showAll) params.set("all", "1");
+        if (currentSort !== "newest") params.set("sort", currentSort);
         var qs = params.toString();
         try {
           history.replaceState(null, "", qs ? "?" + qs : location.pathname);
@@ -746,6 +789,14 @@
         html += 'Data: <a href="https://311.austintexas.gov/open311/v2" target="_blank">Austin Open311 API</a>.';
         el.innerHTML = html;
       }
+
+      // ── Sort ──
+      var sortSelect = document.getElementById("sort-select");
+      sortSelect.value = currentSort;
+      sortSelect.addEventListener("change", function () {
+        currentSort = this.value;
+        refreshList();
+      });
 
       // ── Search ──
       var searchDebounce = null;
