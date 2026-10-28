@@ -35,7 +35,6 @@
       --border:       #E3DEEE;
       --border-hover: #B9A8E0;
       --border-cta:   #D8CFEB;
-      --border-cta-hover: #5B3FA8;
       --text:         #3A3344;
       --text-head:    #241B3A;
       --text-tag:     #6B6180;
@@ -43,22 +42,21 @@
       --text-desc:    #7A7189;
       --text-disc:    #564D6B;
       --text-disc-a:  #4C1D95;
-      --text-cta:     #3A3344;
-      --text-footer:  #A79FB8;
-      --text-footer-a:#7A6F94;
       --text-footer-hover: #4C1D95;
       --text-muted:   #A79FB8;
       --text-sub:     #6B6180;
       --btn-bg:       #EDE8F7;
-      --btn-border:   #D8CFEB;
-      --btn-color:    #5B3FA8;
-      --bar-bg:       #D8CFEB;
-      --bar-fill:     #5B3FA8;
-      --disc-border:  #E3DEEE;
       --accent-violet:#5B3FA8;
       --accent-coral: #E8623D;
       --accent-gold:  #D9A441;
       --shadow-warm:  rgba(91, 63, 168, 0.12);
+
+      /* derived — these carried the same literal before */
+      --btn-color:    var(--accent-violet);
+      --btn-border:   var(--border-cta);
+      --bar-bg:       var(--border-cta);
+      --bar-fill:     var(--accent-violet);
+      --border-cta-hover: var(--accent-violet);
     }
 
     html.dark {
@@ -69,7 +67,6 @@
       --border:       #342B4A;
       --border-hover: #7A63C4;
       --border-cta:   #3E3358;
-      --border-cta-hover: #8B6FE0;
       --text:         #CFC8E0;
       --text-head:    #F0EBFA;
       --text-tag:     #9A8FB5;
@@ -77,18 +74,12 @@
       --text-desc:    #8D82A6;
       --text-disc:    #9A8FB5;
       --text-disc-a:  #B9A8E0;
-      --text-cta:     #CFC8E0;
-      --text-footer:  #5C5178;
-      --text-footer-a:#8D82A6;
       --text-footer-hover: #B9A8E0;
       --text-muted:   #5C5178;
       --text-sub:     #8D82A6;
       --btn-bg:       #282239;
-      --btn-border:   #3E3358;
       --btn-color:    #B9A8E0;
-      --bar-bg:       #3E3358;
-      --bar-fill:     #8B6FE0;
-      --disc-border:  #342B4A;
+      --accent-violet:#8B6FE0;
       --shadow-warm:  rgba(139, 111, 224, 0.10);
     }
 
@@ -315,7 +306,7 @@
     .disclaimer a {
       color: var(--text-disc-a);
       text-decoration: none;
-      border-bottom: 1px solid var(--disc-border);
+      border-bottom: 1px solid var(--border);
     }
     .disclaimer a:hover { opacity: 0.75; }
 
@@ -328,7 +319,7 @@
       border: 1px solid var(--border-cta);
       border-radius: 8px;
       padding: 10px 18px;
-      color: var(--text-cta);
+      color: var(--text);
       font-size: 0.88rem;
       font-weight: 500;
       text-decoration: none;
