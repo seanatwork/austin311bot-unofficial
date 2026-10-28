@@ -481,7 +481,7 @@
               ? "The weekly digest hasn\u2019t been generated for this week yet \u2014 check back after the next run."
               : "The digest data failed to load. This is usually temporary.")
           + ' <button type="button" class="toggle-btn" id="retry-btn">Retry</button></div>';
-        ["search-input", "toggle-citizen", "toggle-all"].forEach(function (id) {
+        ["search-input", "toggle-citizen", "toggle-all", "sort-select"].forEach(function (id) {
           var el = document.getElementById(id);
           if (el) { el.disabled = true; el.style.opacity = "0.5"; }
         });
