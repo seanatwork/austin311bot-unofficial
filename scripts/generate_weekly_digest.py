@@ -462,12 +462,16 @@ def main() -> None:
         digest["citizenComplaints"] = citizen_complaints
         digest["cityResponses"] = city_responses
 
-    # Metadata
+    # Metadata. The total must equal what the page actually lists: near-duplicate
+    # citizen complaints are merged in phase 3, so len(records) overstates it and
+    # the footer's "(x citizen-written, y city responses)" would not add up.
+    citizen_count = len(digest.get("citizenComplaints", []))
+    city_count = len(digest.get("cityResponses", []))
     digest["_meta"] = {
         "generated": now.isoformat(),
-        "totalDescriptions": len(records),
-        "citizenWritten": len(digest.get("citizenComplaints", [])),
-        "cityResponses": len(digest.get("cityResponses", [])),
+        "totalDescriptions": citizen_count + city_count,
+        "citizenWritten": citizen_count,
+        "cityResponses": city_count,
         "source": "Open311 (29 service codes, last 7 days)",
     }
 
