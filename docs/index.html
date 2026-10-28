@@ -123,12 +123,16 @@
     }
     html.dark body::before { opacity: 0.02; }
 
-    /* ── theme toggle ── */
-    #theme-toggle {
+    /* ── fixed utility controls (zen / theme) ── */
+    .chip-row {
       position: fixed;
       top: 14px;
       right: 16px;
       z-index: 200;
+      display: flex;
+      gap: 10px;
+    }
+    .chip {
       background: var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 6px;
@@ -139,25 +143,8 @@
       transition: background 0.15s, border-color 0.15s, color 0.15s;
       user-select: none;
     }
-    #theme-toggle:hover { color: var(--text); border-color: var(--border-hover); }
-
-    #zen-toggle {
-      position: fixed;
-      top: 14px;
-      right: 90px;
-      z-index: 200;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 5px 10px;
-      font-size: 0.75rem;
-      color: var(--text-desc);
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s, color 0.15s;
-      user-select: none;
-    }
-    #zen-toggle:hover { color: var(--text); border-color: var(--border-hover); }
-    #zen-toggle.zen-active { background: var(--bg-card-hover); border-color: var(--border-hover); color: var(--text); }
+    .chip:hover { color: var(--text); border-color: var(--border-hover); }
+    .chip.zen-active { background: var(--bg-card-hover); border-color: var(--border-hover); color: var(--text); }
 
     .zen-hide { display: none !important; }
 
@@ -695,8 +682,10 @@
 </head>
 <body>
 
-  <button id="zen-toggle" aria-label="Toggle zen mode">🧘 Zen</button>
-  <button id="theme-toggle" aria-label="Toggle dark mode">🌙 Dark</button>
+  <div class="chip-row">
+    <button class="chip" id="zen-toggle" aria-label="Toggle zen mode">🧘 Zen</button>
+    <button class="chip" id="theme-toggle" aria-label="Toggle dark mode">🌙 Dark</button>
+  </div>
 
   <header>
     <h1>Austin 311</h1>
