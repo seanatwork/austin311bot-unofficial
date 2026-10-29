@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-29T15:16:37.948333+00:00",
+  "updated": "2026-10-29T15:33:08.130755+00:00",
   "bars": {
     "top10": [
       {
@@ -61,12 +61,6 @@
         "pct": 139.3
       },
       {
-        "name": "Levy At Austin Fc",
-        "address": "10414 Mckalla Pl",
-        "delta": 723878.0,
-        "pct": 300.8
-      },
-      {
         "name": "San Jacinto Beverage Company Llc",
         "address": "98 San Jacinto Blvd",
         "delta": 183147.0,
@@ -83,13 +77,19 @@
         "address": "110 E 2nd St",
         "delta": 105441.0,
         "pct": 10.5
+      },
+      {
+        "name": "Radio East",
+        "address": "3504 Montopolis Dr",
+        "delta": 104444.0,
+        "pct": 215.2
       }
     ],
     "curDate": "2026-08-31",
     "prevDate": "2026-07-31",
     "curLabel": "August 2026",
     "prevLabel": "July 2026",
-    "asOf": "2026-10-29T15:16:37.948333+00:00"
+    "asOf": "2026-10-29T15:33:08.130755+00:00"
   },
   "coyotes": {
     "total": 424,
@@ -170,7 +170,7 @@
         "isPupping": false
       }
     ],
-    "asOf": "2026-10-29T15:16:37.948333+00:00"
+    "asOf": "2026-10-29T15:33:08.130755+00:00"
   },
   "graffiti": {
     "total": 1085,
@@ -179,17 +179,17 @@
     "winner": {
       "address": "7300 Latta Dr",
       "count": 4,
-      "status": "\ud83d\udd34 Tagged",
-      "lat": 30.21693131,
-      "lon": -97.84597396
+      "status": "\u2705 Cleaned",
+      "lat": 30.21693204,
+      "lon": -97.8459693
     },
     "top15": [
       {
         "address": "7300 Latta Dr",
         "count": 4,
-        "status": "\ud83d\udd34 Tagged",
-        "lat": 30.21693131,
-        "lon": -97.84597396
+        "status": "\u2705 Cleaned",
+        "lat": 30.21693204,
+        "lon": -97.8459693
       },
       {
         "address": "615 W 2nd St",
@@ -216,13 +216,13 @@
         "address": "910 W Cesar Chavez St",
         "count": 3,
         "status": "\ud83d\udd34 Tagged",
-        "lat": 30.26667601,
-        "lon": -97.75577683
+        "lat": 30.26667683,
+        "lon": -97.75577199
       },
       {
         "address": "1201 Cedar Ave",
         "count": 3,
-        "status": "\ud83d\udd34 Tagged",
+        "status": "\u2705 Cleaned",
         "lat": 30.275080402624596,
         "lon": -97.71261294727668
       },
@@ -269,11 +269,18 @@
         "lon": -97.75590654682892
       },
       {
-        "address": "8121 Research Blvd Svrd Nb",
+        "address": "4338 Menchaca Rd",
         "count": 2,
         "status": "\ud83d\udd34 Tagged",
-        "lat": 30.35337078,
-        "lon": -97.71399031
+        "lat": 30.229787533887755,
+        "lon": -97.78843688533188
+      },
+      {
+        "address": "8121 Research Blvd Svrd Nb",
+        "count": 2,
+        "status": "\u2705 Cleaned",
+        "lat": 30.35337177,
+        "lon": -97.71398538
       },
       {
         "address": "11819 Pavilion Blvd",
@@ -281,16 +288,9 @@
         "status": "\u2705 Cleaned",
         "lat": 30.42450322,
         "lon": -97.75554158
-      },
-      {
-        "address": "218 Walter Seaholm Dr",
-        "count": 2,
-        "status": "\ud83d\udd34 Tagged",
-        "lat": 30.2681080714849,
-        "lon": -97.7529393615296
       }
     ],
-    "asOf": "2026-10-29T15:16:37.948333+00:00"
+    "asOf": "2026-10-29T15:33:08.130755+00:00"
   },
   "parking": {
     "total": 6965,
@@ -508,53 +508,53 @@
         "pct": 7
       }
     ],
-    "asOf": "2026-10-29T15:16:37.948333+00:00"
+    "asOf": "2026-10-29T15:33:08.130755+00:00"
   },
   "graffitiSpeedrun": {
-    "totalClosed": 789,
-    "avgDays": 29.8,
-    "medianDays": 4.8,
+    "totalClosed": 165,
+    "avgDays": 5.7,
+    "medianDays": 4.1,
     "fastestDays": [
-      0.0082,
-      0.0161,
-      0.0202,
-      0.0211,
-      0.0257
+      0.0514,
+      0.0523,
+      0.054,
+      0.0576,
+      0.071
     ],
     "buckets": {
       "under1h": {
-        "count": 7,
+        "count": 0,
         "label": "Under 1 hour"
       },
       "1hTo6h": {
-        "count": 37,
+        "count": 10,
         "label": "1\u20136 hours"
       },
       "6hTo24h": {
-        "count": 113,
+        "count": 25,
         "label": "6\u201324 hours"
       },
       "1dTo3d": {
-        "count": 174,
+        "count": 32,
         "label": "1\u20133 days"
       },
       "3dTo7d": {
-        "count": 138,
+        "count": 49,
         "label": "3\u20137 days"
       },
       "7dTo30d": {
-        "count": 148,
+        "count": 47,
         "label": "7\u201330 days"
       },
       "over30d": {
-        "count": 172,
+        "count": 2,
         "label": "Over 30 days"
       }
     },
     "longestOpen": {
-      "days": 303.0,
-      "address": "4632 S Lamar Blvd Sb, Austin"
+      "days": 88.7,
+      "address": "1900 Barton Springs Rd, Austin"
     },
-    "asOf": "2026-10-29T15:16:37.948333+00:00"
+    "asOf": "2026-10-29T15:33:08.130755+00:00"
   }
 }
