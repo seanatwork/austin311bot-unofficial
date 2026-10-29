@@ -204,8 +204,11 @@ def _load_bars() -> Optional[dict]:
 
     months.sort(key=lambda m: m["obligation_end_date"], reverse=True)
     counts = [int(m["cnt"]) for m in months]
-    # Skip most recent if incomplete
-    start_idx = 1 if counts[0] < counts[1] * 0.5 else 0
+    # TABC publishes with a ~2-month lag and its newest file arrives incomplete,
+    # so a month with less than half the previous month's rows is still filling
+    # in. Report the latest month that is actually complete instead.
+    skipped_partial = counts[0] < counts[1] * 0.5
+    start_idx = 1 if skipped_partial else 0
     cur_date = months[start_idx]["obligation_end_date"][:10]
     prev_date = months[start_idx + 1]["obligation_end_date"][:10]
 
@@ -270,6 +273,9 @@ def _load_bars() -> Optional[dict]:
         "prevDate": prev_date,
         "curLabel": month_label(cur_date),
         "prevLabel": month_label(prev_date),
+        # True when TABC's newest reported month was still filling in and was
+        # skipped in favor of the last complete month.
+        "skippedPartial": skipped_partial,
     }
     logger.info(f"  ✓ Bar of the Month: {len(top10)} locations, {len(top5_movers)} movers")
     return result

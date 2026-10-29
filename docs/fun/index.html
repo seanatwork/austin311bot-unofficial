@@ -179,7 +179,7 @@
         <span class="card-icon">🍺</span>
         <div>
           <div class="card-title">Bar of the Month</div>
-          <div class="card-sub">Top TABC mixed beverage sales — Austin</div>
+          <div class="card-sub">Top TABC mixed beverage sales — Austin · latest complete month</div>
         </div>
       </div>
       <div id="bar-content"><div class="loading">Loading TABC data…</div></div>
@@ -380,6 +380,11 @@
         <div class="bar-rows">${barRows}</div>
         <div class="section-title">Biggest Movers vs ${prevLabel}</div>
         <div class="mover-rows">${moverRows}</div>
+        <div style="font-size:11px;color:var(--text-sub);line-height:1.4;">
+          ${d.skippedPartial
+            ? `${curLabel} is the latest <b>complete</b> month — TABC's newest monthly file is still filling in and reports roughly two months behind.`
+            : `${curLabel} is the latest complete month TABC has published.`}
+        </div>
         <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
           Source: <a href="https://data.texas.gov/d/g5bj-yb6k" target="_blank" rel="noopener" style="color:var(--text-sub);">TABC Mixed Beverage Sales</a>
         </div>`;
