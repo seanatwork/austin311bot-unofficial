@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-29T15:33:08.130755+00:00",
+  "updated": "2026-10-29T17:04:29.667709+00:00",
   "bars": {
     "top10": [
       {
@@ -61,6 +61,12 @@
         "pct": 139.3
       },
       {
+        "name": "Levy At Austin Fc",
+        "address": "10414 Mckalla Pl",
+        "delta": 723878.0,
+        "pct": 300.8
+      },
+      {
         "name": "San Jacinto Beverage Company Llc",
         "address": "98 San Jacinto Blvd",
         "delta": 183147.0,
@@ -77,30 +83,25 @@
         "address": "110 E 2nd St",
         "delta": 105441.0,
         "pct": 10.5
-      },
-      {
-        "name": "Radio East",
-        "address": "3504 Montopolis Dr",
-        "delta": 104444.0,
-        "pct": 215.2
       }
     ],
     "curDate": "2026-08-31",
     "prevDate": "2026-07-31",
     "curLabel": "August 2026",
     "prevLabel": "July 2026",
-    "asOf": "2026-10-29T15:33:08.130755+00:00"
+    "skippedPartial": true,
+    "asOf": "2026-10-29T17:04:29.667709+00:00"
   },
   "coyotes": {
-    "total": 424,
+    "total": 425,
     "pupping": 112,
     "puppingPct": 26,
     "isPeak": false,
     "months": [
       {
         "label": "Oct 2026",
-        "count": 25,
-        "pct": 45,
+        "count": 26,
+        "pct": 47,
         "isPupping": false
       },
       {
@@ -170,11 +171,11 @@
         "isPupping": false
       }
     ],
-    "asOf": "2026-10-29T15:33:08.130755+00:00"
+    "asOf": "2026-10-29T17:04:29.667709+00:00"
   },
   "graffiti": {
-    "total": 1085,
-    "uniqueLocations": 992,
+    "total": 1088,
+    "uniqueLocations": 995,
     "repeatRate": 9,
     "winner": {
       "address": "7300 Latta Dr",
@@ -290,10 +291,10 @@
         "lon": -97.75554158
       }
     ],
-    "asOf": "2026-10-29T15:33:08.130755+00:00"
+    "asOf": "2026-10-29T17:04:29.667709+00:00"
   },
   "parking": {
-    "total": 6965,
+    "total": 6954,
     "peakHour": "4pm",
     "peakCount": 781,
     "hours": [
@@ -370,21 +371,21 @@
       {
         "hour": 10,
         "label": "10am",
-        "count": 516,
-        "pct": 66,
+        "count": 511,
+        "pct": 65,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
-        "count": 509,
+        "count": 504,
         "pct": 65,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
-        "count": 518,
+        "count": 517,
         "pct": 66,
         "isPeak": false
       },
@@ -469,17 +470,17 @@
     "violationTypes": [
       {
         "type": "Other",
-        "count": 1630,
+        "count": 1627,
         "pct": 100
       },
       {
         "type": "Sidewalk",
-        "count": 459,
+        "count": 457,
         "pct": 28
       },
       {
         "type": "Bike Lane",
-        "count": 345,
+        "count": 343,
         "pct": 21
       },
       {
@@ -489,8 +490,8 @@
       },
       {
         "type": "Oversized Vehicle",
-        "count": 253,
-        "pct": 16
+        "count": 252,
+        "pct": 15
       },
       {
         "type": "Fire Hydrant",
@@ -508,7 +509,7 @@
         "pct": 7
       }
     ],
-    "asOf": "2026-10-29T15:33:08.130755+00:00"
+    "asOf": "2026-10-29T17:04:29.667709+00:00"
   },
   "graffitiSpeedrun": {
     "totalClosed": 165,
@@ -552,9 +553,9 @@
       }
     },
     "longestOpen": {
-      "days": 88.7,
+      "days": 88.8,
       "address": "1900 Barton Springs Rd, Austin"
     },
-    "asOf": "2026-10-29T15:33:08.130755+00:00"
+    "asOf": "2026-10-29T17:04:29.667709+00:00"
   }
 }
