@@ -227,7 +227,7 @@
         <span class="card-icon">⚡</span>
         <div>
           <div class="card-title">Graffiti Speedrun</div>
-          <div class="card-sub">How fast does Austin clean up graffiti? — HHSGRAFF resolution times</div>
+          <div class="card-sub">How fast does Austin clean up graffiti? — HHSGRAFF, last 90 days</div>
         </div>
       </div>
       <div id="speedrun-content"><div class="loading">Loading speedrun data…</div></div>
@@ -580,7 +580,7 @@
       const fastestDays = d.fastestDays;
 
       if (!totalClosed) {
-        el.innerHTML = `<div style="font-size:13px;color:var(--text-muted);">No closed graffiti reports found in the last year.</div>`;
+        el.innerHTML = `<div style="font-size:13px;color:var(--text-muted);">No closed graffiti reports found in the last 90 days.</div>`;
         return;
       }
 
@@ -615,14 +615,14 @@
           </div>
           <div class="stat-box">
             <div class="stat-val">${totalClosed}</div>
-            <div class="stat-label">Closed tickets</div>
+            <div class="stat-label">Closed (90 days)</div>
           </div>
         </div>
         <div class="section-title">Resolution Time Distribution</div>
         <div class="bar-rows">${bucketRows}</div>
         <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
           Fastest: ${fastestStr}
-          ${longestOpen ? `· Longest open: ${fmtDays(longestOpen.days)} at ${longestOpen.address}` : ""}
+          ${longestOpen ? `· Longest still open: ${fmtDays(longestOpen.days)} at ${longestOpen.address}` : ""}
         </div>
         <div style="font-size:10px;color:var(--text-muted);margin-top:4px;">
           Source: <a href="https://311.austintexas.gov/open311/v2" target="_blank" rel="noopener" style="color:var(--text-sub);">Austin Open311 API</a> · service code HHSGRAFF

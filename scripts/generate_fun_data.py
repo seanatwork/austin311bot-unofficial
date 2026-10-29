@@ -64,7 +64,7 @@ def _open311_page(params: dict):
 
 
 def _fetch_monthly(
-    code: str, months_back: int, category: str, max_pages: int = 10
+    code: str, months_back: int, category: str, max_pages: int = 10, use_cache: bool = True
 ) -> Optional[list]:
     """Fetch `months_back` months of a single Open311 service code, month by month.
 
@@ -79,6 +79,11 @@ def _fetch_monthly(
     enough that a normal month is fetched end-to-end, otherwise the month is
     never marked complete and every run re-downloads it (parking runs ~2,400
     tickets/month).
+
+    `use_cache=False` fetches the whole window live. Needed when the *current*
+    status of each ticket matters: cached months are frozen at the status they
+    had when that month was fetched, so a ticket that closed later still reads
+    "open" forever.
     """
     try:
         records = fetch_monthly_with_cache(
@@ -86,7 +91,7 @@ def _fetch_monthly(
             service_codes=[code],
             label_map={code: category},
             months_back=months_back,
-            use_cache=True,
+            use_cache=use_cache,
             make_request=_open311_page,
             extra_params={"extensions": "true"},
             max_pages=max_pages,
@@ -327,6 +332,18 @@ def _load_coyotes() -> Optional[dict]:
 
 # ── 3. Graffiti Hall of Fame ─────────────────────────────────────────────────
 
+def _merge_latest(records: Optional[list], recent: Optional[list]) -> Optional[list]:
+    """Overlay the fresh records on the cached year (fresh status wins, same ids)."""
+    if not records:
+        return records
+    if not recent:
+        return records
+    by_id = {r.get("service_request_id"): r for r in records}
+    for r in recent:
+        by_id[r.get("service_request_id")] = r
+    return list(by_id.values())
+
+
 def _load_graffiti(records: Optional[list]) -> Optional[dict]:
     """Build the Graffiti Hall of Fame from already-fetched HHSGRAFF records."""
     logger.info("Loading Graffiti Hall of Fame…")
@@ -479,7 +496,7 @@ def _load_parking() -> Optional[dict]:
 # ── 5. Graffiti Speedrun Stats ───────────────────────────────────────────────
 
 def _load_graffiti_speedrun(records: Optional[list]) -> Optional[dict]:
-    """Calculate graffiti resolution time stats from already-fetched HHSGRAFF records."""
+    """Resolution-time stats from freshly fetched HHSGRAFF records (last 90 days)."""
     logger.info("Loading Graffiti Speedrun Stats…")
     now = datetime.now(timezone.utc)
     if not records:
@@ -595,12 +612,21 @@ def main() -> None:
     # year of graffiti data is only downloaded once.
     graffiti_records = _fetch_monthly("HHSGRAFF", 12, "graffiti")
 
+    # The resolution-time card needs current ticket statuses, which a cached read
+    # cannot give: months already marked complete keep the status they had when
+    # they were first fetched, so tickets that closed later stay "open" forever
+    # and "closed tickets" came out ~20% low. A fresh 90-day pull is ~8 requests
+    # and returns the live status of every ticket it matches.
+    graffiti_recent = _fetch_monthly("HHSGRAFF", 3, "graffiti", use_cache=False)
+
     sections = {
         "bars": _load_bars,
         "coyotes": _load_coyotes,
-        "graffiti": lambda: _load_graffiti(graffiti_records),
+        "graffiti": lambda: _load_graffiti(
+            _merge_latest(graffiti_records, graffiti_recent)
+        ),
         "parking": _load_parking,
-        "graffitiSpeedrun": lambda: _load_graffiti_speedrun(graffiti_records),
+        "graffitiSpeedrun": lambda: _load_graffiti_speedrun(graffiti_recent),
     }
 
     data = {"updated": now_iso}
