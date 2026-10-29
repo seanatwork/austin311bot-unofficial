@@ -222,7 +222,7 @@ def _fetch_code(service_code: str, days_back: int) -> list:
 | `generate_court_data.py` | Court caseload data |
 | `generate_covid_data.py` | COVID data page |
 | `generate_fire_data.py` | Fire data snapshots |
-| `generate_fun_data.py` | Fun page (bar of the month, coyote sightings, graffiti hall of fame) |
+| `generate_fun_data.py` | Fun page (bar of the month, coyote sightings, graffiti hall of fame/speedrun, parking) — Open311 cards go through `fetch_monthly_with_cache()` |
 | `generate_911_data.py` | 911 call data (quarterly) |
 | `generate_nearby_page.py` | "311 Near You" dynamic map |
 | `generate_og_image.py` | Open Graph preview images |

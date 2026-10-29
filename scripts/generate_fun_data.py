@@ -18,13 +18,20 @@ import os
 import re
 import time
 from collections import Counter
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 
 import requests
 
+from open311_cache import fetch_monthly_with_cache
 from open311_client import open311_get
+
+try:
+    from zoneinfo import ZoneInfo
+    _CENTRAL = ZoneInfo("America/Chicago")
+except ImportError:  # pragma: no cover - Python < 3.9 / missing tzdata
+    _CENTRAL = None
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -51,17 +58,48 @@ def _app_token() -> str:
     return os.getenv("AUSTINAPIKEY", "")
 
 
-def _fetch_open311(params: dict) -> Optional[list]:
-    """Fetch from Open311 using the shared retry-aware client (respects Retry-After, 8 retries)."""
-    session = _get_session()
-    token = _app_token()
-    if token:
-        params = {**params, "$$app_token": token}
+def _open311_page(params: dict):
+    """Fetch one page of Open311 records via the shared retry-aware client."""
+    return open311_get(_get_session(), OPEN311_URL, params)
+
+
+def _fetch_monthly(
+    code: str, months_back: int, category: str, max_pages: int = 10
+) -> Optional[list]:
+    """Fetch `months_back` months of a single Open311 service code, month by month.
+
+    The 311 API truncates a long date window (~300 records, oldest first), so a
+    single 365-day request silently loses the most recent ~9 months of a busy
+    code — which is exactly how this page ended up serving January data in
+    October. Every other Open311 consumer here goes through the shared
+    cache-aware monthly driver; doing the same keeps coverage complete and
+    reuses the cache the map/trends steps already warmed.
+
+    `max_pages` caps records per (code, month) at 100 each. It must be high
+    enough that a normal month is fetched end-to-end, otherwise the month is
+    never marked complete and every run re-downloads it (parking runs ~2,400
+    tickets/month).
+    """
     try:
-        return open311_get(session, OPEN311_URL, params)
+        records = fetch_monthly_with_cache(
+            category=category,
+            service_codes=[code],
+            label_map={code: category},
+            months_back=months_back,
+            use_cache=True,
+            make_request=_open311_page,
+            extra_params={"extensions": "true"},
+            max_pages=max_pages,
+            page_delay=0.5 if _app_token() else 1.0,
+            code_delay=1.0 if _app_token() else 2.0,
+        )
     except Exception as e:
-        logger.warning(f"Open311 fetch failed: {e}")
+        logger.warning(f"Open311 monthly fetch failed for {code}: {e}")
         return None
+    if not records:
+        logger.warning(f"Open311 monthly fetch returned no records for {code}")
+        return None
+    return records
 
 
 def _fetch_json(url: str, params: dict, max_retries: int = 3) -> Optional[list]:
@@ -237,16 +275,7 @@ def _load_bars() -> Optional[dict]:
 def _load_coyotes() -> Optional[dict]:
     """Fetch coyote complaints from Open311."""
     logger.info("Loading Coyote Sightings…")
-    now = datetime.now(timezone.utc)
-    start = now - timedelta(days=365)
-    start_str = start.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    records = _fetch_open311({
-        "service_code": "ACCOYTE",
-        "start_date": start_str,
-        "per_page": 500,
-        "page": 1,
-    })
+    records = _fetch_monthly("ACCOYTE", 12, "fun_coyote")
     if not records:
         return None
 
@@ -298,19 +327,9 @@ def _load_coyotes() -> Optional[dict]:
 
 # ── 3. Graffiti Hall of Fame ─────────────────────────────────────────────────
 
-def _load_graffiti() -> Optional[dict]:
-    """Fetch graffiti complaints from Open311."""
+def _load_graffiti(records: Optional[list]) -> Optional[dict]:
+    """Build the Graffiti Hall of Fame from already-fetched HHSGRAFF records."""
     logger.info("Loading Graffiti Hall of Fame…")
-    now = datetime.now(timezone.utc)
-    start = now - timedelta(days=365)
-    start_str = start.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    records = _fetch_open311({
-        "service_code": "HHSGRAFF",
-        "start_date": start_str,
-        "per_page": 500,
-        "page": 1,
-    })
     if not records:
         return None
 
@@ -393,16 +412,7 @@ def _extract_violation_type(desc: str) -> str:
 def _load_parking() -> Optional[dict]:
     """Fetch parking complaints from Open311."""
     logger.info("Loading Parking Shenanigans…")
-    now = datetime.now(timezone.utc)
-    start = now - timedelta(days=90)
-    start_str = start.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    records = _fetch_open311({
-        "service_code": "PARKINGV",
-        "start_date": start_str,
-        "per_page": 500,
-        "page": 1,
-    })
+    records = _fetch_monthly("PARKINGV", 3, "parking", max_pages=40)
     if not records:
         return None
 
@@ -418,8 +428,11 @@ def _load_parking() -> Optional[dict]:
 
         try:
             d = datetime.fromisoformat(ts.replace("Z", "+00:00"))
-            # Approximate CDT (UTC-5)
-            local_hour = (d.hour - 5) % 24
+            # Bucket by Central wall-clock hour so CST/CDT both land correctly
+            if _CENTRAL is not None:
+                local_hour = d.astimezone(_CENTRAL).hour
+            else:  # fallback: rough CDT (UTC-5)
+                local_hour = (d.hour - 5) % 24
             hourly_counts[local_hour] += 1
         except (ValueError, TypeError):
             pass
@@ -465,19 +478,10 @@ def _load_parking() -> Optional[dict]:
 
 # ── 5. Graffiti Speedrun Stats ───────────────────────────────────────────────
 
-def _load_graffiti_speedrun() -> Optional[dict]:
-    """Calculate graffiti resolution time stats from Open311."""
+def _load_graffiti_speedrun(records: Optional[list]) -> Optional[dict]:
+    """Calculate graffiti resolution time stats from already-fetched HHSGRAFF records."""
     logger.info("Loading Graffiti Speedrun Stats…")
     now = datetime.now(timezone.utc)
-    start = now - timedelta(days=365)
-    start_str = start.strftime("%Y-%m-%dT%H:%M:%SZ")
-
-    records = _fetch_open311({
-        "service_code": "HHSGRAFF",
-        "start_date": start_str,
-        "per_page": 500,
-        "page": 1,
-    })
     if not records:
         return None
 
@@ -494,7 +498,9 @@ def _load_graffiti_speedrun() -> Optional[dict]:
             req = datetime.fromisoformat(req_ts.replace("Z", "+00:00"))
             upd = datetime.fromisoformat(upd_ts.replace("Z", "+00:00"))
             delta = (upd - req).total_seconds() / 86400
-            if delta >= 0:
+            # delta == 0 means the record was stamped closed in the same second
+            # it was opened (auto-close/duplicate) — no resolution info to show.
+            if delta > 0:
                 resolution_times.append(delta)
         except (ValueError, TypeError):
             continue
@@ -507,8 +513,8 @@ def _load_graffiti_speedrun() -> Optional[dict]:
     avg = sum(resolution_times) / n
     median = resolution_times[n // 2] if n % 2 else (resolution_times[n // 2 - 1] + resolution_times[n // 2]) / 2
 
-    # Fastest 5
-    fastest = [round(t, 1) for t in resolution_times[:5]]
+    # Fastest 5 (kept in days, sub-hour precision so the page can show minutes)
+    fastest = [round(t, 4) for t in resolution_times[:5]]
 
     # Distribution buckets
     buckets = {
@@ -568,20 +574,58 @@ def _bucket_label(key: str) -> str:
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 
+def _load_previous(out_path: Path) -> dict:
+    """Read the last committed data.json so a failed fetch can fall back to it."""
+    try:
+        return json.loads(out_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+
+
 def main() -> None:
     now = datetime.now(timezone.utc)
-    logger.info(f"Generating fun/data.json at {now.isoformat()}")
-
-    data = {
-        "updated": now.isoformat(),
-        "bars": _load_bars(),
-        "coyotes": _load_coyotes(),
-        "graffiti": _load_graffiti(),
-        "parking": _load_parking(),
-        "graffitiSpeedrun": _load_graffiti_speedrun(),
-    }
+    now_iso = now.isoformat()
+    logger.info(f"Generating fun/data.json at {now_iso}")
 
     out_path = Path(__file__).resolve().parent.parent / "docs" / "fun" / "data.json"
+    previous = _load_previous(out_path)
+
+    # One shared HHSGRAFF pull feeds both graffiti cards: they can no longer
+    # disagree (previously each fetch got a different truncated slice) and the
+    # year of graffiti data is only downloaded once.
+    graffiti_records = _fetch_monthly("HHSGRAFF", 12, "graffiti")
+
+    sections = {
+        "bars": _load_bars,
+        "coyotes": _load_coyotes,
+        "graffiti": lambda: _load_graffiti(graffiti_records),
+        "parking": _load_parking,
+        "graffitiSpeedrun": lambda: _load_graffiti_speedrun(graffiti_records),
+    }
+
+    data = {"updated": now_iso}
+    for key, load in sections.items():
+        try:
+            value = load()
+        except Exception as e:  # a broken card must not blank the whole page
+            logger.warning(f"{key} failed: {e}")
+            value = None
+
+        if value is None:
+            fallback = previous.get(key) if isinstance(previous, dict) else None
+            if fallback:
+                logger.warning(
+                    f"{key}: no fresh data, keeping last good value from "
+                    f"{fallback.get('asOf', 'unknown')}"
+                )
+                data[key] = fallback
+            else:
+                data[key] = None
+            continue
+
+        value["asOf"] = now_iso
+        data[key] = value
+
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(json.dumps(data, indent=2, default=str), encoding="utf-8")
     logger.info(f"Wrote {out_path.stat().st_size:,} bytes to {out_path}")

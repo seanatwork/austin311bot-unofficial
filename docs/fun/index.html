@@ -1,4 +1,4 @@
-<!DOCTesYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -90,6 +90,12 @@
 
     .loading { color: var(--text-muted); font-size: 13px; padding: 12px 0; }
     .error   { color: #ef4444; font-size: 12px; padding: 8px 0; }
+
+    .stale-note {
+      background: #fef3c7; border: 1px solid #fde68a; color: #92400e;
+      border-radius: 6px; padding: 6px 10px; font-size: 11px; line-height: 1.4;
+    }
+    html.dark .stale-note { background: #3b2706; border-color: #713f12; color: #fcd34d; }
 
     /* winner banner */
     .winner {
@@ -266,13 +272,37 @@
     }
 
     function fmtDays(days) {
+      if (days < 1 / 24) {
+        var minutes = Math.max(1, Math.round(days * 24 * 60));
+        return minutes + "m";
+      }
       if (days < 1) {
         var hours = Math.round(days * 24);
-        return hours + "h";
+        return hours < 1 ? "<1h" : hours + "h";
       }
       if (days < 30) return days.toFixed(1) + "d";
       if (days < 365) return Math.round(days / 30) + "mo";
       return (days / 365).toFixed(1) + "y";
+    }
+
+    // When a section's fetch fails, the generator keeps the last good copy and
+    // stamps its own asOf. Surface that instead of silently showing old numbers.
+    var GENERATED = null;
+
+    function staleNote(section) {
+      if (!section || !section.asOf || !GENERATED) return "";
+      var asOf = new Date(section.asOf);
+      if (isNaN(asOf.getTime()) || GENERATED - asOf < 36 * 3600 * 1000) return "";
+      return '<div class="stale-note">⚠️ Couldn\'t refresh this card — showing data from ' +
+        asOf.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) + '.</div>';
+    }
+
+    function renderMissing(id, what) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.innerHTML = '<div class="error">Couldn\'t load ' + what +
+          ' this week — the city API may be throttling us. Check back after the next refresh.</div>';
+      }
     }
 
     // ── load all from pre-generated data.json ──────────────────────────────────
@@ -282,6 +312,7 @@
         const res = await fetch("data.json");
         if (!res.ok) throw new Error("HTTP " + res.status);
         const data = await res.json();
+        GENERATED = data.updated ? new Date(data.updated) : null;
         if (data.updated) {
           var d = new Date(data.updated);
           document.getElementById("last-updated").textContent =
@@ -290,11 +321,11 @@
               hour: "2-digit", minute: "2-digit", timeZoneName: "short"
             });
         }
-        if (data.bars) renderBars(data.bars);
-        if (data.coyotes) renderCoyotes(data.coyotes);
-        if (data.graffiti) renderGraffiti(data.graffiti);
-        if (data.parking) renderParking(data.parking);
-        if (data.graffitiSpeedrun) renderSpeedrun(data.graffitiSpeedrun);
+        if (data.bars) renderBars(data.bars); else renderMissing("bar-content", "bar of the month");
+        if (data.coyotes) renderCoyotes(data.coyotes); else renderMissing("coyote-content", "coyote sightings");
+        if (data.graffiti) renderGraffiti(data.graffiti); else renderMissing("graffiti-content", "the graffiti hall of fame");
+        if (data.parking) renderParking(data.parking); else renderMissing("parking-content", "parking shenanigans");
+        if (data.graffitiSpeedrun) renderSpeedrun(data.graffitiSpeedrun); else renderMissing("speedrun-content", "graffiti speedrun stats");
 
       } catch (err) {
         document.querySelectorAll(".loading").forEach(function(el) {
@@ -337,6 +368,7 @@
       ).join("") : `<div style="font-size:12px;color:var(--text-muted);">No significant movers this month.</div>`;
 
       el.innerHTML = `
+        ${staleNote(d)}
         <div class="winner">
           <div class="winner-crown">🏆 Bar of the Month — ${curLabel}</div>
           <div class="winner-name">${winner.name}</div>
@@ -378,6 +410,7 @@
       }).join("");
 
       el.innerHTML = `
+        ${staleNote(d)}
         <div class="stat-row">
           <div class="stat-box">
             <div class="stat-val">${total}</div>
@@ -438,6 +471,7 @@
       }).join("");
 
       el.innerHTML = `
+        ${staleNote(d)}
         <div class="winner">
           <div class="winner-crown">🏆 Most Tagged Location</div>
           <div class="winner-name" style="font-size:0.9rem;">${winner.address}</div>
@@ -502,6 +536,7 @@
       }).join("");
 
       el.innerHTML = `
+        ${staleNote(d)}
         <div class="winner" style="background:var(--bg-panel);border-color:var(--border);">
           <div style="font-size:0.85rem;font-weight:700;color:var(--text-head);margin-bottom:6px;">
             🔥 Hottest Enforcement Time</div>
@@ -568,6 +603,7 @@
       var fastestStr = fastestDays.map(function(d) { return fmtDays(d); }).join(", ");
 
       el.innerHTML = `
+        ${staleNote(d)}
         <div class="stat-row">
           <div class="stat-box">
             <div class="stat-val">${fmtDays(avgDays)}</div>
