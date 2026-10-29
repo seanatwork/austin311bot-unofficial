@@ -166,59 +166,6 @@
       line-height: 1.15;
     }
 
-    header .subtitle {
-      margin-top: 0.5rem;
-      color: var(--text-tag);
-      font-size: 1rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-    }
-    header .ticket-lookup {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 0.25rem;
-      background: var(--btn-bg);
-      border: 1px solid var(--btn-border);
-      border-radius: 999px;
-      padding: 4px 4px 4px 12px;
-      margin: 0.75rem auto 0;
-      width: fit-content;
-    }
-    header .ticket-lookup:focus-within {
-      border-color: var(--border-cta-hover);
-      outline: 2px solid var(--border-cta-hover);
-      outline-offset: 2px;
-    }
-    header .ticket-lookup input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--btn-color);
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      width: 14em;
-      padding: 4px 0;
-    }
-    header .ticket-lookup input::placeholder {
-      color: var(--text-tag);
-      opacity: 1;
-    }
-    header .ticket-lookup button {
-      background: var(--btn-color);
-      color: var(--btn-bg);
-      border: none;
-      border-radius: 999px;
-      padding: 4px 12px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
     /* main is a flex item of the centred body: without an explicit width it
        shrink-wraps to its widest child and overflows the viewport */
     main { width: 100%; max-width: 900px; }
@@ -384,7 +331,6 @@
       text-decoration: none;
       border-bottom: 1px dashed var(--border);
     }
-    .footer-tag { font-size: 0.75rem; }
 
     #more-grid { margin-top: 1.25rem; }
     #more-grid[hidden] { display: none; }
@@ -542,9 +488,8 @@
     }
 
     /* micro text (12–14px) sits at 1.4 leading */
-    .chip, .trends-pill, footer, .footer-tag, .ticker-link, .ticker-meta,
-    .ticker-badge, .ticker-count, .ticker-sub,
-    header .ticket-lookup input, header .ticket-lookup button { line-height: 1.4; }
+    .chip, .trends-pill, footer, .ticker-link, .ticker-meta,
+    .ticker-badge, .ticker-count, .ticker-sub { line-height: 1.4; }
 
     /* z-index layering for content above bg pattern */
     .grid, header, .disclaimer, footer { position: relative; z-index: 1; }
@@ -567,7 +512,6 @@
 
   <header>
     <h1>Austin 311</h1>
-    <p class="subtitle">Real data on what your city is doing — and what it isn't.</p>
 
   <!-- ── 311 Descriptions Ticker ── -->
   <div class="card ticker-card" id="funny-card">
@@ -592,10 +536,6 @@
       <a class="ticker-link" href="complaints/">Browse all complaints by category →</a>
     </div>
   </div>
-    <form class="ticket-lookup" id="ticket-lookup">
-      <input type="text" id="ticket-number" placeholder="Track a ticket: 26-00253825" aria-label="311 ticket number" autocomplete="off" spellcheck="false">
-      <button type="submit">Look up</button>
-    </form>
   </header>
 
   <main>
@@ -799,25 +739,9 @@
 
   <footer>
     <a href="https://github.com/seanatwork" target="_blank" rel="noopener">Vibecoded with ❤️</a>
-    <br />
-    <span class="footer-tag">🤘 Keep Austin Weird</span>
   </footer>
 
   <script>
-    // Ticket lookup: paste a 311 ticket number (e.g. 26-00253825) and jump to the city's ticket page
-    document.getElementById("ticket-lookup").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const input = document.getElementById("ticket-number");
-      const ticket = input.value.trim();
-      if (!/^\d{2}-\d{8}$/.test(ticket)) {
-        input.setCustomValidity("Enter a ticket number like 26-00253825");
-        input.reportValidity();
-        return;
-      }
-      input.setCustomValidity("");
-      window.open("https://311.austintexas.gov/tickets/" + ticket, "_blank", "noopener");
-    });
-
     function toggleMore() {
       const grid  = document.getElementById("more-grid");
       const btn   = document.getElementById("more-btn");
@@ -900,14 +824,7 @@
 
       var timer = null;
       var paused = false;
-      var BASE_DURATION = 7000;
-      var MS_PER_CHAR = 15;
-      var MAX_DURATION = 12000;
-
-      function getDuration(text) {
-        var dur = BASE_DURATION + text.length * MS_PER_CHAR;
-        return Math.min(dur, MAX_DURATION);
-      }
+      var SLIDE_DURATION = 6000; // ms each quote stays on screen
 
       function showItem(index) {
         tickerText.classList.remove("ticker-loading");
@@ -941,10 +858,9 @@
       function resetTimers() {
         if (timer) clearTimeout(timer);
         if (paused) return;
-        var duration = getDuration(items[currentIndex].text);
         timer = setTimeout(function() {
           nextItem();
-        }, duration);
+        }, SLIDE_DURATION);
       }
 
       var tickerCard = document.getElementById("funny-card");
