@@ -153,6 +153,8 @@
       margin-bottom: 2rem;
       position: relative;
       z-index: 1;
+      width: 100%;
+      max-width: 900px; /* the ticker card inside sizes to 100% of this */
     }
 
     header h1 {
@@ -392,8 +394,10 @@
       position: relative;
       width: 100%;
       max-width: 900px;
-      margin-top: 2rem;
+      margin: 1.5rem auto 0;
       align-items: stretch; /* .card is flex-start; the ticker needs full-width children */
+      /* header is text-align:center; the quote and meta must stay left-aligned */
+      text-align: start;
     }
     /* the ticker is not a link — don't give it a link card's hover affordance */
     .ticker-card:hover {
@@ -564,6 +568,30 @@
   <header>
     <h1>Austin 311</h1>
     <p class="subtitle">Real data on what your city is doing — and what it isn't.</p>
+
+  <!-- ── 311 Descriptions Ticker ── -->
+  <div class="card ticker-card" id="funny-card">
+    <div id="funny-content">
+      <div class="ticker-content">
+        <div class="ticker-quote ticker-loading" id="ticker-text">Loading 311 descriptions…</div>
+        <div class="ticker-meta">
+          <span class="ticker-badge" id="ticker-badge">—</span>
+          <span class="ticker-addr" id="ticker-address"></span>
+          <span class="ticker-date" id="ticker-date"></span>
+          <span class="ticker-count" id="ticker-count"></span>
+        </div>
+
+        <div class="ticker-nav" id="ticker-nav">
+          <button class="ticker-arrow" id="ticker-prev" aria-label="Previous">&lt;</button>
+          <button class="ticker-arrow" id="ticker-next" aria-label="Next">&gt;</button>
+        </div>
+      </div>
+    </div>
+    <div class="ticker-sub" id="ticker-sub">Loading…</div>
+    <div class="ticker-link-row">
+      <a class="ticker-link" href="complaints/">Browse all complaints by category →</a>
+    </div>
+  </div>
     <form class="ticket-lookup" id="ticket-lookup">
       <input type="text" id="ticket-number" placeholder="Track a ticket: 26-00253825" aria-label="311 ticket number" autocomplete="off" spellcheck="false">
       <button type="submit">Look up</button>
@@ -759,29 +787,6 @@
     </a>
   </section>
 
-  <!-- ── 311 Descriptions Ticker ── -->
-  <div class="card ticker-card" id="funny-card">
-    <div id="funny-content">
-      <div class="ticker-content">
-        <div class="ticker-quote ticker-loading" id="ticker-text">Loading 311 descriptions…</div>
-        <div class="ticker-meta">
-          <span class="ticker-badge" id="ticker-badge">—</span>
-          <span class="ticker-addr" id="ticker-address"></span>
-          <span class="ticker-date" id="ticker-date"></span>
-          <span class="ticker-count" id="ticker-count"></span>
-        </div>
-
-        <div class="ticker-nav" id="ticker-nav">
-          <button class="ticker-arrow" id="ticker-prev" aria-label="Previous">&lt;</button>
-          <button class="ticker-arrow" id="ticker-next" aria-label="Next">&gt;</button>
-        </div>
-      </div>
-    </div>
-    <div class="ticker-sub" id="ticker-sub">Loading…</div>
-    <div class="ticker-link-row">
-      <a class="ticker-link" href="complaints/">Browse all complaints by category →</a>
-    </div>
-  </div>
 </main>
 
   <div class="disclaimer">
