@@ -1,81 +1,81 @@
 {
- "generated": "2026-10-29T17:11:27.373159Z",
+ "generated": "2026-10-30T17:00:25.357412Z",
  "windowDays": 365,
- "totalRecords": 107575,
- "mappedToZip": 107450,
+ "totalRecords": 107545,
+ "mappedToZip": 107420,
  "zipCount": 64,
  "citywide": {
-  "total": 107575,
+  "total": 107545,
   "topIssues": [
    {
     "name": "Parking Violation",
-    "count": 23981,
+    "count": 23989,
     "share": 22.3
    },
    {
     "name": "Traffic Signal",
-    "count": 11864,
+    "count": 11846,
     "share": 11.0
    },
    {
     "name": "Loose Dog",
-    "count": 8868,
+    "count": 8858,
     "share": 8.2
    },
    {
     "name": "Dead Animal",
-    "count": 6402,
+    "count": 6417,
     "share": 6.0
    },
    {
     "name": "Park Maintenance - Grounds",
-    "count": 4932,
+    "count": 4934,
     "share": 4.6
    },
    {
     "name": "Street Light",
-    "count": 4360,
-    "share": 4.1
+    "count": 4354,
+    "share": 4.0
    },
    {
     "name": "Tree in ROW",
-    "count": 3793,
+    "count": 3779,
     "share": 3.5
    },
    {
     "name": "Obstruction in Right of Way",
-    "count": 3405,
+    "count": 3412,
     "share": 3.2
    }
   ],
   "response": {
-   "count": 97389,
-   "medianDays": 0.5,
+   "count": 97209,
+   "medianDays": 0.4,
    "avgDays": 3.8,
-   "p90Days": 5.3,
+   "p90Days": 5.2,
    "sameDayPct": 68
   },
   "leaderboard": {
    "fastest": [
     {
      "name": "Traffic Signal",
-     "count": 11440,
+     "count": 11410,
      "medianDays": 0.0,
-     "avgDays": 3.7,
+     "avgDays": 3.6,
      "p90Days": 1.8,
      "sameDayPct": 88
     },
     {
      "name": "Traffic Sign Maintenance",
-     "count": 960,
+     "count": 958,
      "medianDays": 0.0,
-     "avgDays": 2.8,
+     "avgDays": 2.7,
      "p90Days": 6.6,
      "sameDayPct": 74
     },
     {
      "name": "Parking Violation",
-     "count": 23647,
+     "count": 23645,
      "medianDays": 0.1,
      "avgDays": 0.2,
      "p90Days": 0.3,
@@ -91,9 +91,9 @@
     },
     {
      "name": "Wildlife",
-     "count": 1235,
+     "count": 1239,
      "medianDays": 0.1,
-     "avgDays": 3.6,
+     "avgDays": 3.5,
      "p90Days": 5.9,
      "sameDayPct": 67
     }
@@ -117,34 +117,34 @@
     },
     {
      "name": "New Sign Request",
-     "count": 711,
-     "medianDays": 15.9,
-     "avgDays": 27.1,
-     "p90Days": 66.8,
-     "sameDayPct": 12
+     "count": 701,
+     "medianDays": 15.8,
+     "avgDays": 27.0,
+     "p90Days": 66.9,
+     "sameDayPct": 13
     },
     {
      "name": "Park Playgrounds",
-     "count": 504,
+     "count": 500,
      "medianDays": 6.9,
-     "avgDays": 13.2,
+     "avgDays": 13.1,
      "p90Days": 31.9,
      "sameDayPct": 11
     },
     {
      "name": "Traffic Obstruction",
-     "count": 224,
+     "count": 221,
      "medianDays": 6.6,
      "avgDays": 9.9,
      "p90Days": 23.3,
-     "sameDayPct": 12
+     "sameDayPct": 13
     }
    ]
   },
   "worstDay": {
    "date": "2026-07-05",
    "count": 799,
-   "dailyAvg": 294.7,
+   "dailyAvg": 294.6,
    "xDaily": 2.7
   },
   "zips": {
@@ -161,7 +161,7 @@
  "zips": {
   "78704": {
    "area": "South Congress / Zilker",
-   "volume": 9056,
+   "volume": 9054,
    "rank": 1,
    "zipCount": 64,
    "percentile": 0.02,
@@ -169,8 +169,8 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 2976,
-     "share": 32.9
+     "count": 2973,
+     "share": 32.8
     },
     {
      "name": "Traffic Signal",
@@ -179,12 +179,12 @@
     },
     {
      "name": "Park Maintenance - Grounds",
-     "count": 628,
-     "share": 6.9
+     "count": 631,
+     "share": 7.0
     }
    ],
    "response": {
-    "count": 8286,
+    "count": 8277,
     "medianDays": 0.2,
     "avgDays": 3.7,
     "p90Days": 4.7,
@@ -218,9 +218,9 @@
     {
      "name": "Park Maintenance - Grounds",
      "quotient": 1.5,
-     "shareZip": 6.9,
+     "shareZip": 7.0,
      "shareCity": 4.6,
-     "count": 628
+     "count": 631
     }
    ],
    "activity": {
@@ -228,7 +228,7 @@
     "peakHourLabel": "3pm",
     "peakDay": "Sat",
     "weekendPct": 28,
-    "lateNightCount": 2641
+    "lateNightCount": 2638
    },
    "archetype": "OVERACHIEVER",
    "punchline": "finding parking is a blood sport",
@@ -236,7 +236,7 @@
   },
   "78702": {
    "area": "East Austin",
-   "volume": 7862,
+   "volume": 7867,
    "rank": 2,
    "zipCount": 64,
    "percentile": 0.03,
@@ -244,25 +244,25 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 2868,
-     "share": 36.5
+     "count": 2867,
+     "share": 36.4
     },
     {
      "name": "Outdoor Music Venue",
-     "count": 472,
+     "count": 471,
      "share": 6.0
     },
     {
      "name": "Loose Dog",
-     "count": 471,
+     "count": 470,
      "share": 6.0
     }
    ],
    "response": {
-    "count": 7229,
+    "count": 7217,
     "medianDays": 0.2,
     "avgDays": 2.8,
-    "p90Days": 3.8,
+    "p90Days": 3.7,
     "sameDayPct": 75
    },
    "lowlight": {
@@ -272,7 +272,7 @@
    "worstDay": {
     "date": "2026-09-12",
     "count": 56,
-    "dailyAvg": 21.5,
+    "dailyAvg": 21.6,
     "xDaily": 2.6
    },
    "setsApart": [
@@ -281,7 +281,7 @@
      "quotient": 2.7,
      "shareZip": 6.0,
      "shareCity": 2.2,
-     "count": 472
+     "count": 471
     },
     {
      "name": "Park Building Plumbing",
@@ -300,9 +300,9 @@
     {
      "name": "Parking Violation",
      "quotient": 1.6,
-     "shareZip": 36.5,
+     "shareZip": 36.4,
      "shareCity": 22.3,
-     "count": 2868
+     "count": 2867
     }
    ],
    "activity": {
@@ -310,7 +310,7 @@
     "peakHourLabel": "12am",
     "peakDay": "Sat",
     "weekendPct": 32,
-    "lateNightCount": 2642
+    "lateNightCount": 2646
    },
    "archetype": "OVERACHIEVER",
    "punchline": "finding parking is a blood sport",
@@ -326,8 +326,8 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 2680,
-     "share": 36.1
+     "count": 2686,
+     "share": 36.2
     },
     {
      "name": "Outdoor Music Venue",
@@ -336,12 +336,12 @@
     },
     {
      "name": "Traffic Signal",
-     "count": 631,
+     "count": 630,
      "share": 8.5
     }
    ],
    "response": {
-    "count": 6882,
+    "count": 6876,
     "medianDays": 0.2,
     "avgDays": 3.4,
     "p90Days": 3.1,
@@ -382,9 +382,9 @@
     {
      "name": "Parking Violation",
      "quotient": 1.6,
-     "shareZip": 36.1,
+     "shareZip": 36.2,
      "shareCity": 22.3,
-     "count": 2680
+     "count": 2686
     }
    ],
    "activity": {
@@ -392,7 +392,7 @@
     "peakHourLabel": "9pm",
     "peakDay": "Sat",
     "weekendPct": 31,
-    "lateNightCount": 2226
+    "lateNightCount": 2225
    },
    "archetype": "OVERACHIEVER",
    "punchline": "finding parking is a blood sport",
@@ -400,7 +400,7 @@
   },
   "78745": {
    "area": "South Austin",
-   "volume": 6627,
+   "volume": 6622,
    "rank": 4,
    "zipCount": 64,
    "percentile": 0.06,
@@ -408,22 +408,22 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 1155,
+     "count": 1154,
      "share": 17.4
     },
     {
      "name": "Traffic Signal",
-     "count": 699,
+     "count": 694,
      "share": 10.5
     },
     {
      "name": "Loose Dog",
-     "count": 409,
+     "count": 408,
      "share": 6.2
     }
    ],
    "response": {
-    "count": 6022,
+    "count": 6006,
     "medianDays": 0.6,
     "avgDays": 3.9,
     "p90Days": 5.0,
@@ -436,23 +436,23 @@
    "worstDay": {
     "date": "2026-05-11",
     "count": 71,
-    "dailyAvg": 18.2,
+    "dailyAvg": 18.1,
     "xDaily": 3.9
    },
    "setsApart": [
     {
      "name": "Coyote Sighting",
-     "quotient": 2.8,
+     "quotient": 2.7,
      "shareZip": 1.1,
      "shareCity": 0.4,
-     "count": 74
+     "count": 73
     },
     {
      "name": "Pothole",
      "quotient": 1.9,
      "shareZip": 5.5,
      "shareCity": 2.9,
-     "count": 362
+     "count": 363
     },
     {
      "name": "Channels/Creeks/Drainage",
@@ -466,7 +466,7 @@
      "quotient": 1.7,
      "shareZip": 3.5,
      "shareCity": 2.1,
-     "count": 232
+     "count": 233
     }
    ],
    "activity": {
@@ -474,7 +474,7 @@
     "peakHourLabel": "3pm",
     "peakDay": "Tue",
     "weekendPct": 23,
-    "lateNightCount": 1810
+    "lateNightCount": 1811
    },
    "archetype": "OVERACHIEVER",
    "punchline": "finding parking is a blood sport",
@@ -482,7 +482,7 @@
   },
   "78744": {
    "area": "78744",
-   "volume": 5243,
+   "volume": 5230,
    "rank": 5,
    "zipCount": 64,
    "percentile": 0.08,
@@ -490,25 +490,25 @@
    "topIssues": [
     {
      "name": "Loose Dog",
-     "count": 894,
-     "share": 17.1
+     "count": 891,
+     "share": 17.0
     },
     {
      "name": "Parking Violation",
-     "count": 626,
-     "share": 11.9
+     "count": 628,
+     "share": 12.0
     },
     {
      "name": "Traffic Signal",
-     "count": 499,
+     "count": 497,
      "share": 9.5
     }
    ],
    "response": {
-    "count": 4761,
+    "count": 4740,
     "medianDays": 0.7,
     "avgDays": 4.3,
-    "p90Days": 7.1,
+    "p90Days": 7.0,
     "sameDayPct": 60
    },
    "lowlight": {
@@ -518,7 +518,7 @@
    "worstDay": {
     "date": "2026-07-05",
     "count": 66,
-    "dailyAvg": 14.4,
+    "dailyAvg": 14.3,
     "xDaily": 4.6
    },
    "setsApart": [
@@ -527,14 +527,14 @@
      "quotient": 3.1,
      "shareZip": 0.7,
      "shareCity": 0.2,
-     "count": 35
+     "count": 34
     },
     {
      "name": "Loose Dog",
      "quotient": 2.1,
-     "shareZip": 17.1,
+     "shareZip": 17.0,
      "shareCity": 8.2,
-     "count": 894
+     "count": 891
     },
     {
      "name": "Street Sign",
@@ -556,7 +556,7 @@
     "peakHourLabel": "3pm",
     "peakDay": "Wed",
     "weekendPct": 22,
-    "lateNightCount": 1294
+    "lateNightCount": 1292
    },
    "archetype": "OVERACHIEVER",
    "punchline": "the wildlife is undefeated",
@@ -564,7 +564,7 @@
   },
   "78753": {
    "area": "North Austin",
-   "volume": 4761,
+   "volume": 4746,
    "rank": 6,
    "zipCount": 64,
    "percentile": 0.09,
@@ -572,30 +572,30 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 816,
-     "share": 17.1
+     "count": 817,
+     "share": 17.2
     },
     {
      "name": "Loose Dog",
-     "count": 673,
+     "count": 671,
      "share": 14.1
     },
     {
      "name": "Traffic Signal",
-     "count": 645,
-     "share": 13.5
+     "count": 635,
+     "share": 13.4
     }
    ],
    "response": {
-    "count": 4362,
+    "count": 4337,
     "medianDays": 0.6,
     "avgDays": 4.0,
-    "p90Days": 6.6,
+    "p90Days": 6.2,
     "sameDayPct": 65
    },
    "lowlight": {
     "name": "New Sign Request",
-    "medianDays": 19.0
+    "medianDays": 18.2
    },
    "worstDay": {
     "date": "2026-01-01",
@@ -609,21 +609,21 @@
      "quotient": 1.9,
      "shareZip": 0.6,
      "shareCity": 0.3,
-     "count": 29
+     "count": 30
     },
     {
      "name": "Loose Dog",
      "quotient": 1.7,
      "shareZip": 14.1,
      "shareCity": 8.2,
-     "count": 673
+     "count": 671
     },
     {
      "name": "Animal Care",
      "quotient": 1.6,
-     "shareZip": 3.4,
+     "shareZip": 3.3,
      "shareCity": 2.1,
-     "count": 161
+     "count": 158
     },
     {
      "name": "Channels/Creeks/Drainage",
@@ -638,7 +638,7 @@
     "peakHourLabel": "3pm",
     "peakDay": "Tue",
     "weekendPct": 23,
-    "lateNightCount": 1239
+    "lateNightCount": 1228
    },
    "archetype": "OVERACHIEVER",
    "punchline": "finding parking is a blood sport",
@@ -646,7 +646,7 @@
   },
   "78758": {
    "area": "North Austin",
-   "volume": 4484,
+   "volume": 4474,
    "rank": 7,
    "zipCount": 64,
    "percentile": 0.11,
@@ -654,7 +654,7 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 968,
+     "count": 965,
      "share": 21.6
     },
     {
@@ -664,15 +664,15 @@
     },
     {
      "name": "Traffic Signal",
-     "count": 559,
+     "count": 558,
      "share": 12.5
     }
    ],
    "response": {
-    "count": 4049,
+    "count": 4034,
     "medianDays": 0.5,
     "avgDays": 4.0,
-    "p90Days": 6.0,
+    "p90Days": 5.9,
     "sameDayPct": 66
    },
    "lowlight": {
@@ -720,7 +720,7 @@
     "peakHourLabel": "6pm",
     "peakDay": "Wed",
     "weekendPct": 23,
-    "lateNightCount": 1149
+    "lateNightCount": 1146
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
@@ -728,7 +728,7 @@
   },
   "78741": {
    "area": "East Riverside",
-   "volume": 4230,
+   "volume": 4242,
    "rank": 8,
    "zipCount": 64,
    "percentile": 0.12,
@@ -736,8 +736,8 @@
    "topIssues": [
     {
      "name": "Loose Dog",
-     "count": 476,
-     "share": 11.3
+     "count": 477,
+     "share": 11.2
     },
     {
      "name": "Traffic Signal",
@@ -746,20 +746,20 @@
     },
     {
      "name": "Parking Violation",
-     "count": 470,
+     "count": 471,
      "share": 11.1
     }
    ],
    "response": {
-    "count": 3806,
+    "count": 3809,
     "medianDays": 0.7,
     "avgDays": 4.3,
     "p90Days": 7.0,
-    "sameDayPct": 60
+    "sameDayPct": 61
    },
    "lowlight": {
     "name": "New Sign Request",
-    "medianDays": 21.1
+    "medianDays": 17.3
    },
    "worstDay": {
     "date": "2026-01-01",
@@ -773,7 +773,7 @@
      "quotient": 1.9,
      "shareZip": 5.9,
      "shareCity": 3.2,
-     "count": 251
+     "count": 252
     },
     {
      "name": "Animal Care",
@@ -802,7 +802,7 @@
     "peakHourLabel": "4pm",
     "peakDay": "Mon",
     "weekendPct": 24,
-    "lateNightCount": 1048
+    "lateNightCount": 1049
    },
    "archetype": "KEEN EYE",
    "punchline": "the wildlife is undefeated",
@@ -810,7 +810,7 @@
   },
   "78723": {
    "area": "Mueller",
-   "volume": 3823,
+   "volume": 3828,
    "rank": 9,
    "zipCount": 64,
    "percentile": 0.14,
@@ -828,13 +828,13 @@
     },
     {
      "name": "Dead Animal",
-     "count": 295,
-     "share": 7.7
+     "count": 297,
+     "share": 7.8
     }
    ],
    "response": {
     "count": 3391,
-    "medianDays": 0.7,
+    "medianDays": 0.6,
     "avgDays": 4.2,
     "p90Days": 6.1,
     "sameDayPct": 63
@@ -884,7 +884,7 @@
     "peakHourLabel": "3pm",
     "peakDay": "Thu",
     "weekendPct": 24,
-    "lateNightCount": 943
+    "lateNightCount": 944
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
@@ -900,7 +900,7 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 1148,
+     "count": 1149,
      "share": 31.2
     },
     {
@@ -910,12 +910,12 @@
     },
     {
      "name": "Traffic Signal",
-     "count": 281,
-     "share": 7.6
+     "count": 285,
+     "share": 7.7
     }
    ],
    "response": {
-    "count": 3305,
+    "count": 3302,
     "medianDays": 0.2,
     "avgDays": 4.5,
     "p90Days": 6.5,
@@ -937,7 +937,7 @@
      "quotient": 3.9,
      "shareZip": 2.4,
      "shareCity": 0.6,
-     "count": 88
+     "count": 87
     },
     {
      "name": "Park Building Plumbing",
@@ -964,9 +964,9 @@
    "activity": {
     "peakHour": 17,
     "peakHourLabel": "5pm",
-    "peakDay": "Wed",
+    "peakDay": "Fri",
     "weekendPct": 23,
-    "lateNightCount": 893
+    "lateNightCount": 891
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
@@ -974,7 +974,7 @@
   },
   "78705": {
    "area": "West Campus",
-   "volume": 3465,
+   "volume": 3460,
    "rank": 11,
    "zipCount": 64,
    "percentile": 0.17,
@@ -982,13 +982,13 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 1272,
+     "count": 1269,
      "share": 36.7
     },
     {
      "name": "Traffic Signal",
-     "count": 307,
-     "share": 8.9
+     "count": 305,
+     "share": 8.8
     },
     {
      "name": "Park Maintenance - Grounds",
@@ -997,7 +997,7 @@
     }
    ],
    "response": {
-    "count": 3156,
+    "count": 3149,
     "medianDays": 0.2,
     "avgDays": 4.8,
     "p90Days": 4.8,
@@ -1022,6 +1022,13 @@
      "count": 19
     },
     {
+     "name": "Outdoor Music Venue",
+     "quotient": 2.1,
+     "shareZip": 4.6,
+     "shareCity": 2.2,
+     "count": 158
+    },
+    {
      "name": "Traffic Calming",
      "quotient": 2.1,
      "shareZip": 0.8,
@@ -1029,26 +1036,19 @@
      "count": 28
     },
     {
-     "name": "Outdoor Music Venue",
-     "quotient": 2.0,
-     "shareZip": 4.6,
-     "shareCity": 2.2,
-     "count": 158
-    },
-    {
      "name": "Parking Violation",
      "quotient": 1.6,
      "shareZip": 36.7,
      "shareCity": 22.3,
-     "count": 1272
+     "count": 1269
     }
    ],
    "activity": {
     "peakHour": 15,
     "peakHourLabel": "3pm",
     "peakDay": "Wed",
-    "weekendPct": 21,
-    "lateNightCount": 842
+    "weekendPct": 22,
+    "lateNightCount": 841
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
@@ -1056,7 +1056,7 @@
   },
   "78748": {
    "area": "South Austin",
-   "volume": 3439,
+   "volume": 3440,
    "rank": 12,
    "zipCount": 64,
    "percentile": 0.19,
@@ -1064,8 +1064,8 @@
    "topIssues": [
     {
      "name": "Traffic Signal",
-     "count": 462,
-     "share": 13.4
+     "count": 457,
+     "share": 13.3
     },
     {
      "name": "Parking Violation",
@@ -1079,9 +1079,9 @@
     }
    ],
    "response": {
-    "count": 3100,
+    "count": 3094,
     "medianDays": 0.6,
-    "avgDays": 3.3,
+    "avgDays": 3.2,
     "p90Days": 5.6,
     "sameDayPct": 67
    },
@@ -1111,18 +1111,18 @@
      "count": 76
     },
     {
-     "name": "Sidewalk Repair",
+     "name": "Wildlife",
      "quotient": 1.8,
+     "shareZip": 2.1,
+     "shareCity": 1.2,
+     "count": 71
+    },
+    {
+     "name": "Sidewalk Repair",
+     "quotient": 1.7,
      "shareZip": 2.7,
      "shareCity": 1.5,
      "count": 93
-    },
-    {
-     "name": "Wildlife",
-     "quotient": 1.7,
-     "shareZip": 2.0,
-     "shareCity": 1.2,
-     "count": 69
     }
    ],
    "activity": {
@@ -1130,7 +1130,7 @@
     "peakHourLabel": "3pm",
     "peakDay": "Thu",
     "weekendPct": 24,
-    "lateNightCount": 898
+    "lateNightCount": 903
    },
    "archetype": "KEEN EYE",
    "punchline": "the streets are a choose-your-own-adventure",
@@ -1138,7 +1138,7 @@
   },
   "78751": {
    "area": "Hyde Park",
-   "volume": 3211,
+   "volume": 3213,
    "rank": 13,
    "zipCount": 64,
    "percentile": 0.2,
@@ -1146,13 +1146,13 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 1156,
+     "count": 1157,
      "share": 36.0
     },
     {
      "name": "Traffic Signal",
      "count": 464,
-     "share": 14.5
+     "share": 14.4
     },
     {
      "name": "Tree in ROW",
@@ -1161,10 +1161,10 @@
     }
    ],
    "response": {
-    "count": 2924,
+    "count": 2921,
     "medianDays": 0.2,
     "avgDays": 3.2,
-    "p90Days": 3.7,
+    "p90Days": 3.6,
     "sameDayPct": 77
    },
    "lowlight": {
@@ -1187,10 +1187,10 @@
     },
     {
      "name": "Traffic Obstruction",
-     "quotient": 1.9,
+     "quotient": 2.0,
      "shareZip": 1.0,
      "shareCity": 0.5,
-     "count": 32
+     "count": 33
     },
     {
      "name": "Obstruction in Right of Way",
@@ -1204,7 +1204,7 @@
      "quotient": 1.6,
      "shareZip": 36.0,
      "shareCity": 22.3,
-     "count": 1156
+     "count": 1157
     }
    ],
    "activity": {
@@ -1212,7 +1212,7 @@
     "peakHourLabel": "12am",
     "peakDay": "Sat",
     "weekendPct": 28,
-    "lateNightCount": 1121
+    "lateNightCount": 1122
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
@@ -1220,7 +1220,7 @@
   },
   "78759": {
    "area": "Arboretum",
-   "volume": 2993,
+   "volume": 2996,
    "rank": 14,
    "zipCount": 64,
    "percentile": 0.22,
@@ -1233,7 +1233,7 @@
     },
     {
      "name": "Parking Violation",
-     "count": 472,
+     "count": 473,
      "share": 15.8
     },
     {
@@ -1243,7 +1243,7 @@
     }
    ],
    "response": {
-    "count": 2734,
+    "count": 2735,
     "medianDays": 0.4,
     "avgDays": 2.8,
     "p90Days": 4.0,
@@ -1294,7 +1294,7 @@
     "peakHourLabel": "2pm",
     "peakDay": "Thu",
     "weekendPct": 23,
-    "lateNightCount": 693
+    "lateNightCount": 692
    },
    "archetype": "KEEN EYE",
    "punchline": "the wildlife is undefeated",
@@ -1302,7 +1302,7 @@
   },
   "78757": {
    "area": "North Shoal Creek",
-   "volume": 2890,
+   "volume": 2886,
    "rank": 15,
    "zipCount": 64,
    "percentile": 0.23,
@@ -1310,13 +1310,13 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 553,
-     "share": 19.1
+     "count": 554,
+     "share": 19.2
     },
     {
      "name": "Traffic Signal",
-     "count": 254,
-     "share": 8.8
+     "count": 251,
+     "share": 8.7
     },
     {
      "name": "Loose Dog",
@@ -1325,7 +1325,7 @@
     }
    ],
    "response": {
-    "count": 2576,
+    "count": 2571,
     "medianDays": 0.5,
     "avgDays": 3.3,
     "p90Days": 5.9,
@@ -1361,22 +1361,22 @@
      "quotient": 2.2,
      "shareZip": 2.3,
      "shareCity": 1.0,
-     "count": 66
+     "count": 65
     },
     {
      "name": "Construction in Right of Way",
      "quotient": 2.0,
      "shareZip": 5.0,
-     "shareCity": 2.4,
-     "count": 144
+     "shareCity": 2.5,
+     "count": 145
     }
    ],
    "activity": {
     "peakHour": 15,
     "peakHourLabel": "3pm",
-    "peakDay": "Wed",
+    "peakDay": "Fri",
     "weekendPct": 24,
-    "lateNightCount": 746
+    "lateNightCount": 747
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
@@ -1384,7 +1384,7 @@
   },
   "78749": {
    "area": "78749",
-   "volume": 2780,
+   "volume": 2781,
    "rank": 16,
    "zipCount": 64,
    "percentile": 0.25,
@@ -1397,7 +1397,7 @@
     },
     {
      "name": "Traffic Signal",
-     "count": 440,
+     "count": 439,
      "share": 15.8
     },
     {
@@ -1407,11 +1407,11 @@
     }
    ],
    "response": {
-    "count": 2568,
+    "count": 2567,
     "medianDays": 0.2,
-    "avgDays": 3.0,
-    "p90Days": 4.6,
-    "sameDayPct": 73
+    "avgDays": 2.9,
+    "p90Days": 4.5,
+    "sameDayPct": 74
    },
    "lowlight": {
     "name": "Traffic Obstruction",
@@ -1432,18 +1432,18 @@
      "count": 25
     },
     {
-     "name": "Traffic Calming",
-     "quotient": 1.8,
-     "shareZip": 0.7,
-     "shareCity": 0.4,
-     "count": 19
-    },
-    {
      "name": "Traffic Sign Maintenance",
      "quotient": 1.7,
      "shareZip": 1.7,
      "shareCity": 1.0,
      "count": 48
+    },
+    {
+     "name": "Traffic Calming",
+     "quotient": 1.7,
+     "shareZip": 0.7,
+     "shareCity": 0.4,
+     "count": 19
     },
     {
      "name": "Bicycle Issue",
@@ -1458,7 +1458,7 @@
     "peakHourLabel": "2pm",
     "peakDay": "Wed",
     "weekendPct": 21,
-    "lateNightCount": 834
+    "lateNightCount": 837
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
@@ -1466,7 +1466,7 @@
   },
   "78754": {
    "area": "Northeast Austin",
-   "volume": 2655,
+   "volume": 2659,
    "rank": 17,
    "zipCount": 64,
    "percentile": 0.27,
@@ -1474,22 +1474,22 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 761,
+     "count": 763,
      "share": 28.7
     },
     {
      "name": "Traffic Signal",
-     "count": 276,
+     "count": 277,
      "share": 10.4
     },
     {
      "name": "Animal Protection",
-     "count": 207,
+     "count": 208,
      "share": 7.8
     }
    ],
    "response": {
-    "count": 2384,
+    "count": 2385,
     "medianDays": 0.3,
     "avgDays": 3.3,
     "p90Days": 5.0,
@@ -1518,7 +1518,7 @@
      "quotient": 2.5,
      "shareZip": 7.8,
      "shareCity": 3.1,
-     "count": 207
+     "count": 208
     },
     {
      "name": "Animal Bite",
@@ -1529,7 +1529,7 @@
     },
     {
      "name": "Traffic Signal New",
-     "quotient": 2.0,
+     "quotient": 1.9,
      "shareZip": 0.6,
      "shareCity": 0.3,
      "count": 17
@@ -1539,8 +1539,8 @@
     "peakHour": 16,
     "peakHourLabel": "4pm",
     "peakDay": "Fri",
-    "weekendPct": 24,
-    "lateNightCount": 675
+    "weekendPct": 23,
+    "lateNightCount": 677
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
@@ -1548,7 +1548,7 @@
   },
   "78752": {
    "area": "North Loop",
-   "volume": 2554,
+   "volume": 2549,
    "rank": 18,
    "zipCount": 64,
    "percentile": 0.28,
@@ -1557,24 +1557,24 @@
     {
      "name": "Parking Violation",
      "count": 542,
-     "share": 21.2
+     "share": 21.3
     },
     {
      "name": "Traffic Signal",
      "count": 471,
-     "share": 18.4
+     "share": 18.5
     },
     {
      "name": "Loose Dog",
-     "count": 226,
+     "count": 224,
      "share": 8.8
     }
    ],
    "response": {
-    "count": 2353,
+    "count": 2345,
     "medianDays": 0.4,
     "avgDays": 3.6,
-    "p90Days": 4.9,
+    "p90Days": 4.8,
     "sameDayPct": 70
    },
    "lowlight": {
@@ -1598,14 +1598,14 @@
     {
      "name": "Animal Care",
      "quotient": 1.7,
-     "shareZip": 3.6,
+     "shareZip": 3.5,
      "shareCity": 2.1,
-     "count": 91
+     "count": 89
     },
     {
      "name": "Traffic Signal",
      "quotient": 1.7,
-     "shareZip": 18.4,
+     "shareZip": 18.5,
      "shareCity": 11.0,
      "count": 471
     }
@@ -1615,7 +1615,7 @@
     "peakHourLabel": "3pm",
     "peakDay": "Wed",
     "weekendPct": 24,
-    "lateNightCount": 657
+    "lateNightCount": 658
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
@@ -1623,7 +1623,7 @@
   },
   "78731": {
    "area": "Allandale",
-   "volume": 2315,
+   "volume": 2310,
    "rank": 19,
    "zipCount": 64,
    "percentile": 0.3,
@@ -1631,13 +1631,13 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 410,
+     "count": 408,
      "share": 17.7
     },
     {
      "name": "Dead Animal",
-     "count": 366,
-     "share": 15.8
+     "count": 368,
+     "share": 15.9
     },
     {
      "name": "Traffic Signal",
@@ -1646,10 +1646,10 @@
     }
    ],
    "response": {
-    "count": 2099,
+    "count": 2091,
     "medianDays": 0.3,
-    "avgDays": 2.8,
-    "p90Days": 4.0,
+    "avgDays": 2.7,
+    "p90Days": 3.9,
     "sameDayPct": 74
    },
    "lowlight": {
@@ -1680,21 +1680,21 @@
     {
      "name": "Dead Animal",
      "quotient": 2.7,
-     "shareZip": 15.8,
+     "shareZip": 15.9,
      "shareCity": 6.0,
-     "count": 366
+     "count": 368
     },
     {
-     "name": "Traffic Obstruction",
+     "name": "Drainage Inlet",
      "quotient": 2.1,
-     "shareZip": 1.1,
-     "shareCity": 0.5,
-     "count": 25
+     "shareZip": 1.6,
+     "shareCity": 0.8,
+     "count": 36
     }
    ],
    "activity": {
-    "peakHour": 15,
-    "peakHourLabel": "3pm",
+    "peakHour": 13,
+    "peakHourLabel": "1pm",
     "peakDay": "Tue",
     "weekendPct": 20,
     "lateNightCount": 503
@@ -1705,7 +1705,7 @@
   },
   "78724": {
    "area": "78724",
-   "volume": 2302,
+   "volume": 2296,
    "rank": 20,
    "zipCount": 64,
    "percentile": 0.31,
@@ -1713,24 +1713,24 @@
    "topIssues": [
     {
      "name": "Loose Dog",
-     "count": 497,
+     "count": 496,
      "share": 21.6
     },
     {
      "name": "Traffic Signal",
-     "count": 281,
+     "count": 279,
      "share": 12.2
     },
     {
      "name": "Parking Violation",
-     "count": 262,
-     "share": 11.4
+     "count": 263,
+     "share": 11.5
     }
    ],
    "response": {
-    "count": 2066,
+    "count": 2059,
     "medianDays": 0.7,
-    "avgDays": 4.9,
+    "avgDays": 5.0,
     "p90Days": 8.1,
     "sameDayPct": 59
    },
@@ -1757,7 +1757,14 @@
      "quotient": 2.6,
      "shareZip": 21.6,
      "shareCity": 8.2,
-     "count": 497
+     "count": 496
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 2.0,
+     "shareZip": 6.1,
+     "shareCity": 3.1,
+     "count": 140
     },
     {
      "name": "Street Sign",
@@ -1765,13 +1772,6 @@
      "shareZip": 1.1,
      "shareCity": 0.6,
      "count": 26
-    },
-    {
-     "name": "Animal Protection",
-     "quotient": 1.9,
-     "shareZip": 6.1,
-     "shareCity": 3.1,
-     "count": 140
     }
    ],
    "activity": {
@@ -1779,7 +1779,7 @@
     "peakHourLabel": "1pm",
     "peakDay": "Fri",
     "weekendPct": 22,
-    "lateNightCount": 598
+    "lateNightCount": 593
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "the wildlife is undefeated",
@@ -1787,7 +1787,7 @@
   },
   "78721": {
    "area": "East Austin",
-   "volume": 2153,
+   "volume": 2156,
    "rank": 21,
    "zipCount": 64,
    "percentile": 0.33,
@@ -1795,13 +1795,13 @@
    "topIssues": [
     {
      "name": "Loose Dog",
-     "count": 361,
+     "count": 362,
      "share": 16.8
     },
     {
      "name": "Parking Violation",
      "count": 294,
-     "share": 13.7
+     "share": 13.6
     },
     {
      "name": "Park Maintenance - Grounds",
@@ -1810,7 +1810,7 @@
     }
    ],
    "response": {
-    "count": 1921,
+    "count": 1920,
     "medianDays": 0.8,
     "avgDays": 5.0,
     "p90Days": 9.0,
@@ -1853,7 +1853,7 @@
      "quotient": 2.1,
      "shareZip": 4.4,
      "shareCity": 2.1,
-     "count": 94
+     "count": 95
     }
    ],
    "activity": {
@@ -1861,7 +1861,7 @@
     "peakHourLabel": "3pm",
     "peakDay": "Wed",
     "weekendPct": 23,
-    "lateNightCount": 553
+    "lateNightCount": 554
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "the wildlife is undefeated",
@@ -1869,7 +1869,7 @@
   },
   "78747": {
    "area": "78747",
-   "volume": 1715,
+   "volume": 1726,
    "rank": 22,
    "zipCount": 64,
    "percentile": 0.34,
@@ -1877,24 +1877,24 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 509,
-     "share": 29.7
+     "count": 516,
+     "share": 29.9
     },
     {
      "name": "Loose Dog",
-     "count": 178,
+     "count": 179,
      "share": 10.4
     },
     {
      "name": "Dead Animal",
-     "count": 141,
-     "share": 8.2
+     "count": 145,
+     "share": 8.4
     }
    ],
    "response": {
-    "count": 1533,
+    "count": 1536,
     "medianDays": 0.4,
-    "avgDays": 3.4,
+    "avgDays": 3.2,
     "p90Days": 4.9,
     "sameDayPct": 68
    },
@@ -1918,7 +1918,7 @@
     },
     {
      "name": "Fireworks",
-     "quotient": 2.9,
+     "quotient": 2.8,
      "shareZip": 3.5,
      "shareCity": 1.2,
      "count": 60
@@ -1933,9 +1933,9 @@
     {
      "name": "Animal Care",
      "quotient": 2.3,
-     "shareZip": 4.8,
+     "shareZip": 4.9,
      "shareCity": 2.1,
-     "count": 83
+     "count": 84
     }
    ],
    "activity": {
@@ -1943,7 +1943,7 @@
     "peakHourLabel": "4pm",
     "peakDay": "Wed",
     "weekendPct": 27,
-    "lateNightCount": 518
+    "lateNightCount": 523
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "finding parking is a blood sport",
@@ -1951,7 +1951,7 @@
   },
   "78727": {
    "area": "78727",
-   "volume": 1667,
+   "volume": 1666,
    "rank": 23,
    "zipCount": 64,
    "percentile": 0.36,
@@ -1959,8 +1959,8 @@
    "topIssues": [
     {
      "name": "Traffic Signal",
-     "count": 313,
-     "share": 18.8
+     "count": 312,
+     "share": 18.7
     },
     {
      "name": "Parking Violation",
@@ -1974,7 +1974,7 @@
     }
    ],
    "response": {
-    "count": 1503,
+    "count": 1502,
     "medianDays": 0.5,
     "avgDays": 4.5,
     "p90Days": 5.5,
@@ -2000,16 +2000,16 @@
     },
     {
      "name": "Sidewalk Repair",
-     "quotient": 2.7,
-     "shareZip": 4.2,
+     "quotient": 2.8,
+     "shareZip": 4.3,
      "shareCity": 1.5,
-     "count": 70
+     "count": 71
     },
     {
      "name": "Street Light",
      "quotient": 1.9,
      "shareZip": 7.7,
-     "shareCity": 4.1,
+     "shareCity": 4.0,
      "count": 129
     },
     {
@@ -2033,7 +2033,7 @@
   },
   "78750": {
    "area": "78750",
-   "volume": 1479,
+   "volume": 1475,
    "rank": 24,
    "zipCount": 64,
    "percentile": 0.38,
@@ -2046,17 +2046,17 @@
     },
     {
      "name": "Dead Animal",
-     "count": 207,
-     "share": 14.0
+     "count": 208,
+     "share": 14.1
     },
     {
      "name": "Parking Violation",
-     "count": 109,
-     "share": 7.4
+     "count": 108,
+     "share": 7.3
     }
    ],
    "response": {
-    "count": 1302,
+    "count": 1297,
     "medianDays": 0.6,
     "avgDays": 3.6,
     "p90Days": 5.4,
@@ -2064,12 +2064,12 @@
    },
    "lowlight": {
     "name": "New Sign Request",
-    "medianDays": 13.3
+    "medianDays": 12.1
    },
    "worstDay": {
     "date": "2026-08-28",
     "count": 49,
-    "dailyAvg": 4.1,
+    "dailyAvg": 4.0,
     "xDaily": 12.1
    },
    "setsApart": [
@@ -2090,9 +2090,9 @@
     {
      "name": "Dead Animal",
      "quotient": 2.4,
-     "shareZip": 14.0,
+     "shareZip": 14.1,
      "shareCity": 6.0,
-     "count": 207
+     "count": 208
     },
     {
      "name": "Fireworks",
@@ -2107,7 +2107,7 @@
     "peakHourLabel": "3pm",
     "peakDay": "Fri",
     "weekendPct": 20,
-    "lateNightCount": 381
+    "lateNightCount": 383
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "the streets are a choose-your-own-adventure",
@@ -2115,7 +2115,7 @@
   },
   "78746": {
    "area": "78746",
-   "volume": 1449,
+   "volume": 1455,
    "rank": 25,
    "zipCount": 64,
    "percentile": 0.39,
@@ -2124,7 +2124,7 @@
     {
      "name": "Parking Violation",
      "count": 224,
-     "share": 15.5
+     "share": 15.4
     },
     {
      "name": "Park Maintenance - Grounds",
@@ -2133,12 +2133,12 @@
     },
     {
      "name": "Traffic Signal",
-     "count": 126,
-     "share": 8.7
+     "count": 125,
+     "share": 8.6
     }
    ],
    "response": {
-    "count": 1259,
+    "count": 1260,
     "medianDays": 0.7,
     "avgDays": 4.0,
     "p90Days": 8.1,
@@ -2189,15 +2189,15 @@
     "peakHourLabel": "6pm",
     "peakDay": "Wed",
     "weekendPct": 24,
-    "lateNightCount": 328
+    "lateNightCount": 327
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "78746 (78746): 16% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #25 of 64 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78746 (78746): 15% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #25 of 64 Austin areas by volume. austin311.com/wrapped/"
   },
   "78722": {
    "area": "North University",
-   "volume": 1441,
+   "volume": 1442,
    "rank": 26,
    "zipCount": 64,
    "percentile": 0.41,
@@ -2205,8 +2205,8 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 328,
-     "share": 22.8
+     "count": 330,
+     "share": 22.9
     },
     {
      "name": "Traffic Signal",
@@ -2220,11 +2220,11 @@
     }
    ],
    "response": {
-    "count": 1277,
+    "count": 1276,
     "medianDays": 0.4,
-    "avgDays": 5.1,
-    "p90Days": 9.3,
-    "sameDayPct": 68
+    "avgDays": 4.9,
+    "p90Days": 9.1,
+    "sameDayPct": 69
    },
    "lowlight": {
     "name": "Graffiti",
@@ -2233,7 +2233,7 @@
    "worstDay": {
     "date": "2025-11-01",
     "count": 18,
-    "dailyAvg": 3.9,
+    "dailyAvg": 4.0,
     "xDaily": 4.6
    },
    "setsApart": [
@@ -2279,7 +2279,7 @@
   },
   "78756": {
    "area": "Crestview",
-   "volume": 1383,
+   "volume": 1384,
    "rank": 27,
    "zipCount": 64,
    "percentile": 0.42,
@@ -2292,8 +2292,8 @@
     },
     {
      "name": "Traffic Signal",
-     "count": 231,
-     "share": 16.7
+     "count": 230,
+     "share": 16.6
     },
     {
      "name": "Tree in ROW",
@@ -2302,10 +2302,10 @@
     }
    ],
    "response": {
-    "count": 1200,
+    "count": 1197,
     "medianDays": 0.2,
-    "avgDays": 3.8,
-    "p90Days": 5.6,
+    "avgDays": 3.6,
+    "p90Days": 5.4,
     "sameDayPct": 70
    },
    "lowlight": {
@@ -2334,18 +2334,18 @@
      "count": 19
     },
     {
+     "name": "Street Sign",
+     "quotient": 2.1,
+     "shareZip": 1.2,
+     "shareCity": 0.6,
+     "count": 16
+    },
+    {
      "name": "Tree in ROW",
      "quotient": 2.1,
      "shareZip": 7.4,
      "shareCity": 3.5,
      "count": 103
-    },
-    {
-     "name": "Street Misc",
-     "quotient": 2.1,
-     "shareZip": 1.7,
-     "shareCity": 0.8,
-     "count": 24
     }
    ],
    "activity": {
@@ -2353,7 +2353,7 @@
     "peakHourLabel": "2pm",
     "peakDay": "Wed",
     "weekendPct": 21,
-    "lateNightCount": 346
+    "lateNightCount": 344
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "finding parking is a blood sport",
@@ -2361,7 +2361,7 @@
   },
   "78617": {
    "area": "78617",
-   "volume": 1218,
+   "volume": 1213,
    "rank": 28,
    "zipCount": 64,
    "percentile": 0.44,
@@ -2370,21 +2370,21 @@
     {
      "name": "Loose Dog",
      "count": 420,
-     "share": 34.5
-    },
-    {
-     "name": "Animal Protection",
-     "count": 109,
-     "share": 8.9
+     "share": 34.6
     },
     {
      "name": "Parking Violation",
+     "count": 109,
+     "share": 9.0
+    },
+    {
+     "name": "Animal Protection",
      "count": 108,
      "share": 8.9
     }
    ],
    "response": {
-    "count": 1108,
+    "count": 1102,
     "medianDays": 1.0,
     "avgDays": 5.2,
     "p90Days": 8.1,
@@ -2404,7 +2404,7 @@
     {
      "name": "Loose Dog",
      "quotient": 4.2,
-     "shareZip": 34.5,
+     "shareZip": 34.6,
      "shareCity": 8.2,
      "count": 420
     },
@@ -2427,23 +2427,23 @@
      "quotient": 2.9,
      "shareZip": 8.9,
      "shareCity": 3.1,
-     "count": 109
+     "count": 108
     }
    ],
    "activity": {
     "peakHour": 15,
     "peakHourLabel": "3pm",
-    "peakDay": "Wed",
-    "weekendPct": 20,
+    "peakDay": "Tue",
+    "weekendPct": 21,
     "lateNightCount": 278
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "the wildlife is undefeated",
-   "shareText": "78617 (78617): 34% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #28 of 64 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78617 (78617): 35% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #28 of 64 Austin areas by volume. austin311.com/wrapped/"
   },
   "78735": {
    "area": "78735",
-   "volume": 1169,
+   "volume": 1171,
    "rank": 29,
    "zipCount": 64,
    "percentile": 0.45,
@@ -2451,8 +2451,8 @@
    "topIssues": [
     {
      "name": "Traffic Signal",
-     "count": 226,
-     "share": 19.3
+     "count": 227,
+     "share": 19.4
     },
     {
      "name": "Parking Violation",
@@ -2466,7 +2466,7 @@
     }
    ],
    "response": {
-    "count": 1054,
+    "count": 1053,
     "medianDays": 0.6,
     "avgDays": 3.5,
     "p90Days": 6.0,
@@ -2525,33 +2525,33 @@
   },
   "78660": {
    "area": "Pflugerville",
-   "volume": 1122,
+   "volume": 1119,
    "rank": 30,
    "zipCount": 64,
    "percentile": 0.47,
    "topLabel": "Middle",
    "topIssues": [
     {
-     "name": "Parking Violation",
-     "count": 229,
-     "share": 20.4
-    },
-    {
      "name": "Loose Dog",
      "count": 227,
+     "share": 20.3
+    },
+    {
+     "name": "Parking Violation",
+     "count": 226,
      "share": 20.2
     },
     {
      "name": "Traffic Signal",
      "count": 161,
-     "share": 14.3
+     "share": 14.4
     }
    ],
    "response": {
-    "count": 1026,
+    "count": 1022,
     "medianDays": 0.7,
-    "avgDays": 3.3,
-    "p90Days": 6.1,
+    "avgDays": 3.2,
+    "p90Days": 6.0,
     "sameDayPct": 59
    },
    "lowlight": {
@@ -2575,7 +2575,7 @@
     {
      "name": "Loose Dog",
      "quotient": 2.5,
-     "shareZip": 20.2,
+     "shareZip": 20.3,
      "shareCity": 8.2,
      "count": 227
     },
@@ -2602,8 +2602,8 @@
     "lateNightCount": 251
    },
    "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "Pflugerville (78660): 20% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #30 of 64 Austin areas by volume. austin311.com/wrapped/"
+   "punchline": "the wildlife is undefeated",
+   "shareText": "Pflugerville (78660): 20% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #30 of 64 Austin areas by volume. austin311.com/wrapped/"
   },
   "78729": {
    "area": "78729",
@@ -2615,8 +2615,8 @@
    "topIssues": [
     {
      "name": "Traffic Signal",
-     "count": 199,
-     "share": 18.2
+     "count": 198,
+     "share": 18.1
     },
     {
      "name": "Parking Violation",
@@ -2625,16 +2625,16 @@
     },
     {
      "name": "Loose Dog",
-     "count": 97,
-     "share": 8.9
+     "count": 96,
+     "share": 8.8
     }
    ],
    "response": {
-    "count": 987,
+    "count": 985,
     "medianDays": 0.7,
     "avgDays": 3.8,
     "p90Days": 6.5,
-    "sameDayPct": 64
+    "sameDayPct": 63
    },
    "lowlight": {
     "name": "Traffic Calming",
@@ -2681,7 +2681,7 @@
     "peakHourLabel": "3pm",
     "peakDay": "Tue",
     "weekendPct": 21,
-    "lateNightCount": 280
+    "lateNightCount": 281
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "the streets are a choose-your-own-adventure",
@@ -2689,7 +2689,7 @@
   },
   "78717": {
    "area": "78717",
-   "volume": 949,
+   "volume": 943,
    "rank": 32,
    "zipCount": 64,
    "percentile": 0.5,
@@ -2697,30 +2697,30 @@
    "topIssues": [
     {
      "name": "Street Light",
-     "count": 206,
-     "share": 21.7
+     "count": 203,
+     "share": 21.5
     },
     {
      "name": "Traffic Signal",
      "count": 158,
-     "share": 16.6
+     "share": 16.8
     },
     {
      "name": "Parking Violation",
-     "count": 108,
-     "share": 11.4
+     "count": 107,
+     "share": 11.3
     }
    ],
    "response": {
-    "count": 863,
-    "medianDays": 0.6,
+    "count": 856,
+    "medianDays": 0.5,
     "avgDays": 2.6,
     "p90Days": 3.9,
     "sameDayPct": 68
    },
    "lowlight": {
-    "name": "Traffic Signal New",
-    "medianDays": 10.3
+    "name": "Bicycle Issue",
+    "medianDays": 9.7
    },
    "worstDay": {
     "date": "2026-01-26",
@@ -2731,22 +2731,22 @@
    "setsApart": [
     {
      "name": "Loose Animal",
-     "quotient": 8.3,
+     "quotient": 8.4,
      "shareZip": 3.4,
      "shareCity": 0.4,
      "count": 32
     },
     {
      "name": "Street Light",
-     "quotient": 5.4,
-     "shareZip": 21.7,
-     "shareCity": 4.1,
-     "count": 206
+     "quotient": 5.3,
+     "shareZip": 21.5,
+     "shareCity": 4.0,
+     "count": 203
     },
     {
      "name": "Street Repair",
-     "quotient": 4.7,
-     "shareZip": 2.6,
+     "quotient": 4.8,
+     "shareZip": 2.7,
      "shareCity": 0.6,
      "count": 25
     },
@@ -2771,7 +2771,7 @@
   },
   "78653": {
    "area": "Manor",
-   "volume": 768,
+   "volume": 769,
    "rank": 33,
    "zipCount": 64,
    "percentile": 0.52,
@@ -2779,13 +2779,13 @@
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 311,
-     "share": 40.5
+     "count": 310,
+     "share": 40.3
     },
     {
      "name": "Loose Dog",
-     "count": 174,
-     "share": 22.7
+     "count": 175,
+     "share": 22.8
     },
     {
      "name": "Traffic Signal",
@@ -2813,10 +2813,10 @@
    "setsApart": [
     {
      "name": "Loose Dog",
-     "quotient": 2.7,
-     "shareZip": 22.7,
+     "quotient": 2.8,
+     "shareZip": 22.8,
      "shareCity": 8.2,
-     "count": 174
+     "count": 175
     },
     {
      "name": "Traffic Signal New",
@@ -2826,18 +2826,18 @@
      "count": 6
     },
     {
+     "name": "Loose Animal",
+     "quotient": 2.3,
+     "shareZip": 0.9,
+     "shareCity": 0.4,
+     "count": 7
+    },
+    {
      "name": "Street Repair",
      "quotient": 2.3,
      "shareZip": 1.3,
      "shareCity": 0.6,
      "count": 10
-    },
-    {
-     "name": "Loose Animal",
-     "quotient": 2.2,
-     "shareZip": 0.9,
-     "shareCity": 0.4,
-     "count": 7
     }
    ],
    "activity": {
@@ -2853,7 +2853,7 @@
   },
   "78739": {
    "area": "78739",
-   "volume": 573,
+   "volume": 575,
    "rank": 34,
    "zipCount": 64,
    "percentile": 0.53,
@@ -2862,7 +2862,7 @@
     {
      "name": "Traffic Signal",
      "count": 133,
-     "share": 23.2
+     "share": 23.1
     },
     {
      "name": "Street Light",
@@ -2876,26 +2876,26 @@
     }
    ],
    "response": {
-    "count": 516,
+    "count": 517,
     "medianDays": 0.5,
     "avgDays": 2.7,
     "p90Days": 4.9,
     "sameDayPct": 68
    },
    "lowlight": {
-    "name": "Street Sign",
-    "medianDays": 7.6
+    "name": "Animal Bite",
+    "medianDays": 6.5
    },
    "worstDay": {
     "date": "2026-03-25",
     "count": 32,
     "dailyAvg": 1.6,
-    "xDaily": 20.4
+    "xDaily": 20.3
    },
    "setsApart": [
     {
      "name": "Street Repair",
-     "quotient": 3.5,
+     "quotient": 3.4,
      "shareZip": 1.9,
      "shareCity": 0.6,
      "count": 11
@@ -2908,18 +2908,18 @@
      "count": 8
     },
     {
+     "name": "Street Sign",
+     "quotient": 2.8,
+     "shareZip": 1.6,
+     "shareCity": 0.6,
+     "count": 9
+    },
+    {
      "name": "Wildlife",
      "quotient": 2.7,
      "shareZip": 3.1,
      "shareCity": 1.2,
      "count": 18
-    },
-    {
-     "name": "Park Playgrounds",
-     "quotient": 2.6,
-     "shareZip": 1.6,
-     "shareCity": 0.6,
-     "count": 9
     }
    ],
    "activity": {
@@ -2927,7 +2927,7 @@
     "peakHourLabel": "5pm",
     "peakDay": "Wed",
     "weekendPct": 20,
-    "lateNightCount": 140
+    "lateNightCount": 139
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "the streets are a choose-your-own-adventure",
@@ -2935,7 +2935,7 @@
   },
   "78725": {
    "area": "78725",
-   "volume": 440,
+   "volume": 438,
    "rank": 35,
    "zipCount": 64,
    "percentile": 0.55,
@@ -2943,8 +2943,8 @@
    "topIssues": [
     {
      "name": "Loose Dog",
-     "count": 142,
-     "share": 32.3
+     "count": 140,
+     "share": 32.0
     },
     {
      "name": "Animal Protection",
@@ -2958,7 +2958,7 @@
     }
    ],
    "response": {
-    "count": 373,
+    "count": 371,
     "medianDays": 1.0,
     "avgDays": 7.6,
     "p90Days": 17.9,
@@ -2977,8 +2977,8 @@
    "setsApart": [
     {
      "name": "Loose Animal",
-     "quotient": 15.1,
-     "shareZip": 6.1,
+     "quotient": 15.2,
+     "shareZip": 6.2,
      "shareCity": 0.4,
      "count": 27
     },
@@ -2992,9 +2992,9 @@
     {
      "name": "Loose Dog",
      "quotient": 3.9,
-     "shareZip": 32.3,
+     "shareZip": 32.0,
      "shareCity": 8.2,
-     "count": 142
+     "count": 140
     },
     {
      "name": "Animal Bite",
@@ -3007,9 +3007,9 @@
    "activity": {
     "peakHour": 15,
     "peakHourLabel": "3pm",
-    "peakDay": "Wed",
+    "peakDay": "Thu",
     "weekendPct": 24,
-    "lateNightCount": 115
+    "lateNightCount": 116
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "the wildlife is undefeated",
@@ -3017,7 +3017,7 @@
   },
   "78730": {
    "area": "78730",
-   "volume": 430,
+   "volume": 431,
    "rank": 36,
    "zipCount": 64,
    "percentile": 0.56,
@@ -3026,12 +3026,12 @@
     {
      "name": "Traffic Signal",
      "count": 193,
-     "share": 44.9
+     "share": 44.8
     },
     {
      "name": "Street Light",
-     "count": 37,
-     "share": 8.6
+     "count": 38,
+     "share": 8.8
     },
     {
      "name": "Parking Violation",
@@ -3059,7 +3059,7 @@
    "setsApart": [
     {
      "name": "Park Electrical",
-     "quotient": 6.0,
+     "quotient": 5.9,
      "shareZip": 2.6,
      "shareCity": 0.4,
      "count": 11
@@ -3074,16 +3074,16 @@
     {
      "name": "Traffic Signal",
      "quotient": 4.1,
-     "shareZip": 44.9,
+     "shareZip": 44.8,
      "shareCity": 11.0,
      "count": 193
     },
     {
      "name": "Street Light",
-     "quotient": 2.1,
-     "shareZip": 8.6,
-     "shareCity": 4.1,
-     "count": 37
+     "quotient": 2.2,
+     "shareZip": 8.8,
+     "shareCity": 4.0,
+     "count": 38
     }
    ],
    "activity": {
@@ -3099,7 +3099,7 @@
   },
   "78726": {
    "area": "78726",
-   "volume": 396,
+   "volume": 397,
    "rank": 37,
    "zipCount": 64,
    "percentile": 0.58,
@@ -3118,11 +3118,11 @@
     {
      "name": "Dead Animal",
      "count": 26,
-     "share": 6.6
+     "share": 6.5
     }
    ],
    "response": {
-    "count": 339,
+    "count": 340,
     "medianDays": 0.4,
     "avgDays": 3.2,
     "p90Days": 5.1,
@@ -3141,7 +3141,7 @@
    "setsApart": [
     {
      "name": "Traffic Calming",
-     "quotient": 6.5,
+     "quotient": 6.4,
      "shareZip": 2.5,
      "shareCity": 0.4,
      "count": 10
@@ -3156,7 +3156,7 @@
     {
      "name": "Animal Care",
      "quotient": 2.6,
-     "shareZip": 5.6,
+     "shareZip": 5.5,
      "shareCity": 2.1,
      "count": 22
     },
@@ -3194,17 +3194,17 @@
     },
     {
      "name": "Traffic Signal",
-     "count": 80,
-     "share": 20.5
+     "count": 79,
+     "share": 20.2
     },
     {
      "name": "Street Light",
-     "count": 77,
-     "share": 19.7
+     "count": 78,
+     "share": 19.9
     }
    ],
    "response": {
-    "count": 360,
+    "count": 359,
     "medianDays": 1.0,
     "avgDays": 4.7,
     "p90Days": 10.6,
@@ -3224,9 +3224,9 @@
     {
      "name": "Street Light",
      "quotient": 4.9,
-     "shareZip": 19.7,
-     "shareCity": 4.1,
-     "count": 77
+     "shareZip": 19.9,
+     "shareCity": 4.0,
+     "count": 78
     },
     {
      "name": "Wildlife",
@@ -3319,7 +3319,7 @@
     },
     {
      "name": "Wildlife",
-     "quotient": 3.3,
+     "quotient": 3.2,
      "shareZip": 3.8,
      "shareCity": 1.2,
      "count": 12
@@ -3551,7 +3551,7 @@
    "setsApart": [
     {
      "name": "Park Playgrounds",
-     "quotient": 15.4,
+     "quotient": 15.5,
      "shareZip": 9.4,
      "shareCity": 0.6,
      "count": 12
@@ -3591,7 +3591,7 @@
   },
   "78613": {
    "area": "78613",
-   "volume": 122,
+   "volume": 121,
    "rank": 43,
    "zipCount": 64,
    "percentile": 0.67,
@@ -3599,8 +3599,8 @@
    "topIssues": [
     {
      "name": "Traffic Signal",
-     "count": 54,
-     "share": 44.3
+     "count": 53,
+     "share": 43.8
     },
     {
      "name": "Traffic Sign Maintenance",
@@ -3614,9 +3614,9 @@
     }
    ],
    "response": {
-    "count": 115,
+    "count": 114,
     "medianDays": 0.4,
-    "avgDays": 7.8,
+    "avgDays": 7.9,
     "p90Days": 19.4,
     "sameDayPct": 70
    },
@@ -3628,12 +3628,12 @@
     "date": "2026-05-14",
     "count": 4,
     "dailyAvg": 0.3,
-    "xDaily": 12.0
+    "xDaily": 12.1
    },
    "setsApart": [
     {
      "name": "Traffic Sign Maintenance",
-     "quotient": 10.4,
+     "quotient": 10.5,
      "shareZip": 10.7,
      "shareCity": 1.0,
      "count": 13
@@ -3641,14 +3641,14 @@
     {
      "name": "Traffic Signal",
      "quotient": 4.0,
-     "shareZip": 44.3,
+     "shareZip": 43.8,
      "shareCity": 11.0,
-     "count": 54
+     "count": 53
     },
     {
      "name": "Animal Care",
      "quotient": 2.3,
-     "shareZip": 4.9,
+     "shareZip": 5.0,
      "shareCity": 2.1,
      "count": 6
     },
@@ -3656,13 +3656,13 @@
      "name": "Street Light",
      "quotient": 1.6,
      "shareZip": 6.6,
-     "shareCity": 4.1,
+     "shareCity": 4.0,
      "count": 8
     }
    ],
    "activity": {
-    "peakHour": 17,
-    "peakHourLabel": "5pm",
+    "peakHour": 19,
+    "peakHourLabel": "7pm",
     "peakDay": "Thu",
     "weekendPct": 28,
     "lateNightCount": 45
@@ -3768,8 +3768,8 @@
     },
     {
      "name": "Animal Bite",
-     "count": 15,
-     "share": 15.2
+     "count": 14,
+     "share": 14.1
     },
     {
      "name": "Loose Dog",
@@ -3778,15 +3778,15 @@
     }
    ],
    "response": {
-    "count": 92,
-    "medianDays": 1.0,
-    "avgDays": 5.2,
-    "p90Days": 17.0,
-    "sameDayPct": 52
+    "count": 91,
+    "medianDays": 0.9,
+    "avgDays": 4.9,
+    "p90Days": 15.5,
+    "sameDayPct": 53
    },
    "lowlight": {
     "name": "Animal Bite",
-    "medianDays": 12.5
+    "medianDays": 12.1
    },
    "worstDay": {
     "date": "2026-03-23",
@@ -3797,31 +3797,31 @@
    "setsApart": [
     {
      "name": "Coyote Sighting",
-     "quotient": 20.1,
-     "shareZip": 8.1,
+     "quotient": 22.6,
+     "shareZip": 9.1,
      "shareCity": 0.4,
-     "count": 8
+     "count": 9
     },
     {
      "name": "Street Sign",
-     "quotient": 9.1,
+     "quotient": 9.0,
      "shareZip": 5.1,
      "shareCity": 0.6,
      "count": 5
     },
     {
      "name": "Wildlife",
-     "quotient": 7.8,
+     "quotient": 7.7,
      "shareZip": 9.1,
      "shareCity": 1.2,
      "count": 9
     },
     {
      "name": "Animal Bite",
-     "quotient": 6.6,
-     "shareZip": 15.2,
+     "quotient": 6.1,
+     "shareZip": 14.1,
      "shareCity": 2.3,
-     "count": 15
+     "count": 14
     }
    ],
    "activity": {
@@ -3927,8 +3927,8 @@
    "topIssues": [
     {
      "name": "Traffic Signal",
-     "count": 28,
-     "share": 31.1
+     "count": 27,
+     "share": 30.0
     },
     {
      "name": "Parking Violation",
@@ -3944,9 +3944,9 @@
    "response": {
     "count": 88,
     "medianDays": 0.1,
-    "avgDays": 4.9,
-    "p90Days": 1.9,
-    "sameDayPct": 86
+    "avgDays": 4.1,
+    "p90Days": 1.6,
+    "sameDayPct": 88
    },
    "lowlight": {
     "name": "Pothole",
@@ -3975,10 +3975,10 @@
     },
     {
      "name": "Traffic Signal",
-     "quotient": 2.8,
-     "shareZip": 31.1,
+     "quotient": 2.7,
+     "shareZip": 30.0,
      "shareCity": 11.0,
-     "count": 28
+     "count": 27
     }
    ],
    "activity": {
@@ -3990,7 +3990,7 @@
    },
    "archetype": "OBSERVER",
    "punchline": "the streets are a choose-your-own-adventure",
-   "shareText": "78712 (78712): 31% of 311 complaints were about Traffic Signal \u2014 the streets are a choose-your-own-adventure Ranked #47 of 64 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78712 (78712): 30% of 311 complaints were about Traffic Signal \u2014 the streets are a choose-your-own-adventure Ranked #47 of 64 Austin areas by volume. austin311.com/wrapped/"
   },
   "78610": {
    "area": "78610",
@@ -4036,7 +4036,7 @@
    "setsApart": [
     {
      "name": "Vicious Dog",
-     "quotient": 9.6,
+     "quotient": 9.5,
      "shareZip": 7.4,
      "shareCity": 0.8,
      "count": 6
@@ -4093,21 +4093,21 @@
      "share": 16.0
     },
     {
-     "name": "Animal Bite",
+     "name": "Traffic Signal",
      "count": 8,
      "share": 10.7
     }
    ],
    "response": {
-    "count": 58,
-    "medianDays": 1.3,
-    "avgDays": 9.7,
-    "p90Days": 30.8,
-    "sameDayPct": 45
+    "count": 57,
+    "medianDays": 1.2,
+    "avgDays": 9.3,
+    "p90Days": 28.9,
+    "sameDayPct": 46
    },
    "lowlight": {
     "name": "Animal Bite",
-    "medianDays": 12.4
+    "medianDays": 12.2
    },
    "worstDay": {
     "date": "2026-08-17",
@@ -4125,10 +4125,10 @@
     },
     {
      "name": "Animal Bite",
-     "quotient": 4.6,
-     "shareZip": 10.7,
+     "quotient": 4.1,
+     "shareZip": 9.3,
      "shareCity": 2.3,
-     "count": 8
+     "count": 7
     },
     {
      "name": "Animal Protection",
@@ -4138,11 +4138,11 @@
      "count": 7
     },
     {
-     "name": "Loose Dog",
-     "quotient": 1.9,
-     "shareZip": 16.0,
-     "shareCity": 8.2,
-     "count": 12
+     "name": "Street Light",
+     "quotient": 2.0,
+     "shareZip": 8.0,
+     "shareCity": 4.0,
+     "count": 6
     }
    ],
    "activity": {
@@ -4150,7 +4150,7 @@
     "peakHourLabel": "8pm",
     "peakDay": "Mon",
     "weekendPct": 27,
-    "lateNightCount": 19
+    "lateNightCount": 18
    },
    "archetype": "OBSERVER",
    "punchline": "the city's small print gets written daily",
@@ -4158,7 +4158,7 @@
   },
   "78669": {
    "area": "78669",
-   "volume": 73,
+   "volume": 75,
    "rank": 50,
    "zipCount": 64,
    "percentile": 0.78,
@@ -4166,18 +4166,18 @@
    "topIssues": [
     {
      "name": "Animal Bite",
-     "count": 23,
-     "share": 31.5
+     "count": 25,
+     "share": 33.3
     },
     {
      "name": "Loose Dog",
      "count": 17,
-     "share": 23.3
+     "share": 22.7
     },
     {
      "name": "Animal Protection",
      "count": 17,
-     "share": 23.3
+     "share": 22.7
     }
    ],
    "response": {
@@ -4195,34 +4195,34 @@
     "date": "2026-02-18",
     "count": 2,
     "dailyAvg": 0.2,
-    "xDaily": 10.0
+    "xDaily": 9.7
    },
    "setsApart": [
     {
      "name": "Animal Bite",
-     "quotient": 13.7,
-     "shareZip": 31.5,
+     "quotient": 14.5,
+     "shareZip": 33.3,
      "shareCity": 2.3,
-     "count": 23
+     "count": 25
     },
     {
      "name": "Wildlife",
-     "quotient": 8.2,
-     "shareZip": 9.6,
+     "quotient": 7.9,
+     "shareZip": 9.3,
      "shareCity": 1.2,
      "count": 7
     },
     {
      "name": "Animal Protection",
-     "quotient": 7.5,
-     "shareZip": 23.3,
+     "quotient": 7.3,
+     "shareZip": 22.7,
      "shareCity": 3.1,
      "count": 17
     },
     {
      "name": "Loose Dog",
      "quotient": 2.8,
-     "shareZip": 23.3,
+     "shareZip": 22.7,
      "shareCity": 8.2,
      "count": 17
     }
@@ -4232,11 +4232,11 @@
     "peakHourLabel": "3pm",
     "peakDay": "Sat",
     "weekendPct": 23,
-    "lateNightCount": 11
+    "lateNightCount": 12
    },
    "archetype": "OBSERVER",
    "punchline": "the city's small print gets written daily",
-   "shareText": "78669 (78669): 32% of 311 complaints were about Animal Bite \u2014 the city's small print gets written daily Ranked #50 of 64 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78669 (78669): 33% of 311 complaints were about Animal Bite \u2014 the city's small print gets written daily Ranked #50 of 64 Austin areas by volume. austin311.com/wrapped/"
   },
   "78641": {
    "area": "78641",
@@ -4315,7 +4315,7 @@
   },
   "78621": {
    "area": "78621",
-   "volume": 60,
+   "volume": 58,
    "rank": 52,
    "zipCount": 64,
    "percentile": 0.81,
@@ -4323,56 +4323,49 @@
    "topIssues": [
     {
      "name": "Loose Dog",
-     "count": 38,
-     "share": 63.3
+     "count": 37,
+     "share": 63.8
     },
     {
      "name": "Animal Protection",
      "count": 12,
-     "share": 20.0
+     "share": 20.7
     },
     {
      "name": "Vicious Dog",
-     "count": 5,
-     "share": 8.3
+     "count": 4,
+     "share": 6.9
     }
    ],
    "response": {
-    "count": 49,
+    "count": 47,
     "medianDays": 1.1,
-    "avgDays": 3.3,
-    "p90Days": 6.9,
-    "sameDayPct": 37
+    "avgDays": 2.5,
+    "p90Days": 5.0,
+    "sameDayPct": 38
    },
    "lowlight": {
-    "name": "Vicious Dog",
-    "medianDays": 5.0
+    "name": "Wildlife",
+    "medianDays": 2.1
    },
    "worstDay": {
     "date": "2026-05-12",
     "count": 3,
     "dailyAvg": 0.2,
-    "xDaily": 18.2
+    "xDaily": 18.9
    },
    "setsApart": [
     {
-     "name": "Vicious Dog",
-     "quotient": 10.8,
-     "shareZip": 8.3,
-     "shareCity": 0.8,
-     "count": 5
-    },
-    {
      "name": "Loose Dog",
      "quotient": 7.7,
-     "shareZip": 63.3,
+     "shareZip": 63.8,
      "shareCity": 8.2,
-     "count": 38
+     "count": 37
     },
     {
      "name": "Animal Protection",
-     "quotient": 6.4,
-     "shareZip": 20.0,
+     "quotient": 6.6,
+     "shareZip": 20.7,
      "shareCity": 3.1,
      "count": 12
     }
@@ -4381,12 +4374,12 @@
     "peakHour": 17,
     "peakHourLabel": "5pm",
     "peakDay": "Tue",
-    "weekendPct": 15,
-    "lateNightCount": 12
+    "weekendPct": 16,
+    "lateNightCount": 11
    },
    "archetype": "OBSERVER",
    "punchline": "the wildlife is undefeated",
-   "shareText": "78621 (78621): 63% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #52 of 64 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78621 (78621): 64% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #52 of 64 Austin areas by volume. austin311.com/wrapped/"
   },
   "78738": {
    "area": "78738",
@@ -4432,7 +4425,7 @@
    "setsApart": [
     {
      "name": "Wildlife",
-     "quotient": 16.4,
+     "quotient": 16.3,
      "shareZip": 19.1,
      "shareCity": 1.2,
      "count": 9
@@ -4441,7 +4434,7 @@
      "name": "Street Light",
      "quotient": 6.8,
      "shareZip": 27.7,
-     "shareCity": 4.1,
+     "shareCity": 4.0,
      "count": 13
     },
     {
@@ -4643,7 +4636,7 @@
    "setsApart": [
     {
      "name": "Animal Bite",
-     "quotient": 19.8,
+     "quotient": 19.7,
      "shareZip": 45.5,
      "shareCity": 2.3,
      "count": 5
