@@ -81,6 +81,52 @@
     footer a { color: var(--text-sub); text-decoration: none; }
     footer a:hover { color: var(--text); }
     @media (max-width: 520px) { .stat-value { font-size: 1rem; } .chart-container { height: 260px; } }
+
+    .chart-hint { font-size: 11px; color: var(--text-muted); margin-bottom: 8px; font-style: italic; }
+
+    #type-detail {
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-top: 3px solid #f59e0b;
+      border-radius: 0 0 8px 8px;
+      padding: 16px;
+      margin-top: -9px;
+    }
+    #td-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    #td-title { font-size: 15px; font-weight: 700; color: var(--text-head); }
+    #td-close {
+      background: none; border: 1px solid var(--border); border-radius: 4px;
+      color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 2px 8px;
+      line-height: 1.4;
+    }
+    #td-close:hover { color: var(--text); border-color: #94a3b8; }
+    .vd-section { margin-bottom: 14px; }
+    .vd-section-title { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .vd-stat-row { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+    .vd-stat { background: var(--bg-panel, #f1f5f9); border-radius: 6px; padding: 8px 12px; text-align: center; min-width: 80px; }
+    .vd-stat .v { font-size: 1.2rem; font-weight: 700; color: var(--text-head); }
+    .vd-stat .l { font-size: 0.67rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }
+    .mini-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 11px; }
+    .mini-bar-label { width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }
+    .mini-bar-track { flex: 1; background: var(--border); border-radius: 2px; height: 9px; }
+    .mini-bar-fill { height: 100%; border-radius: 2px; }
+    .mini-bar-count { width: 34px; text-align: right; color: var(--text-sub); }
+    .month-bar-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-size: 10px; }
+    .month-bar-label { width: 32px; color: var(--text-muted); }
+    .month-bar-track { flex: 1; background: var(--border); border-radius: 2px; height: 8px; }
+    .month-bar-fill { height: 100%; border-radius: 2px; background: #f59e0b; }
+    .month-bar-count { width: 30px; text-align: right; color: var(--text-sub); }
+    #td-map-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #2563eb; color: #fff; border: none; border-radius: 5px;
+      padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+      text-decoration: none; margin-top: 4px;
+    }
+    #td-map-btn:hover { background: #1d4ed8; }
   </style>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
@@ -98,7 +144,7 @@
   <div id="panel">
     <div id="panel-title">🐾 Austin Animal Services Trends</div>
     <div id="panel-subtitle">Animal complaint &amp; incident reports — last 12 months</div>
-    <div id="last-ran">Last ran: 2026-10-26 03:19 PM CDT</div>
+    <div id="last-ran">Last ran: 2026-10-30 02:09 PM CDT</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Animal Map</a>
       <a class="fbtn" href="../../">Austin 311 Home</a>
@@ -108,21 +154,21 @@
   <div id="stats">
     <div class="stats-inner">
       <div class="stat">
-        <div class="stat-value" style="color:#3b82f6;">20,782</div>
+        <div class="stat-value" style="color:#3b82f6;">20,854</div>
         <div class="stat-label">Total reports</div>
         <div class="stat-sub">last 12 months</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#22c55e;">1,599</div>
+        <div class="stat-value" style="color:#22c55e;">1,604</div>
         <div class="stat-label">Avg / month</div>
       </div>
       <div class="stat">
         <div class="stat-value" style="color:#ef4444;">11%</div>
         <div class="stat-label">Still open</div>
-        <div class="stat-sub">2,200 unresolved</div>
+        <div class="stat-sub">2,328 unresolved</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#f59e0b;">9,471</div>
+        <div class="stat-value" style="color:#f59e0b;">9,525</div>
         <div class="stat-label">Top type</div>
         <div class="stat-sub">Loose Dog</div>
       </div>
@@ -140,9 +186,27 @@
       <div class="chart-container" style="height: 400px;"><canvas id="typeMonthlyChart"></canvas></div>
     </div>
 
-    <div class="chart-block">
+    <div class="chart-block" id="types-block">
       <div class="chart-title">Breakdown by incident type</div>
+      <div class="chart-hint">Click a bar to explore that incident type ↓</div>
       <div class="chart-container" style="height: 280px;"><canvas id="typesChart"></canvas></div>
+    </div>
+
+    <div id="type-detail">
+      <div id="td-header">
+        <span id="td-title"></span>
+        <button id="td-close" onclick="closeTypeDetail()">✕ Close</button>
+      </div>
+      <div class="vd-stat-row" id="td-stats"></div>
+      <div class="vd-section">
+        <div class="vd-section-title">Top streets</div>
+        <div id="td-streets"></div>
+      </div>
+      <div class="vd-section">
+        <div class="vd-section-title">Monthly breakdown</div>
+        <div id="td-trend"></div>
+      </div>
+      <a id="td-map-btn" href="../" target="_blank">🗺️ View on animal map →</a>
     </div>
   </div>
 
@@ -156,7 +220,7 @@
   </footer>
 
   <script>
-    const DATA = {"months": ["Oct 2025", "Nov 2025", "Dec 2025", "Jan 2026", "Feb 2026", "Mar 2026", "Apr 2026", "May 2026", "Jun 2026", "Jul 2026", "Aug 2026", "Sep 2026", "Oct 2026"], "monthlyCounts": [1634, 1541, 1643, 1658, 1605, 1896, 1815, 1816, 1724, 1541, 1368, 1322, 1219], "monthlyOpenCounts": [0, 0, 0, 0, 0, 0, 92, 535, 507, 369, 256, 264, 177], "rollingAvg": [null, null, 1606.0, 1614.0, 1635.3, 1719.7, 1772.0, 1842.3, 1785.0, 1693.7, 1544.3, 1410.3, 1303.0], "types": [{"name": "Loose Dog", "count": 9471}, {"name": "Animal Protection Request", "count": 3609}, {"name": "Animal Bite", "count": 2616}, {"name": "Animal Care Concern", "count": 2396}, {"name": "Wildlife Exposure", "count": 1349}, {"name": "Vicious Dog", "count": 887}, {"name": "Loose Animal (Not Dog)", "count": 454}], "typeMonthly": [{"name": "Loose Dog", "data": [794, 796, 829, 846, 787, 878, 844, 781, 731, 594, 508, 513, 570]}, {"name": "Animal Protection Request", "data": [318, 236, 258, 260, 262, 299, 329, 295, 260, 305, 271, 299, 217]}, {"name": "Animal Bite", "data": [172, 183, 194, 183, 187, 245, 230, 260, 198, 221, 194, 187, 162]}, {"name": "Animal Care Concern", "data": [151, 148, 209, 239, 188, 174, 199, 192, 258, 209, 174, 132, 123]}, {"name": "Wildlife Exposure", "data": [107, 81, 49, 46, 70, 164, 86, 150, 154, 127, 120, 113, 82]}, {"name": "Vicious Dog", "data": [68, 71, 76, 60, 89, 86, 66, 73, 76, 63, 60, 58, 41]}, {"name": "Loose Animal (Not Dog)", "data": [24, 26, 28, 24, 22, 50, 61, 65, 47, 22, 41, 20, 24]}]};
+    const DATA = {"months": ["Oct 2025", "Nov 2025", "Dec 2025", "Jan 2026", "Feb 2026", "Mar 2026", "Apr 2026", "May 2026", "Jun 2026", "Jul 2026", "Aug 2026", "Sep 2026", "Oct 2026"], "monthlyCounts": [1448, 1541, 1643, 1658, 1605, 1896, 1815, 1816, 1724, 1541, 1368, 1322, 1477], "monthlyOpenCounts": [0, 0, 0, 0, 0, 0, 92, 535, 507, 369, 256, 264, 305], "rollingAvg": [null, null, 1544.0, 1614.0, 1635.3, 1719.7, 1772.0, 1842.3, 1785.0, 1693.7, 1544.3, 1410.3, 1389.0], "types": [{"name": "Loose Dog", "count": 9525}, {"name": "Animal Protection Request", "count": 3606}, {"name": "Animal Bite", "count": 2627}, {"name": "Animal Care Concern", "count": 2392}, {"name": "Wildlife Exposure", "count": 1353}, {"name": "Vicious Dog", "count": 893}, {"name": "Loose Animal (Not Dog)", "count": 458}], "typeMonthly": [{"name": "Loose Dog", "data": [706, 796, 829, 846, 787, 878, 844, 781, 731, 594, 508, 513, 712]}, {"name": "Animal Protection Request", "data": [280, 236, 258, 260, 262, 299, 329, 295, 260, 305, 271, 299, 252]}, {"name": "Animal Bite", "data": [154, 183, 194, 183, 187, 245, 230, 260, 198, 221, 194, 187, 191]}, {"name": "Animal Care Concern", "data": [129, 148, 209, 239, 188, 174, 199, 192, 258, 209, 174, 132, 141]}, {"name": "Wildlife Exposure", "data": [93, 81, 49, 46, 70, 164, 86, 150, 154, 127, 120, 113, 100]}, {"name": "Vicious Dog", "data": [62, 71, 76, 60, 89, 86, 66, 73, 76, 63, 60, 58, 53]}, {"name": "Loose Animal (Not Dog)", "data": [24, 26, 28, 24, 22, 50, 61, 65, 47, 22, 41, 20, 28]}], "typeDetails": {"Loose Dog": {"streets": [{"name": "Cummings St", "count": 99}, {"name": "East Ave", "count": 98}, {"name": "N Lamar Blvd", "count": 88}, {"name": "E Howard Ln", "count": 39}, {"name": "Rainey St", "count": 37}], "monthly": [706, 796, 829, 846, 787, 878, 844, 781, 731, 594, 508, 513, 712], "open": 912, "closed": 8613}, "Animal Protection Request": {"streets": [{"name": "Rutherford Ln", "count": 170}, {"name": "Levander Loop", "count": 45}, {"name": "S Congress Ave", "count": 30}, {"name": "E Riverside Dr", "count": 23}, {"name": "S 1st St", "count": 21}], "monthly": [280, 236, 258, 260, 262, 299, 329, 295, 260, 305, 271, 299, 252], "open": 408, "closed": 3198}, "Animal Bite": {"streets": [{"name": "Rutherford Ln", "count": 92}, {"name": "N Lamar Blvd", "count": 32}, {"name": "W Slaughter Ln", "count": 24}, {"name": "N Capital of Texas Hwy NB", "count": 23}, {"name": "S Congress Ave", "count": 21}], "monthly": [154, 183, 194, 183, 187, 245, 230, 260, 198, 221, 194, 187, 191], "open": 346, "closed": 2281}, "Animal Care Concern": {"streets": [{"name": "N Lamar Blvd", "count": 37}, {"name": "S Congress Ave", "count": 32}, {"name": "Dessau Rd", "count": 21}, {"name": "Metric Blvd", "count": 21}, {"name": "Menchaca Rd", "count": 19}], "monthly": [129, 148, 209, 239, 188, 174, 199, 192, 258, 209, 174, 132, 141], "open": 367, "closed": 2025}, "Wildlife Exposure": {"streets": [{"name": "Barton Springs Rd", "count": 22}, {"name": "S Congress Ave", "count": 21}, {"name": "E Riverside Dr", "count": 21}, {"name": "San Jacinto Blvd", "count": 20}, {"name": "W Riverside Dr", "count": 12}], "monthly": [93, 81, 49, 46, 70, 164, 86, 150, 154, 127, 120, 113, 100], "open": 24, "closed": 1329}, "Vicious Dog": {"streets": [{"name": "South Hearsey Dr", "count": 10}, {"name": "S Congress Ave", "count": 9}, {"name": "S Lamar Blvd", "count": 8}, {"name": "E Riverside Dr", "count": 7}, {"name": "Linden Rd", "count": 7}], "monthly": [62, 71, 76, 60, 89, 86, 66, 73, 76, 63, 60, 58, 53], "open": 222, "closed": 671}, "Loose Animal (Not Dog)": {"streets": [{"name": "Ed Bluestein Blvd NB", "count": 8}, {"name": "S Lamar Blvd", "count": 8}, {"name": "S 1st St", "count": 7}, {"name": "Lakeline Blvd", "count": 7}, {"name": "Lakeline Blvd & Staked Plains Dr", "count": 7}], "monthly": [24, 26, 28, 24, 22, 50, 61, 65, 47, 22, 41, 20, 28], "open": 49, "closed": 409}}};
 
     const isDark = document.documentElement.classList.contains("dark");
     const gridColor  = isDark ? "#252b3b" : "#e8ecf0";
@@ -276,20 +340,94 @@
       },
     });
 
-    // Incident type breakdown — horizontal bar
-    new Chart(document.getElementById("typesChart"), {
+    // Incident type breakdown — horizontal bar, click to drill down
+    let selectedTypeIdx = null;
+    const typesChart = new Chart(document.getElementById("typesChart"), {
       type: "bar",
       data: {
         labels: DATA.types.map(t => t.name),
         datasets: [{
           label: "Reports",
           data: DATA.types.map(t => t.count),
-          backgroundColor: "#f59e0b",
+          backgroundColor: DATA.types.map(() => "#f59e0b"),
           borderRadius: 4,
         }],
       },
-      options: hBarOpts,
+      options: {
+        ...hBarOpts,
+        onClick(evt, elements) {
+          if (!elements.length) return;
+          const idx = elements[0].index;
+          if (idx === selectedTypeIdx) {
+            closeTypeDetail();
+          } else {
+            openTypeDetail(idx);
+          }
+        },
+        onHover(evt, elements) {
+          evt.native.target.style.cursor = elements.length ? "pointer" : "default";
+        },
+      },
     });
+
+    function openTypeDetail(idx) {
+      selectedTypeIdx = idx;
+      const t = DATA.types[idx];
+      const detail = DATA.typeDetails[t.name] || {};
+      const total = DATA.types.reduce((s, x) => s + x.count, 0);
+      const pct = total ? Math.round(t.count / total * 100) : 0;
+
+      // Highlight selected bar, dim others
+      typesChart.data.datasets[0].backgroundColor =
+        DATA.types.map((_, i) => i === idx ? "#f59e0b" : "rgba(245,158,11,0.3)");
+      typesChart.update("none");
+
+      document.getElementById("td-title").textContent = t.name + " reports";
+
+      const openCount = detail.open || 0;
+      const closedCount = detail.closed || 0;
+      document.getElementById("td-stats").innerHTML = `
+        <div class="vd-stat"><div class="v">${t.count.toLocaleString()}</div><div class="l">Reports</div></div>
+        <div class="vd-stat"><div class="v">${pct}%</div><div class="l">of all reports</div></div>
+        <div class="vd-stat"><div class="v" style="color:#ef4444">${openCount}</div><div class="l">Still open</div></div>
+        <div class="vd-stat"><div class="v" style="color:#22c55e">${closedCount}</div><div class="l">Resolved</div></div>
+      `;
+
+      // Top streets
+      const streets = detail.streets || [];
+      const maxStreet = streets.length ? streets[0].count : 1;
+      document.getElementById("td-streets").innerHTML = streets.length
+        ? streets.map(s => `
+            <div class="mini-bar-row">
+              <span class="mini-bar-label" title="${s.name}">${s.name}</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${Math.round(s.count/maxStreet*100)}%;background:#8b5cf6;"></div></div>
+              <span class="mini-bar-count">${s.count}</span>
+            </div>`).join("")
+        : '<span style="font-size:12px;color:var(--text-muted);">No street data available</span>';
+
+      // Monthly trend
+      const monthly = detail.monthly || [];
+      const maxMonth = Math.max(...monthly, 1);
+      document.getElementById("td-trend").innerHTML = monthly.map((cnt, i) => `
+        <div class="month-bar-row">
+          <span class="month-bar-label">${DATA.months[i].split(" ")[0]}</span>
+          <div class="month-bar-track"><div class="month-bar-fill" style="width:${Math.round(cnt/maxMonth*100)}%;"></div></div>
+          <span class="month-bar-count">${cnt}</span>
+        </div>`).join("");
+
+      // Map link — passes the type as a URL param (map reads ?type=)
+      document.getElementById("td-map-btn").href = "../?type=" + encodeURIComponent(t.name);
+
+      document.getElementById("type-detail").style.display = "block";
+      document.getElementById("type-detail").scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+
+    function closeTypeDetail() {
+      selectedTypeIdx = null;
+      typesChart.data.datasets[0].backgroundColor = DATA.types.map(() => "#f59e0b");
+      typesChart.update("none");
+      document.getElementById("type-detail").style.display = "none";
+    }
   </script>
 </body>
 </html>
