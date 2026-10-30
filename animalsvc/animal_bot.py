@@ -632,6 +632,9 @@ def generate_animal_map(days_back: int = 90) -> tuple:
     for slug, label in _TYPE_OPTIONS:
         type_options_html += f'<option value="{slug}">{label}</option>\n'
 
+    # Type label -> slug, so the trends page can deep-link with ?type=<label>
+    type_slug_js = json.dumps(_TYPE_SLUGS, ensure_ascii=False)
+
     map_var = m.get_name()
     cluster_var = marker_cluster.get_name()
     panel_html = """
@@ -674,6 +677,7 @@ def generate_animal_map(days_back: int = 90) -> tuple:
         var markerCluster = null;
         var typeBucketCounts = __COUNTS_JS__;
         var labelColors = __LABEL_COLORS__;
+        var typeSlugMap = __TYPE_SLUG_MAP__;
 
         function esc(s) {
             return String(s == null ? '' : s)
@@ -770,11 +774,39 @@ def generate_animal_map(days_back: int = 90) -> tuple:
 
         function setTypeFilter(type) {
             currentType = type;
+            var sel = document.getElementById('type-select');
+            if (sel) sel.value = (currentType === 'all') ? 'all' : currentType;
             updateLayers();
+        }
+
+        function clearTypeFilter() {
+            setTypeFilter('all');
+            var b = document.getElementById('type-filter-banner');
+            if (b) b.remove();
         }
 
         document.addEventListener('DOMContentLoaded', function() {
             setTimeout(initLayers, 1000);
+            // Deep link from the trends page: /animal/?type=Loose%20Dog
+            var typeFilter = new URLSearchParams(window.location.search).get('type');
+            if (typeFilter) {
+                var slug = typeSlugMap[typeFilter];
+                if (slug) {
+                    setTypeFilter(slug);
+                    var banner = document.createElement('div');
+                    banner.id = 'type-filter-banner';
+                    banner.style.cssText = 'position:absolute;bottom:24px;left:50%;transform:translateX(-50%);' +
+                        'background:#1d4ed8;color:#fff;padding:7px 14px;border-radius:6px;' +
+                        'font-family:sans-serif;font-size:12px;z-index:9999;white-space:nowrap;' +
+                        'box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;gap:10px;';
+                    banner.innerHTML = '🔍 Filtering: <strong>' + typeFilter + '</strong>' +
+                        ' &nbsp;<a href="." style="color:#93c5fd;font-size:11px;">show all</a>' +
+                        ' &nbsp;<a href="trends/" style="color:#93c5fd;font-size:11px;">← back to trends</a>' +
+                        ' &nbsp;<span onclick="clearTypeFilter()" ' +
+                        'style="cursor:pointer;opacity:0.7;font-size:14px;">✕</span>';
+                    document.body.appendChild(banner);
+                }
+            }
         });
     </script>
     """
@@ -783,6 +815,7 @@ def generate_animal_map(days_back: int = 90) -> tuple:
         .replace("__CLUSTER_VAR__", cluster_var)
         .replace("__COUNTS_JS__", counts_js)
         .replace("__LABEL_COLORS__", label_colors_js)
+        .replace("__TYPE_SLUG_MAP__", type_slug_js)
         .replace("__TYPE_OPTIONS__", type_options_html)
         .replace("__RECORDS_JS__", records_js)
     )

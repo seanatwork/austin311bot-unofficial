@@ -12,7 +12,7 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
-from animalsvc.animal_bot import SERVICE_CODES
+from animalsvc.animal_bot import SERVICE_CODES, _extract_street
 
 
 def _format_central_time() -> str:
@@ -29,6 +29,7 @@ def _format_central_time() -> str:
 logger = logging.getLogger(__name__)
 
 LOOKBACK_DAYS = 365
+TOP_STREETS = 5
 
 
 def _aggregate(records: list) -> dict:
@@ -37,6 +38,8 @@ def _aggregate(records: list) -> dict:
     monthly_open: dict = defaultdict(int)
     by_type: dict = defaultdict(int)
     monthly_by_type: dict = defaultdict(lambda: defaultdict(int))
+    type_streets: dict = defaultdict(lambda: defaultdict(int))
+    type_open: dict = defaultdict(int)
     total = 0
 
     for r in records:
@@ -62,6 +65,13 @@ def _aggregate(records: list) -> dict:
         )
         by_type[label] += 1
         monthly_by_type[label][month_key] += 1
+        if is_open:
+            type_open[label] += 1
+
+        street = _extract_street((r.get("address") or "").strip())
+        if street:
+            type_streets[label][street] += 1
+
         total += 1
 
     months_sorted = sorted(monthly.keys())
@@ -85,6 +95,17 @@ def _aggregate(records: list) -> dict:
         for label, _ in top_types
     ]
 
+    # Per-type drill-down detail: top streets, monthly series, open/closed split
+    type_details: dict = {}
+    for label, count in top_types:
+        streets = sorted(type_streets[label].items(), key=lambda x: -x[1])[:TOP_STREETS]
+        type_details[label] = {
+            "streets": [{"name": s, "count": c} for s, c in streets],
+            "monthly": [monthly_by_type[label].get(m, 0) for m in months_sorted],
+            "open": type_open[label],
+            "closed": count - type_open[label],
+        }
+
     return {
         "total": total,
         "months": months_sorted,
@@ -93,6 +114,7 @@ def _aggregate(records: list) -> dict:
         "rolling_avg": rolling,
         "top_types": top_types,
         "type_monthly": type_monthly,
+        "type_details": type_details,
     }
 
 
@@ -120,6 +142,7 @@ def _render_html(data: dict, fetched_at: str) -> str:
         "rollingAvg": data["rolling_avg"],
         "types": [{"name": t, "count": c} for t, c in top_types],
         "typeMonthly": type_monthly,
+        "typeDetails": data.get("type_details", {}),
     }
     payload_json = json.dumps(payload)
 
@@ -208,6 +231,52 @@ def _render_html(data: dict, fetched_at: str) -> str:
     footer a {{ color: var(--text-sub); text-decoration: none; }}
     footer a:hover {{ color: var(--text); }}
     @media (max-width: 520px) {{ .stat-value {{ font-size: 1rem; }} .chart-container {{ height: 260px; }} }}
+
+    .chart-hint {{ font-size: 11px; color: var(--text-muted); margin-bottom: 8px; font-style: italic; }}
+
+    #type-detail {{
+      display: none;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-top: 3px solid #f59e0b;
+      border-radius: 0 0 8px 8px;
+      padding: 16px;
+      margin-top: -9px;
+    }}
+    #td-header {{
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 12px;
+    }}
+    #td-title {{ font-size: 15px; font-weight: 700; color: var(--text-head); }}
+    #td-close {{
+      background: none; border: 1px solid var(--border); border-radius: 4px;
+      color: var(--text-muted); cursor: pointer; font-size: 13px; padding: 2px 8px;
+      line-height: 1.4;
+    }}
+    #td-close:hover {{ color: var(--text); border-color: #94a3b8; }}
+    .vd-section {{ margin-bottom: 14px; }}
+    .vd-section-title {{ font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }}
+    .vd-stat-row {{ display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }}
+    .vd-stat {{ background: var(--bg-panel, #f1f5f9); border-radius: 6px; padding: 8px 12px; text-align: center; min-width: 80px; }}
+    .vd-stat .v {{ font-size: 1.2rem; font-weight: 700; color: var(--text-head); }}
+    .vd-stat .l {{ font-size: 0.67rem; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.04em; margin-top: 2px; }}
+    .mini-bar-row {{ display: flex; align-items: center; gap: 8px; margin-bottom: 5px; font-size: 11px; }}
+    .mini-bar-label {{ width: 160px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text); }}
+    .mini-bar-track {{ flex: 1; background: var(--border); border-radius: 2px; height: 9px; }}
+    .mini-bar-fill {{ height: 100%; border-radius: 2px; }}
+    .mini-bar-count {{ width: 34px; text-align: right; color: var(--text-sub); }}
+    .month-bar-row {{ display: flex; align-items: center; gap: 6px; margin-bottom: 4px; font-size: 10px; }}
+    .month-bar-label {{ width: 32px; color: var(--text-muted); }}
+    .month-bar-track {{ flex: 1; background: var(--border); border-radius: 2px; height: 8px; }}
+    .month-bar-fill {{ height: 100%; border-radius: 2px; background: #f59e0b; }}
+    .month-bar-count {{ width: 30px; text-align: right; color: var(--text-sub); }}
+    #td-map-btn {{
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #2563eb; color: #fff; border: none; border-radius: 5px;
+      padding: 7px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
+      text-decoration: none; margin-top: 4px;
+    }}
+    #td-map-btn:hover {{ background: #1d4ed8; }}
   </style>
 </head>
 <body>
@@ -259,9 +328,27 @@ def _render_html(data: dict, fetched_at: str) -> str:
       <div class="chart-container" style="height: 400px;"><canvas id="typeMonthlyChart"></canvas></div>
     </div>
 
-    <div class="chart-block">
+    <div class="chart-block" id="types-block">
       <div class="chart-title">Breakdown by incident type</div>
+      <div class="chart-hint">Click a bar to explore that incident type ↓</div>
       <div class="chart-container" style="height: {max(280, type_count * 38)}px;"><canvas id="typesChart"></canvas></div>
+    </div>
+
+    <div id="type-detail">
+      <div id="td-header">
+        <span id="td-title"></span>
+        <button id="td-close" onclick="closeTypeDetail()">✕ Close</button>
+      </div>
+      <div class="vd-stat-row" id="td-stats"></div>
+      <div class="vd-section">
+        <div class="vd-section-title">Top streets</div>
+        <div id="td-streets"></div>
+      </div>
+      <div class="vd-section">
+        <div class="vd-section-title">Monthly breakdown</div>
+        <div id="td-trend"></div>
+      </div>
+      <a id="td-map-btn" href="../" target="_blank">🗺️ View on animal map →</a>
     </div>
   </div>
 
@@ -395,20 +482,94 @@ def _render_html(data: dict, fetched_at: str) -> str:
       }},
     }});
 
-    // Incident type breakdown — horizontal bar
-    new Chart(document.getElementById("typesChart"), {{
+    // Incident type breakdown — horizontal bar, click to drill down
+    let selectedTypeIdx = null;
+    const typesChart = new Chart(document.getElementById("typesChart"), {{
       type: "bar",
       data: {{
         labels: DATA.types.map(t => t.name),
         datasets: [{{
           label: "Reports",
           data: DATA.types.map(t => t.count),
-          backgroundColor: "#f59e0b",
+          backgroundColor: DATA.types.map(() => "#f59e0b"),
           borderRadius: 4,
         }}],
       }},
-      options: hBarOpts,
+      options: {{
+        ...hBarOpts,
+        onClick(evt, elements) {{
+          if (!elements.length) return;
+          const idx = elements[0].index;
+          if (idx === selectedTypeIdx) {{
+            closeTypeDetail();
+          }} else {{
+            openTypeDetail(idx);
+          }}
+        }},
+        onHover(evt, elements) {{
+          evt.native.target.style.cursor = elements.length ? "pointer" : "default";
+        }},
+      }},
     }});
+
+    function openTypeDetail(idx) {{
+      selectedTypeIdx = idx;
+      const t = DATA.types[idx];
+      const detail = DATA.typeDetails[t.name] || {{}};
+      const total = DATA.types.reduce((s, x) => s + x.count, 0);
+      const pct = total ? Math.round(t.count / total * 100) : 0;
+
+      // Highlight selected bar, dim others
+      typesChart.data.datasets[0].backgroundColor =
+        DATA.types.map((_, i) => i === idx ? "#f59e0b" : "rgba(245,158,11,0.3)");
+      typesChart.update("none");
+
+      document.getElementById("td-title").textContent = t.name + " reports";
+
+      const openCount = detail.open || 0;
+      const closedCount = detail.closed || 0;
+      document.getElementById("td-stats").innerHTML = `
+        <div class="vd-stat"><div class="v">${{t.count.toLocaleString()}}</div><div class="l">Reports</div></div>
+        <div class="vd-stat"><div class="v">${{pct}}%</div><div class="l">of all reports</div></div>
+        <div class="vd-stat"><div class="v" style="color:#ef4444">${{openCount}}</div><div class="l">Still open</div></div>
+        <div class="vd-stat"><div class="v" style="color:#22c55e">${{closedCount}}</div><div class="l">Resolved</div></div>
+      `;
+
+      // Top streets
+      const streets = detail.streets || [];
+      const maxStreet = streets.length ? streets[0].count : 1;
+      document.getElementById("td-streets").innerHTML = streets.length
+        ? streets.map(s => `
+            <div class="mini-bar-row">
+              <span class="mini-bar-label" title="${{s.name}}">${{s.name}}</span>
+              <div class="mini-bar-track"><div class="mini-bar-fill" style="width:${{Math.round(s.count/maxStreet*100)}}%;background:#8b5cf6;"></div></div>
+              <span class="mini-bar-count">${{s.count}}</span>
+            </div>`).join("")
+        : '<span style="font-size:12px;color:var(--text-muted);">No street data available</span>';
+
+      // Monthly trend
+      const monthly = detail.monthly || [];
+      const maxMonth = Math.max(...monthly, 1);
+      document.getElementById("td-trend").innerHTML = monthly.map((cnt, i) => `
+        <div class="month-bar-row">
+          <span class="month-bar-label">${{DATA.months[i].split(" ")[0]}}</span>
+          <div class="month-bar-track"><div class="month-bar-fill" style="width:${{Math.round(cnt/maxMonth*100)}}%;"></div></div>
+          <span class="month-bar-count">${{cnt}}</span>
+        </div>`).join("");
+
+      // Map link — passes the type as a URL param (map reads ?type=)
+      document.getElementById("td-map-btn").href = "../?type=" + encodeURIComponent(t.name);
+
+      document.getElementById("type-detail").style.display = "block";
+      document.getElementById("type-detail").scrollIntoView({{ behavior: "smooth", block: "nearest" }});
+    }}
+
+    function closeTypeDetail() {{
+      selectedTypeIdx = null;
+      typesChart.data.datasets[0].backgroundColor = DATA.types.map(() => "#f59e0b");
+      typesChart.update("none");
+      document.getElementById("type-detail").style.display = "none";
+    }}
   </script>
 </body>
 </html>
