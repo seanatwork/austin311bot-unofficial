@@ -161,6 +161,8 @@ _OG_PAGES = {
                     "Potholes, signal issues, and sidewalk requests citywide — last 30/60/90 days."),
     "water":       ("Austin 311 — Water Conservation Violations",
                     "Water conservation violation reports across Austin."),
+    "environment": ("Austin 311 — Environment: Water, Spills & Algae",
+                    "Water conservation violations, TCEQ environmental spills, and Lady Bird Lake harmful algae levels across Austin."),
 }
 
 

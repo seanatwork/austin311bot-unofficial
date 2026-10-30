@@ -173,6 +173,17 @@ jobs:
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
+      # Environment page: Open311 WWREPORT (same code as the water map above,
+      # so the cache is already warm) + Socrata TCEQ spills and Lady Bird Lake
+      # chlorophyll-a. Was hand-written and months stale before this step.
+      - name: Generate environment page
+        id: environment_page
+        continue-on-error: true
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.categories == 'all' || contains(github.event.inputs.categories, 'environment')
+        run: python scripts/generate_map.py environment
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
       - name: Generate childcare map
         id: childcare_map
         continue-on-error: true
@@ -372,6 +383,7 @@ jobs:
             docs/homeless/index.html \
             docs/crime/index.html \
             docs/water/index.html \
+            docs/environment/index.html \
             docs/childcare/index.html \
             docs/cameras/index.html \
             docs/budget/index.html \

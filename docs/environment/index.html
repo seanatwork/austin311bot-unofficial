@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Austin 311 — Environment</title>
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="Austin 311 — Environment: Water, Spills & Algae" />
-  <meta property="og:description" content="Water conservation violations, environmental spills, and harmful algae bloom reports across Austin." />
-  <meta property="og:url" content="https://austin311.com/environment/" />
-  <meta property="og:image" content="https://austin311.com/og-default.png" />
-  <meta property="og:image:width" content="1200" />
-  <meta property="og:image:height" content="630" />
-  <meta property="og:site_name" content="Austin 311" />
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Austin 311 — Environment: Water, Spills & Algae" />
-  <meta name="twitter:description" content="Water conservation violations, environmental spills, and harmful algae bloom reports across Austin." />
-  <meta name="twitter:image" content="https://austin311.com/og-default.png" />
-  <meta name="description" content="Water conservation violations, environmental spills, and harmful algae bloom reports across Austin." />
+<meta property="og:title" content="Austin 311 — Environment: Water, Spills & Algae" />
+<meta property="og:description" content="Water conservation violations, TCEQ environmental spills, and Lady Bird Lake harmful algae levels across Austin." />
+<meta property="og:url" content="https://austin311.com/environment/" />
+<meta property="og:image" content="https://austin311.com/og-default.png" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:site_name" content="Austin 311" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Austin 311 — Environment: Water, Spills & Algae" />
+<meta name="twitter:description" content="Water conservation violations, TCEQ environmental spills, and Lady Bird Lake harmful algae levels across Austin." />
+<meta name="twitter:image" content="https://austin311.com/og-default.png" />
+<meta name="description" content="Water conservation violations, TCEQ environmental spills, and Lady Bird Lake harmful algae levels across Austin." />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -99,6 +99,13 @@
       font-size: 0.95rem;
     }
 
+    header .stamp {
+      margin-top: 0.7rem;
+      font-size: 0.75rem;
+      color: var(--text-footer);
+    }
+    header .stamp b { color: var(--text-desc); font-weight: 600; }
+
     .back-link {
       display: inline-block;
       margin-bottom: 1rem;
@@ -180,6 +187,15 @@
       margin-bottom: 0.3rem;
     }
 
+    .info-box.warn {
+      border-color: #f59e0b;
+      background: #fffbeb;
+    }
+    html.dark .info-box.warn {
+      background: #2a2311;
+      border-color: #b45309;
+    }
+
     .map-link {
       display: inline-flex;
       align-items: center;
@@ -251,6 +267,14 @@
     footer a { color: var(--text-footer-a); text-decoration: none; }
     footer a:hover { color: var(--text-footer-hover); }
   </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-TS158R7XSN');
+</script>
 </head>
 <body>
   <button id="theme-toggle" aria-label="Toggle dark mode">🌙 Dark</button>
@@ -259,6 +283,7 @@
     <a class="back-link" href="../">← Austin 311</a>
     <h1>🌍 Environment</h1>
     <p>Water conservation, environmental spills, harmful algae &amp; surface water quality</p>
+    <p class="stamp">Last updated <b>Oct 30, 2026 11:50 AM CDT</b> · Water quality sampled Sep 16, 2026 · spills Oct 30, 2025 – Oct 30, 2026 · 311 water conservation last 90 days</p>
   </header>
 
   <div class="section">
@@ -267,41 +292,42 @@
       Scientists measure algae by how much green pigment (chlorophyll) is in the water. The higher the number, the more algae — and the greater the risk of a harmful bloom.
       <a href="https://www.austintexas.gov/department/watershed-protection" target="_blank" rel="noopener" class="tag" style="text-decoration:none;">Source: Austin Watershed Protection ↗</a>
     </p>
-
     <div class="info-box">
-      <strong>🔬 Lady Bird Lake — Current algae levels (Apr 14, 2026):</strong>
+      <strong>🔬 Lady Bird Lake — latest algae levels (Sep 16, 2026):</strong>
       <div style="margin-top:0.75rem;display:flex;flex-direction:column;gap:0.6rem;">
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
             <span>Basin (west end)</span>
-            <span style="font-weight:600;color:#16a34a;">2.4 µg/L — Clean ✅</span>
+            <span style="font-weight:600;color:#ca8a04;">15.1 µg/L — Low caution ⚠️</span>
           </div>
           <div style="background:#e2e8f0;border-radius:4px;height:8px;overflow:hidden;">
-            <div style="background:#16a34a;height:100%;width:9.6%;" title="2.4 out of 25 µg/L advisory threshold"></div>
+            <div style="background:#ca8a04;height:100%;width:60.4%;" title="15.1 out of 25 µg/L advisory threshold"></div>
           </div>
+          <div style="font-size:0.72rem;color:var(--text-desc);margin-top:2px;">sampled Sep 16, 2026</div>
         </div>
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
             <span>1st St bridge</span>
-            <span style="font-weight:600;color:#16a34a;">0.4 µg/L — Clean ✅</span>
+            <span style="font-weight:600;color:#16a34a;">5.1 µg/L — Clean</span>
           </div>
           <div style="background:#e2e8f0;border-radius:4px;height:8px;overflow:hidden;">
-            <div style="background:#16a34a;height:100%;width:1.7%;" title="0.4 out of 25 µg/L advisory threshold"></div>
+            <div style="background:#16a34a;height:100%;width:20.4%;" title="5.1 out of 25 µg/L advisory threshold"></div>
           </div>
+          <div style="font-size:0.72rem;color:var(--text-desc);margin-top:2px;">sampled Sep 16, 2026</div>
         </div>
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:3px;">
             <span>Red Bud Isle</span>
-            <span style="font-weight:600;color:#16a34a;">0.4 µg/L — Clean ✅</span>
+            <span style="font-weight:600;color:#16a34a;">1.0 µg/L — Clean</span>
           </div>
           <div style="background:#e2e8f0;border-radius:4px;height:8px;overflow:hidden;">
-            <div style="background:#16a34a;height:100%;width:1.7%;" title="0.4 out of 25 µg/L advisory threshold"></div>
+            <div style="background:#16a34a;height:100%;width:3.8%;" title="1.0 out of 25 µg/L advisory threshold"></div>
           </div>
+          <div style="font-size:0.72rem;color:var(--text-desc);margin-top:2px;">sampled Sep 16, 2026 (estimated)</div>
         </div>
       </div>
-      <p style="margin-top:0.75rem;font-size:0.82em;color:var(--text-desc);">Bar shows % of advisory trigger level (25 µg/L). All sites currently well within safe range.</p>
+      <p style="margin-top:0.75rem;font-size:0.82em;color:var(--text-desc);">Bar shows % of advisory trigger level (25 µg/L). Austin Watershed Protection samples these three lake sites roughly every 6–8 weeks; "estimated" marks lab results flagged as approximate.</p>
     </div>
-
     <div class="info-box">
       <strong>📅 Algae levels over the past year — Lady Bird Lake (basin):</strong>
       <table style="width:100%;border-collapse:collapse;margin-top:0.6rem;font-size:0.88rem;">
@@ -314,6 +340,26 @@
         </thead>
         <tbody>
           <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:5px 0;">Sep 2026</td>
+            <td style="text-align:right;">15.1 µg/L</td>
+            <td style="text-align:right;color:#ca8a04;font-weight:600;">Low caution</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:5px 0;">Jul 2026</td>
+            <td style="text-align:right;">2.9 µg/L</td>
+            <td style="text-align:right;color:#16a34a;font-weight:600;">Clean</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:5px 0;">Jun 2026</td>
+            <td style="text-align:right;">12.2 µg/L</td>
+            <td style="text-align:right;color:#ca8a04;font-weight:600;">Low caution</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
+            <td style="padding:5px 0;">May 2026</td>
+            <td style="text-align:right;">3.1 µg/L</td>
+            <td style="text-align:right;color:#16a34a;font-weight:600;">Clean</td>
+          </tr>
+          <tr style="border-bottom:1px solid var(--border);">
             <td style="padding:5px 0;">Apr 2026</td>
             <td style="text-align:right;">2.4 µg/L</td>
             <td style="text-align:right;color:#16a34a;font-weight:600;">Clean</td>
@@ -323,28 +369,14 @@
             <td style="text-align:right;">6.2 µg/L</td>
             <td style="text-align:right;color:#16a34a;font-weight:600;">Clean</td>
           </tr>
-          <tr style="border-bottom:1px solid var(--border);">
-            <td style="padding:5px 0;">Dec 2025</td>
-            <td style="text-align:right;">3.5 µg/L</td>
-            <td style="text-align:right;color:#16a34a;font-weight:600;">Clean</td>
-          </tr>
-          <tr style="border-bottom:1px solid var(--border);">
-            <td style="padding:5px 0;">Oct 2025 <em style="font-weight:normal;color:var(--text-desc);">(seasonal peak)</em></td>
-            <td style="text-align:right;">9.8 µg/L</td>
-            <td style="text-align:right;color:#ca8a04;font-weight:600;">Low caution</td>
-          </tr>
-          <tr>
-            <td style="padding:5px 0;">Sep 2025</td>
-            <td style="text-align:right;">3.1 µg/L</td>
-            <td style="text-align:right;color:#16a34a;font-weight:600;">Clean</td>
-          </tr>
         </tbody>
       </table>
+      <p style="margin-top:0.6rem;font-size:0.82em;color:var(--text-desc);">One row per sampling month — the latest basin reading in that month. Rows are missing where the lake was not sampled.</p>
     </div>
-
     <div class="info-box">
       <strong>🌍 How does Austin compare to global safety standards?</strong>
-      <p style="margin:0.5rem 0 0.4rem;">Chlorophyll-a above <strong>25 µg/L</strong> is where regulators around the world start issuing public health advisories. Austin's lake is well under that right now.</p>
+      <p style="margin:0.5rem 0 0.4rem;">Chlorophyll-a above <strong>25 µg/L</strong> is where regulators around the world start issuing public health advisories. The highest basin reading in the past 12 months was <strong>15.1 µg/L</strong> on Sep 16, 2026, above the WHO 10 µg/L low-risk threshold, but below the 25 µg/L advisory trigger used in California and the EU.</p>
+
       <table style="width:100%;border-collapse:collapse;font-size:0.85rem;margin-top:0.5rem;">
         <thead>
           <tr style="border-bottom:1px solid var(--border);color:var(--text-desc);">
@@ -376,7 +408,7 @@
           </tr>
         </tbody>
       </table>
-      <p style="margin-top:0.7rem;font-size:0.82em;color:var(--text-desc);">Lady Bird Lake's Oct 2025 peak (9.8 µg/L) fell below the WHO low-risk threshold. A level between 10–25 µg/L would warrant closer monitoring; above 25 µg/L would trigger a public advisory in California and most of Europe.</p>
+
     </div>
 
     <div class="info-box">
@@ -384,7 +416,7 @@
     </div>
 
     <p style="font-size:0.8rem;color:var(--text-desc);margin-top:0.5rem;">
-      Data: <a href="https://data.austintexas.gov/resource/5tye-7ray" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">Austin Water Quality Sampling dataset</a> (chlorophyll-a, Lady Bird Lake watershed). µg/L = micrograms per liter, a standard unit for algae pigment concentration.
+      Data: <a href="https://data.austintexas.gov/resource/5tye-7ray" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">Austin Water Quality Sampling dataset</a> (chlorophyll-a, Lady Bird Lake watershed; lab results reported in mg/L and converted here to µg/L). µg/L = micrograms per liter, a standard unit for algae pigment concentration.
     </p>
   </div>
 
@@ -394,121 +426,45 @@
       Chemical, fuel, and waste spills reported to the Texas Commission on Environmental Quality (TCEQ) in Austin &amp; Travis County.
       <span class="tag">Source: TCEQ Emergency Response</span>
     </p>
-
     <div class="stat-grid">
-      <div class="stat-card">
-        <div class="value">31</div>
-        <div class="label">Incidents (last 365 days)</div>
-      </div>
-      <div class="stat-card">
-        <div class="value">6</div>
-        <div class="label">Open investigations</div>
-      </div>
-      <div class="stat-card">
-        <div class="value">25</div>
-        <div class="label">Closed / resolved</div>
-      </div>
-      <div class="stat-card">
-        <div class="value">~0.6</div>
-        <div class="label">Incidents per week</div>
-      </div>
-    </div>
-
+<div class="stat-card"><div class="value">23</div><div class="label">Incidents (Oct 30, 2025 – Oct 30, 2026)</div></div><div class="stat-card"><div class="value">0</div><div class="label">Open / referred</div></div><div class="stat-card"><div class="value">23</div><div class="label">Closed / resolved</div></div><div class="stat-card"><div class="value">0.4</div><div class="label">Incidents per week</div></div>    </div>
     <div class="info-box">
       <strong>Impacted media:</strong>
-      <ul>
-        <li>🗑️ Waste (solid or liquid) — 26 incidents</li>
-        <li>💧 Water (surface or ground) — 5 incidents</li>
-      </ul>
+      <ul><li>🗑️ Waste — 23 incidents</li></ul>
     </div>
-
     <div class="info-box">
       <strong>Reported materials:</strong>
-      <ul>
-        <li>⛽ Diesel — 3 incidents</li>
-        <li>🛢️ Kerosene — 1 incident</li>
-        <li>⛽ Gasoline — 1 incident</li>
-        <li>🔧 Hydraulic fluid — 1 incident</li>
-        <li>⚗️ Aluminum sulfate — 1 incident</li>
-        <li>❓ Unknown material — 23 incidents</li>
-      </ul>
+      <ul><li>❓ Unknown material — 10 incidents</li><li>⚗️ Diesel — 5 incidents</li><li>⚗️ Diesel fuel — 1 incident</li><li>⚗️ Transformer Mineral Oil (Non-PCB) — 1 incident</li><li>⚗️ Used Oil — 1 incident</li><li>⚗️ OIL — 1 incident</li></ul>
     </div>
-
     <div class="info-box">
       <strong>📋 Recent incidents:</strong>
-      <ul>
-        <li><strong>2026-04-06</strong> — 50-gallon diesel release while moving a storage tank (78754) <em style="color:var(--text-desc)">[Closed]</em></li>
-        <li><strong>2026-03-20</strong> — 20-gallon fuel spill from overfilling tank (78758) <em style="color:var(--text-desc)">[Closed]</em></li>
-        <li><strong>2026-03-15</strong> — Up to 167 gallons of mineral oil released from pad-mounted transformer (78734) <em style="color:var(--text-desc)">[Closed]</em></li>
-        <li><strong>2025-12-22</strong> — 275-gallon kerosene release from abandoned highway tote <em style="color:var(--text-desc)">[Closed]</em></li>
-      </ul>
+      <ul><li><strong>Sep 30, 2026</strong> — Broken hydraulic line on trash truck. (78754) <em style="color:var(--text-desc)">[Closed]</em></li><li><strong>Sep 7, 2026</strong> — 15 gallon diesel release to land only due to vehicular accident. (78736) <em style="color:var(--text-desc)">[Closed]</em></li><li><strong>Aug 10, 2026</strong> — 33 gallon fuel release while filling tank. (Manor, 78653) <em style="color:var(--text-desc)">[Closed]</em></li><li><strong>Jun 14, 2026</strong> — 100 gallons of Diesel fuel released (78753) <em style="color:var(--text-desc)">[Closed]</em></li><li><strong>Jun 3, 2026</strong> — 80 Gallon of Diesel spill to land only. (78758) <em style="color:var(--text-desc)">[Closed]</em></li></ul>
     </div>
 
     <p style="font-size:0.8rem;color:var(--text-desc);margin-top:0.5rem;">
-      Data: <a href="https://data.austintexas.gov/resource/xagr-a3x2" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">TCEQ Emergency Response Spills dataset</a> — Austin/Travis County incidents only.
+      Data: <a href="https://data.texas.gov/resource/xagr-a3x2" target="_blank" rel="noopener" style="color:inherit;text-decoration:underline;">TCEQ Emergency Response Spills dataset</a> — statewide data filtered to Travis County incidents filed Oct 30, 2025 – Oct 30, 2026. Duplicate incident records are collapsed.
     </p>
   </div>
 
   <div class="section">
     <h2>💧 Water Conservation Violations</h2>
     <p style="font-size:0.85rem;color:var(--text-desc);margin-bottom:1rem;">
-      Reports of sprinkler misuse, leaks, and water waste investigated by Austin Water.
+      Reports of sprinkler misuse, leaks, and water waste investigated by Austin Water, over the last 90 days.
       <span class="tag">Service code: WWREPORT</span>
     </p>
-
     <div class="stat-grid">
-      <div class="stat-card">
-        <div class="value">243</div>
-        <div class="label">Reports (last 90 days)</div>
-      </div>
-      <div class="stat-card">
-        <div class="value">9</div>
-        <div class="label">Open investigations</div>
-      </div>
-      <div class="stat-card">
-        <div class="value">234</div>
-        <div class="label">Closed / resolved</div>
-      </div>
-      <div class="stat-card">
-        <div class="value">~2.7</div>
-        <div class="label">Reports per day</div>
-      </div>
-    </div>
-
+<div class="stat-card"><div class="value">476</div><div class="label">Reports (last 90 days)</div></div><div class="stat-card"><div class="value">4</div><div class="label">Open investigations</div></div><div class="stat-card"><div class="value">472</div><div class="label">Closed / resolved</div></div><div class="stat-card"><div class="value">5.3</div><div class="label">Reports per day</div></div>    </div>
     <div class="info-box">
       <strong>📋 Investigation Outcomes:</strong>
-      <ul>
-        <li>📬 Warning postcard sent: 98</li>
-        <li>✅ Violation confirmed: 47</li>
-        <li>🚫 Invalid complaint: 19</li>
-        <li>🔍 No problem found: 14</li>
-        <li>✔️ Action already taken: 12</li>
-        <li>🔎 Under investigation: 53</li>
-      </ul>
+      <ul><li>📬 Warning postcard sent: 225</li><li>🔍 No problem found: 68</li><li>✔️ Action already taken: 47</li><li>🚫 Invalid complaint: 38</li><li>✅ Violation confirmed: 30</li><li>📋 Other: 28</li></ul>
     </div>
-
     <div class="info-box">
       <strong>🚿 Violation Types:</strong>
-      <ul>
-        <li>💧 Other water waste: 112</li>
-        <li>🔧 Leak / broken pipe: 58</li>
-        <li>🌊 Runoff into street: 32</li>
-        <li>📅 Wrong watering day: 24</li>
-        <li>🌧️ Watering during rain: 12</li>
-        <li>💦 Sprinkler / irrigation: 5</li>
-      </ul>
+      <ul><li>💧 Other water waste: 377</li><li>💦 Sprinkler / irrigation: 38</li><li>🔧 Leak / broken pipe: 24</li><li>📅 Wrong watering day: 19</li><li>🌧️ Watering during rain: 12</li><li>🌊 Runoff into street: 2</li></ul>
     </div>
-
     <div class="info-box">
       <strong>📍 Most Reported Streets:</strong>
-      <ul>
-        <li>S Ih 35 Svrd NB: 6</li>
-        <li>W Sh 71: 3</li>
-        <li>Wilson Heights Dr: 2</li>
-        <li>Shoal Creek Blvd: 2</li>
-        <li>Unity Cir: 2</li>
-        <li>Airport Blvd: 2</li>
-      </ul>
+      <ul><li>Hank Ave: 14</li><li>Business Park Dr: 10</li><li>N Lamar Blvd: 9</li><li>N Mopac Expy Svrd Sb: 6</li><li>N Mopac Expy Svrd Nb: 6</li><li>Anderson Mill Rd: 6</li></ul>
     </div>
 
     <a class="map-link" href="../water/" target="_blank">

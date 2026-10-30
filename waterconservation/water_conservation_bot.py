@@ -170,6 +170,10 @@ def _extract_street(address: str) -> str:
 def get_water_conservation_stats(days_back: int = 90) -> dict:
     """Fetch and summarise water conservation violations."""
     records = _fetch_violations(days_back)
+    if not records:
+        # Same fallback the map uses: a throttled 311 fetch (403 bursts) should
+        # not blank out the summary when the cache already holds these records.
+        records = _cached_violations(days_back)
 
     total  = len(records)
     open_  = sum(1 for r in records if (r.get("status") or "").lower() == "open")

@@ -45,7 +45,7 @@ Not a government website. Built by a concerned citizen using publicly available 
 
 - **[Austin Open311 API](https://311.austintexas.gov/open311/v2)** — all 311 service requests
 - **[Austin Open Data Portal](https://data.austintexas.gov)** — APD crime, crashes, restaurant inspections, court data, water quality, childcare, MetroBike
-- **[Texas Open Data Portal](https://data.texas.gov)** — TABC mixed beverage sales (bar of the month)
+- **[Texas Open Data Portal](https://data.texas.gov)** — TABC mixed beverage sales (bar of the month), TCEQ environmental spills
 
 All data is publicly available. Get your own API key at [data.austintexas.gov](https://data.austintexas.gov).
 

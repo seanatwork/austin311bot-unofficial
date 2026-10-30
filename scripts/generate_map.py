@@ -139,6 +139,12 @@ def generate_water_map(days_back: int = 90) -> tuple:
     return generate_water_map(days_back)
 
 
+def generate_environment_page(days_back: int = 90) -> tuple:
+    """Generate the environment overview page (algae, TCEQ spills, water conservation)."""
+    from environment.environment_bot import generate_environment_page as _generate
+    return _generate(days_back)
+
+
 def generate_childcare_map(days_back: int = 90) -> tuple:
     """Generate childcare facility compliance map."""
     from childcare.childcare_bot import generate_childcare_map
@@ -254,6 +260,7 @@ CATEGORY_MAPS = {
     "parks": (generate_parks_map, "parks/map/index.html"),
     "parks-hub": (generate_parks_hub, "parks/index.html"),
     "water": (generate_water_map, "water/index.html"),
+    "environment": (generate_environment_page, "environment/index.html"),
     "childcare": (generate_childcare_map, "childcare/index.html"),
     "animal": (generate_animal_map, "animal/index.html"),
     "dead-animal": (generate_dead_animal_map, "animal/dead/index.html"),

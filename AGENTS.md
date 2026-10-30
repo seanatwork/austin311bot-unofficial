@@ -61,7 +61,7 @@ python scripts/generate_map.py <category>
 
 - Maps: `bicycle`, `graffiti`, `homeless`, `traffic`, `parking`, `crime`, `noise`, `parks`, `parks-hub`, `water`, `childcare`, `animal`, `dead-animal`, `storm`, `trees`, `cameras`
 - Trends: `parking-trends`, `crime-trends`, `noise-trends`, `graffiti-trends`, `homeless-trends`, `storm-trends`, `parks-trends`, `animal-trends`, `dead-animal-trends`
-- Other: `hate-crime`, `budget`, `shelter` (writes `docs/shelter/data.json`), `nearby` (maps to `docs/nearby/index.html`, which **no workflow generates** — the directory does not exist on the site)
+- Other: `hate-crime`, `budget`, `shelter` (writes `docs/shelter/data.json`), `environment`, `nearby` (maps to `docs/nearby/index.html`, which **no workflow generates** — the directory does not exist on the site)
 
 Other standalone generators: `scripts/generate_911_data.py`, `generate_capmetro_data.py`, `generate_court_data.py`, `generate_covid_data.py`, `generate_fire_data.py`, `generate_fun_data.py`, `generate_nearby_page.py`, `generate_og_image.py`, `generate_pool_data.py`, `generate_pulse.py` (retired), `generate_query_data.py`, `generate_shelter_data.py`, `generate_weekly_digest.py`, `generate_wrapped_data.py`, plus the helpers `ci_report_failures.py`, `fetch_austin_parks.py`, `fetch_austin_zctas.py`.
 
@@ -71,7 +71,7 @@ No app server to deploy — "deployment" means regenerating the static output. W
 
 | Workflow | Schedule | Generates |
 |----------|----------|-----------|
-| `weekly.yml` | Monday 14:00 UTC | Everything: every point/choropleth map (bicycle, graffiti, homeless, traffic, parking, crime, noise, parks + hub, water, childcare, animal, storm, trees, cameras), budget + hate-crime pages, all trends pages, pools, fire, shelter, court cache, querystore, fun data, 311 Wrapped |
+| `weekly.yml` | Monday 14:00 UTC | Everything: every point/choropleth map (bicycle, graffiti, homeless, traffic, parking, crime, noise, parks + hub, water, childcare, animal, storm, trees, cameras), the environment overview page, budget + hate-crime pages, all trends pages, pools, fire, shelter, court cache, querystore, fun data, 311 Wrapped |
 | `weekly-digest.yml` | Monday 12:30 UTC | Weekly 311 digest (`generate_weekly_digest.py`) |
 | `quarterly.yml` | 1st of Jan/Apr/Jul/Oct | 911 data |
 | `deploy-worker.yml` | On push to `workers/query-gateway/**` | Cloudflare Worker (`workers/query-gateway`), needs `CLOUDFLARE_API_TOKEN` |
@@ -105,6 +105,7 @@ Each package is independent and owns one data domain. Its `__init__.py` re-expor
 | `trafficcameras/` | Austin traffic camera feeds | `generate_cameras_map`, `fetch_cameras`, `get_camera_stats` |
 | `restaurants/` | Socrata `ecmv-9xxi` (health inspections) | `get_restaurant_stats`, `format_restaurant_stats` |
 | `waterconservation/` | Open311 `WWREPORT` | `generate_water_map`, `get_water_conservation_stats` |
+| `environment/` | Socrata `5tye-7ray` (chlorophyll-a), TCEQ `xagr-a3x2` (spills), Open311 `WWREPORT` | `generate_environment_page` + fetch/summarise helpers |
 | `childcare/` | Socrata childcare facility inspections | `generate_childcare_map`, `get_childcare_stats` |
 | `crime/` | Socrata `fdj4-gpfu` (APD), `i7fg-wrk5` (NIBRS), `t99n-5ib4` (hate crime) | `generate_crime_map`, `generate_hate_crime` |
 | `capmetro/` | Socrata `tyfh-5r8s` (MetroBike trips) | `get_electric_vs_classic`, `get_kiosk_flow`, `get_membership_breakdown`, `KIOSK_LOCATIONS` |
@@ -262,7 +263,7 @@ The `docs/` folder is the GitHub Pages site at https://austin311.com/.
 | `covid/` | COVID data | `scripts.generate_covid_data.main()` — **not run by any workflow** |
 | `crashes/` | Crash map (client-side only) | Fetches live from Socrata `y2wy-tgr5` |
 | `crime/` | Crime choropleth (+trends, hate crime) | `crime.crime_map.generate_crime_map()` |
-| `environment/` | TCEQ spills + water quality | Manual (hand-written HTML) |
+| `environment/` | TCEQ spills + lake water quality + water conservation | `environment.environment_bot.generate_environment_page()` |
 | `fire/` | Fire incidents | `scripts.generate_fire_data.main()` |
 | `fun/` | Fun data (bars, coyotes) | `scripts.generate_fun_data.main()` |
 | `graffiti/` | Graffiti abatement map (+trends) | `graffiti.graffiti_bot.generate_graffiti_map()` |
@@ -297,7 +298,7 @@ A Cloudflare Worker (`src/index.js`, `src/categories.js`, `wrangler.toml`) servi
 |--------|----------|----------|
 | Open311 API | `https://311.austintexas.gov/open311/v2` | All 311 service requests |
 | Socrata API | `data.austintexas.gov` | Restaurant inspections, crime, crashes, water, childcare, MetroBike |
-| Texas HHSC/TABC Socrata | `data.texas.gov` | Child care licensing (`bc5r-88dy`, `tqgd-mf4x`), mixed beverage sales (`g5bj-yb6k`) |
+| Texas HHSC/TABC Socrata | `data.texas.gov` | Child care licensing (`bc5r-88dy`, `tqgd-mf4x`), mixed beverage sales (`g5bj-yb6k`), TCEQ spills (`xagr-a3x2`) |
 | City of Austin ArcGIS | `services.arcgis.com/...` | Council district GeoJSON for crime choropleth |
 
 Key Socrata datasets:
@@ -312,7 +313,8 @@ Key Socrata datasets:
 | Austin MetroBike Trips | `tyfh-5r8s` | Bike trip analytics (`capmetro/`) |
 | TABC Mixed Beverage | `g5bj-yb6k` | Bar of the month (fun page) |
 | Building Permits | `3syk-w9eu` | Permit activity |
-| Surface Water Quality | `5tye-7ray` | Water quality |
+| Surface Water Quality | `5tye-7ray` | Chlorophyll-a for the environment page, water quality |
+| TCEQ Emergency Response Spills | `xagr-a3x2` (**data.texas.gov**) | Environmental spills on the environment page |
 | Parking Meter Transactions | `5bb2-gtef` | Parking pulse (24h activity) |
 
 Open311: ISO8601 dates with `Z` suffix, `per_page`/`page` pagination.
@@ -337,6 +339,27 @@ The Open311 v2 API does NOT return a `description` field for some service codes 
 - Join key: `COUNCIL_DI` (integer 1–10) in GeoJSON matches Socrata `council_district` string
 - Color scale: YlOrRd 5-step
 - 30d/60d/90d buttons update polygon fill via `geoLayer.setStyle()` (no open/closed toggle — APD data has no status field)
+
+## Environment Page
+
+`environment/environment_bot.py` — `generate_environment_page(days_back=90)` builds `docs/environment/index.html` from three sources, each of which fails soft (warning box per section) so one outage can't blank the page:
+
+| Section | Source | Window |
+|---------|--------|--------|
+| Algae / lake water quality | Socrata `5tye-7ray` (`CHLOROPHYLL-A`, Lady Bird Lake) | 730 days of history |
+| Environmental spills | TCEQ `xagr-a3x2` | trailing 365 days |
+| Water conservation | Open311 `WWREPORT` via `get_water_conservation_stats()` | `days_back` (90) |
+
+Quirks that will bite if you rewrite the fetches:
+
+- **`xagr-a3x2` lives on `data.texas.gov`, not `data.austintexas.gov`** — the Austin URL 302-redirects and returns nothing. Filter the statewide dataset with `loc_cnty_name='TRAVIS'` and de-duplicate rows on `incid_track_num` (the dataset repeats some incidents).
+- **Chlorophyll-a units are not µg/L.** The lab usually reports MG/L (`0.00239` = 2.39 µg/L), sometimes UG/L or MG/M3 (1 mg/m³ == 1 µg/L); `_to_ugl()` normalises. RFU is a fluorescence unit and is discarded.
+- **`qc_type = 'Field Split'` rows are QC duplicates of a sample already in the dataset** — dropping them matters, e.g. the Sep 16 2026 basin pair reads 1.4 vs the real 15.1 µg/L.
+- Socrata timestamps are naive wall-clock **Central** time; `_parse_local()` attaches `America/Chicago` so comparisons against `utc_now()` don't raise. `sample_date`/`start_dt` have no timezone offset.
+- `qualifier` containing `J` means the lab flagged the result as estimated — surfaced as "(estimated)" on the page.
+- Status mapping: TCEQ only emits `CLOSED` and `BREFERRED`; anything not `CLOSED` counts as open ("referred").
+
+The page header prints "Last updated …" with the newest sample date, spills window and 311 window, so staleness is visible on the page itself.
 
 ## Service Code Notes
 
