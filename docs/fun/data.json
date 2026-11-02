@@ -1,5 +1,5 @@
 {
-  "updated": "2026-10-30T19:09:38.354097+00:00",
+  "updated": "2026-11-02T23:02:46.155046+00:00",
   "bars": {
     "top10": [
       {
@@ -90,12 +90,12 @@
     "curLabel": "August 2026",
     "prevLabel": "July 2026",
     "skippedPartial": true,
-    "asOf": "2026-10-30T19:09:38.354097+00:00"
+    "asOf": "2026-11-02T23:02:46.155046+00:00"
   },
   "coyotes": {
-    "total": 426,
+    "total": 420,
     "pupping": 112,
-    "puppingPct": 26,
+    "puppingPct": 27,
     "isPeak": false,
     "months": [
       {
@@ -166,31 +166,31 @@
       },
       {
         "label": "Nov 2025",
-        "count": 33,
-        "pct": 60,
+        "count": 27,
+        "pct": 49,
         "isPupping": false
       }
     ],
-    "asOf": "2026-10-30T19:09:38.354097+00:00"
+    "asOf": "2026-11-02T23:02:46.155046+00:00"
   },
   "graffiti": {
-    "total": 1090,
-    "uniqueLocations": 997,
+    "total": 1083,
+    "uniqueLocations": 990,
     "repeatRate": 9,
     "winner": {
       "address": "7300 Latta Dr",
       "count": 4,
-      "status": "\u2705 Cleaned",
-      "lat": 30.21693204,
-      "lon": -97.8459693
+      "status": "\ud83d\udd34 Tagged",
+      "lat": 30.21693131,
+      "lon": -97.84597396
     },
     "top15": [
       {
         "address": "7300 Latta Dr",
         "count": 4,
-        "status": "\u2705 Cleaned",
-        "lat": 30.21693204,
-        "lon": -97.8459693
+        "status": "\ud83d\udd34 Tagged",
+        "lat": 30.21693131,
+        "lon": -97.84597396
       },
       {
         "address": "615 W 2nd St",
@@ -217,13 +217,13 @@
         "address": "910 W Cesar Chavez St",
         "count": 3,
         "status": "\ud83d\udd34 Tagged",
-        "lat": 30.26667683,
-        "lon": -97.75577199
+        "lat": 30.26667601,
+        "lon": -97.75577683
       },
       {
         "address": "1201 Cedar Ave",
         "count": 3,
-        "status": "\u2705 Cleaned",
+        "status": "\ud83d\udd34 Tagged",
         "lat": 30.275080402624596,
         "lon": -97.71261294727668
       },
@@ -279,9 +279,9 @@
       {
         "address": "8121 Research Blvd Svrd Nb",
         "count": 2,
-        "status": "\u2705 Cleaned",
-        "lat": 30.35337177,
-        "lon": -97.71398538
+        "status": "\ud83d\udd34 Tagged",
+        "lat": 30.35337078,
+        "lon": -97.71399031
       },
       {
         "address": "11819 Pavilion Blvd",
@@ -291,17 +291,17 @@
         "lon": -97.75554158
       }
     ],
-    "asOf": "2026-10-30T19:09:38.354097+00:00"
+    "asOf": "2026-11-02T23:02:46.155046+00:00"
   },
   "parking": {
-    "total": 6914,
+    "total": 6888,
     "peakHour": "4pm",
-    "peakCount": 777,
+    "peakCount": 772,
     "hours": [
       {
         "hour": 0,
         "label": "12am",
-        "count": 14,
+        "count": 12,
         "pct": 2,
         "isPeak": false
       },
@@ -315,7 +315,7 @@
       {
         "hour": 2,
         "label": "2am",
-        "count": 8,
+        "count": 9,
         "pct": 1,
         "isPeak": false
       },
@@ -343,77 +343,77 @@
       {
         "hour": 6,
         "label": "6am",
-        "count": 44,
+        "count": 43,
         "pct": 6,
         "isPeak": false
       },
       {
         "hour": 7,
         "label": "7am",
-        "count": 237,
-        "pct": 31,
+        "count": 230,
+        "pct": 30,
         "isPeak": false
       },
       {
         "hour": 8,
         "label": "8am",
-        "count": 439,
-        "pct": 56,
+        "count": 441,
+        "pct": 57,
         "isPeak": false
       },
       {
         "hour": 9,
         "label": "9am",
-        "count": 478,
-        "pct": 62,
+        "count": 485,
+        "pct": 63,
         "isPeak": false
       },
       {
         "hour": 10,
         "label": "10am",
-        "count": 503,
+        "count": 498,
         "pct": 65,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
-        "count": 507,
+        "count": 505,
         "pct": 65,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
-        "count": 512,
-        "pct": 66,
+        "count": 504,
+        "pct": 65,
         "isPeak": false
       },
       {
         "hour": 13,
         "label": "1pm",
-        "count": 440,
+        "count": 438,
         "pct": 57,
         "isPeak": false
       },
       {
         "hour": 14,
         "label": "2pm",
-        "count": 413,
-        "pct": 53,
+        "count": 419,
+        "pct": 54,
         "isPeak": false
       },
       {
         "hour": 15,
         "label": "3pm",
-        "count": 392,
-        "pct": 50,
+        "count": 396,
+        "pct": 51,
         "isPeak": false
       },
       {
         "hour": 16,
         "label": "4pm",
-        "count": 777,
+        "count": 772,
         "pct": 100,
         "isPeak": true
       },
@@ -434,35 +434,35 @@
       {
         "hour": 19,
         "label": "7pm",
-        "count": 446,
+        "count": 443,
         "pct": 57,
         "isPeak": false
       },
       {
         "hour": 20,
         "label": "8pm",
-        "count": 366,
-        "pct": 47,
+        "count": 354,
+        "pct": 46,
         "isPeak": false
       },
       {
         "hour": 21,
         "label": "9pm",
-        "count": 186,
+        "count": 184,
         "pct": 24,
         "isPeak": false
       },
       {
         "hour": 22,
         "label": "10pm",
-        "count": 133,
+        "count": 134,
         "pct": 17,
         "isPeak": false
       },
       {
         "hour": 23,
         "label": "11pm",
-        "count": 45,
+        "count": 47,
         "pct": 6,
         "isPeak": false
       }
@@ -470,46 +470,46 @@
     "violationTypes": [
       {
         "type": "Other",
-        "count": 1619,
+        "count": 1593,
         "pct": 100
       },
       {
         "type": "Sidewalk",
-        "count": 460,
-        "pct": 28
-      },
-      {
-        "type": "Bike Lane",
-        "count": 337,
-        "pct": 21
+        "count": 455,
+        "pct": 29
       },
       {
         "type": "No Parking Zone",
-        "count": 334,
+        "count": 333,
+        "pct": 21
+      },
+      {
+        "type": "Bike Lane",
+        "count": 331,
         "pct": 21
       },
       {
         "type": "Oversized Vehicle",
-        "count": 251,
-        "pct": 16
+        "count": 239,
+        "pct": 15
       },
       {
         "type": "Fire Hydrant",
-        "count": 179,
+        "count": 176,
         "pct": 11
       },
       {
         "type": "Handicap",
-        "count": 136,
-        "pct": 8
+        "count": 137,
+        "pct": 9
       },
       {
         "type": "Driveway",
-        "count": 112,
+        "count": 114,
         "pct": 7
       }
     ],
-    "asOf": "2026-10-30T19:09:38.354097+00:00"
+    "asOf": "2026-11-02T23:02:46.155046+00:00"
   },
   "graffitiSpeedrun": {
     "totalClosed": 164,
