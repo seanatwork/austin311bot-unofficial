@@ -341,13 +341,23 @@ jobs:
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
-      # Deliberately last: this refreshes the Open311 cache for the shared
-      # taxonomy codes, and running it earlier would make the maps above skip
-      # their own refetch via their 6-day cache gates.
+      # Deliberately last of the Open311 *fetchers*: this refreshes the cache for
+      # the shared taxonomy codes, and running it earlier would make the maps
+      # above skip their own refetch via their 6-day cache gates. The troublespot
+      # step below only reads the cache, so it cannot disturb those gates.
       - name: Generate query data (pre-computed datasets)
         id: query_data
         continue-on-error: true
         run: python scripts/generate_query_data.py
+        env:
+          AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
+
+      # Runs after query_data so the 5 homeless codes are in the cache; reads it
+      # read-only for the encampment join. Does not touch the Open311 API for that.
+      - name: Generate troublespot ranking data
+        id: address_data
+        continue-on-error: true
+        run: python scripts/generate_address_data.py
         env:
           AUSTINAPIKEY: ${{ secrets.AUSTINAPIKEY }}
 
@@ -368,6 +378,9 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # These are all tracked output paths; if git doesn't recognise one
+          # (a typo or a renamed output) `git add` exits non-zero and fails the
+          # step visibly, which is what we want.
           git add \
             docs/graffiti/index.html \
             docs/noise/index.html \
@@ -410,6 +423,13 @@ jobs:
             docs/querystore/resolution_stats.json \
             docs/querystore/monthly_aggregates.json \
             docs/querystore/service_codes.json
+          # address_counts.json is a brand-new artifact: if its generator failed
+          # on the first run the file won't exist, and a missing pathspec makes
+          # `git add` abort without staging *anything* (which `|| true` would
+          # hide as a green no-op commit). Stage it separately instead.
+          if [ -f docs/querystore/address_counts.json ]; then
+            git add docs/querystore/address_counts.json
+          fi
           git diff --cached --quiet || git commit -m "chore: refresh weekly data [skip ci]"
           git pull --rebase origin main
           git push
