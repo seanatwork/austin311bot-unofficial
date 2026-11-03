@@ -12,7 +12,7 @@
  *   GET  /api/v1/open311/:id  — Single ticket detail
  */
 
-import { buildLLMSystemPrompt, CATEGORY_CODES, CATEGORY_NAMES, SERVICE_CODE_NAMES, SOCRATA_DATASETS } from "./categories.js";
+import { buildLLMSystemPrompt, CATEGORY_CODES, CATEGORY_NAMES, SERVICE_CODE_NAMES, SOCRATA_DATASETS, TROUBLESPOT_LABELS, troublespotKey } from "./categories.js";
 
 // ── Configuration ───────────────────────────────────────────────────────────
 
@@ -185,7 +185,7 @@ function validateParams(params) {
   }
 
   // Validate category if set
-  if (params.category && !CATEGORY_CODES[params.category]) {
+  if (params.category && !CATEGORY_CODES[params.category] && !TROUBLESPOT_LABELS[params.category]) {
     // Try fuzzy matching — the LLM might output "pothole" instead of "traffic"
     for (const [cat, codes] of Object.entries(CATEGORY_CODES)) {
       if (params.category.toLowerCase().includes(cat.toLowerCase())) {
@@ -194,7 +194,7 @@ function validateParams(params) {
       }
     }
     // If still invalid, clear it
-    if (!CATEGORY_CODES[params.category]) {
+    if (!CATEGORY_CODES[params.category] && !TROUBLESPOT_LABELS[params.category]) {
       params.category = null;
     }
   }
@@ -424,9 +424,61 @@ function formatLookupResult(ticket) {
   };
 }
 
+// ── Address ranking ─────────────────────────────────────────────────────────
+
+// The address dataset carries only 90- and 365-day windows: fold every shorter
+// range onto 90d and everything else onto 365d.
+const SHORT_RANGES = new Set(["today", "last_week", "last_month", "last_30d", "last_90d"]);
+
+function addressWindow(dateRange) {
+  const start = dateRange && dateRange.start;
+  return SHORT_RANGES.has(start) ? "90d" : "365d";
+}
+
+/**
+ * Format one list from address_counts.json — the top reported addresses and
+ * intersections for a window, overall or for a single troublespot category.
+ *
+ * Ranking is by *reported location*, not by offender: the leaders are large
+ * apartment complexes and shelters, so the wording stays "most-reported".
+ */
+function formatAddressRanking(precomputed, params) {
+  const key = troublespotKey(params.category);
+  if (params.category && !key) return null; // a category this dataset can't rank
+
+  const win = addressWindow(params.date_range);
+  const block = (precomputed.windows || {})[win];
+  if (!block) return null;
+
+  const entries = (key ? (block.by_category || {})[key] : block.all) || [];
+  if (entries.length === 0) return null;
+
+  const top = entries.slice(0, 10);
+  const label = key ? TROUBLESPOT_LABELS[key] : "311 requests";
+  const period = win === "90d" ? "the last 90 days" : "the last 12 months";
+
+  return {
+    answer_summary: `Most-reported locations for ${label} over ${period}: ${top.slice(0, 3).map((e) => `${e.address} (${e.count})`).join(", ")}.`,
+    chart_config: {
+      type: "bar",
+      data: {
+        labels: top.map((e) => e.address),
+        datasets: [{ label: "Reports", data: top.map((e) => e.count), backgroundColor: "#3b82f6" }],
+      },
+    },
+    table_data: top.map((e) => ({ address: e.address, reports: e.count, kind: e.kind })),
+  };
+}
+
 function formatFromPrecomputed(precomputed, params) {
   // Route to the right pre-computed dataset based on intent
   const { intent, category, date_range, district, group_by } = params;
+
+  // Address ranking — its own dataset shape and its own category set, so it is
+  // checked before the count/rank routing below.
+  if (group_by === "address" && precomputed.windows) {
+    return formatAddressRanking(precomputed, params);
+  }
 
   if (intent === "count" || intent === "rank") {
     const totals = precomputed.totals_90d || precomputed.totals_365d || {};
@@ -565,6 +617,13 @@ async function handleQuery(request, env) {
     return errorResponse("No question or parameters provided.");
   }
 
+  // The address ranking exists only as pre-computed data (Socrata-sourced, in
+  // docs/querystore/address_counts.json) — never send it to Open311/Socrata,
+  // whichever source the caller (or the LLM) claimed.
+  if (params.group_by === "address") {
+    params.source = "precomputed";
+  }
+
   console.log("Parsed params:", JSON.stringify(params));
 
   // Step 2: Route to data source
@@ -660,7 +719,7 @@ async function handleQuery(request, env) {
       source = "precomputed";
       const filename = params.intent === "resolution_time"
         ? "resolution_stats.json"
-        : "daily_counts.json";
+        : (params.group_by === "address" ? "address_counts.json" : "daily_counts.json");
 
       const precomputed = await fetchPrecomputed(env, filename);
       if (!precomputed) {
@@ -669,7 +728,7 @@ async function handleQuery(request, env) {
 
       result = formatFromPrecomputed(precomputed, params);
       if (!result) {
-        return errorResponse("I don't have data for that specific query. Try one of the following: counts by category, resolution times, or district breakdowns.");
+        return errorResponse("I don't have data for that specific query. Try one of the following: address rankings, counts by category, resolution times, or district breakdowns.");
       }
     }
   } catch (e) {

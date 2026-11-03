@@ -31,6 +31,39 @@ export const CATEGORY_NAMES = {
   dead_animal: "Dead Animal",
 };
 
+/**
+ * Troublespot categories for the address ranking
+ * (docs/querystore/address_counts.json, written by scripts/generate_address_data.py).
+ *
+ * Keys mirror the `by_category` keys in that file. They are NOT all Open311
+ * categories: trash, code_violations and abandoned_vehicles have no Open311
+ * service codes at all — that volume only exists in Socrata, which is why the
+ * ranking exists. Never add them to CATEGORY_CODES.
+ */
+export const TROUBLESPOT_LABELS = {
+  graffiti: "Graffiti",
+  abandoned_vehicles: "Abandoned Vehicles",
+  parking: "Parking",
+  trash: "Trash & Dumping",
+  code_violations: "Code Violations",
+  noise: "Noise",
+  animals: "Animals",
+  traffic: "Traffic & Streets",
+  water_storm: "Water & Drainage",
+  parks: "Parks",
+  homeless: "Homeless Encampments",
+};
+
+/** Site category names that the ranking stores under a different key. */
+export const TROUBLESPOT_ALIASES = { animal: "animals", storm: "water_storm" };
+
+/** Resolve any category name to an address-ranking key, or null. */
+export function troublespotKey(category) {
+  if (!category) return null;
+  const key = TROUBLESPOT_ALIASES[category] || category;
+  return TROUBLESPOT_LABELS[key] ? key : null;
+}
+
 export const SERVICE_CODE_NAMES = {
   // Homeless
   PRGRDISS: "Park Maintenance",
@@ -132,7 +165,7 @@ Return ONLY valid JSON with these exact fields:
 {
   "intent": "count" | "trend" | "hotspots" | "rank" | "compare" | "resolution_time" | "lookup",
   "source": "open311" | "socrata" | "precomputed",
-  "category": "graffiti" | "parking" | "noise" | "homeless" | "animal" | "traffic" | "parks" | "storm" | "bicycle" | "dead_animal" | "crime" | "911" | "restaurants" | null,
+  "category": "graffiti" | "parking" | "noise" | "homeless" | "animal" | "traffic" | "parks" | "storm" | "bicycle" | "dead_animal" | "trash" | "code_violations" | "abandoned_vehicles" | "crime" | "911" | "restaurants" | null,
   "service_codes": ["HHSGRAFF"] or null,
   "socrata_dataset": "fdj4-gpfu" or null,
   "date_range": {
@@ -142,7 +175,7 @@ Return ONLY valid JSON with these exact fields:
   "district": 1-10 or null,
   "crime_type": string or null,  // only for fdj4-gpfu: e.g. "burglary", "theft", "assault", "robbery"
   "status": "open" | "closed" | null,
-  "group_by": "day" | "month" | "category" | "district" | "status" | null,
+  "group_by": "day" | "month" | "category" | "district" | "status" | "address" | null,
   "limit": number or null,
   "address": string or null,
   "ticket_id": string or null
@@ -161,6 +194,11 @@ SOCRATA DATASETS:
 - dx9v-zd7x: Real-Time Traffic Incidents
 
 DATE RANGES: Use symbolic names ("last_30d", "last_90d", "last_365d", "this_year", "last_month", "last_week", "today") unless the question specifies an exact date.
+
+ADDRESS RANKINGS: for "where", "which addresses", "top locations" or "troublespots" questions, return
+"source": "precomputed" with "group_by": "address". The category may be any listed type — trash,
+code_violations and abandoned_vehicles exist ONLY here (they have no Open311 codes). Omit category
+for all 311 activity together. Only 90-day and 365-day windows exist; anything shorter becomes 90 days.
 
 EXAMPLES:
 Q: "How many graffiti complaints in the last 30 days?"
@@ -198,6 +236,15 @@ A: {"intent":"count","source":"precomputed","category":null,"group_by":"category
 
 Q: "Which agency closes tickets the fastest?"
 A: {"intent":"resolution_time","source":"precomputed","category":null}
+
+Q: "Where are the 311 troublespots?" / "What addresses get the most complaints?"
+A: {"intent":"rank","source":"precomputed","group_by":"address","date_range":{"start":"last_365d"}}
+
+Q: "Which addresses have the most graffiti complaints?"
+A: {"intent":"rank","source":"precomputed","category":"graffiti","group_by":"address","date_range":{"start":"last_90d"}}
+
+Q: "Top 10 addresses for trash complaints this year"
+A: {"intent":"rank","source":"precomputed","category":"trash","group_by":"address","date_range":{"start":"last_365d"}}
 
 Return ONLY the JSON object, no markdown, no explanation.`;
 }

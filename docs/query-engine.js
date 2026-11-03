@@ -29,6 +29,7 @@
   let monthlyAggs = null;
   let districtCounts = null;
   let serviceCodes = null;
+  let addressCounts = null;
   let chartInstance = null;
 
   // ── Preload pre-computed data ────────────────────────────────────────────
@@ -52,7 +53,7 @@
   }
 
   // ── Local query: try to answer from pre-computed data ────────────────────
-  function tryLocalQuery(question) {
+  async function tryLocalQuery(question) {
     if (!dailyCounts) return null;
 
     const q = question.toLowerCase();
@@ -61,6 +62,13 @@
     // to the worker rather than answering with all-category 311 data.
     if (/crime|burglar|theft|larceny|assault|robber|murder|homicide|shoot|crash|\b911\b/.test(q)) {
       return null;
+    }
+
+    // Pattern: "where are the troublespots" / "which addresses have the most X".
+    // Its own dataset (address_counts.json), fetched on demand — it is large.
+    if (isAddressQuestion(q)) {
+      const addressResult = await localAddressRanking(question);
+      if (addressResult) return addressResult;
     }
 
     // Pattern: "how many [category] [timeframe]"
@@ -157,6 +165,11 @@
       park: "parks", parks: "parks",
       storm: "storm", flooding: "storm", drainage: "storm", debris: "storm",
       bicycle: "bicycle", bike: "bicycle",
+      // Troublespot-only types (address ranking; no Open311 codes)
+      trash: "trash", garbage: "trash", dumping: "trash", "bulk pickup": "trash",
+      "code violation": "code_violations", "code officer": "code_violations",
+      "short term rental": "code_violations",
+      "abandoned vehicle": "abandoned_vehicles", "abandoned car": "abandoned_vehicles",
     };
 
     const normalized = raw.toLowerCase().trim().replace(/\bi\s+ng\b/g, "");
@@ -415,11 +428,73 @@
     return null;
   }
 
+  // ── Address ranking (querystore/address_counts.json) ──────────────────────
+  // Keys mirror the dataset's `by_category` keys; `animal` and `storm` are the
+  // site names for `animals` / `water_storm`.
+  const TROUBLESPOT_ALIASES = { animal: "animals", storm: "water_storm" };
+  const TROUBLESPOT_KEYS = new Set([
+    "graffiti", "abandoned_vehicles", "parking", "trash", "code_violations",
+    "noise", "animals", "traffic", "water_storm", "parks", "homeless",
+  ]);
+
+  function isAddressQuestion(q) {
+    // "top 10 addresses", "addresses with the most complaints", "which address…"
+    if (/\b(?:address|addresses|intersections?|troublespots?)\b/.test(q)) {
+      return /\b(?:top|most|worst|busiest|highest|where|which|what)\b/.test(q);
+    }
+    // "where are the most abandoned vehicles", "where do the complaints cluster"
+    return /\bwhere\b/.test(q) && /\b(?:most|troublespots?|complaints?|reports?)\b/.test(q);
+  }
+
+  async function localAddressRanking(question) {
+    if (!addressCounts) {
+      try {
+        const resp = await fetch(`${QUERYSTORE_BASE}/address_counts.json`);
+        if (!resp.ok) return null;
+        addressCounts = await resp.json();
+      } catch (e) {
+        return null;
+      }
+    }
+    if (!addressCounts || !addressCounts.windows) return null;
+
+    const q = question.toLowerCase();
+    const win = /\b90\b|\bthree\s+months?\b|\b3\s+months?\b/.test(q) ? "90d" : "365d";
+    const block = addressCounts.windows[win] || addressCounts.windows["365d"];
+    if (!block) return null;
+
+    const siteCategory = normalizeCategory(question);
+    const key = siteCategory ? (TROUBLESPOT_ALIASES[siteCategory] || siteCategory) : null;
+    if (siteCategory && !TROUBLESPOT_KEYS.has(key)) return null;
+
+    const entries = (key ? (block.by_category || {})[key] : block.all) || [];
+    if (entries.length === 0) return null;
+
+    const top = entries.slice(0, 10);
+    const label = key ? capitalize(key) : "311 requests";
+    const period = win === "90d" ? "the last 90 days" : "the last 12 months";
+
+    return {
+      answer_summary: `Most-reported locations for ${label} over ${period}: ${top.slice(0, 3).map((e) => `${e.address} (${e.count})`).join(" · ")}.`,
+      chart_config: {
+        type: "bar",
+        data: {
+          labels: top.map((e) => e.address),
+          datasets: [{ label: "Reports", data: top.map((e) => e.count), backgroundColor: "#C2855C" }],
+        },
+      },
+      table_data: top.map((e) => ({ address: e.address, reports: e.count, kind: e.kind })),
+      source: "precomputed",
+    };
+  }
+
   function capitalize(category) {
     const names = {
       homeless: "Homeless", parking: "Parking", noise: "Noise", animal: "Animal Services",
       graffiti: "Graffiti", parks: "Parks", storm: "Storm & Drainage",
       traffic: "Traffic", bicycle: "Bicycle", dead_animal: "Dead Animal",
+      animals: "Animals", water_storm: "Water & Drainage", trash: "Trash & Dumping",
+      code_violations: "Code Violations", abandoned_vehicles: "Abandoned Vehicles",
     };
     return names[category] || category.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   }
@@ -566,7 +641,7 @@
 
     // Step 2: Worker unavailable or couldn't parse — fall back to local
     // pre-computed data matched against common question patterns
-    const local = tryLocalQuery(question);
+    const local = await tryLocalQuery(question);
     if (local) {
       loadingEl.style.display = "none";
       renderResults(local);
