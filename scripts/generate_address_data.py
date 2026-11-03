@@ -71,7 +71,7 @@ TOP_CATEGORY = 25       # entries kept in each by_category list
 API_KEY = os.getenv("AUSTINAPIKEY", "")
 
 # ── Troublespot taxonomy ────────────────────────────────────────────────────
-# Separate from categories.py on purpose: the site's 10 reporting categories
+# Separate from categories.py on purpose: the site's reporting categories
 # are built from Open311 service codes and exclude trash, code violations and
 # abandoned vehicles — exactly the volume this feature exists to surface.
 # Entries are matched against Socrata `sr_type_desc` by exact type and/or

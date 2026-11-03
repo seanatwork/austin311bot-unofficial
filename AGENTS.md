@@ -365,3 +365,7 @@ The page header prints "Last updated …" with the newest sample date, spills wi
 ## Service Code Notes
 
 **Homeless service codes (optimized 2026-04-29):** PRGRDISS, OBSTMIDB, SBDEBROW, DRCHANEL, ATCOCIRW. The "Homeless - Violet Kiosk" and "Homelessness Matters" 311 categories reuse general maintenance codes — there are no unique homeless-specific service codes. APDNONNO and HHSGRAFF were excluded after analysis (too many false positives).
+
+**Water is its own category (2026-11):** `water` = AWUBEEMT (Austin Water "water related issues") + WWREPORT (conservation violations, already rendered by the `/water/` map). It is deliberately separate from `storm`, which is Watershed Protection drainage/flooding — don't fold utility reports into storm. `WWREPORT` was missing from `CATEGORY_CODES` even though the map used it, so adding it also created the category.
+
+**Traffic sign codes:** `ATTRSIMO` and `SIGNTRA1` both display as "Traffic Sign Maintenance" but are distinct service codes; both count toward `traffic`. `SIGNPARK` (parking *sign* maintenance) is traffic infrastructure too, not the `parking` enforcement category.

@@ -483,7 +483,11 @@ function formatFromPrecomputed(precomputed, params) {
   if (intent === "count" || intent === "rank") {
     const totals = precomputed.totals_90d || precomputed.totals_365d || {};
     const wantOpen = params.status === "open";
-    if (category && totals[category]) {
+    // A category we know about but have no totals for — e.g. one just added to
+    // the taxonomy before the next data refresh — must not fall through to the
+    // all-categories breakdown below.
+    if (category && !totals[category]) return null;
+    if (category) {
       const { total, open, closed } = totals[category];
       const name = CATEGORY_NAMES[category] || category;
       if (wantOpen) {

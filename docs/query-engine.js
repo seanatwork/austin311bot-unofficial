@@ -170,6 +170,8 @@
       "code violation": "code_violations", "code officer": "code_violations",
       "short term rental": "code_violations",
       "abandoned vehicle": "abandoned_vehicles", "abandoned car": "abandoned_vehicles",
+      // Austin Water utility reports (WWREPORT / AWUBEEMT)
+      water: "water", "water conservation": "water", "water waste": "water",
     };
 
     const normalized = raw.toLowerCase().trim().replace(/\bi\s+ng\b/g, "");
@@ -199,7 +201,8 @@
     const totalsKey = timeframe === "last_365d" ? "totals_365d" : "totals_90d";
     const totals = dailyCounts[totalsKey] || dailyCounts.totals_90d || {};
 
-    if (category && totals[category]) {
+    if (category && !totals[category]) return null; // known category, no data yet
+    if (category) {
       const { total, open, closed } = totals[category];
       const name = capitalize(category);
       return {
@@ -495,6 +498,7 @@
       traffic: "Traffic", bicycle: "Bicycle", dead_animal: "Dead Animal",
       animals: "Animals", water_storm: "Water & Drainage", trash: "Trash & Dumping",
       code_violations: "Code Violations", abandoned_vehicles: "Abandoned Vehicles",
+      water: "Water",
     };
     return names[category] || category.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
   }
@@ -586,6 +590,7 @@
           <option value="parks">Parks</option>
           <option value="storm">Storm & Drainage</option>
           <option value="bicycle">Bicycle</option>
+          <option value="water">Water</option>
           <option value="dead_animal">Dead Animal</option>
         </select>
         <select id="filter-timeframe">

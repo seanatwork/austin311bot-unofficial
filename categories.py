@@ -18,13 +18,19 @@ CATEGORY_CODES = {
     "homeless": ["PRGRDISS", "ATCOCIRW", "OBSTMIDB", "SBDEBROW", "DRCHANEL"],
     "parking":  ["PARKINGV"],
     "noise":    ["APDNONNO", "DSOUCVMC", "AFDFIREW"],
-    "animal":   ["ACLONAG", "ACLOANIM", "ACBITE2", "COAACDD", "ACPROPER", "WILDEXPO", "ACINFORM"],
+    "animal":   ["ACLONAG", "ACLOANIM", "ACBITE2", "COAACDD", "ACPROPER", "WILDEXPO", "ACINFORM", "COAACINJ"],
     "graffiti": ["HHSGRAFF"],
     "parks":    ["PRGRDISS", "PRGRDPLB", "PRGRDELC", "PRBLDPLB", "PRBLDISS", "PRBLDACH", "PRBLDELE", "COMPARLN", "PRCEMET1"],
     "storm":    ["SWSSTORM", "DRCHANEL", "DRILID", "DRFLOODG", "DRSSPIPE", "DRFLOODR", "ZZEROSIO", "DRDITCH"],
-    "traffic":  ["SBPOTREP", "TRASIGMA", "STREETL2", "SBDEBROW", "ATTRSIMO", "SIGNSTRE", "OBSINTTR", "SBSIDERE", "SBSTRES", "OBSTMIDB", "ZZARSTSW", "DRCHANEL", "ATCOCIRW", "PWTRISRW", "SBGENRL", "SIGNNEWT", "TRASIGNE", "TPPECRNE"],
+    "traffic":  ["SBPOTREP", "TRASIGMA", "STREETL2", "SBDEBROW", "ATTRSIMO", "SIGNSTRE", "OBSINTTR", "SBSIDERE", "SBSTRES", "OBSTMIDB", "ZZARSTSW", "DRCHANEL", "ATCOCIRW", "PWTRISRW", "SBGENRL", "SIGNNEWT", "TRASIGNE", "TPPECRNE",
+                 "SIGNPARK", "SIGNTRA1", "DOCKMOBI", "SBPAVEFA", "ROADMARK", "TRAFFICC"],
     "bicycle":  ["PWBICYCL"],
     "dead_animal": ["ZZARDEAC"],
+    # Austin Water utility reports. WWREPORT is the water-conservation violation
+    # code the /water/ map already renders; AWUBEEMT is the general "water
+    # related issues" bucket. Kept separate from `storm` (Watershed Protection
+    # drainage/flooding) so utility reports aren't miscounted as storm damage.
+    "water":    ["AWUBEEMT", "WWREPORT"],
 }
 
 CATEGORY_NAMES = {
@@ -38,4 +44,5 @@ CATEGORY_NAMES = {
     "traffic":     "Traffic",
     "bicycle":     "Bicycle",
     "dead_animal": "Dead Animal",
+    "water":       "Water",
 }

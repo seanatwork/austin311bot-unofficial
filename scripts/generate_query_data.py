@@ -78,6 +78,7 @@ SERVICE_CODE_NAMES: Dict[str, str] = {
     "WILDEXPO": "Wildlife",
     "ACINFORM": "Animal Protection",
     "ACCOYTE": "Coyote Sighting",
+    "COAACINJ": "Injured / Sick Animal",
     # Graffiti
     "HHSGRAFF": "Graffiti",
     # Parks
@@ -112,12 +113,19 @@ SERVICE_CODE_NAMES: Dict[str, str] = {
     "SIGNNEWT": "New Sign Request",
     "TRASIGNE": "Traffic Signal New",
     "TPPECRNE": "Traffic Calming",
+    "SIGNPARK": "Parking Sign Maintenance",
+    "SIGNTRA1": "Traffic Sign Maintenance",
+    "DOCKMOBI": "Shared Micromobility",
+    "SBPAVEFA": "Pavement Failure",
+    "ROADMARK": "Road Markings/Striping - Maintenance",
+    "TRAFFICC": "Speed Management",
     # Bicycle
     "PWBICYCL": "Bicycle Issue",
     # Dead Animal
     "ZZARDEAC": "Dead Animal",
     # Water
-    "WWREPORT": "Water Waste",
+    "AWUBEEMT": "Water Related Issues",
+    "WWREPORT": "Water Conservation Violation",
     # Tree
     "DSDENVCO": "Tree/Environmental",
     "PATRISPA": "Tree/Parks",

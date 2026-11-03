@@ -9,13 +9,14 @@ export const CATEGORY_CODES = {
   homeless: ["PRGRDISS", "ATCOCIRW", "OBSTMIDB", "SBDEBROW", "DRCHANEL"],
   parking: ["PARKINGV"],
   noise: ["APDNONNO", "DSOUCVMC", "AFDFIREW"],
-  animal: ["ACLONAG", "ACLOANIM", "ACBITE2", "COAACDD", "ACPROPER", "WILDEXPO", "ACINFORM"],
+  animal: ["ACLONAG", "ACLOANIM", "ACBITE2", "COAACDD", "ACPROPER", "WILDEXPO", "ACINFORM", "COAACINJ"],
   graffiti: ["HHSGRAFF"],
   parks: ["PRGRDISS", "PRGRDPLB", "PRGRDELC", "PRBLDPLB", "PRBLDISS", "PRBLDACH", "PRBLDELE", "COMPARLN", "PRCEMET1"],
   storm: ["SWSSTORM", "DRCHANEL", "DRILID", "DRFLOODG", "DRSSPIPE", "DRFLOODR", "ZZEROSIO", "DRDITCH"],
-  traffic: ["SBPOTREP", "TRASIGMA", "STREETL2", "SBDEBROW", "ATTRSIMO", "SIGNSTRE", "OBSINTTR", "SBSIDERE", "SBSTRES", "OBSTMIDB", "ZZARSTSW", "DRCHANEL", "ATCOCIRW", "PWTRISRW", "SBGENRL", "SIGNNEWT", "TRASIGNE", "TPPECRNE"],
+  traffic: ["SBPOTREP", "TRASIGMA", "STREETL2", "SBDEBROW", "ATTRSIMO", "SIGNSTRE", "OBSINTTR", "SBSIDERE", "SBSTRES", "OBSTMIDB", "ZZARSTSW", "DRCHANEL", "ATCOCIRW", "PWTRISRW", "SBGENRL", "SIGNNEWT", "TRASIGNE", "TPPECRNE", "SIGNPARK", "SIGNTRA1", "DOCKMOBI", "SBPAVEFA", "ROADMARK", "TRAFFICC"],
   bicycle: ["PWBICYCL", "OBSTMIDB", "SBDEBROW", "ATCOCIRW", "ZZARSTSW"],
   dead_animal: ["ZZARDEAC"],
+  water: ["AWUBEEMT", "WWREPORT"],
 };
 
 export const CATEGORY_NAMES = {
@@ -29,6 +30,7 @@ export const CATEGORY_NAMES = {
   traffic: "Traffic",
   bicycle: "Bicycle",
   dead_animal: "Dead Animal",
+  water: "Water",
 };
 
 /**
@@ -86,6 +88,7 @@ export const SERVICE_CODE_NAMES = {
   WILDEXPO: "Wildlife",
   ACINFORM: "Animal Protection",
   ACCOYTE: "Coyote Sighting",
+  COAACINJ: "Injured / Sick Animal",
   // Graffiti
   HHSGRAFF: "Graffiti",
   // Parks
@@ -120,10 +123,19 @@ export const SERVICE_CODE_NAMES = {
   SIGNNEWT: "New Sign Request",
   TRASIGNE: "Traffic Signal New",
   TPPECRNE: "Traffic Calming",
+  SIGNPARK: "Parking Sign Maintenance",
+  SIGNTRA1: "Traffic Sign Maintenance",
+  DOCKMOBI: "Shared Micromobility",
+  SBPAVEFA: "Pavement Failure",
+  ROADMARK: "Road Markings/Striping",
+  TRAFFICC: "Speed Management",
   // Bicycle
   PWBICYCL: "Bicycle Issue",
   // Dead Animal
   ZZARDEAC: "Dead Animal",
+  // Water
+  AWUBEEMT: "Water Related Issues",
+  WWREPORT: "Water Conservation Violation",
 };
 
 /** All known Socrata datasets (whitelisted for the proxy). */
@@ -165,7 +177,7 @@ Return ONLY valid JSON with these exact fields:
 {
   "intent": "count" | "trend" | "hotspots" | "rank" | "compare" | "resolution_time" | "lookup",
   "source": "open311" | "socrata" | "precomputed",
-  "category": "graffiti" | "parking" | "noise" | "homeless" | "animal" | "traffic" | "parks" | "storm" | "bicycle" | "dead_animal" | "trash" | "code_violations" | "abandoned_vehicles" | "crime" | "911" | "restaurants" | null,
+  "category": "graffiti" | "parking" | "noise" | "homeless" | "animal" | "traffic" | "parks" | "storm" | "bicycle" | "dead_animal" | "water" | "trash" | "code_violations" | "abandoned_vehicles" | "crime" | "911" | "restaurants" | null,
   "service_codes": ["HHSGRAFF"] or null,
   "socrata_dataset": "fdj4-gpfu" or null,
   "date_range": {
