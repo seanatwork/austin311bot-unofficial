@@ -156,10 +156,44 @@
       pointer-events: none;
     }
     .query-hints {
-      text-align: center;
-      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      margin-top: 0.55rem;
+      font-size: 0.85rem;
       color: var(--text-muted);
-      margin-top: 0.4rem;
+      min-height: 2rem;
+    }
+    .query-hints .hint-prefix { flex: none; }
+    .hint-suggestion {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 5px 13px;
+      font: inherit;
+      font-size: 0.85rem;
+      color: var(--accent-violet);
+      cursor: pointer;
+      max-width: min(100%, 34rem);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .hint-suggestion:hover,
+    .hint-suggestion:focus-visible {
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+      outline: none;
+    }
+    .hint-suggestion.is-changing { animation: hintFade 0.45s ease; }
+    @keyframes hintFade {
+      from { opacity: 0; transform: translateY(3px); }
+      to   { opacity: 1; transform: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hint-suggestion.is-changing { animation: none; }
     }
     .query-loading {
       text-align: center;
@@ -284,7 +318,13 @@
       autofocus
     />
     <div class="query-hints" id="query-hints">
-      Try: "Potholes in district 3" · "Noise complaint trend" · "Which addresses have the most complaints?"
+      <span class="hint-prefix">Try:</span>
+      <button
+        class="hint-suggestion"
+        id="hint-suggestion"
+        type="button"
+        title="Click to run this query"
+      >Loading suggestions…</button>
     </div>
   </div>
 
@@ -317,5 +357,58 @@
   <!-- ── Query Engine ── -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="/query-engine.js"></script>
+
+  <!-- ── Rotating query suggestions ── -->
+  <script>
+    (function suggestionTicker() {
+      const el = document.getElementById("hint-suggestion");
+      if (!el) return;
+
+      // Each of these is answerable end-to-end: the first group hits Socrata,
+      // the "saying"/"how were they closed" ones hit Open311 for the text, and
+      // the rest come from the pre-computed querystore.
+      const SUGGESTIONS = [
+        "How many potholes were reported in 78704 this year?",
+        "Which ZIP codes have the most trash complaints?",
+        "How many abandoned vehicles were reported last month?",
+        "Which council district has the most open potholes?",
+        "Are noise complaints going up or down over the last year?",
+        "What are people saying about the potholes?",
+        "How many code violations were reported in 78702?",
+        "How fast are graffiti tickets closed?",
+        "How many animal complaints in district 2 last month?",
+        "Which addresses have the most complaints?"
+      ];
+
+      const SLIDE_MS = 6000;
+      let index = 0;
+      let paused = false;
+
+      function show(next) {
+        index = (next + SUGGESTIONS.length) % SUGGESTIONS.length;
+        el.textContent = SUGGESTIONS[index];
+        // Restart the fade: toggling the class alone won't re-trigger it.
+        el.classList.remove("is-changing");
+        void el.offsetWidth;
+        el.classList.add("is-changing");
+      }
+
+      function run() {
+        const input = document.getElementById("query-input");
+        if (input) input.value = SUGGESTIONS[index];
+        if (window.ask311) window.ask311(SUGGESTIONS[index]);
+      }
+
+      el.addEventListener("click", run);
+      // Hold the current suggestion still while it is being read or clicked.
+      el.addEventListener("mouseenter", function () { paused = true; });
+      el.addEventListener("mouseleave", function () { paused = false; });
+      el.addEventListener("focus", function () { paused = true; });
+      el.addEventListener("blur", function () { paused = false; });
+
+      show(0);
+      setInterval(function () { if (!paused) show(index + 1); }, SLIDE_MS);
+    })();
+  </script>
 </body>
 </html>
