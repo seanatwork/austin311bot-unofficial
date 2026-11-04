@@ -759,7 +759,9 @@
     if (dark) { html.classList.add("dark"); btn.textContent = "☀️ Light"; }
 
     // ── Zen mode ──────────────────────────────────────────────────────────────
-    const ZEN_TARGETS = ["main-grid", "more-btn", "more-grid", "funny-card"]
+    // Hides the map cards *below* the ticker. Do not add "funny-card": that is
+    // the ticker itself, which lives in the hero and is the point of zen mode.
+    const ZEN_TARGETS = ["main-grid", "more-btn", "more-grid"]
       .map(id => document.getElementById(id));
     const zenBtn = document.getElementById("zen-toggle");
 
