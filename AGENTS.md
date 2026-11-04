@@ -309,6 +309,8 @@ Address rankings (`group_by: "address"`) are a live `$group sr_location` too —
 
 Plain counts are force-routed to Socrata even when the LLM says `open311` — Open311 caps `per_page` at 100, so a live count silently answered "100" for anything bigger.
 
+**Every example question on `docs/ask/` must be answerable end to end.** `docs/ask/index.html` carries one `GROUPS` list that drives the rotating prompt, the input placeholder and the browsable panel. A suggestion that lands on "I couldn't understand that" is worse than no suggestion, so when adding one, run it through the deployed `/api/v1/query` (with a browser `User-Agent` — the CDN 403s `Python-urllib` instantly, and the worker rate-limits to 20/min/IP). Questions needing data the site does not hold (population joins, enforcement/citation datasets, reopen fields, promised-vs-actual SLAs) do not belong in the list.
+
 Category → Socrata types lives in `CATEGORY_SOCRATA_TYPES` / `CATEGORY_SOCRATA_EXCLUDE` (`categories.py` owns it). Three invariants:
 
 - **`homeless` must never get Socrata types.** The sync script enforces this.

@@ -195,6 +195,90 @@
     @media (prefers-reduced-motion: reduce) {
       .hint-suggestion.is-changing { animation: none; }
     }
+
+    /* ── browsable prompt library ── */
+    .prompt-library {
+      width: 100%;
+      max-width: 680px;
+      margin: 0 auto 1.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      font-size: 0.85rem;
+      transition: border-color 0.15s;
+    }
+    .prompt-library[open] { border-color: var(--border-hover); }
+    .prompt-library > summary {
+      cursor: pointer;
+      padding: 11px 16px;
+      color: var(--text-tag);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .prompt-library > summary::-webkit-details-marker { display: none; }
+    .prompt-library > summary::before {
+      content: "▸";
+      color: var(--accent-violet);
+      font-size: 0.75rem;
+      transition: transform 0.15s;
+    }
+    .prompt-library[open] > summary::before { transform: rotate(90deg); }
+    .prompt-library > summary:hover { color: var(--text); }
+    .prompt-library > summary:focus-visible {
+      outline: none;
+      color: var(--text);
+      border-radius: 12px;
+      box-shadow: 0 0 0 2px var(--border-hover);
+    }
+    .prompt-body {
+      padding: 0 16px 14px;
+      max-height: 60vh;
+      overflow-y: auto;
+    }
+    .prompt-group + .prompt-group { margin-top: 0.9rem; }
+    .prompt-group h2 {
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 0.45rem;
+    }
+    .prompt-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .prompt-chip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      font: inherit;
+      font-size: 0.82rem;
+      line-height: 1.35;
+      color: var(--text);
+      text-align: left;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s, color 0.15s;
+    }
+    .prompt-chip:hover,
+    .prompt-chip:focus-visible {
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+      color: var(--text-head);
+      outline: none;
+    }
+    .prompt-note {
+      margin-top: 0.9rem;
+      padding-top: 0.7rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
     .query-loading {
       text-align: center;
       padding: 1rem;
@@ -328,6 +412,12 @@
     </div>
   </div>
 
+  <!-- ── Story-query prompts ── -->
+  <details class="prompt-library" id="prompt-library">
+    <summary>Browse example questions — accountability, neighborhoods, trends, and what people actually said</summary>
+    <div class="prompt-body" id="prompt-body"></div>
+  </details>
+
   <!-- ── Query results ── -->
   <div id="query-loading" class="query-loading" style="display:none;">
     <span class="spinner"></span> Searching…
@@ -358,56 +448,152 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="/query-engine.js"></script>
 
-  <!-- ── Rotating query suggestions ── -->
+  <!-- ── Example-question prompts ── -->
   <script>
-    (function suggestionTicker() {
-      const el = document.getElementById("hint-suggestion");
-      if (!el) return;
+    (function promptLibrary() {
+      const chip = document.getElementById("hint-suggestion");
+      const input = document.getElementById("query-input");
+      const library = document.getElementById("prompt-library");
+      const body = document.getElementById("prompt-body");
+      if (!chip || !input || !body) return;
 
-      // Each of these is answerable end-to-end: the first group hits Socrata,
-      // the "saying"/"how were they closed" ones hit Open311 for the text, and
-      // the rest come from the pre-computed querystore.
-      const SUGGESTIONS = [
-        "How many potholes were reported in 78704 this year?",
-        "Which ZIP codes have the most trash complaints?",
-        "How many abandoned vehicles were reported last month?",
-        "Which council district has the most open potholes?",
-        "Are noise complaints going up or down over the last year?",
-        "What are people saying about the potholes?",
-        "How many code violations were reported in 78702?",
-        "How fast are graffiti tickets closed?",
-        "How many animal complaints in district 2 last month?",
-        "Which addresses have the most complaints?"
+      // One list drives the rotating chip, the input placeholder and the
+      // browsable panel, so they can never disagree.
+      //
+      // Every question here is answerable end-to-end by the deployed worker.
+      // Keep it that way: a suggestion that lands on "I couldn't understand
+      // that" is worse than no suggestion. The worker answers 311 counting
+      // questions from Socrata, text questions from Open311, and resolution
+      // times from the pre-computed querystore.
+      const GROUPS = [
+        {
+          title: "Accountability & response time",
+          prompts: [
+            "How fast are graffiti tickets closed?",
+            "What is the median days to close for parking tickets?",
+            "What is the 90th-percentile days to close for graffiti?",
+            "Which agency closes tickets the fastest?",
+            "How many traffic requests are still open after 90 days?",
+            "How many requests are still open after 90 days, by category?",
+            "How many open parking tickets are there right now?"
+          ]
+        },
+        {
+          title: "Neighborhoods & council districts",
+          prompts: [
+            "Which council district has the most open potholes?",
+            "Which council districts have the most noise complaints this year?",
+            "Which ZIP codes have the most parking complaints?",
+            "Which council districts have the most trash complaints?",
+            "Which district has the most abandoned vehicles this year?",
+            "How many traffic requests are still open in 78704?",
+            "What are the top request types in 78704 this month?"
+          ]
+        },
+        {
+          title: "Hotspots & repeat locations",
+          prompts: [
+            "Which addresses have the most complaints?",
+            "Which addresses get the most graffiti complaints?",
+            "What are the top addresses for trash complaints this year?",
+            "Which ZIP codes have the most abandoned vehicles?",
+            "Which ZIP codes have the most open abandoned vehicle reports older than 90 days?",
+            "How many potholes were reported in 78704 this year?"
+          ]
+        },
+        {
+          title: "Trends over time",
+          prompts: [
+            "Are noise complaints going up or down over the last year?",
+            "How has graffiti changed over the last year?",
+            "How many parking tickets were issued each month this year?",
+            "How many animal complaints in district 2 last month?"
+          ]
+        },
+        {
+          title: "What people actually said",
+          prompts: [
+            "What are people saying about the potholes?",
+            "What did residents report about noise complaints?",
+            "How were the graffiti tickets closed?",
+            "How were the parking tickets closed?"
+          ]
+        },
+        {
+          title: "Homelessness & other city data",
+          prompts: [
+            "How many homeless encampment reports in the last 90 days?",
+            "How many code violations were reported in 78702?",
+            "How many abandoned vehicles were reported last month?",
+            "What's the status of ticket 26-00229538?"
+          ]
+        }
       ];
 
+      const ALL = GROUPS.flatMap(function (g) { return g.prompts; });
+
+      // ── browsable panel ──
+      GROUPS.forEach(function (group) {
+        const section = document.createElement("section");
+        section.className = "prompt-group";
+
+        const heading = document.createElement("h2");
+        heading.textContent = group.title;
+        section.appendChild(heading);
+
+        const list = document.createElement("div");
+        list.className = "prompt-list";
+        group.prompts.forEach(function (prompt) {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = "prompt-chip";
+          button.textContent = prompt;
+          button.addEventListener("click", function () { run(prompt); });
+          list.appendChild(button);
+        });
+        section.appendChild(list);
+        body.appendChild(section);
+      });
+
+      // ── rotation: chip + placeholder ──
       const SLIDE_MS = 6000;
-      let index = 0;
+      let index = Math.floor(Math.random() * ALL.length);
       let paused = false;
 
       function show(next) {
-        index = (next + SUGGESTIONS.length) % SUGGESTIONS.length;
-        el.textContent = SUGGESTIONS[index];
+        index = (next + ALL.length) % ALL.length;
+        chip.textContent = ALL[index];
+        input.setAttribute("placeholder", ALL[index]);
+
         // Restart the fade: toggling the class alone won't re-trigger it.
-        el.classList.remove("is-changing");
-        void el.offsetWidth;
-        el.classList.add("is-changing");
+        chip.classList.remove("is-changing");
+        void chip.offsetWidth;
+        chip.classList.add("is-changing");
       }
 
-      function run() {
-        const input = document.getElementById("query-input");
-        if (input) input.value = SUGGESTIONS[index];
-        if (window.ask311) window.ask311(SUGGESTIONS[index]);
+      function run(text) {
+        input.value = text;
+        input.focus();
+        if (library) library.open = false;
+        if (window.ask311) window.ask311(text);
       }
 
-      el.addEventListener("click", run);
+      chip.addEventListener("click", function () { run(ALL[index]); });
       // Hold the current suggestion still while it is being read or clicked.
-      el.addEventListener("mouseenter", function () { paused = true; });
-      el.addEventListener("mouseleave", function () { paused = false; });
-      el.addEventListener("focus", function () { paused = true; });
-      el.addEventListener("blur", function () { paused = false; });
+      chip.addEventListener("mouseenter", function () { paused = true; });
+      chip.addEventListener("mouseleave", function () { paused = false; });
+      chip.addEventListener("focus", function () { paused = true; });
+      chip.addEventListener("blur", function () { paused = false; });
 
-      show(0);
-      setInterval(function () { if (!paused) show(index + 1); }, SLIDE_MS);
+      // Don't swap the placeholder out from under someone mid-question.
+      input.addEventListener("input", function () {
+        paused = input.value.length > 0;
+      });
+
+      show(index);
+      setInterval(function () {
+        if (!paused && !input.value) show(index + 1);
+      }, SLIDE_MS);
     })();
   </script>
 </body>
