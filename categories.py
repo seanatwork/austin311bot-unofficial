@@ -33,6 +33,53 @@ CATEGORY_CODES = {
     "water":    ["AWUBEEMT", "WWREPORT"],
 }
 
+# Socrata `xwdj-i9he` ("Austin 311 Public Data") equivalent of each category,
+# for the query gateway's live answers. An entry ending in " - *" matches by
+# prefix (`starts_with`); anything else is an exact `sr_type_desc`.
+#
+# Three things to know before editing:
+#   * `homeless` has no entry and never will: the category is defined by a
+#     keyword filter over `description`/`status_notes`, and Socrata publishes
+#     neither. A homeless question has to go to Open311 or the cache.
+#   * Totals from this mapping run higher than the Open311-derived ones in
+#     `daily_counts.json` — on purpose. Socrata's type taxonomy is finer and
+#     covers departments Open311 has no codes for at all (ARR trash, DSD code
+#     enforcement, APD vehicle abatement). Don't narrow the prefixes to "fix"
+#     that; wider is the point of preferring Socrata.
+#   * `trash`, `code_violations` and `abandoned_vehicles` are Socrata-only:
+#     they have no Open311 codes, which is why they are not in CATEGORY_CODES.
+#     Their type lists match `scripts/generate_address_data.py`, so an ask
+#     answer and the address ranking agree.
+CATEGORY_SOCRATA_TYPES = {
+    "parking":    ["TPW - Parking Violation Enforcement"],
+    "noise":      ["DSD - Outdoor Commercial Venue Music Complaint",
+                   "AFD - Fireworks Complaint", "ZZ - AFD - Fireworks Complaint"],
+    "animal":     ["Animal Protection - *", "Animal Services - *",
+                   "Pet Resource Center - *", "ZZ - Pet Resource Center - *"],
+    "graffiti":   ["APH - Graffiti Abatement - Public Property",
+                   "DSD - Graffiti Abatement - Private Property"],
+    "parks":      ["Park Maintenance - *", "PARD - *", "APR (PARD) - *"],
+    "storm":      ["WPD - *"],
+    "traffic":    ["TPW - *"],
+    "bicycle":    ["TPW - Bicycle Issues"],
+    "dead_animal": ["ARR - Dead Animal Collection"],
+    "water":      ["AW - *"],
+    # Socrata-only categories (see note above).
+    "trash":      ["ARR - Garbage", "ARR - Bulk", "ARR - Compost", "ARR - Recycling",
+                   "ARR - General", "ARR - Brush", "ARR - Household Hazardous Waste"],
+    "code_violations": ["DSD - Request Code Officer", "DSD - Follow-Up",
+                        "DSD - Short Term Rental Complaint", "DSD - Billboard Complaint"],
+    "abandoned_vehicles": ["APD - Vehicle Abatement Report",
+                           "APD - Vehicle Abatement Callback Request"],
+}
+
+# The TPW prefix covers parking enforcement and bicycle issues, both of which
+# are their own category. Excluding them keeps a "traffic complaints" answer in
+# the same ballpark as the /traffic/ page instead of roughly doubling it.
+CATEGORY_SOCRATA_EXCLUDE = {
+    "traffic": ["TPW - Parking Violation Enforcement", "TPW - Bicycle Issues"],
+}
+
 CATEGORY_NAMES = {
     "homeless":    "Homeless",
     "parking":     "Parking",

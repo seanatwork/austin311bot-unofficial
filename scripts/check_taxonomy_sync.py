@@ -3,16 +3,19 @@
 
 `categories.py` is the canonical reporting taxonomy, but the Cloudflare worker
 cannot import Python, so `workers/query-gateway/src/categories.js` carries a
-hand-maintained copy of CATEGORY_CODES / CATEGORY_NAMES / SERVICE_CODE_NAMES.
+hand-maintained copy of CATEGORY_CODES / CATEGORY_NAMES / SERVICE_CODE_NAMES,
+plus the Socrata type maps and the `homeless` encampment keyword lists owned by
+`homeless/homeless_bot.py`.
 
 That copy has drifted before: the worker's Bicycle category listed five
 right-of-way codes while the reporting category counts PWBICYCL only, which
 silently changed what the LLM was told a "bicycle" question means.
 
-This compares the two — keys, per-category code sets, labels, and service-code
-display names — and exits non-zero on any difference. It reads both files
-without importing them (stdlib `ast` for Python) so it works in the worker
-deploy job, which never installs the Python dependencies.
+This compares the two — keys, per-category code sets, labels, service-code
+display names, Socrata types and encampment keywords — and exits non-zero on
+any difference. It reads both files without importing them (stdlib `ast` for
+Python) so it works in the worker deploy job, which never installs the Python
+dependencies.
 
 Usage:
     python scripts/check_taxonomy_sync.py [--root PATH]
@@ -31,6 +34,7 @@ from pathlib import Path
 
 PY_TAXONOMY = "categories.py"
 PY_SERVICE_NAMES = Path("scripts") / "generate_query_data.py"
+PY_HOMELESS_FILTER = Path("homeless") / "homeless_bot.py"
 JS_TAXONOMY = Path("workers") / "query-gateway" / "src" / "categories.js"
 
 _JS_SCRIPT = """
@@ -39,6 +43,11 @@ process.stdout.write(JSON.stringify({
   codes: m.CATEGORY_CODES,
   names: m.CATEGORY_NAMES,
   service: m.SERVICE_CODE_NAMES,
+  socrata: m.CATEGORY_SOCRATA_TYPES,
+  socrataExclude: m.CATEGORY_SOCRATA_EXCLUDE,
+  encampment: m.ENCAMPMENT_KEYWORDS,
+  hso: m.HSO_KEYWORDS,
+  trash: m.TRASH_KEYWORDS,
 }));
 """
 
@@ -63,13 +72,20 @@ def _literals(path: Path, wanted: set[str]) -> dict:
     return found
 
 
-def load_python(root: Path) -> tuple[dict, dict, dict]:
-    tax = _literals(root / PY_TAXONOMY, {"CATEGORY_CODES", "CATEGORY_NAMES"})
+def load_python(root: Path) -> dict:
+    tax = _literals(
+        root / PY_TAXONOMY,
+        {"CATEGORY_CODES", "CATEGORY_NAMES", "CATEGORY_SOCRATA_TYPES", "CATEGORY_SOCRATA_EXCLUDE"},
+    )
     names = _literals(root / PY_SERVICE_NAMES, {"SERVICE_CODE_NAMES"})
-    return tax["CATEGORY_CODES"], tax["CATEGORY_NAMES"], names["SERVICE_CODE_NAMES"]
+    homeless = _literals(
+        root / PY_HOMELESS_FILTER,
+        {"ENCAMPMENT_KEYWORDS", "HSO_KEYWORDS", "TRASH_KEYWORDS"},
+    )
+    return {**tax, "service": names["SERVICE_CODE_NAMES"], **homeless}
 
 
-def load_worker(root: Path) -> tuple[dict, dict, dict]:
+def load_worker(root: Path) -> dict:
     js_path = root / JS_TAXONOMY
     env = dict(os.environ, TAXONOMY_FILE=js_path.resolve().as_uri())
     try:
@@ -88,12 +104,21 @@ def load_worker(root: Path) -> tuple[dict, dict, dict]:
     if proc.returncode != 0:
         raise SystemExit(f"could not load {js_path}:\n{proc.stderr.strip()}")
     data = json.loads(proc.stdout)
-    return data["codes"], data["names"], data["service"]
+    return {
+        "codes": data["codes"],
+        "names": data["names"],
+        "service": data["service"],
+        "CATEGORY_SOCRATA_TYPES": data["socrata"],
+        "CATEGORY_SOCRATA_EXCLUDE": data["socrataExclude"],
+        "ENCAMPMENT_KEYWORDS": data["encampment"],
+        "HSO_KEYWORDS": data["hso"],
+        "TRASH_KEYWORDS": data["trash"],
+    }
 
 
-def diff(py: tuple[dict, dict, dict], js: tuple[dict, dict, dict]) -> list[str]:
-    (py_codes, py_names, py_service) = py
-    (js_codes, js_names, js_service) = js
+def diff(py: dict, js: dict) -> list[str]:
+    py_codes, py_names, py_service = py["CATEGORY_CODES"], py["CATEGORY_NAMES"], py["service"]
+    js_codes, js_names, js_service = js["codes"], js["names"], js["service"]
     problems: list[str] = []
 
     # The taxonomy has to be internally consistent before comparing it.
@@ -135,6 +160,92 @@ def diff(py: tuple[dict, dict, dict], js: tuple[dict, dict, dict]) -> list[str]:
                 f"{code}: display name differs — python {py_service[code]!r} vs worker {js_service[code]!r}"
             )
 
+    problems += _diff_socrata(py, js)
+
+    return problems
+
+
+def _diff_socrata(py: dict, js: dict) -> list[str]:
+    """Compare the Socrata type mappings the query gateway queries with.
+
+    Two different keys, so two different invariants:
+      * `homeless` must never have Socrata types — the category is a keyword
+        filter over text Socrata does not publish.
+      * So the other side, every *other* reporting category must have them,
+        otherwise a "how many X" question silently falls back to the slower
+        Open311 path (or, worse, answers with nothing).
+    Socrata-only categories (trash, code_violations, abandoned_vehicles) are
+    allowed on top; they have no Open311 codes by design.
+    """
+    problems: list[str] = []
+    py_types = py["CATEGORY_SOCRATA_TYPES"]
+    js_types = js["CATEGORY_SOCRATA_TYPES"]
+
+    if "homeless" in py_types or "homeless" in js_types:
+        problems.append(
+            "homeless must not have Socrata types — the category needs "
+            "description/status_notes, which xwdj-i9he does not publish"
+        )
+
+    missing = set(py["CATEGORY_CODES"]) - set(py_types) - {"homeless"}
+    if missing:
+        problems.append(
+            f"categories.py: no Socrata types for {sorted(missing)} — those "
+            "questions cannot use the fast path"
+        )
+
+    if set(py_types) != set(js_types):
+        problems.append(
+            "Socrata category keys differ — "
+            f"python only: {sorted(set(py_types) - set(js_types))}, "
+            f"worker only: {sorted(set(js_types) - set(py_types))}"
+        )
+
+    for cat in sorted(set(py_types) & set(js_types)):
+        a, b = set(py_types[cat]), set(js_types[cat])
+        if a != b:
+            problems.append(
+                f"{cat}: Socrata type list differs — "
+                f"python only: {sorted(a - b)}, worker only: {sorted(b - a)}"
+            )
+
+    py_ex = py["CATEGORY_SOCRATA_EXCLUDE"]
+    js_ex = js["CATEGORY_SOCRATA_EXCLUDE"]
+    if set(py_ex) != set(js_ex):
+        problems.append(
+            f"Socrata exclusion keys differ — python {sorted(py_ex)} vs worker {sorted(js_ex)}"
+        )
+    for cat in sorted(set(py_ex) & set(js_ex)):
+        a, b = set(py_ex[cat]), set(js_ex[cat])
+        if a != b:
+            problems.append(
+                f"{cat}: Socrata exclusion list differs — "
+                f"python only: {sorted(a - b)}, worker only: {sorted(b - a)}"
+            )
+    for cat in sorted(set(py_ex) & set(py_types)):
+        if not py_ex[cat]:
+            problems.append(f"{cat}: empty Socrata exclusion list")
+
+    problems += _diff_homeless_keywords(py, js)
+
+    return problems
+
+
+def _diff_homeless_keywords(py: dict, js: dict) -> list[str]:
+    """Compare the encampment keyword lists.
+
+    `homeless` is a keyword filter over ticket text, so the worker reimplements
+    `is_encampment_report` to show ticket samples. A keyword added to one side
+    only would make the same report homeless on the site and not in `/ask`.
+    """
+    problems: list[str] = []
+    for name in ("ENCAMPMENT_KEYWORDS", "HSO_KEYWORDS", "TRASH_KEYWORDS"):
+        a, b = set(py[name]), set(js[name])
+        if a != b:
+            problems.append(
+                f"{name}: keyword list differs — "
+                f"python only: {sorted(a - b)}, worker only: {sorted(b - a)}"
+            )
     return problems
 
 
@@ -148,14 +259,21 @@ def main() -> int:
     problems = diff(py, js)
 
     if problems:
-        print("❌ Worker taxonomy has drifted from categories.py:\n")
+        print("❌ Worker taxonomy has drifted from the Python source:\n")
         for p in problems:
             print(f"  - {p}")
-        print(f"\nFix {JS_TAXONOMY} (or categories.py if the Python side is wrong).")
+        print(
+            f"\nFix {JS_TAXONOMY} (or the Python side — {PY_TAXONOMY} / "
+            f"{PY_HOMELESS_FILTER} — if it is wrong)."
+        )
         return 1
 
-    total = sum(len(c) for c in py[0].values())
-    print(f"✅ taxonomy in sync: {len(py[0])} categories, {total} codes")
+    total = sum(len(c) for c in py["CATEGORY_CODES"].values())
+    socrata = sum(len(c) for c in py["CATEGORY_SOCRATA_TYPES"].values())
+    print(
+        f"✅ taxonomy in sync: {len(py['CATEGORY_CODES'])} categories, {total} codes, "
+        f"{socrata} Socrata types"
+    )
     return 0
 
 

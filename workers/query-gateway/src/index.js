@@ -12,7 +12,7 @@
  *   GET  /api/v1/open311/:id  — Single ticket detail
  */
 
-import { buildLLMSystemPrompt, CATEGORY_CODES, CATEGORY_NAMES, SERVICE_CODE_NAMES, SOCRATA_DATASETS, TROUBLESPOT_LABELS, troublespotKey } from "./categories.js";
+import { buildLLMSystemPrompt, CATEGORY_CODES, CATEGORY_NAMES, SERVICE_CODE_NAMES, SOCRATA_DATASETS, TROUBLESPOT_LABELS, troublespotKey, socrataTypePredicate, isEncampmentReport } from "./categories.js";
 
 // ── Configuration ───────────────────────────────────────────────────────────
 
@@ -131,6 +131,66 @@ function formatDateUTC(d) {
   return d.toISOString().replace(/\.\d{3}Z$/, "Z");
 }
 
+// Socrata timestamps are naive wall-clock Central time; Open311 returns UTC
+// with a Z. Formatting a Socrata window boundary in UTC would shift every
+// 30/90/365-day bucket by 5-6 hours and quietly disagree with the cached
+// trend pages.
+function formatDateCentral(d) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "America/Chicago",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d);
+  const get = (type) => parts.find((p) => p.type === type).value;
+  return `${get("year")}-${get("month")}-${get("day")}`;
+}
+
+// ── Socrata dataset shapes ──────────────────────────────────────────────────
+
+// Austin 311 Public Data: every 311 request (ARR/DSD/APD included), not just
+// the Open311 subset. This is the default source for 311 counting.
+const SOCRATA_311 = "xwdj-i9he";
+
+// Categories that live in other Socrata datasets, never in the 311 one.
+const NON_311_CATEGORIES = new Set(["crime", "911", "restaurants"]);
+
+const OPEN_STATUSES = ["Open", "Duplicate (open)", "New", "Pending", "Work In Progress"];
+const CLOSED_STATUSES = ["Closed", "Duplicate (closed)", "Closed -Incomplete"];
+
+function statusPredicate(status) {
+  const list = status === "open" ? OPEN_STATUSES : CLOSED_STATUSES;
+  return `sr_status_desc in(${list.map((s) => `'${s}'`).join(",")})`;
+}
+
+function dateField(dataset) {
+  if (dataset === SOCRATA_311) return "sr_created_date";
+  if (dataset === "fdj4-gpfu") return "occ_date";
+  if (dataset === "22de-7rzg") return "response_datetime";
+  return "date";
+}
+
+/** Column a group_by maps to, or null when the dataset has no such dimension. */
+function groupColumn(dataset, groupBy) {
+  if (!groupBy) return null;
+  if (dataset === SOCRATA_311) {
+    return (
+      {
+        month: "sr_created_date",
+        day: "sr_created_date",
+        category: "sr_type_desc",
+        district: "sr_location_council_district",
+        zip: "sr_location_zip_code",
+        status: "sr_status_desc",
+      }[groupBy] || null
+    );
+  }
+  if (groupBy === "month" || groupBy === "day") return dateField(dataset);
+  if (groupBy === "district") return "council_district";
+  if (groupBy === "category") return "category";
+  return groupBy;
+}
+
 // ── LLM Parsing ─────────────────────────────────────────────────────────────
 
 async function parseQuestion(env, question) {
@@ -184,6 +244,20 @@ function validateParams(params) {
     return false;
   }
 
+  // Only these groupings map to a real column; anything else would be
+  // interpolated into $select/$group unchecked.
+  const GROUP_BYS = ["day", "month", "category", "district", "zip", "status", "address"];
+  if (params.group_by && !GROUP_BYS.includes(params.group_by)) {
+    params.group_by = null;
+  }
+
+  // Cap the row count: it lands in $limit, and an unbounded value would either
+  // time out or return a 50,000-row table the page cannot render.
+  if (params.limit !== null && params.limit !== undefined) {
+    const n = parseInt(params.limit, 10);
+    params.limit = Number.isNaN(n) ? null : Math.min(Math.max(n, 1), 500);
+  }
+
   // Validate category if set
   if (params.category && !CATEGORY_CODES[params.category] && !TROUBLESPOT_LABELS[params.category]) {
     // Try fuzzy matching — the LLM might output "pothole" instead of "traffic"
@@ -214,6 +288,13 @@ function validateParams(params) {
     }
   }
 
+  // Validate ZIP — only a bare five-digit code survives, so it can be
+  // interpolated into SoQL without escaping concerns.
+  if (params.zip !== null && params.zip !== undefined) {
+    const z = String(params.zip).trim();
+    params.zip = /^\d{5}$/.test(z) ? z : null;
+  }
+
   // Validate date_range
   if (params.date_range && params.date_range.start) {
     const validStarts = [
@@ -222,8 +303,10 @@ function validateParams(params) {
     ];
     const isPreset = validStarts.includes(params.date_range.start);
     const isDate = /^\d{4}-\d{2}-\d{2}$/.test(params.date_range.start);
+    // Fall back to 90 days rather than dropping the filter: an unparseable
+    // start used to mean "all time", i.e. a silent 12-year scan.
     if (!isPreset && !isDate) {
-      params.date_range = null;
+      params.date_range = { start: "last_90d" };
     }
   }
 
@@ -260,33 +343,51 @@ function crimeTypePattern(raw) {
 }
 
 function buildSoQL(params) {
-  const { socrata_dataset, date_range, district, group_by, limit } = params;
-  const queries = [];
-
-  const resolved = resolveDateRange(date_range);
+  const { socrata_dataset, date_range, district, zip, group_by, limit } = params;
+  const is311 = socrata_dataset === SOCRATA_311;
+  const dfield = dateField(socrata_dataset);
+  const col = groupColumn(socrata_dataset, group_by);
+  const isTimeSeries = group_by === "month" || group_by === "day";
 
   // Build $select
   let select = "count(*)";
-
-  if (group_by === "month") {
-    const dateField = socrata_dataset === "fdj4-gpfu" ? "occ_date" :
-                      socrata_dataset === "22de-7rzg" ? "response_datetime" : "date";
-    select = `date_trunc_ym(${dateField}) as month, count(*)`;
-  } else if (group_by === "district") {
-    select = "council_district, count(*)";
-  } else if (group_by === "category" || group_by === "day") {
-    select = `${group_by}, count(*)`;
+  if (isTimeSeries) {
+    const fn = group_by === "month" ? "date_trunc_ym" : "date_trunc_ymd";
+    select = `${fn}(${dfield}) as ${group_by}, count(*)`;
+  } else if (col) {
+    select = `${col}, count(*)`;
   }
 
   // Build $where
+  const resolved = resolveDateRange(date_range);
   const whereParts = [];
   if (resolved) {
-    const dateField = socrata_dataset === "fdj4-gpfu" ? "occ_date" :
-                      socrata_dataset === "22de-7rzg" ? "response_datetime" : "date";
-    whereParts.push(`${dateField} >= '${formatDateUTC(resolved.start).slice(0, 10)}'`);
+    const start = is311
+      ? formatDateCentral(resolved.start)
+      : formatDateUTC(resolved.start).slice(0, 10);
+    whereParts.push(`${dfield} >= '${start}'`);
   }
   if (district) {
-    whereParts.push(`council_district = '${district}'`);
+    whereParts.push(
+      is311
+        ? `sr_location_council_district = '${district}'`
+        : `council_district = '${district}'`
+    );
+  }
+  // ZIPs only exist on the 311 dataset. Validate here as well as in the handler:
+  // the value is interpolated into SoQL, and this is the last place a caller can
+  // reach it.
+  if (zip && /^\d{5}$/.test(String(zip))) {
+    whereParts.push(`sr_location_zip_code = '${zip}'`);
+  }
+  // A category is expressed as a set of `sr_type_desc` values on the 311
+  // dataset — Socrata carries no Open311 service codes.
+  if (is311 && params.category) {
+    const predicate = socrataTypePredicate(params.category);
+    if (predicate) whereParts.push(predicate);
+  }
+  if (is311 && params.status) {
+    whereParts.push(statusPredicate(params.status));
   }
   if (socrata_dataset === "fdj4-gpfu" && params.crime_type) {
     const pattern = crimeTypePattern(params.crime_type);
@@ -302,12 +403,14 @@ function buildSoQL(params) {
     query.$where = whereParts.join(" AND ");
   }
 
-  if (group_by && group_by !== "day") {
-    query.$group = group_by === "month" ? "month" : group_by;
+  if (isTimeSeries) {
+    query.$group = group_by;
+  } else if (col) {
+    query.$group = col;
   }
 
   // Time series must be chronological; rankings sort by volume
-  query.$order = group_by === "month" ? "month" : "count DESC";
+  query.$order = isTimeSeries ? group_by : "count DESC";
   query.$limit = limit || 50;
 
   return query;
@@ -315,38 +418,72 @@ function buildSoQL(params) {
 
 // ── Open311 Query ───────────────────────────────────────────────────────────
 
-async function fetchOpen311(env, params) {
-  const { service_codes, date_range, status } = params;
-  const resolved = resolveDateRange(date_range);
-
-  if (!resolved || !service_codes || service_codes.length === 0) return null;
-
-  const code = service_codes[0]; // Single code for live queries
+/** One page (max 100) of Open311 records for a code and window. */
+async function open311Page(env, code, start, end, status) {
   const queryParams = new URLSearchParams({
     service_code: code,
-    start_date: formatDateUTC(resolved.start),
-    end_date: formatDateUTC(resolved.end),
+    start_date: formatDateUTC(start),
+    end_date: formatDateUTC(end),
     per_page: "100",
     page: "1",
     status: status === "open" ? "open" : "open,closed",
   });
-
-  if (env.AUSTINAPIKEY) {
-    queryParams.set("$$app_token", env.AUSTINAPIKEY);
-  }
-
-  const url = `${OPEN311_BASE}/requests.json?${queryParams.toString()}`;
+  if (env.AUSTINAPIKEY) queryParams.set("$$app_token", env.AUSTINAPIKEY);
 
   try {
-    const resp = await fetch(url, {
+    const resp = await fetch(`${OPEN311_BASE}/requests.json?${queryParams.toString()}`, {
       headers: { "Accept": "application/json", "User-Agent": "austin311bot/query-gateway" },
     });
-    if (!resp.ok) return null;
-    return await resp.json();
+    if (!resp.ok) return [];
+    const data = await resp.json();
+    return Array.isArray(data) ? data : [];
   } catch (e) {
     console.error("Open311 fetch error:", e);
-    return null;
+    return [];
   }
+}
+
+/**
+ * The newest `wanted` records across a category's codes.
+ *
+ * Two Open311 quirks shape this:
+ *   * records come back *oldest first*, so taking the first pages of a 90/365-day
+ *     window returns the OLDEST records — the opposite of "what are people
+ *     saying lately". Walk 30-day windows backwards from today instead.
+ *   * `per_page` caps at 100 and each request takes ~2s, so a 24-code category
+ *     (traffic) costs 14s if swept whole. Cap the sweep to the first few codes
+ *     (the lists are ordered headline-code first), run them 5 at a time, and
+ *     stop as soon as enough records survive `keep`.
+ */
+async function fetchOpen311Recent(env, codes, wanted, { status, keep } = {}) {
+  const selected = codes.slice(0, 8);
+  const collected = [];
+  const now = Date.now();
+  const MONTH = 30 * 24 * 60 * 60 * 1000;
+  const CONCURRENCY = 5;
+
+  const kept = () => (keep ? collected.filter(keep) : collected);
+  const enough = () => kept().length >= wanted;
+
+  for (let i = 0; i < 6 && !enough(); i++) {
+    const end = new Date(now - i * MONTH);
+    const start = new Date(end.getTime() - MONTH);
+
+    for (let j = 0; j < selected.length && !enough(); j += CONCURRENCY) {
+      const batch = selected.slice(j, j + CONCURRENCY);
+      const pages = await Promise.all(
+        batch.map((code) => open311Page(env, code, start, end, status))
+      );
+      for (const page of pages) collected.push(...page);
+    }
+  }
+
+  const records = kept();
+  // Newest first — within a window the API is still oldest-first per code.
+  records.sort(
+    (a, b) => new Date(b.requested_datetime || 0) - new Date(a.requested_datetime || 0)
+  );
+  return records;
 }
 
 async function fetchOpen311Ticket(env, ticketId) {
@@ -369,6 +506,146 @@ async function fetchOpen311Ticket(env, ticketId) {
 
 // ── Pre-computed data ───────────────────────────────────────────────────────
 
+// ── Address ranking (live) ──────────────────────────────────────────────────
+
+// Canonicalization mirrors scripts/generate_address_data.py, so a live answer
+// and the pre-computed ranking agree on what one location is. The city stores
+// the same corner both ways ("AIRPORT BLVD & E 45TH ST" and its reverse), so
+// without sorting the parts the #1 and #2 troublespots are one corner.
+const CITY_SUFFIX = /,\s*AUSTIN\s*,\s*TX\b\s*(?:\d{5})?\s*$/i;
+const CITY_ONLY = /^AUSTIN\s*,?\s*TX\b.*$/i;
+const ROAD_ABBREV = new Set(["Fm", "Rm", "Ih", "Us", "Sh", "Hwy", "Lp"]);
+
+function canonLocation(loc) {
+  let s = String(loc || "").trim();
+  if (!s) return "";
+
+  s = s
+    .replace(CITY_SUFFIX, "")
+    .toUpperCase()
+    .replace(/\s*&\s*/g, " & ")
+    .replace(/\s+/g, " ")
+    .replace(/^[\s,]+|[\s,]+$/g, "");
+
+  if (!s || CITY_ONLY.test(s)) return "";
+
+  if (s.includes(" & ")) {
+    const parts = s.split(" & ").map((p) => p.trim()).filter(Boolean).sort();
+    if (parts.length >= 2) return parts.join(" & ");
+  }
+  return s;
+}
+
+function displayLocation(key) {
+  return key
+    .toLowerCase()
+    .replace(/(^|\s)(\S)/g, (_, lead, ch) => lead + ch.toUpperCase())
+    .replace(/\b(\d+)(st|nd|rd|th)\b/g, (_, n, suffix) => n + suffix)
+    .split(" ")
+    .map((w) => (ROAD_ABBREV.has(w) ? w.toUpperCase() : w))
+    .join(" ");
+}
+
+/**
+ * "Where are the troublespots?" — one `$group sr_location` on Socrata, merged
+ * and ranked here. Returns null when Socrata cannot answer it (homeless has no
+ * live text to filter on) or the request fails.
+ */
+async function fetchAddressRanking(env, params) {
+  // `homeless` is a keyword filter over description/status_notes.
+  const predicate = params.category ? socrataTypePredicate(params.category) : null;
+  if (params.category && !predicate) return null;
+
+  const resolved = resolveDateRange(params.date_range);
+  const whereParts = ["sr_location IS NOT NULL"];
+  if (resolved) {
+    whereParts.push(`sr_created_date >= '${formatDateCentral(resolved.start)}'`);
+  }
+  if (predicate) whereParts.push(predicate);
+  if (params.zip) whereParts.push(`sr_location_zip_code = '${params.zip}'`);
+  if (params.district) {
+    whereParts.push(`sr_location_council_district = '${params.district}'`);
+  }
+
+  // Ask for more rows than are shown so canonicalization can merge reversed
+  // intersection pairs that both rank just below the cut.
+  const queryParams = new URLSearchParams({
+    $select: "sr_location, count(*) as n",
+    $where: whereParts.join(" AND "),
+    $group: "sr_location",
+    $order: "n DESC",
+    $limit: "500",
+  });
+  if (env.AUSTINAPIKEY) queryParams.set("$$app_token", env.AUSTINAPIKEY);
+
+  let rows;
+  try {
+    const resp = await fetch(`${SOCRATA_BASE}/${SOCRATA_311}.json?${queryParams}`, {
+      headers: { "Accept": "application/json", "User-Agent": "austin311bot/query-gateway" },
+    });
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    rows = Array.isArray(data) ? data : [];
+  } catch (e) {
+    console.error("Socrata address ranking error:", e);
+    return null;
+  }
+
+  const counts = new Map();
+  let blank = 0;
+  for (const row of rows) {
+    const key = canonLocation(row.sr_location);
+    const n = parseInt(row.n, 10) || 0;
+    if (!key) {
+      blank += n;
+      continue;
+    }
+    counts.set(key, (counts.get(key) || 0) + n);
+  }
+  if (counts.size === 0) return null;
+
+  const wanted = Math.min(Math.max(parseInt(params.limit, 10) || 25, 1), 50);
+  const ranked = [...counts.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+    .slice(0, wanted)
+    .map(([key, count]) => ({
+      address: displayLocation(key),
+      count,
+      kind: key.includes(" & ") ? "intersection" : "address",
+    }));
+
+  const label = params.category
+    ? `${CATEGORY_NAMES[params.category] || TROUBLESPOT_LABELS[params.category] || params.category} requests`
+    : "311 requests";
+  const place = params.zip
+    ? ` in ZIP ${params.zip}`
+    : params.district
+      ? ` in district ${params.district}`
+      : "";
+  const top3 = ranked.slice(0, 3).map((e) => `${e.address} (${e.count})`).join(" · ");
+
+  return {
+    answer_summary:
+      `Most-reported locations for ${label}${place}: ${top3}. ` +
+      `Ranked from the ${rows.length} most-reported locations` +
+      (blank ? `; ${blank} reports in that set had no usable address.` : "."),
+    chart_config: {
+      type: "bar",
+      data: {
+        labels: ranked.slice(0, 12).map((e) => e.address),
+        datasets: [
+          {
+            label: "Reports",
+            data: ranked.slice(0, 12).map((e) => e.count),
+            backgroundColor: "#C2855C",
+          },
+        ],
+      },
+    },
+    table_data: ranked,
+  };
+}
+
 async function fetchPrecomputed(env, filename) {
   const url = `${QUERYSTORE_BASE}/${filename}`;
   try {
@@ -382,24 +659,36 @@ async function fetchPrecomputed(env, filename) {
 
 // ── Result formatting ───────────────────────────────────────────────────────
 
-function formatCountResult(records, params) {
-  const total = Array.isArray(records) ? records.length : 0;
-  const openCount = Array.isArray(records)
-    ? records.filter((r) => (r.status || "").toLowerCase() === "open").length
-    : 0;
-  const closedCount = total - openCount;
-  const category = CATEGORY_NAMES[params.category] || params.category || "311";
+// "What are people saying?" / "How were these closed?" — the one thing only
+// Open311 can answer, because it exposes `description` (reporter's words) and
+// `status_notes` (the city's closing note). Socrata publishes neither.
+function formatSamplesResult(records, params) {
+  const wanted = params.limit || 25;
+  const clip = (s, n) => {
+    const text = String(s || "").replace(/\s+/g, " ").trim();
+    return text.length > n ? text.slice(0, n - 1) + "…" : text;
+  };
+  const name = CATEGORY_NAMES[params.category] || TROUBLESPOT_LABELS[params.category] || "311";
+
+  const rows = records.slice(0, wanted).map((r) => ({
+    date: (r.requested_datetime || "").slice(0, 10) || "—",
+    status: r.status || "—",
+    type: r.service_name || r.service_code || "—",
+    description: clip(r.description, 160) || "—",
+    staff_note: clip(r.status_notes, 160) || "—",
+  }));
+
+  const withDescription = rows.filter((r) => r.description !== "—").length;
+  const withNote = rows.filter((r) => r.staff_note !== "—").length;
+  const verb = (n) => (n === 1 ? "includes" : "include");
 
   return {
-    answer_summary: `${total} ${category} complaints in the selected period. ${openCount} open, ${closedCount} closed.`,
-    chart_config: {
-      type: "doughnut",
-      data: {
-        labels: ["Open", "Closed"],
-        datasets: [{ label: category, data: [openCount, closedCount], backgroundColor: ["#ef4444", "#22c55e"] }],
-      },
-    },
-    table_data: [{ status: "Open", count: openCount }, { status: "Closed", count: closedCount }],
+    answer_summary:
+      `The ${rows.length} most recent ${name} requests. ` +
+      `${withDescription} ${verb(withDescription)} the reporter's own description and ` +
+      `${withNote} ${verb(withNote)} a city closing note.`,
+    chart_config: null,
+    table_data: rows,
   };
 }
 
@@ -621,11 +910,58 @@ async function handleQuery(request, env) {
     return errorResponse("No question or parameters provided.");
   }
 
-  // The address ranking exists only as pre-computed data (Socrata-sourced, in
-  // docs/querystore/address_counts.json) — never send it to Open311/Socrata,
-  // whichever source the caller (or the LLM) claimed.
-  if (params.group_by === "address") {
+  // Structured params skip the LLM, but they must not skip validation: the
+  // values end up interpolated into SoQL, and a caller can post whatever it
+  // likes. `intent` defaults to a plain count.
+  if (params === body) {
+    params.intent = params.intent || "count";
+    if (!validateParams(params)) {
+      return errorResponse("Those query parameters are not supported.");
+    }
+  }
+
+  // "Where are the troublespots?" is just a `$group sr_location`, answered live.
+  // `homeless` is the exception: its ranking needs the encampment keyword filter
+  // over ticket text, which is applied when the pre-computed file is generated.
+  // Crime/911 questions keep their own datasets.
+  if (params.group_by === "address" && !NON_311_CATEGORIES.has(params.category)) {
+    const homelessRanking = params.category === "homeless";
+    params.source = homelessRanking ? "precomputed" : "socrata";
+    params.socrata_dataset = homelessRanking ? null : SOCRATA_311;
+  }
+
+  // Default a 311-shaped Socrata question onto the 311 dataset. Crime, 911 and
+  // restaurant questions name their own dataset and must not be hijacked.
+  if (params.source === "socrata" && !params.socrata_dataset && !NON_311_CATEGORIES.has(params.category)) {
+    params.socrata_dataset = SOCRATA_311;
+  }
+
+  // `homeless` is a keyword filter over description/status_notes, and Socrata
+  // publishes neither — likewise any category whose types are unknown there.
+  // Those are answered from the cache, which applies the same filters the maps
+  // and the weekly digest use.
+  if (
+    params.socrata_dataset === SOCRATA_311 &&
+    params.intent !== "lookup" &&
+    params.category &&
+    !socrataTypePredicate(params.category)
+  ) {
+    params.socrata_dataset = null;
     params.source = "precomputed";
+  }
+
+  // A plain count always belongs on Socrata: Open311 caps `per_page` at 100, so
+  // a live count silently reports "100" for anything bigger. Only the text
+  // intents need the Open311 path.
+  if (
+    params.intent === "count" &&
+    params.source !== "precomputed" &&
+    params.source !== "socrata" &&
+    params.category !== "homeless" &&
+    (params.category === null || params.category === undefined || socrataTypePredicate(params.category))
+  ) {
+    params.source = "socrata";
+    params.socrata_dataset = SOCRATA_311;
   }
 
   console.log("Parsed params:", JSON.stringify(params));
@@ -640,6 +976,54 @@ async function handleQuery(request, env) {
       const ticket = await fetchOpen311Ticket(env, params.ticket_id);
       result = formatLookupResult(ticket);
       source = "open311";
+    }
+    // Text questions — Open311 is the only source with description/status_notes
+    else if (params.intent === "samples") {
+      source = "open311";
+      const codes = params.service_codes && params.service_codes.length
+        ? params.service_codes
+        : CATEGORY_CODES[params.category] || null;
+      if (!codes) {
+        return errorResponse(
+          "I don't have ticket text for that. Ask about a specific category, or a ticket number."
+        );
+      }
+      const fetched = await fetchOpen311Recent(
+        env,
+        codes,
+        params.limit || 25,
+        {
+          status: params.status,
+          // `homeless` is a keyword filter over exactly these text fields, so the
+          // unfiltered stream is full of unrelated park-maintenance reports.
+          keep: params.category === "homeless" ? isEncampmentReport : null,
+        }
+      );
+      if (fetched.length === 0) {
+        return errorResponse(
+          params.category === "homeless"
+            ? "No homeless/encampment reports in the last 6 months. Try a ticket number instead."
+            : "No 311 records matched in the last 6 months."
+        );
+      }
+
+      result = formatSamplesResult(fetched, params);
+    }
+    // Address rankings need canonicalization the generic SoQL builder cannot
+    // do (one location can arrive spelled several ways), so they get their own
+    // path — with the pre-computed file as fallback.
+    else if (params.group_by === "address" && source === "socrata") {
+      result = await fetchAddressRanking(env, params);
+      if (result) {
+        source = "socrata";
+      } else {
+        source = "precomputed";
+        const precomputed = await fetchPrecomputed(env, "address_counts.json");
+        result = precomputed ? formatFromPrecomputed(precomputed, params) : null;
+        if (!result) {
+          return errorResponse("Query data is temporarily unavailable. Try again later.");
+        }
+      }
     }
     // Socrata
     else if (source === "socrata" || params.socrata_dataset) {
@@ -659,7 +1043,12 @@ async function handleQuery(request, env) {
 
       const socrataData = await resp.json();
       const entries = Array.isArray(socrataData) ? socrataData : [];
-      const rowCount = (row) => parseInt(row.count) || row.cnt || 1;
+      // parseInt("0") is falsy, so a zero-count row must not fall through to 1.
+      const rowCount = (row) => {
+        const raw = row.count !== undefined ? row.count : row.cnt;
+        const n = parseInt(raw, 10);
+        return Number.isNaN(n) ? 1 : n;
+      };
       const total = entries.reduce((sum, row) => sum + rowCount(row), 0);
 
       // Human-readable month labels: "2025-07-01T00:00:00.000" → "Jul 2025"
@@ -669,28 +1058,83 @@ async function handleQuery(request, env) {
       };
       const isMonthly = params.group_by === "month" && entries.length > 0 && entries[0].month;
 
+      // "TPW - Parking Violation Enforcement" → "Parking Violation Enforcement".
+      // One type ships an HTML-escaped ampersand, so decode that too.
+      const prettyType = (t) =>
+        String(t).replace(/^[A-Z() ]{2,6} - /, "").replace(/&amp;/g, "&");
+
+      const rowLabel = (row) => {
+        if (row.month) return fmtMonth(row.month);
+        if (row.day) return String(row.day).slice(0, 10);
+        // Grouped queries can return a null key (e.g. a request with no council
+        // district, or one outside city limits) — label it rather than dropping it.
+        if (params.group_by === "zip") return `ZIP ${row.sr_location_zip_code || "unknown"}`;
+        if (params.group_by === "district") {
+          const d = row.sr_location_council_district ?? row.council_district;
+          return d === null || d === undefined || d === "" ? "No district" : `District ${d}`;
+        }
+        if (params.group_by === "status" && row.sr_status_desc) return row.sr_status_desc;
+        if (params.group_by === "category" && row.sr_type_desc) return prettyType(row.sr_type_desc);
+        if (row.sr_location_zip_code) return `ZIP ${row.sr_location_zip_code}`;
+        if (row.sr_location_council_district) return `District ${row.sr_location_council_district}`;
+        if (row.council_district) return `District ${row.council_district}`;
+        if (row.sr_type_desc) return prettyType(row.sr_type_desc);
+        if (row.sr_status_desc) return row.sr_status_desc;
+        return row.crime_type || "Total";
+      };
+
+      const rows = entries.map((row) => ({ label: rowLabel(row), ...row }));
+
+      const subject = params.crime_type
+        ? `${params.crime_type} reports`
+        : params.category
+          ? `${CATEGORY_NAMES[params.category] || TROUBLESPOT_LABELS[params.category] || params.category} requests`
+          : "311 records";
+
       const scopeBits = [
-        params.crime_type ? `${params.crime_type} reports` : "records",
+        subject,
+        params.zip ? `in ZIP ${params.zip}` : null,
         params.district ? `in district ${params.district}` : null,
         isMonthly && entries.length ? `since ${fmtMonth(entries[0].month)}` : null,
       ].filter(Boolean);
 
-      const rows = entries.map((row) => ({
-        ...row,
-        month: row.month ? fmtMonth(row.month) : row.month,
-      }));
-
       const counts = entries.map(rowCount);
       const peakIdx = counts.indexOf(Math.max(...counts));
-      const peakLabel = isMonthly && peakIdx >= 0 ? ` Peak: ${rows[peakIdx].month} (${counts[peakIdx]}).` : "";
+      const peakLabel = isMonthly && peakIdx >= 0 ? ` Peak: ${rows[peakIdx].label} (${counts[peakIdx]}).` : "";
+
+      // Ranked breakdowns get a bar chart for their top 12; a plain grouped
+      // ZIP/type query can return 50 rows, which is unreadable as bars.
+      const barRows = rows.slice(0, 12);
+
+      // A capped ranking ($limit) is the top N, not the whole population — the
+      // sum of those rows must not be presented as the grand total.
+      const limit = params.limit || 50;
+      const truncated = Boolean(params.group_by) && entries.length >= limit;
+      const groupNoun = {
+        zip: "ZIP codes",
+        district: "districts",
+        category: "request types",
+        status: "statuses",
+        day: "days",
+        month: "months",
+      }[params.group_by];
+
+      const summary = truncated
+        ? `Top ${entries.length} ${groupNoun || "groups"} for ${subject}: ${total} requests` +
+          (entries.length ? `. Leader: ${rows[0].label} (${counts[0]}).` : ".")
+        : `Found ${total} ${scopeBits.join(" ")}` +
+          (!isMonthly && params.group_by && entries.length
+            ? ` across ${entries.length} ${groupNoun || "groups"}`
+            : "") +
+          `.${peakLabel}`;
 
       result = {
-        answer_summary: `Found ${total} ${scopeBits.join(" ")}.${peakLabel}`,
+        answer_summary: summary,
         table_data: rows,
         chart_config: isMonthly ? {
           type: "line",
           data: {
-            labels: rows.map((row) => row.month),
+            labels: rows.map((row) => row.label),
             datasets: [{
               label: params.crime_type ? `${params.crime_type} reports` : "Count",
               data: counts,
@@ -699,25 +1143,19 @@ async function handleQuery(request, env) {
               fill: false,
             }],
           },
-        } : (entries.length <= 10 ? {
+        } : (params.group_by && barRows.length > 1 ? {
           type: "bar",
           data: {
-            labels: entries.map((row) => row.council_district ? `D${row.council_district}` : (row.crime_type || "Entry")),
-            datasets: [{ label: "Count", data: counts, backgroundColor: "#3b82f6" }],
+            labels: barRows.map((row) => row.label),
+            datasets: [{ label: "Count", data: barRows.map(rowCount), backgroundColor: "#3b82f6" }],
           },
         } : null),
       };
     }
-    // Open311 live query (recent data)
-    else if ((source === "open311") && params.intent === "count") {
-      const records = await fetchOpen311(env, params);
-      if (records === null) {
-        // Fall back to pre-computed
-        source = "precomputed";
-      } else {
-        result = formatCountResult(records, params);
-      }
-    }
+    // No live Open311 counting path on purpose. Open311 caps `per_page` at 100,
+    // so counting its records silently answered "100" for anything bigger;
+    // counts go to Socrata, and a category Socrata cannot express (homeless)
+    // is force-routed to the pre-computed cache above.
     // Pre-computed data (historical, trends, resolution, hotspots)
     else {
       source = "precomputed";

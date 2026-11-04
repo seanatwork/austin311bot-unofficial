@@ -70,6 +70,145 @@ export function troublespotKey(category) {
   return TROUBLESPOT_LABELS[key] ? key : null;
 }
 
+/**
+ * Socrata `xwdj-i9he` equivalent of each category — see CATEGORY_SOCRATA_TYPES
+ * in categories.py, which owns this list. An entry ending in " - *" is a prefix
+ * match; anything else is an exact `sr_type_desc`.
+ *
+ * `homeless` is deliberately absent: the category is a keyword filter over
+ * `description` and `status_notes`, neither of which Socrata publishes.
+ * `trash`, `code_violations` and `abandoned_vehicles` are Socrata-only.
+ */
+export const CATEGORY_SOCRATA_TYPES = {
+  parking: ["TPW - Parking Violation Enforcement"],
+  noise: [
+    "DSD - Outdoor Commercial Venue Music Complaint",
+    "AFD - Fireworks Complaint",
+    "ZZ - AFD - Fireworks Complaint",
+  ],
+  animal: [
+    "Animal Protection - *",
+    "Animal Services - *",
+    "Pet Resource Center - *",
+    "ZZ - Pet Resource Center - *",
+  ],
+  graffiti: [
+    "APH - Graffiti Abatement - Public Property",
+    "DSD - Graffiti Abatement - Private Property",
+  ],
+  parks: ["Park Maintenance - *", "PARD - *", "APR (PARD) - *"],
+  storm: ["WPD - *"],
+  traffic: ["TPW - *"],
+  bicycle: ["TPW - Bicycle Issues"],
+  dead_animal: ["ARR - Dead Animal Collection"],
+  water: ["AW - *"],
+  trash: [
+    "ARR - Garbage",
+    "ARR - Bulk",
+    "ARR - Compost",
+    "ARR - Recycling",
+    "ARR - General",
+    "ARR - Brush",
+    "ARR - Household Hazardous Waste",
+  ],
+  code_violations: [
+    "DSD - Request Code Officer",
+    "DSD - Follow-Up",
+    "DSD - Short Term Rental Complaint",
+    "DSD - Billboard Complaint",
+  ],
+  abandoned_vehicles: [
+    "APD - Vehicle Abatement Report",
+    "APD - Vehicle Abatement Callback Request",
+  ],
+};
+
+/** Types a category's prefix sweep should not include (see categories.py). */
+export const CATEGORY_SOCRATA_EXCLUDE = {
+  traffic: ["TPW - Parking Violation Enforcement", "TPW - Bicycle Issues"],
+};
+
+/**
+ * The `homeless` category is not a set of service codes — it is a keyword
+ * filter over the ticket's own text, applied by the map, the weekly digest and
+ * the Open311 cache. `homeless/homeless_bot.py` owns these lists; this copy is
+ * checked by `scripts/check_taxonomy_sync.py`.
+ */
+export const ENCAMPMENT_KEYWORDS = [
+  "encampment",
+  "homelessness",
+  "homeless camp",
+  "homeless",
+  "camp",
+  "tent",
+  "transient",
+  "vagrant",
+];
+
+/** Fires on the city's `status_notes` when a report was routed to the HSO. */
+export const HSO_KEYWORDS = ["homeless strategy", "hso"];
+
+/** Trash/debris only counts alongside an explicit homeless keyword. */
+export const TRASH_KEYWORDS = ["trash", "debris", "garbage"];
+
+/** Whole-word (or phrase) match, mirroring Python's `\b...\b`. */
+function wordIn(keyword, text) {
+  const escaped = keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`\\b${escaped}\\b`).test(text);
+}
+
+/**
+ * Port of `homeless.homeless_bot.is_encampment_report`: does this Open311
+ * record actually belong to the homeless category? Used when showing ticket
+ * text, where answering with unfiltered park-maintenance posters would be
+ * wrong.
+ */
+export function isEncampmentReport(record) {
+  const citizenText = [record.description, record.address]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  const statusText = (record.status_notes || "").toLowerCase();
+  const fullText = `${citizenText} ${statusText}`;
+
+  if (!fullText.trim()) return false;
+  if (ENCAMPMENT_KEYWORDS.some((kw) => wordIn(kw, fullText))) return true;
+  if (HSO_KEYWORDS.some((kw) => wordIn(kw, statusText))) return true;
+
+  // The city sometimes writes status_notes with asterisks between words
+  // ("Homeless* *Strategy* *Office"), which breaks the word boundary.
+  if (statusText.replace(/\*/g, " ").includes("homeless strategy")) return true;
+
+  const hasTrash = TRASH_KEYWORDS.some((kw) => wordIn(kw, fullText));
+  return hasTrash && wordIn("homeless", fullText);
+}
+
+/**
+ * SoQL predicate for one category's 311 types, or null when Socrata cannot
+ * answer it (only `homeless`, which has no type equivalent).
+ */
+export function socrataTypePredicate(category) {
+  const entries = CATEGORY_SOCRATA_TYPES[category];
+  if (!entries) return null;
+
+  const quote = (s) => s.replace(/'/g, "''");
+
+  // A trailing "*" marks a prefix match; the text before it is passed to
+  // `starts_with` verbatim, trailing space included ("TPW - " not "TPW -").
+  const includes = entries.map((entry) =>
+    entry.endsWith("*")
+      ? `starts_with(sr_type_desc,'${quote(entry.slice(0, -1))}')`
+      : `sr_type_desc = '${quote(entry)}'`
+  );
+  const predicate = includes.length === 1 ? includes[0] : `(${includes.join(" OR ")})`;
+
+  const excluded = CATEGORY_SOCRATA_EXCLUDE[category] || [];
+  if (!excluded.length) return `(${predicate})`;
+
+  const list = excluded.map((t) => `'${quote(t)}'`).join(",");
+  return `(${predicate} AND NOT sr_type_desc in(${list}))`;
+}
+
 export const SERVICE_CODE_NAMES = {
   // Homeless
   PRGRDISS: "Park Maintenance - Grounds",
@@ -144,6 +283,7 @@ export const SERVICE_CODE_NAMES = {
 
 /** All known Socrata datasets (whitelisted for the proxy). */
 export const SOCRATA_DATASETS = [
+  "xwdj-i9he",   // Austin 311 Public Data (all 311 volume, not just Open311)
   "fdj4-gpfu",   // APD Crime Reports
   "t99n-5ib4",   // Hate Crime Incidents
   "i7fg-wrk5",   // NIBRS Homicides
@@ -179,28 +319,46 @@ Given a natural language question, extract structured query parameters.
 Return ONLY valid JSON with these exact fields:
 
 {
-  "intent": "count" | "trend" | "hotspots" | "rank" | "compare" | "resolution_time" | "lookup",
+  "intent": "count" | "trend" | "hotspots" | "rank" | "compare" | "resolution_time" | "lookup" | "samples",
   "source": "open311" | "socrata" | "precomputed",
   "category": "graffiti" | "parking" | "noise" | "homeless" | "animal" | "traffic" | "parks" | "storm" | "bicycle" | "dead_animal" | "water" | "trash" | "code_violations" | "abandoned_vehicles" | "crime" | "911" | "restaurants" | null,
   "service_codes": ["HHSGRAFF"] or null,
-  "socrata_dataset": "fdj4-gpfu" or null,
+  "socrata_dataset": "xwdj-i9he" | "fdj4-gpfu" | ... or null,
   "date_range": {
     "start": "last_30d" | "last_90d" | "last_365d" | "this_year" | "last_month" | "last_week" | "today" | "YYYY-MM-DD",
     "end": "YYYY-MM-DD" | null
   },
   "district": 1-10 or null,
+  "zip": "78704" or null,
   "crime_type": string or null,  // only for fdj4-gpfu: e.g. "burglary", "theft", "assault", "robbery"
   "status": "open" | "closed" | null,
-  "group_by": "day" | "month" | "category" | "district" | "status" | "address" | null,
+  "group_by": "day" | "month" | "category" | "district" | "zip" | "status" | "address" | null,
   "limit": number or null,
   "address": string or null,
   "ticket_id": string or null
 }
 
-AVAILABLE CATEGORIES AND SERVICE CODES:
+CHOOSING A SOURCE — this is the most important decision:
+- "socrata" for ANY 311 question that is about counting: how many, trends over time, rankings,
+  by district, by ZIP code, by type, hotspots. Use "socrata_dataset": "xwdj-i9he" and the category.
+  Socrata carries all 311 volume (trash, code enforcement, abandoned vehicles included) and is fast.
+- "open311" ONLY when the question is about what a report SAYS or how it was CLOSED — the
+  reporter's own words (description), the city's closing notes (status_notes), "what did people
+  complain about", "how was this resolved", or a specific ticket id. Socrata publishes no text.
+- "open311" also for "homeless" questions: that category is a keyword filter over that same text.
+- "precomputed" for resolution times and anything asking about a category the data does not cover.
+  Address rankings are live Socrata too — see below.
+
+AVAILABLE CATEGORIES AND SERVICE CODES (Open311):
 ${categoryEntries}
 
+SOCRATA-ONLY CATEGORIES (no Open311 codes — use socrata or the address ranking):
+- trash: Garbage, Bulk, Compost, Recycling, General, Brush, Household Hazardous Waste
+- code_violations: Request Code Officer, Follow-Up, Short Term Rental, Billboard
+- abandoned_vehicles: Vehicle Abatement Report / Callback Request
+
 SOCRATA DATASETS:
+- xwdj-i9he: Austin 311 Public Data (every 311 request — use this for 311 counts and trends)
 - fdj4-gpfu: APD Crime Reports (for crime questions)
 - 22de-7rzg: 911 Dispatch (for 911 response time questions)
 - ecmv-9xxi: Restaurant Inspections (for restaurant health score questions)
@@ -211,17 +369,33 @@ SOCRATA DATASETS:
 
 DATE RANGES: Use symbolic names ("last_30d", "last_90d", "last_365d", "this_year", "last_month", "last_week", "today") unless the question specifies an exact date.
 
+ZIP CODES: "my neighborhood", "in 78704", "by ZIP code" -> set "zip" to the code and/or "group_by": "zip". Only xwdj-i9he has ZIPs.
+
 ADDRESS RANKINGS: for "where", "which addresses", "top locations" or "troublespots" questions, return
-"source": "precomputed" with "group_by": "address". The category may be any listed type — trash,
-code_violations and abandoned_vehicles exist ONLY here (they have no Open311 codes). Omit category
-for all 311 activity together. Only 90-day and 365-day windows exist; anything shorter becomes 90 days.
+the category (or none for all 311 activity) with "group_by": "address" and "source": "socrata" on
+"xwdj-i9he". Only "homeless" address rankings use "source": "precomputed" (they need the text filter).
 
 EXAMPLES:
 Q: "How many graffiti complaints in the last 30 days?"
-A: {"intent":"count","source":"open311","category":"graffiti","service_codes":["HHSGRAFF"],"date_range":{"start":"last_30d"}}
+A: {"intent":"count","source":"socrata","socrata_dataset":"xwdj-i9he","category":"graffiti","date_range":{"start":"last_30d"}}
+
+Q: "How many potholes were reported in 78704 this year?"
+A: {"intent":"count","source":"socrata","socrata_dataset":"xwdj-i9he","category":"traffic","zip":"78704","date_range":{"start":"this_year"}}
+
+Q: "Which ZIP codes have the most trash complaints?"
+A: {"intent":"rank","source":"socrata","socrata_dataset":"xwdj-i9he","category":"trash","group_by":"zip","date_range":{"start":"last_90d"}}
+
+Q: "How many abandoned vehicles were reported last month?"
+A: {"intent":"count","source":"socrata","socrata_dataset":"xwdj-i9he","category":"abandoned_vehicles","date_range":{"start":"last_month"}}
 
 Q: "Which council district has the most open potholes?"
-A: {"intent":"hotspots","source":"open311","category":"traffic","service_codes":["SBPOTREP"],"date_range":{"start":"last_90d"},"group_by":"district","status":"open"}
+A: {"intent":"hotspots","source":"socrata","socrata_dataset":"xwdj-i9he","category":"traffic","date_range":{"start":"last_90d"},"group_by":"district","status":"open"}
+
+Q: "What are people saying about the potholes?" / "Show me recent noise complaints"
+A: {"intent":"samples","source":"open311","category":"traffic","date_range":{"start":"last_30d"},"limit":25}
+
+Q: "How were the graffiti tickets closed?" / "What did staff write on those reports?"
+A: {"intent":"samples","source":"open311","category":"graffiti","date_range":{"start":"last_90d"},"limit":25}
 
 Q: "Show me the trend of violent crime over the past year"
 A: {"intent":"trend","source":"socrata","socrata_dataset":"fdj4-gpfu","date_range":{"start":"last_365d"},"group_by":"month"}
@@ -233,34 +407,34 @@ Q: "What's the status of ticket 26-00229538?"
 A: {"intent":"lookup","source":"open311","ticket_id":"26-00229538"}
 
 Q: "How fast are potholes getting fixed?"
-A: {"intent":"resolution_time","source":"open311","category":"traffic","service_codes":["SBPOTREP"]}
+A: {"intent":"resolution_time","source":"precomputed","category":"traffic"}
 
 Q: "Are noise complaints going up or down compared to last summer?"
-A: {"intent":"trend","source":"open311","category":"noise","service_codes":["APDNONNO","DSOUCVMC","AFDFIREW"],"date_range":{"start":"last_365d"},"group_by":"month"}
+A: {"intent":"trend","source":"socrata","socrata_dataset":"xwdj-i9he","category":"noise","date_range":{"start":"last_365d"},"group_by":"month"}
 
 Q: "Compare parking enforcement in district 5 vs district 7"
-A: {"intent":"compare","source":"open311","category":"parking","service_codes":["PARKINGV"],"date_range":{"start":"last_90d"},"group_by":"district"}
+A: {"intent":"compare","source":"socrata","socrata_dataset":"xwdj-i9he","category":"parking","date_range":{"start":"last_90d"},"group_by":"district"}
 
 Q: "How many tickets are currently open right now, by department?"
-A: {"intent":"count","source":"precomputed","category":null,"group_by":"category","status":"open"}
+A: {"intent":"count","source":"socrata","socrata_dataset":"xwdj-i9he","category":null,"group_by":"category","status":"open","date_range":{"start":"last_90d"}}
 
 Q: "How many open pothole tickets are there?"
-A: {"intent":"count","source":"precomputed","category":"traffic","service_codes":["SBPOTREP"],"status":"open"}
-
-Q: "How many tickets have been open for more than 30 days, by type?"
-A: {"intent":"count","source":"precomputed","category":null,"group_by":"category","status":"open"}
+A: {"intent":"count","source":"socrata","socrata_dataset":"xwdj-i9he","category":"traffic","status":"open","date_range":{"start":"last_90d"}}
 
 Q: "Which agency closes tickets the fastest?"
 A: {"intent":"resolution_time","source":"precomputed","category":null}
 
 Q: "Where are the 311 troublespots?" / "What addresses get the most complaints?"
-A: {"intent":"rank","source":"precomputed","group_by":"address","date_range":{"start":"last_365d"}}
+A: {"intent":"rank","source":"socrata","socrata_dataset":"xwdj-i9he","group_by":"address","date_range":{"start":"last_365d"}}
 
 Q: "Which addresses have the most graffiti complaints?"
-A: {"intent":"rank","source":"precomputed","category":"graffiti","group_by":"address","date_range":{"start":"last_90d"}}
+A: {"intent":"rank","source":"socrata","socrata_dataset":"xwdj-i9he","category":"graffiti","group_by":"address","date_range":{"start":"last_90d"}}
 
 Q: "Top 10 addresses for trash complaints this year"
-A: {"intent":"rank","source":"precomputed","category":"trash","group_by":"address","date_range":{"start":"last_365d"}}
+A: {"intent":"rank","source":"socrata","socrata_dataset":"xwdj-i9he","category":"trash","group_by":"address","date_range":{"start":"last_365d"}}
+
+Q: "Where are people camping?" / "Which addresses get the most homeless reports?"
+A: {"intent":"rank","source":"precomputed","category":"homeless","group_by":"address","date_range":{"start":"last_365d"}}
 
 Return ONLY the JSON object, no markdown, no explanation.`;
 }

@@ -64,6 +64,12 @@
       return null;
     }
 
+    // ZIP answers only exist in the worker's Socrata path — the querystore has
+    // no ZIP dimension, so answering locally would silently ignore the ZIP.
+    if (/\b\d{5}\b|\bzip\b/.test(q)) {
+      return null;
+    }
+
     // Pattern: "where are the troublespots" / "which addresses have the most X".
     // Its own dataset (address_counts.json), fetched on demand — it is large.
     if (isAddressQuestion(q)) {
