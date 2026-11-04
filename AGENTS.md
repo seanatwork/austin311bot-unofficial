@@ -293,7 +293,34 @@ Rows flagged **not run by any workflow** or **retired** are hand-refreshed or de
 
 A Cloudflare Worker (`src/index.js`, `src/categories.js`, `wrangler.toml`) serving the query API behind `docs/ask/` and the `querystore` datasets. Deployed only by `deploy-worker.yml` on changes under that path, with `CLOUDFLARE_API_TOKEN`. `AUSTINAPIKEY` and `CLOUDFLARE_API_TOKEN` are the only secrets this repo needs.
 
-`src/categories.js` mirrors `categories.py` by hand because the worker cannot import Python. `scripts/check_taxonomy_sync.py` compares the two (category keys, per-category code sets, labels, service-code display names) and runs in `deploy-worker.yml` (blocking) and `weekly.yml` (non-blocking, reported by `ci_report_failures.py`). Run it after touching either file — the worker's copy had drifted before, listing five right-of-way codes for Bicycle where the reporting category counts `PWBICYCL` only.
+`src/categories.js` mirrors `categories.py` by hand because the worker cannot import Python. `scripts/check_taxonomy_sync.py` compares the two (category keys, per-category code sets, labels, service-code display names, and the Socrata type maps) and runs in `deploy-worker.yml` (blocking) and `weekly.yml` (non-blocking, reported by `ci_report_failures.py`). Run it after touching either file — the worker's copy had drifted before, listing five right-of-way codes for Bicycle where the reporting category counts `PWBICYCL` only.
+
+**Source policy (2026-11): Socrata `xwdj-i9he` is the default for 311 counting.** It carries every 311 request — the Open311 endpoint exposes only about 40% of volume, with no ARR (trash), DSD (code enforcement) or APD (vehicle abatement) codes at all — and it aggregates server-side, so a count is one ~300 ms request instead of a paginated scan.
+
+Open311 is reserved for the three things Socrata cannot answer, because the dataset publishes no text fields:
+
+| Question needs | Source | Why |
+|---|---|---|
+| reporter's `description`, city `status_notes` (`intent: "samples"`) | Open311 live | Socrata has neither column |
+| a specific ticket (`intent: "lookup"`) | Open311 live | `sr_number` and `service_request_id` are the same id |
+| `homeless` (any intent) | precomputed cache | the category *is* a keyword filter over that same text |
+
+Address rankings (`group_by: "address"`) are a live `$group sr_location` too — one ~250 ms query, canonicalized in the worker. `homeless` addresses are the exception and still read `address_counts.json`, because the ranking needs the encampment keyword filter applied to ticket text.
+
+Plain counts are force-routed to Socrata even when the LLM says `open311` — Open311 caps `per_page` at 100, so a live count silently answered "100" for anything bigger.
+
+Category → Socrata types lives in `CATEGORY_SOCRATA_TYPES` / `CATEGORY_SOCRATA_EXCLUDE` (`categories.py` owns it). Three invariants:
+
+- **`homeless` must never get Socrata types.** The sync script enforces this.
+- **Every other reporting category must have them**, or its questions silently fall back to the slow path.
+- **Socrata totals run higher than `daily_counts.json` on purpose.** The type taxonomy is finer and covers departments Open311 has no codes for. Don't narrow the prefixes to "fix" it. `traffic` is the one category with exclusions (parking and bicycle), so "traffic complaints" stays in the same ballpark as `/traffic/` instead of roughly doubling.
+
+Two traps when adding Socrata 311 queries:
+
+- **Socrata timestamps are naive Central, Open311 is UTC.** `formatDateCentral()` builds the window boundary; using UTC shifts every 30/90/365-day bucket by 5-6 hours and disagrees with the cached trend pages.
+- **`$group` + `$limit` is a top-N, not a population.** A summary that sums capped rows must say "top N", not "found N total".
+
+One duplication to keep in step: location canonicalization (`canonLocation`/`displayLocation` in `src/index.js`) mirrors `canon()`/`_display()` in `scripts/generate_address_data.py`. The city stores one corner several ways, so both sides strip the `, AUSTIN, TX` suffix, drop city-only rows and sort the halves of an intersection; if only one side is updated, the live answer and the pre-computed ranking disagree about which corner is #1.
 
 ## Data Sources
 
@@ -308,6 +335,7 @@ Key Socrata datasets:
 
 | Dataset | ID | Used for |
 |---------|-----|----------|
+| Austin 311 Public Data | `xwdj-i9he` | Every 311 request (ARR/DSD/APD included); default source for `/ask` counts, trends, ZIP and district breakdowns |
 | APD Crime Reports | `fdj4-gpfu` | Crime choropleth, crime trends |
 | NIBRS Homicides | `i7fg-wrk5` | Homicide data |
 | Hate Crime Incidents | `t99n-5ib4` | Hate crime trends (`crime/hate_crime.py`) |
