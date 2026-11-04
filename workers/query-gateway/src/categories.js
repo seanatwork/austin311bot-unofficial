@@ -330,6 +330,7 @@ Return ONLY valid JSON with these exact fields:
   },
   "district": 1-10 or null,
   "zip": "78704" or null,
+  "min_age_days": number or null,  // "still open after 90 days", "older than 30 days"
   "crime_type": string or null,  // only for fdj4-gpfu: e.g. "burglary", "theft", "assault", "robbery"
   "status": "open" | "closed" | null,
   "group_by": "day" | "month" | "category" | "district" | "zip" | "status" | "address" | null,
@@ -420,6 +421,15 @@ A: {"intent":"count","source":"socrata","socrata_dataset":"xwdj-i9he","category"
 
 Q: "How many open pothole tickets are there?"
 A: {"intent":"count","source":"socrata","socrata_dataset":"xwdj-i9he","category":"traffic","status":"open","date_range":{"start":"last_90d"}}
+
+Q: "How many traffic requests are still open after 90 days?"
+A: {"intent":"count","source":"socrata","socrata_dataset":"xwdj-i9he","category":"traffic","status":"open","min_age_days":90}
+
+Q: "How many requests are still open after 90 days, by category?"
+A: {"intent":"count","source":"socrata","socrata_dataset":"xwdj-i9he","category":null,"status":"open","min_age_days":90,"group_by":"category"}
+
+Q: "Which ZIP codes have the oldest open abandoned vehicle reports?"
+A: {"intent":"rank","source":"socrata","socrata_dataset":"xwdj-i9he","category":"abandoned_vehicles","status":"open","min_age_days":90,"group_by":"zip"}
 
 Q: "Which agency closes tickets the fastest?"
 A: {"intent":"resolution_time","source":"precomputed","category":null}

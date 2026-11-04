@@ -258,6 +258,12 @@ function validateParams(params) {
     params.limit = Number.isNaN(n) ? null : Math.min(Math.max(n, 1), 500);
   }
 
+  // "older than N days" — how much backlog has aged past a threshold.
+  if (params.min_age_days !== null && params.min_age_days !== undefined) {
+    const n = parseInt(params.min_age_days, 10);
+    params.min_age_days = Number.isNaN(n) || n <= 0 ? null : Math.min(n, 3650);
+  }
+
   // Validate category if set
   if (params.category && !CATEGORY_CODES[params.category] && !TROUBLESPOT_LABELS[params.category]) {
     // Try fuzzy matching — the LLM might output "pothole" instead of "traffic"
@@ -385,6 +391,15 @@ function buildSoQL(params) {
   if (is311 && params.category) {
     const predicate = socrataTypePredicate(params.category);
     if (predicate) whereParts.push(predicate);
+  }
+  // "still open after 90 days" is a created-before bound, applied on its own
+  // (no lower bound) so a years-old backlog is not silently excluded.
+  if (params.min_age_days) {
+    const cutoff = new Date(Date.now() - params.min_age_days * 24 * 60 * 60 * 1000);
+    const value = is311
+      ? formatDateCentral(cutoff)
+      : formatDateUTC(cutoff).slice(0, 10);
+    whereParts.push(`${dfield} <= '${value}'`);
   }
   if (is311 && params.status) {
     whereParts.push(statusPredicate(params.status));
@@ -1093,6 +1108,8 @@ async function handleQuery(request, env) {
 
       const scopeBits = [
         subject,
+        params.status === "open" ? "still open" : params.status === "closed" ? "closed" : null,
+        params.min_age_days ? `and older than ${params.min_age_days} days` : null,
         params.zip ? `in ZIP ${params.zip}` : null,
         params.district ? `in district ${params.district}` : null,
         isMonthly && entries.length ? `since ${fmtMonth(entries[0].month)}` : null,
@@ -1119,10 +1136,11 @@ async function handleQuery(request, env) {
         month: "months",
       }[params.group_by];
 
+      const scopeText = scopeBits.join(" ");
       const summary = truncated
-        ? `Top ${entries.length} ${groupNoun || "groups"} for ${subject}: ${total} requests` +
+        ? `Top ${entries.length} ${groupNoun || "groups"} for ${scopeText}: ${total} requests` +
           (entries.length ? `. Leader: ${rows[0].label} (${counts[0]}).` : ".")
-        : `Found ${total} ${scopeBits.join(" ")}` +
+        : `Found ${total} ${scopeText}` +
           (!isMonthly && params.group_by && entries.length
             ? ` across ${entries.length} ${groupNoun || "groups"}`
             : "") +
