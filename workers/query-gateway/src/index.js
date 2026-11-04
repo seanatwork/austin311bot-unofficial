@@ -146,6 +146,23 @@ function formatDateCentral(d) {
   return `${get("year")}-${get("month")}-${get("day")}`;
 }
 
+/**
+ * SoQL date bound for a Socrata date_range, in Austin's calendar.
+ *
+ * `resolveDateRange()` builds instants on the Worker's UTC clock, so
+ * "this year" comes out as 2026-01-01T00:00Z — which is still 2025-12-31 in
+ * Chicago, and made a "this year" answer start in December. Calendar-day
+ * presets are therefore resolved from the Central date directly; rolling
+ * windows (last 30/90/365 days) are fine as instants.
+ */
+function socrataStart(dateRange) {
+  const start = dateRange && dateRange.start;
+  if (start === "today") return formatDateCentral(new Date());
+  if (start === "this_year") return `${formatDateCentral(new Date()).slice(0, 4)}-01-01`;
+  const resolved = resolveDateRange(dateRange);
+  return resolved ? formatDateCentral(resolved.start) : null;
+}
+
 // ── Socrata dataset shapes ──────────────────────────────────────────────────
 
 // Austin 311 Public Data: every 311 request (ARR/DSD/APD included), not just
@@ -348,8 +365,20 @@ function crimeTypePattern(raw) {
   return safe.length >= 3 ? safe : null;
 }
 
+/**
+ * Row cap for one SoQL query.
+ *
+ * A type breakdown has to cover the whole taxonomy (~140 `sr_type_desc`
+ * values), otherwise "by category" answers "Top 50" and the total understates
+ * the real count. Everything else can stay at a short ranking.
+ */
+function rowLimit(params) {
+  if (params.limit) return params.limit;
+  return params.group_by === "category" ? 500 : 50;
+}
+
 function buildSoQL(params) {
-  const { socrata_dataset, date_range, district, zip, group_by, limit } = params;
+  const { socrata_dataset, date_range, district, zip, group_by } = params;
   const is311 = socrata_dataset === SOCRATA_311;
   const dfield = dateField(socrata_dataset);
   const col = groupColumn(socrata_dataset, group_by);
@@ -367,11 +396,11 @@ function buildSoQL(params) {
   // Build $where
   const resolved = resolveDateRange(date_range);
   const whereParts = [];
-  if (resolved) {
-    const start = is311
-      ? formatDateCentral(resolved.start)
-      : formatDateUTC(resolved.start).slice(0, 10);
-    whereParts.push(`${dfield} >= '${start}'`);
+  const startDate = is311
+    ? socrataStart(date_range)
+    : (resolved ? formatDateUTC(resolved.start).slice(0, 10) : null);
+  if (startDate) {
+    whereParts.push(`${dfield} >= '${startDate}'`);
   }
   if (district) {
     whereParts.push(
@@ -426,7 +455,7 @@ function buildSoQL(params) {
 
   // Time series must be chronological; rankings sort by volume
   query.$order = isTimeSeries ? group_by : "count DESC";
-  query.$limit = limit || 50;
+  query.$limit = rowLimit(params);
 
   return query;
 }
@@ -571,10 +600,10 @@ async function fetchAddressRanking(env, params) {
   const predicate = params.category ? socrataTypePredicate(params.category) : null;
   if (params.category && !predicate) return null;
 
-  const resolved = resolveDateRange(params.date_range);
+  const start = socrataStart(params.date_range);
   const whereParts = ["sr_location IS NOT NULL"];
-  if (resolved) {
-    whereParts.push(`sr_created_date >= '${formatDateCentral(resolved.start)}'`);
+  if (start) {
+    whereParts.push(`sr_created_date >= '${start}'`);
   }
   if (predicate) whereParts.push(predicate);
   if (params.zip) whereParts.push(`sr_location_zip_code = '${params.zip}'`);
@@ -1125,8 +1154,7 @@ async function handleQuery(request, env) {
 
       // A capped ranking ($limit) is the top N, not the whole population — the
       // sum of those rows must not be presented as the grand total.
-      const limit = params.limit || 50;
-      const truncated = Boolean(params.group_by) && entries.length >= limit;
+      const truncated = Boolean(params.group_by) && entries.length >= rowLimit(params);
       const groupNoun = {
         zip: "ZIP codes",
         district: "districts",
