@@ -293,6 +293,8 @@ Rows flagged **not run by any workflow** or **retired** are hand-refreshed or de
 
 A Cloudflare Worker (`src/index.js`, `src/categories.js`, `wrangler.toml`) serving the query API behind `docs/ask/` and the `querystore` datasets. Deployed only by `deploy-worker.yml` on changes under that path, with `CLOUDFLARE_API_TOKEN`. `AUSTINAPIKEY` and `CLOUDFLARE_API_TOKEN` are the only secrets this repo needs.
 
+`src/categories.js` mirrors `categories.py` by hand because the worker cannot import Python. `scripts/check_taxonomy_sync.py` compares the two (category keys, per-category code sets, labels, service-code display names) and runs in `deploy-worker.yml` (blocking) and `weekly.yml` (non-blocking, reported by `ci_report_failures.py`). Run it after touching either file — the worker's copy had drifted before, listing five right-of-way codes for Bicycle where the reporting category counts `PWBICYCL` only.
+
 ## Data Sources
 
 | Source | Base URL | Used for |
@@ -366,6 +368,6 @@ The page header prints "Last updated …" with the newest sample date, spills wi
 
 **Homeless service codes (optimized 2026-04-29):** PRGRDISS, OBSTMIDB, SBDEBROW, DRCHANEL, ATCOCIRW. The "Homeless - Violet Kiosk" and "Homelessness Matters" 311 categories reuse general maintenance codes — there are no unique homeless-specific service codes. APDNONNO and HHSGRAFF were excluded after analysis (too many false positives).
 
-**Water is its own category (2026-11):** `water` = AWUBEEMT (Austin Water "water related issues") + WWREPORT (conservation violations, already rendered by the `/water/` map). It is deliberately separate from `storm`, which is Watershed Protection drainage/flooding — don't fold utility reports into storm. `WWREPORT` was missing from `CATEGORY_CODES` even though the map used it, so adding it also created the category.
+**Water is its own category (2026-11):** `water` = AWUBEEMT (Austin Water "water related issues") + WWREPORT (conservation violations, already rendered by the `/water/` map). It is deliberately separate from `storm`, which is Watershed Protection drainage/flooding — don't fold utility reports into storm. `WWREPORT` was missing from `CATEGORY_CODES` even though the map used it, so adding it also created the category. The troublespot address ranking splits the same way: `water` = Socrata types prefixed `AW - `, `storm` = `WPD - ` (the earlier merged `water_storm` key is gone).
 
 **Traffic sign codes:** `ATTRSIMO` and `SIGNTRA1` both display as "Traffic Sign Maintenance" but are distinct service codes; both count toward `traffic`. `SIGNPARK` (parking *sign* maintenance) is traffic infrastructure too, not the `parking` enforcement category.

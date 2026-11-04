@@ -14,7 +14,10 @@ export const CATEGORY_CODES = {
   parks: ["PRGRDISS", "PRGRDPLB", "PRGRDELC", "PRBLDPLB", "PRBLDISS", "PRBLDACH", "PRBLDELE", "COMPARLN", "PRCEMET1"],
   storm: ["SWSSTORM", "DRCHANEL", "DRILID", "DRFLOODG", "DRSSPIPE", "DRFLOODR", "ZZEROSIO", "DRDITCH"],
   traffic: ["SBPOTREP", "TRASIGMA", "STREETL2", "SBDEBROW", "ATTRSIMO", "SIGNSTRE", "OBSINTTR", "SBSIDERE", "SBSTRES", "OBSTMIDB", "ZZARSTSW", "DRCHANEL", "ATCOCIRW", "PWTRISRW", "SBGENRL", "SIGNNEWT", "TRASIGNE", "TPPECRNE", "SIGNPARK", "SIGNTRA1", "DOCKMOBI", "SBPAVEFA", "ROADMARK", "TRAFFICC"],
-  bicycle: ["PWBICYCL", "OBSTMIDB", "SBDEBROW", "ATCOCIRW", "ZZARSTSW"],
+  // Canonical reporting category: PWBICYCL only. The bicycle *map* also shows
+  // OBSTMIDB/SBDEBROW/ATCOCIRW/ZZARSTSW (cycling-relevant ROW codes), but those
+  // over-count the category — see AGENTS.md.
+  bicycle: ["PWBICYCL"],
   dead_animal: ["ZZARDEAC"],
   water: ["AWUBEEMT", "WWREPORT"],
 };
@@ -51,13 +54,14 @@ export const TROUBLESPOT_LABELS = {
   noise: "Noise",
   animals: "Animals",
   traffic: "Traffic & Streets",
-  water_storm: "Water & Drainage",
+  water: "Water",
+  storm: "Storm & Drainage",
   parks: "Parks",
   homeless: "Homeless Encampments",
 };
 
 /** Site category names that the ranking stores under a different key. */
-export const TROUBLESPOT_ALIASES = { animal: "animals", storm: "water_storm" };
+export const TROUBLESPOT_ALIASES = { animal: "animals" };
 
 /** Resolve any category name to an address-ranking key, or null. */
 export function troublespotKey(category) {
@@ -68,11 +72,11 @@ export function troublespotKey(category) {
 
 export const SERVICE_CODE_NAMES = {
   // Homeless
-  PRGRDISS: "Park Maintenance",
-  ATCOCIRW: "Construction in ROW",
-  OBSTMIDB: "Obstruction in ROW",
+  PRGRDISS: "Park Maintenance - Grounds",
+  ATCOCIRW: "Construction in Right of Way",
+  OBSTMIDB: "Obstruction in Right of Way",
   SBDEBROW: "Debris in Street",
-  DRCHANEL: "Channels/Drainage",
+  DRCHANEL: "Channels/Creeks/Drainage",
   // Parking
   PARKINGV: "Parking Violation",
   // Noise
@@ -94,10 +98,10 @@ export const SERVICE_CODE_NAMES = {
   // Parks
   PRGRDPLB: "Park Playgrounds",
   PRGRDELC: "Park Electrical",
-  PRBLDPLB: "Park Plumbing",
-  PRBLDISS: "Park Building",
-  PRBLDACH: "Park ADA",
-  PRBLDELE: "Park Electric",
+  PRBLDPLB: "Park Building Plumbing",
+  PRBLDISS: "Park Building Issue",
+  PRBLDACH: "Park Building ADA",
+  PRBLDELE: "Park Building Electric",
   COMPARLN: "Park Comparable",
   PRCEMET1: "Cemetery",
   // Storm
@@ -112,7 +116,7 @@ export const SERVICE_CODE_NAMES = {
   SBPOTREP: "Pothole",
   TRASIGMA: "Traffic Signal",
   STREETL2: "Street Light",
-  ATTRSIMO: "Traffic Sign",
+  ATTRSIMO: "Traffic Sign Maintenance",
   SIGNSTRE: "Street Sign",
   OBSINTTR: "Traffic Obstruction",
   SBSIDERE: "Sidewalk Repair",
@@ -127,7 +131,7 @@ export const SERVICE_CODE_NAMES = {
   SIGNTRA1: "Traffic Sign Maintenance",
   DOCKMOBI: "Shared Micromobility",
   SBPAVEFA: "Pavement Failure",
-  ROADMARK: "Road Markings/Striping",
+  ROADMARK: "Road Markings/Striping - Maintenance",
   TRAFFICC: "Speed Management",
   // Bicycle
   PWBICYCL: "Bicycle Issue",

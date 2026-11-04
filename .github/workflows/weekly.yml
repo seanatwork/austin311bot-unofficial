@@ -51,6 +51,14 @@ jobs:
       - name: Install dependencies
         run: pip install -e .
 
+      # The worker keeps a copy of categories.py's taxonomy; keep the two in
+      # step. continue-on-error so a drift can't block the refresh — the run is
+      # reported red afterwards by ci_report_failures.py.
+      - name: Check worker taxonomy sync
+        id: taxonomy_sync
+        continue-on-error: true
+        run: python scripts/check_taxonomy_sync.py
+
       - name: Restore Open311 cache
         uses: actions/cache/restore@v4
         with:

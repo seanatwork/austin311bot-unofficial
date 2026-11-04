@@ -141,9 +141,17 @@ TROUBLESPOT_TYPES: Dict[str, Dict[str, Any]] = {
         "label": "Traffic & Streets",
         "prefixes": ["TPW - "],
     },
-    "water_storm": {
-        "label": "Water & Drainage",
-        "prefixes": ["WPD - ", "AW - "],
+    # Austin Water and Watershed Protection are separate reporting categories
+    # (`water` = AWUBEEMT/WWREPORT, `storm` = the WPD drainage codes), so the
+    # ranking splits them too: a "most-reported water locations" answer should
+    # not be dominated by storm drains, and vice versa.
+    "water": {
+        "label": "Water",
+        "prefixes": ["AW - "],
+    },
+    "storm": {
+        "label": "Storm & Drainage",
+        "prefixes": ["WPD - "],
     },
     "parks": {
         "label": "Parks",

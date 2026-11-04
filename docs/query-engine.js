@@ -432,12 +432,12 @@
   }
 
   // ── Address ranking (querystore/address_counts.json) ──────────────────────
-  // Keys mirror the dataset's `by_category` keys; `animal` and `storm` are the
-  // site names for `animals` / `water_storm`.
-  const TROUBLESPOT_ALIASES = { animal: "animals", storm: "water_storm" };
+  // Keys mirror the dataset's `by_category` keys; `animal` is the site name for
+  // `animals`. Water and storm are separate buckets, matching the taxonomy.
+  const TROUBLESPOT_ALIASES = { animal: "animals" };
   const TROUBLESPOT_KEYS = new Set([
     "graffiti", "abandoned_vehicles", "parking", "trash", "code_violations",
-    "noise", "animals", "traffic", "water_storm", "parks", "homeless",
+    "noise", "animals", "traffic", "water", "storm", "parks", "homeless",
   ]);
 
   function isAddressQuestion(q) {
@@ -496,7 +496,7 @@
       homeless: "Homeless", parking: "Parking", noise: "Noise", animal: "Animal Services",
       graffiti: "Graffiti", parks: "Parks", storm: "Storm & Drainage",
       traffic: "Traffic", bicycle: "Bicycle", dead_animal: "Dead Animal",
-      animals: "Animals", water_storm: "Water & Drainage", trash: "Trash & Dumping",
+      animals: "Animals", trash: "Trash & Dumping",
       code_violations: "Code Violations", abandoned_vehicles: "Abandoned Vehicles",
       water: "Water",
     };

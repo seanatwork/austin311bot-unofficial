@@ -15,6 +15,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # The worker carries a hand-maintained copy of categories.py's taxonomy
+      # (it cannot import Python). Refuse to deploy a drifted copy.
+      - name: Check taxonomy sync
+        run: python scripts/check_taxonomy_sync.py
+
       - name: Deploy worker
         uses: cloudflare/wrangler-action@v3
         with:
