@@ -1,5 +1,5 @@
 {
-  "generated": "2026-11-02T23:15:04.011087+00:00",
+  "generated": "2026-11-10T00:18:26.795839+00:00",
   "codes": {
     "PRGRDISS": {
       "name": "Park Maintenance - Grounds",
@@ -78,6 +78,11 @@
     },
     "ACINFORM": {
       "name": "Animal Protection",
+      "category": "animal",
+      "category_name": "Animal Services"
+    },
+    "COAACINJ": {
+      "name": "Injured / Sick Animal",
       "category": "animal",
       "category_name": "Animal Services"
     },
@@ -231,6 +236,36 @@
       "category": "traffic",
       "category_name": "Traffic"
     },
+    "SIGNPARK": {
+      "name": "Parking Sign Maintenance",
+      "category": "traffic",
+      "category_name": "Traffic"
+    },
+    "SIGNTRA1": {
+      "name": "Traffic Sign Maintenance",
+      "category": "traffic",
+      "category_name": "Traffic"
+    },
+    "DOCKMOBI": {
+      "name": "Shared Micromobility",
+      "category": "traffic",
+      "category_name": "Traffic"
+    },
+    "SBPAVEFA": {
+      "name": "Pavement Failure",
+      "category": "traffic",
+      "category_name": "Traffic"
+    },
+    "ROADMARK": {
+      "name": "Road Markings/Striping - Maintenance",
+      "category": "traffic",
+      "category_name": "Traffic"
+    },
+    "TRAFFICC": {
+      "name": "Speed Management",
+      "category": "traffic",
+      "category_name": "Traffic"
+    },
     "PWBICYCL": {
       "name": "Bicycle Issue",
       "category": "bicycle",
@@ -240,6 +275,16 @@
       "name": "Dead Animal",
       "category": "dead_animal",
       "category_name": "Dead Animal"
+    },
+    "AWUBEEMT": {
+      "name": "Water Related Issues",
+      "category": "water",
+      "category_name": "Water"
+    },
+    "WWREPORT": {
+      "name": "Water Conservation Violation",
+      "category": "water",
+      "category_name": "Water"
     }
   }
 }

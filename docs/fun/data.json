@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-02T23:02:46.155046+00:00",
+  "updated": "2026-11-10T00:02:18.577342+00:00",
   "bars": {
     "top10": [
       {
@@ -61,12 +61,6 @@
         "pct": 139.3
       },
       {
-        "name": "Levy At Austin Fc",
-        "address": "10414 Mckalla Pl",
-        "delta": 723878.0,
-        "pct": 300.8
-      },
-      {
         "name": "San Jacinto Beverage Company Llc",
         "address": "98 San Jacinto Blvd",
         "delta": 183147.0,
@@ -83,6 +77,12 @@
         "address": "110 E 2nd St",
         "delta": 105441.0,
         "pct": 10.5
+      },
+      {
+        "name": "Radio East",
+        "address": "3504 Montopolis Dr",
+        "delta": 104444.0,
+        "pct": 215.2
       }
     ],
     "curDate": "2026-08-31",
@@ -90,10 +90,10 @@
     "curLabel": "August 2026",
     "prevLabel": "July 2026",
     "skippedPartial": true,
-    "asOf": "2026-11-02T23:02:46.155046+00:00"
+    "asOf": "2026-11-10T00:02:18.577342+00:00"
   },
   "coyotes": {
-    "total": 420,
+    "total": 416,
     "pupping": 112,
     "puppingPct": 27,
     "isPeak": false,
@@ -166,31 +166,38 @@
       },
       {
         "label": "Nov 2025",
-        "count": 27,
-        "pct": 49,
+        "count": 23,
+        "pct": 42,
         "isPupping": false
       }
     ],
-    "asOf": "2026-11-02T23:02:46.155046+00:00"
+    "asOf": "2026-11-10T00:02:18.577342+00:00"
   },
   "graffiti": {
-    "total": 1083,
-    "uniqueLocations": 990,
+    "total": 1094,
+    "uniqueLocations": 996,
     "repeatRate": 9,
     "winner": {
-      "address": "7300 Latta Dr",
+      "address": "1684 E 5th St",
       "count": 4,
-      "status": "\ud83d\udd34 Tagged",
-      "lat": 30.21693131,
-      "lon": -97.84597396
+      "status": "\u2705 Cleaned",
+      "lat": 30.26172,
+      "lon": -97.72540333333333
     },
     "top15": [
       {
+        "address": "1684 E 5th St",
+        "count": 4,
+        "status": "\u2705 Cleaned",
+        "lat": 30.26172,
+        "lon": -97.72540333333333
+      },
+      {
         "address": "7300 Latta Dr",
         "count": 4,
-        "status": "\ud83d\udd34 Tagged",
-        "lat": 30.21693131,
-        "lon": -97.84597396
+        "status": "\u2705 Cleaned",
+        "lat": 30.21693204,
+        "lon": -97.8459693
       },
       {
         "address": "615 W 2nd St",
@@ -217,13 +224,13 @@
         "address": "910 W Cesar Chavez St",
         "count": 3,
         "status": "\ud83d\udd34 Tagged",
-        "lat": 30.26667601,
-        "lon": -97.75577683
+        "lat": 30.26667683,
+        "lon": -97.75577199
       },
       {
         "address": "1201 Cedar Ave",
         "count": 3,
-        "status": "\ud83d\udd34 Tagged",
+        "status": "\u2705 Cleaned",
         "lat": 30.275080402624596,
         "lon": -97.71261294727668
       },
@@ -270,33 +277,26 @@
         "lon": -97.75590654682892
       },
       {
-        "address": "4338 Menchaca Rd",
+        "address": "1000 Village West Dr",
         "count": 2,
         "status": "\ud83d\udd34 Tagged",
-        "lat": 30.229787533887755,
-        "lon": -97.78843688533188
+        "lat": 30.33693361,
+        "lon": -97.87239969
       },
       {
-        "address": "8121 Research Blvd Svrd Nb",
-        "count": 2,
-        "status": "\ud83d\udd34 Tagged",
-        "lat": 30.35337078,
-        "lon": -97.71399031
-      },
-      {
-        "address": "11819 Pavilion Blvd",
+        "address": "2711 Canterbury St",
         "count": 2,
         "status": "\u2705 Cleaned",
-        "lat": 30.42450322,
-        "lon": -97.75554158
+        "lat": 30.25134756,
+        "lon": -97.71406045
       }
     ],
-    "asOf": "2026-11-02T23:02:46.155046+00:00"
+    "asOf": "2026-11-10T00:02:18.577342+00:00"
   },
   "parking": {
-    "total": 6888,
+    "total": 6925,
     "peakHour": "4pm",
-    "peakCount": 772,
+    "peakCount": 788,
     "hours": [
       {
         "hour": 0,
@@ -343,126 +343,126 @@
       {
         "hour": 6,
         "label": "6am",
-        "count": 43,
+        "count": 46,
         "pct": 6,
         "isPeak": false
       },
       {
         "hour": 7,
         "label": "7am",
-        "count": 230,
-        "pct": 30,
+        "count": 232,
+        "pct": 29,
         "isPeak": false
       },
       {
         "hour": 8,
         "label": "8am",
-        "count": 441,
-        "pct": 57,
+        "count": 440,
+        "pct": 56,
         "isPeak": false
       },
       {
         "hour": 9,
         "label": "9am",
-        "count": 485,
-        "pct": 63,
+        "count": 484,
+        "pct": 61,
         "isPeak": false
       },
       {
         "hour": 10,
         "label": "10am",
-        "count": 498,
-        "pct": 65,
+        "count": 517,
+        "pct": 66,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
-        "count": 505,
-        "pct": 65,
+        "count": 528,
+        "pct": 67,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
-        "count": 504,
+        "count": 515,
         "pct": 65,
         "isPeak": false
       },
       {
         "hour": 13,
         "label": "1pm",
-        "count": 438,
-        "pct": 57,
+        "count": 432,
+        "pct": 55,
         "isPeak": false
       },
       {
         "hour": 14,
         "label": "2pm",
         "count": 419,
-        "pct": 54,
+        "pct": 53,
         "isPeak": false
       },
       {
         "hour": 15,
         "label": "3pm",
-        "count": 396,
+        "count": 399,
         "pct": 51,
         "isPeak": false
       },
       {
         "hour": 16,
         "label": "4pm",
-        "count": 772,
+        "count": 788,
         "pct": 100,
         "isPeak": true
       },
       {
         "hour": 17,
         "label": "5pm",
-        "count": 479,
-        "pct": 62,
+        "count": 496,
+        "pct": 63,
         "isPeak": false
       },
       {
         "hour": 18,
         "label": "6pm",
-        "count": 463,
-        "pct": 60,
+        "count": 455,
+        "pct": 58,
         "isPeak": false
       },
       {
         "hour": 19,
         "label": "7pm",
-        "count": 443,
-        "pct": 57,
+        "count": 426,
+        "pct": 54,
         "isPeak": false
       },
       {
         "hour": 20,
         "label": "8pm",
-        "count": 354,
-        "pct": 46,
+        "count": 337,
+        "pct": 43,
         "isPeak": false
       },
       {
         "hour": 21,
         "label": "9pm",
-        "count": 184,
-        "pct": 24,
+        "count": 174,
+        "pct": 22,
         "isPeak": false
       },
       {
         "hour": 22,
         "label": "10pm",
-        "count": 134,
-        "pct": 17,
+        "count": 140,
+        "pct": 18,
         "isPeak": false
       },
       {
         "hour": 23,
         "label": "11pm",
-        "count": 47,
+        "count": 44,
         "pct": 6,
         "isPeak": false
       }
@@ -470,57 +470,57 @@
     "violationTypes": [
       {
         "type": "Other",
-        "count": 1593,
+        "count": 1605,
         "pct": 100
       },
       {
         "type": "Sidewalk",
-        "count": 455,
-        "pct": 29
-      },
-      {
-        "type": "No Parking Zone",
-        "count": 333,
-        "pct": 21
+        "count": 434,
+        "pct": 27
       },
       {
         "type": "Bike Lane",
-        "count": 331,
+        "count": 345,
         "pct": 21
       },
       {
+        "type": "No Parking Zone",
+        "count": 320,
+        "pct": 20
+      },
+      {
         "type": "Oversized Vehicle",
-        "count": 239,
-        "pct": 15
+        "count": 232,
+        "pct": 14
       },
       {
         "type": "Fire Hydrant",
-        "count": 176,
+        "count": 178,
         "pct": 11
       },
       {
         "type": "Handicap",
-        "count": 137,
-        "pct": 9
+        "count": 135,
+        "pct": 8
       },
       {
         "type": "Driveway",
-        "count": 114,
+        "count": 117,
         "pct": 7
       }
     ],
-    "asOf": "2026-11-02T23:02:46.155046+00:00"
+    "asOf": "2026-11-10T00:02:18.577342+00:00"
   },
   "graffitiSpeedrun": {
-    "totalClosed": 164,
-    "avgDays": 5.7,
-    "medianDays": 4.3,
+    "totalClosed": 112,
+    "avgDays": 6.6,
+    "medianDays": 4.9,
     "fastestDays": [
       0.0514,
-      0.0523,
-      0.054,
-      0.0576,
-      0.071
+      0.094,
+      0.1002,
+      0.123,
+      0.4623
     ],
     "buckets": {
       "under1h": {
@@ -528,23 +528,23 @@
         "label": "Under 1 hour"
       },
       "1hTo6h": {
-        "count": 10,
+        "count": 4,
         "label": "1\u20136 hours"
       },
       "6hTo24h": {
-        "count": 25,
+        "count": 16,
         "label": "6\u201324 hours"
       },
       "1dTo3d": {
-        "count": 32,
+        "count": 18,
         "label": "1\u20133 days"
       },
       "3dTo7d": {
-        "count": 48,
+        "count": 35,
         "label": "3\u20137 days"
       },
       "7dTo30d": {
-        "count": 47,
+        "count": 37,
         "label": "7\u201330 days"
       },
       "over30d": {
@@ -553,9 +553,9 @@
       }
     },
     "longestOpen": {
-      "days": 89.9,
-      "address": "1900 Barton Springs Rd, Austin"
+      "days": 89.4,
+      "address": "634 Barton Springs Rd, Austin"
     },
-    "asOf": "2026-10-30T19:09:38.354097+00:00"
+    "asOf": "2026-11-10T00:02:18.577342+00:00"
   }
 }
