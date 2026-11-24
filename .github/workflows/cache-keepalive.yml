@@ -1,0 +1,56 @@
+name: Keep Open311 cache warm
+
+# GitHub deletes Actions caches that have not been accessed for more than
+# 7 days. weekly.yml runs exactly every 7 days, so any scheduling delay lets
+# the Open311 SQLite cache expire and every generator starts cold, backfills
+# a year of data at once, and gets throttled by the city API (403s).
+#
+# This tiny workflow restores the cache and saves it back under a fresh key
+# a few times a week, resetting the idle timer. It makes no API calls and
+# regenerates no pages — the Monday weekly job still owns all data refreshes.
+#
+# Same concurrency group as weekly.yml so the two never touch the cache at
+# the same time.
+
+on:
+  schedule:
+    - cron: "0 6 * * 0,2,4"  # Sun/Tue/Thu 06:00 UTC; max gap to Monday's run ~4.5 days
+  workflow_dispatch:
+
+concurrency:
+  group: weekly-data
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Restore Open311 cache
+        id: restore
+        uses: actions/cache/restore@v4
+        with:
+          path: .cache/open311_cache.db
+          key: open311-${{ github.run_id }}
+          restore-keys: |
+            open311-
+
+      - name: Check cache
+        id: check
+        run: |
+          if [ -s .cache/open311_cache.db ]; then
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            echo "Open311 cache present — re-saving to keep the idle timer reset."
+          else
+            echo "::warning::No Open311 cache to keep alive; the next weekly run will seed it."
+          fi
+
+      - name: Save Open311 cache
+        if: steps.check.outputs.found == 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: .cache/open311_cache.db
+          key: open311-${{ github.run_id }}-${{ github.run_attempt }}
