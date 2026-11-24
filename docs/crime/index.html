@@ -29,7 +29,7 @@
             <meta name="viewport" content="width=device-width,
                 initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
             <style>
-                #map_3f11436f69a693b9ade814904e2ee45e {
+                #map_1c3e693449aef0655f4b712691938d56 {
                     position: relative;
                     width: 100.0vw;
                     height: 100.0vh;
@@ -285,7 +285,7 @@
                 z-index: 9999; font-family: sans-serif; text-align: center;
                 min-width: 320px;">
         <b style="font-size: 15px;">🚔 Austin APD Crime by Council District</b><br/>
-        <span style="font-size: 11px; color: #888;">Last ran: 2026-11-23 08:47 PM CDT</span><br/>
+        <span style="font-size: 11px; color: #888;">Last ran: 2026-11-24 12:47 PM CDT</span><br/>
         <span id="map-summary" style="font-size: 12px; color: #555;"></span>
         <div style="display: flex; justify-content: center; gap: 4px; margin-top: 7px;">
             <button id="btn-30" onclick="setDayFilter(30)" class="fbtn">30d</button>
@@ -435,7 +435,7 @@
         }
 
         function initMap() {
-            var leafletMap = map_3f11436f69a693b9ade814904e2ee45e;
+            var leafletMap = map_1c3e693449aef0655f4b712691938d56;
             geoLayer = L.geoJSON(districtGeojson, {
                 style: styleFeature,
                 onEachFeature: function(feature, layer) {
@@ -468,14 +468,14 @@
     </script>
     
     
-            <div class="folium-map" id="map_3f11436f69a693b9ade814904e2ee45e" ></div>
+            <div class="folium-map" id="map_1c3e693449aef0655f4b712691938d56" ></div>
         
 </body>
 <script>
     
     
-            var map_3f11436f69a693b9ade814904e2ee45e = L.map(
-                "map_3f11436f69a693b9ade814904e2ee45e",
+            var map_1c3e693449aef0655f4b712691938d56 = L.map(
+                "map_1c3e693449aef0655f4b712691938d56",
                 {
                     center: [30.2672, -97.7431],
                     crs: L.CRS.EPSG3857,
@@ -492,7 +492,7 @@
 
         
     
-            var tile_layer_97eaf07a389864763987166016c5c552 = L.tileLayer(
+            var tile_layer_c51e8bfe0f30dbd86ff4e3f2ed70b937 = L.tileLayer(
                 "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png?key=cb1_2du8_1_a49e4774820276874a1a5b33",
                 {
   "minZoom": 0,
@@ -509,7 +509,7 @@
             );
         
     
-            tile_layer_97eaf07a389864763987166016c5c552.addTo(map_3f11436f69a693b9ade814904e2ee45e);
+            tile_layer_c51e8bfe0f30dbd86ff4e3f2ed70b937.addTo(map_1c3e693449aef0655f4b712691938d56);
         
 </script>
 </html>
