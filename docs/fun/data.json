@@ -1,5 +1,5 @@
 {
-  "updated": "2026-11-24T18:42:22.876332+00:00",
+  "updated": "2026-11-25T19:38:37.688800+00:00",
   "bars": {
     "top10": [
       {
@@ -93,11 +93,23 @@
     "asOf": "2026-11-24T18:42:22.876332+00:00"
   },
   "coyotes": {
-    "total": 189,
-    "pupping": 75,
-    "puppingPct": 40,
-    "isPeak": true,
+    "total": 388,
+    "pupping": 112,
+    "puppingPct": 29,
+    "isPeak": false,
     "months": [
+      {
+        "label": "Nov 2026",
+        "count": 31,
+        "pct": 56,
+        "isPupping": false
+      },
+      {
+        "label": "Oct 2026",
+        "count": 29,
+        "pct": 53,
+        "isPupping": false
+      },
       {
         "label": "Sep 2026",
         "count": 24,
@@ -105,7 +117,19 @@
         "isPupping": false
       },
       {
+        "label": "Aug 2026",
+        "count": 23,
+        "pct": 42,
+        "isPupping": false
+      },
+      {
         "label": "Jul 2026",
+        "count": 34,
+        "pct": 62,
+        "isPupping": false
+      },
+      {
+        "label": "Jun 2026",
         "count": 34,
         "pct": 62,
         "isPupping": false
@@ -117,10 +141,22 @@
         "isPupping": true
       },
       {
+        "label": "Apr 2026",
+        "count": 37,
+        "pct": 67,
+        "isPupping": true
+      },
+      {
         "label": "Mar 2026",
         "count": 25,
         "pct": 45,
         "isPupping": true
+      },
+      {
+        "label": "Feb 2026",
+        "count": 45,
+        "pct": 82,
+        "isPupping": false
       },
       {
         "label": "Jan 2026",
@@ -135,12 +171,12 @@
         "isPupping": false
       }
     ],
-    "asOf": "2026-11-24T18:42:22.876332+00:00"
+    "asOf": "2026-11-25T19:38:37.688800+00:00"
   },
   "graffiti": {
-    "total": 731,
-    "uniqueLocations": 672,
-    "repeatRate": 8,
+    "total": 1100,
+    "uniqueLocations": 1005,
+    "repeatRate": 9,
     "winner": {
       "address": "1684 E 5th St",
       "count": 4,
@@ -157,6 +193,13 @@
         "lon": -97.72540333333333
       },
       {
+        "address": "7300 Latta Dr",
+        "count": 4,
+        "status": "\u2705 Cleaned",
+        "lat": 30.21693204,
+        "lon": -97.8459693
+      },
+      {
         "address": "615 W 2nd St",
         "count": 4,
         "status": "\u2705 Cleaned",
@@ -171,11 +214,25 @@
         "lon": -97.73760136216879
       },
       {
-        "address": "7300 Latta Dr",
+        "address": "2409 W 49th St",
         "count": 3,
         "status": "\u2705 Cleaned",
-        "lat": 30.21693204,
-        "lon": -97.8459693
+        "lat": 30.32205825,
+        "lon": -97.74406357
+      },
+      {
+        "address": "910 W Cesar Chavez St",
+        "count": 3,
+        "status": "\ud83d\udd34 Tagged",
+        "lat": 30.26667683,
+        "lon": -97.75577199
+      },
+      {
+        "address": "1201 Cedar Ave",
+        "count": 3,
+        "status": "\u2705 Cleaned",
+        "lat": 30.275080402624596,
+        "lon": -97.71261294727668
       },
       {
         "address": "10610 Morado Cir",
@@ -185,6 +242,20 @@
         "lon": -97.75231871
       },
       {
+        "address": "301 W 2nd St",
+        "count": 3,
+        "status": "\ud83d\udd34 Tagged",
+        "lat": 30.2649099322049,
+        "lon": -97.74709101766348
+      },
+      {
+        "address": "1300 W Riverside Dr",
+        "count": 3,
+        "status": "\u2705 Cleaned",
+        "lat": 30.265383333333332,
+        "lon": -97.75588833333333
+      },
+      {
         "address": "E 6th St & Attayac St",
         "count": 3,
         "status": "\u2705 Cleaned",
@@ -192,18 +263,18 @@
         "lon": -97.7295303
       },
       {
-        "address": "1304 W Riverside Dr",
-        "count": 3,
-        "status": "\u2705 Cleaned",
-        "lat": 30.265413877907903,
-        "lon": -97.75590654682892
-      },
-      {
         "address": "809 W 5th St",
         "count": 3,
         "status": "\u2705 Cleaned",
         "lat": 30.268871973346943,
         "lon": -97.75229359639172
+      },
+      {
+        "address": "1304 W Riverside Dr",
+        "count": 3,
+        "status": "\u2705 Cleaned",
+        "lat": 30.265413877907903,
+        "lon": -97.75590654682892
       },
       {
         "address": "El Salido Pkwy & N Fm 620 Rd",
@@ -218,49 +289,14 @@
         "status": "\u2705 Cleaned",
         "lat": 30.33693458,
         "lon": -97.87239508
-      },
-      {
-        "address": "2711 Canterbury St",
-        "count": 2,
-        "status": "\u2705 Cleaned",
-        "lat": 30.25134756,
-        "lon": -97.71406045
-      },
-      {
-        "address": "4338 Menchaca Rd",
-        "count": 2,
-        "status": "\u2705 Cleaned",
-        "lat": 30.229787533887755,
-        "lon": -97.78843688533188
-      },
-      {
-        "address": "8121 Research Blvd Svrd Nb",
-        "count": 2,
-        "status": "\u2705 Cleaned",
-        "lat": 30.35337177,
-        "lon": -97.71398538
-      },
-      {
-        "address": "218 Walter Seaholm Dr",
-        "count": 2,
-        "status": "\ud83d\udd34 Tagged",
-        "lat": 30.2681080714849,
-        "lon": -97.7529393615296
-      },
-      {
-        "address": "1101 S 6th St",
-        "count": 2,
-        "status": "\ud83d\udd34 Tagged",
-        "lat": 30.25533488,
-        "lon": -97.75861032
       }
     ],
-    "asOf": "2026-11-24T18:42:22.876332+00:00"
+    "asOf": "2026-11-25T19:38:37.688800+00:00"
   },
   "parking": {
-    "total": 6827,
+    "total": 6799,
     "peakHour": "4pm",
-    "peakCount": 794,
+    "peakCount": 795,
     "hours": [
       {
         "hour": 0,
@@ -272,7 +308,7 @@
       {
         "hour": 1,
         "label": "1am",
-        "count": 12,
+        "count": 13,
         "pct": 2,
         "isPeak": false
       },
@@ -321,112 +357,112 @@
       {
         "hour": 8,
         "label": "8am",
-        "count": 441,
-        "pct": 56,
+        "count": 439,
+        "pct": 55,
         "isPeak": false
       },
       {
         "hour": 9,
         "label": "9am",
-        "count": 474,
-        "pct": 60,
+        "count": 471,
+        "pct": 59,
         "isPeak": false
       },
       {
         "hour": 10,
         "label": "10am",
-        "count": 507,
+        "count": 512,
         "pct": 64,
         "isPeak": false
       },
       {
         "hour": 11,
         "label": "11am",
-        "count": 529,
-        "pct": 67,
+        "count": 527,
+        "pct": 66,
         "isPeak": false
       },
       {
         "hour": 12,
         "label": "12pm",
-        "count": 501,
-        "pct": 63,
+        "count": 505,
+        "pct": 64,
         "isPeak": false
       },
       {
         "hour": 13,
         "label": "1pm",
-        "count": 439,
+        "count": 437,
         "pct": 55,
         "isPeak": false
       },
       {
         "hour": 14,
         "label": "2pm",
-        "count": 416,
+        "count": 411,
         "pct": 52,
         "isPeak": false
       },
       {
         "hour": 15,
         "label": "3pm",
-        "count": 385,
+        "count": 382,
         "pct": 48,
         "isPeak": false
       },
       {
         "hour": 16,
         "label": "4pm",
-        "count": 794,
+        "count": 795,
         "pct": 100,
         "isPeak": true
       },
       {
         "hour": 17,
         "label": "5pm",
-        "count": 531,
+        "count": 533,
         "pct": 67,
         "isPeak": false
       },
       {
         "hour": 18,
         "label": "6pm",
-        "count": 456,
+        "count": 451,
         "pct": 57,
         "isPeak": false
       },
       {
         "hour": 19,
         "label": "7pm",
-        "count": 391,
-        "pct": 49,
+        "count": 385,
+        "pct": 48,
         "isPeak": false
       },
       {
         "hour": 20,
         "label": "8pm",
-        "count": 306,
-        "pct": 39,
+        "count": 299,
+        "pct": 38,
         "isPeak": false
       },
       {
         "hour": 21,
         "label": "9pm",
-        "count": 172,
-        "pct": 22,
+        "count": 169,
+        "pct": 21,
         "isPeak": false
       },
       {
         "hour": 22,
         "label": "10pm",
-        "count": 132,
-        "pct": 17,
+        "count": 130,
+        "pct": 16,
         "isPeak": false
       },
       {
         "hour": 23,
         "label": "11pm",
-        "count": 42,
+        "count": 41,
         "pct": 5,
         "isPeak": false
       }
@@ -434,27 +470,27 @@
     "violationTypes": [
       {
         "type": "Other",
-        "count": 1613,
+        "count": 1606,
         "pct": 100
       },
       {
         "type": "Sidewalk",
-        "count": 439,
-        "pct": 27
+        "count": 444,
+        "pct": 28
       },
       {
         "type": "Bike Lane",
-        "count": 329,
-        "pct": 20
-      },
-      {
-        "type": "No Parking Zone",
         "count": 326,
         "pct": 20
       },
       {
+        "type": "No Parking Zone",
+        "count": 319,
+        "pct": 20
+      },
+      {
         "type": "Oversized Vehicle",
-        "count": 230,
+        "count": 231,
         "pct": 14
       },
       {
@@ -463,28 +499,28 @@
         "pct": 10
       },
       {
-        "type": "Driveway",
+        "type": "Handicap",
         "count": 130,
         "pct": 8
       },
       {
-        "type": "Handicap",
-        "count": 130,
+        "type": "Driveway",
+        "count": 128,
         "pct": 8
       }
     ],
-    "asOf": "2026-11-24T18:42:22.876332+00:00"
+    "asOf": "2026-11-25T19:38:37.688800+00:00"
   },
   "graffitiSpeedrun": {
-    "totalClosed": 74,
-    "avgDays": 6.4,
-    "medianDays": 5.8,
+    "totalClosed": 164,
+    "avgDays": 5.9,
+    "medianDays": 4.9,
     "fastestDays": [
+      0.0514,
       0.0523,
       0.071,
-      0.229,
-      0.3005,
-      0.6599
+      0.0762,
+      0.0879
     ],
     "buckets": {
       "under1h": {
@@ -492,34 +528,34 @@
         "label": "Under 1 hour"
       },
       "1hTo6h": {
-        "count": 3,
+        "count": 8,
         "label": "1\u20136 hours"
       },
       "6hTo24h": {
-        "count": 7,
+        "count": 20,
         "label": "6\u201324 hours"
       },
       "1dTo3d": {
-        "count": 14,
+        "count": 31,
         "label": "1\u20133 days"
       },
       "3dTo7d": {
-        "count": 21,
+        "count": 57,
         "label": "3\u20137 days"
       },
       "7dTo30d": {
-        "count": 29,
+        "count": 46,
         "label": "7\u201330 days"
       },
       "over30d": {
-        "count": 0,
+        "count": 2,
         "label": "Over 30 days"
       }
     },
     "longestOpen": {
-      "days": 88.1,
+      "days": 89.2,
       "address": "E 40th St & Red River St, Austin"
     },
-    "asOf": "2026-11-24T18:42:22.876332+00:00"
+    "asOf": "2026-11-25T19:38:37.688800+00:00"
   }
 }

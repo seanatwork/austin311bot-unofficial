@@ -100,14 +100,6 @@
     footer a:hover { color: var(--text); }
     @media (max-width: 520px) { .stat-value { font-size: 1rem; } .chart-container { height: 260px; } }
   </style>
-<!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-TS158R7XSN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-TS158R7XSN');
-</script>
 </head>
 <body>
 
@@ -116,7 +108,7 @@
   <div id="panel">
     <div id="panel-title">🏞️ Austin Parks Maintenance Trends</div>
     <div id="panel-subtitle">Park maintenance 311 requests — last 365 days</div>
-    <div id="last-ran">Last ran: 2026-11-24 01:26 PM CDT</div>
+    <div id="last-ran">Last ran: 2026-11-25 02:32 PM CDT</div>
     <div class="btn-row">
       <a class="fbtn" href="../">← Parks Map</a>
       <a class="fbtn" href="../../">Austin 311 Home</a>
@@ -126,14 +118,14 @@
   <div id="stats">
     <div class="stats-inner">
       <div class="stat">
-        <div class="stat-value" style="color:#3b82f6;">2,104</div>
+        <div class="stat-value" style="color:#3b82f6;">4,144</div>
         <div class="stat-label">Total reports</div>
         <div class="stat-sub">last 365 days</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#ef4444;">205</div>
+        <div class="stat-value" style="color:#ef4444;">221</div>
         <div class="stat-label">Still open</div>
-        <div class="stat-sub">0 open 6+ months</div>
+        <div class="stat-sub">1 open 6+ months</div>
       </div>
       <div class="stat">
         <div class="stat-value" style="color:#22c55e;">3</div>
@@ -141,14 +133,14 @@
         <div class="stat-sub">half close this fast</div>
       </div>
       <div class="stat">
-        <div class="stat-value" style="color:#f59e0b;">Sep</div>
+        <div class="stat-value" style="color:#f59e0b;">Jun</div>
         <div class="stat-label">Busiest month</div>
-        <div class="stat-sub">avg 478 / month</div>
+        <div class="stat-sub">avg 742 / month</div>
       </div>
     </div>
   </div>
 
-  <div id="findings"><div class="findings-inner"><div class="finding"><span class="f-ico">📋</span><div><b>Grounds Maintenance</b> is the most common park request — 1,186 of 2,104 reports (56%).</div></div><div class="finding"><span class="f-ico">⚡</span><div><b>Half of resolved park issues close within 3 days.</b> Some types move much slower — see “How long does it take to fix?”</div></div><div class="finding"><span class="f-ico">🌦️</span><div>Complaints run hottest in <b>Sep–Oct</b> — grounds maintenance season.</div></div></div></div>
+  <div id="findings"><div class="findings-inner"><div class="finding"><span class="f-ico">📋</span><div><b>Grounds Maintenance</b> is the most common park request — 1,719 of 4,144 reports (41%).</div></div><div class="finding"><span class="f-ico">⚡</span><div><b>Half of resolved park issues close within 3 days.</b> Some types move much slower — see “How long does it take to fix?”</div></div><div class="finding"><span class="f-ico">🌦️</span><div>Complaints run hottest in <b>Jun–Aug</b> — grounds maintenance season.</div></div><div class="finding"><span class="f-ico">⏳</span><div><b>1 park reports have been open 6+ months.</b> 221 reports are still unresolved.</div></div></div></div>
 
   <div id="chart-wrap">
     <div class="chart-block">
@@ -169,7 +161,7 @@
 
     <div class="chart-block">
       <div class="chart-title">⚡ How long does it take to fix? — median days to resolve, by issue type</div>
-      <div class="chart-container" style="height: 306px;"><canvas id="resolveChart"></canvas></div>
+      <div class="chart-container" style="height: 340px;"><canvas id="resolveChart"></canvas></div>
     </div>
 
     <div class="chart-grid">
@@ -193,7 +185,7 @@
   </footer>
 
   <script>
-    const DATA = {"months": ["Oct 2025", "Nov 2025", "Mar 2026", "Apr 2026", "May 2026", "Jun 2026", "Aug 2026", "Sep 2026", "Oct 2026", "Nov 2026"], "monthlyCounts": [21, 16, 197, 105, 100, 100, 140, 478, 519, 428], "monthlyGrounds": [0, 12, 197, 66, 45, 0, 78, 446, 466, 396], "monthlyBuildings": [0, 4, 0, 39, 55, 0, 9, 32, 53, 30], "rollingAvg": [null, null, 78.0, 106.0, 134.0, 101.7, 113.3, 239.3, 379.0, 475.0], "types": [{"name": "Grounds Maintenance", "count": 1186}, {"name": "Grounds Plumbing", "count": 314}, {"name": "Parks \u2014 Grounds Maintenance", "count": 176}, {"name": "Grounds Electrical", "count": 137}, {"name": "Building Plumbing", "count": 133}, {"name": "Commercial Use of Parkland", "count": 65}, {"name": "Building Issues", "count": 41}, {"name": "Building A/C & Heating", "count": 37}, {"name": "Building Electric", "count": 11}], "resolution": [{"type": "Parks \u2014 Grounds Maintenance", "count": 170, "median": 24.0, "mean": 29.9}, {"type": "Grounds Plumbing", "count": 297, "median": 5.0, "mean": 10.7}, {"type": "Building Plumbing", "count": 121, "median": 4.0, "mean": 9.6}, {"type": "Building Issues", "count": 31, "median": 4.0, "mean": 6.2}, {"type": "Commercial Use of Parkland", "count": 65, "median": 3.0, "mean": 28.9}, {"type": "Grounds Electrical", "count": 104, "median": 3.0, "mean": 7.6}, {"type": "Building A/C & Heating", "count": 37, "median": 3.0, "mean": 3.1}, {"type": "Grounds Maintenance", "count": 1061, "median": 2.0, "mean": 8.5}, {"type": "Building Electric", "count": 9, "median": 0.0, "mean": 3.6}], "backlog": [{"label": "< 30 days", "count": 157}, {"label": "30\u201360 days", "count": 32}, {"label": "60\u201390 days", "count": 12}, {"label": "90\u2013180 days", "count": 4}, {"label": "6+ months", "count": 0}], "seasonality": [{"month": "Jan", "count": 0, "avg": 0.0}, {"month": "Feb", "count": 0, "avg": 0.0}, {"month": "Mar", "count": 197, "avg": 197.0}, {"month": "Apr", "count": 105, "avg": 105.0}, {"month": "May", "count": 100, "avg": 100.0}, {"month": "Jun", "count": 100, "avg": 100.0}, {"month": "Jul", "count": 0, "avg": 0.0}, {"month": "Aug", "count": 140, "avg": 140.0}, {"month": "Sep", "count": 478, "avg": 478.0}, {"month": "Oct", "count": 540, "avg": 270.0}, {"month": "Nov", "count": 444, "avg": 222.0}, {"month": "Dec", "count": 0, "avg": 0.0}], "stuck": [{"id": "26-00196483", "label": "Parks \u2014 Grounds Maintenance", "location": "Springwoods Neighborhood Park", "age_days": 161, "requested": "Jun 16, 2026"}, {"id": "26-00264366", "label": "Parks \u2014 Grounds Maintenance", "location": "Dottie Jordan Neighborhood Park", "age_days": 104, "requested": "Aug 12, 2026"}, {"id": "26-00266861", "label": "Parks \u2014 Grounds Maintenance", "location": "Amherst Dr", "age_days": 102, "requested": "Aug 14, 2026"}, {"id": "26-00272522", "label": "Parks \u2014 Grounds Maintenance", "location": "Bartholomew District Park", "age_days": 97, "requested": "Aug 19, 2026"}, {"id": "26-00280889", "label": "Building Issues", "location": "Rosewood Neighborhood Park", "age_days": 89, "requested": "Aug 26, 2026"}, {"id": "26-00282247", "label": "Grounds Maintenance", "location": "Ed Bluestein Blvd Nb", "age_days": 88, "requested": "Aug 27, 2026"}]};
+    const DATA = {"months": ["Oct 2025", "Nov 2025", "Dec 2025", "Mar 2026", "Apr 2026", "May 2026", "Jun 2026", "Jul 2026", "Aug 2026", "Sep 2026", "Oct 2026", "Nov 2026"], "monthlyCounts": [3, 349, 200, 197, 105, 100, 742, 492, 517, 478, 519, 442], "monthlyGrounds": [0, 345, 200, 197, 66, 45, 73, 79, 162, 446, 466, 400], "monthlyBuildings": [0, 4, 0, 0, 39, 55, 54, 50, 47, 32, 53, 30], "rollingAvg": [null, null, 184.0, 248.7, 167.3, 134.0, 315.7, 444.7, 583.7, 495.7, 504.7, 479.7], "types": [{"name": "Grounds Maintenance", "count": 1719}, {"name": "Parks \u2014 Grounds Maintenance", "count": 1301}, {"name": "Grounds Plumbing", "count": 433}, {"name": "Grounds Electrical", "count": 222}, {"name": "Building Plumbing", "count": 185}, {"name": "Commercial Use of Parkland", "count": 95}, {"name": "Building Issues", "count": 91}, {"name": "Building A/C & Heating", "count": 62}, {"name": "Building Electric", "count": 26}], "resolution": [{"type": "Commercial Use of Parkland", "count": 95, "median": 22.0, "mean": 36.4}, {"type": "Grounds Plumbing", "count": 415, "median": 5.0, "mean": 12.7}, {"type": "Building Electric", "count": 24, "median": 4.5, "mean": 7.1}, {"type": "Building Plumbing", "count": 172, "median": 4.0, "mean": 8.9}, {"type": "Grounds Electrical", "count": 186, "median": 4.0, "mean": 10.0}, {"type": "Building Issues", "count": 81, "median": 4.0, "mean": 10.8}, {"type": "Grounds Maintenance", "count": 1593, "median": 3.0, "mean": 10.9}, {"type": "Building A/C & Heating", "count": 62, "median": 3.0, "mean": 4.1}, {"type": "Parks \u2014 Grounds Maintenance", "count": 1285, "median": 3.0, "mean": 7.7}, {"type": "Park Cemeteries", "count": 10, "median": 1.0, "mean": 2.6}], "backlog": [{"label": "< 30 days", "count": 169}, {"label": "30\u201360 days", "count": 34}, {"label": "60\u201390 days", "count": 11}, {"label": "90\u2013180 days", "count": 6}, {"label": "6+ months", "count": 1}], "seasonality": [{"month": "Jan", "count": 0, "avg": 0.0}, {"month": "Feb", "count": 0, "avg": 0.0}, {"month": "Mar", "count": 197, "avg": 197.0}, {"month": "Apr", "count": 105, "avg": 105.0}, {"month": "May", "count": 100, "avg": 100.0}, {"month": "Jun", "count": 742, "avg": 742.0}, {"month": "Jul", "count": 492, "avg": 492.0}, {"month": "Aug", "count": 517, "avg": 517.0}, {"month": "Sep", "count": 478, "avg": 478.0}, {"month": "Oct", "count": 522, "avg": 261.0}, {"month": "Nov", "count": 791, "avg": 395.5}, {"month": "Dec", "count": 200, "avg": 200.0}], "stuck": [{"id": "25-00418837", "label": "Grounds Maintenance", "location": "Lakeshore at Town Lake Metro Park", "age_days": 344, "requested": "Dec 15, 2025"}, {"id": "26-00196483", "label": "Parks \u2014 Grounds Maintenance", "location": "Springwoods Neighborhood Park", "age_days": 162, "requested": "Jun 16, 2026"}, {"id": "26-00264366", "label": "Parks \u2014 Grounds Maintenance", "location": "Dottie Jordan Neighborhood Park", "age_days": 105, "requested": "Aug 12, 2026"}, {"id": "26-00266861", "label": "Parks \u2014 Grounds Maintenance", "location": "Amherst Dr", "age_days": 103, "requested": "Aug 14, 2026"}, {"id": "26-00268450", "label": "Building Plumbing", "location": "Shoal Beach at Town Lake Metro Park", "age_days": 101, "requested": "Aug 15, 2026"}, {"id": "26-00272522", "label": "Parks \u2014 Grounds Maintenance", "location": "Bartholomew District Park", "age_days": 98, "requested": "Aug 19, 2026"}]};
 
     const isDark = document.documentElement.classList.contains("dark");
     const gridColor  = isDark ? "#252b3b" : "#e8ecf0";

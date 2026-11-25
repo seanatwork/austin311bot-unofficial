@@ -1,280 +1,287 @@
 {
- "generated": "2026-11-24T18:57:22.977133Z",
+ "generated": "2026-11-25T20:09:04.570401Z",
  "windowDays": 365,
- "totalRecords": 23355,
- "mappedToZip": 23336,
- "zipCount": 58,
+ "totalRecords": 74737,
+ "mappedToZip": 74683,
+ "zipCount": 62,
  "citywide": {
-  "total": 23355,
+  "total": 74737,
   "topIssues": [
    {
     "name": "Parking Violation",
-    "count": 10946,
-    "share": 46.9
+    "count": 23474,
+    "share": 31.4
+   },
+   {
+    "name": "Loose Dog",
+    "count": 7884,
+    "share": 10.5
    },
    {
     "name": "Park Maintenance - Grounds",
-    "count": 1596,
-    "share": 6.8
+    "count": 4517,
+    "share": 6.0
    },
    {
     "name": "Dead Animal",
-    "count": 1509,
-    "share": 6.5
+    "count": 4319,
+    "share": 5.8
    },
    {
     "name": "Obstruction in Right of Way",
-    "count": 1322,
-    "share": 5.7
+    "count": 3461,
+    "share": 4.6
    },
    {
     "name": "Debris in Street",
-    "count": 1047,
-    "share": 4.5
+    "count": 3228,
+    "share": 4.3
    },
    {
-    "name": "Channels/Creeks/Drainage",
-    "count": 888,
-    "share": 3.8
+    "name": "Animal Protection",
+    "count": 3078,
+    "share": 4.1
    },
    {
     "name": "Construction in Right of Way",
-    "count": 876,
-    "share": 3.8
-   },
-   {
-    "name": "Graffiti",
-    "count": 738,
-    "share": 3.2
+    "count": 2663,
+    "share": 3.6
    }
   ],
   "response": {
-   "count": 22808,
-   "medianDays": 0.2,
-   "avgDays": 3.4,
-   "p90Days": 5.8,
-   "sameDayPct": 73
+   "count": 73659,
+   "medianDays": 0.6,
+   "avgDays": 3.8,
+   "p90Days": 6.8,
+   "sameDayPct": 64
   },
   "leaderboard": {
    "fastest": [
     {
+     "name": "Traffic Signal",
+     "count": 620,
+     "medianDays": 0.0,
+     "avgDays": 0.6,
+     "p90Days": 1.1,
+     "sameDayPct": 90
+    },
+    {
      "name": "Parking Violation",
-     "count": 10930,
+     "count": 23445,
      "medianDays": 0.1,
      "avgDays": 0.2,
-     "p90Days": 0.4,
+     "p90Days": 0.3,
      "sameDayPct": 98
     },
     {
-     "name": "Wildlife",
-     "count": 200,
-     "medianDays": 0.2,
-     "avgDays": 4.7,
-     "p90Days": 11.0,
-     "sameDayPct": 57
+     "name": "Fireworks",
+     "count": 792,
+     "medianDays": 0.1,
+     "avgDays": 0.4,
+     "p90Days": 1.0,
+     "sameDayPct": 92
     },
     {
-     "name": "Construction in Right of Way",
-     "count": 869,
-     "medianDays": 0.5,
-     "avgDays": 0.7,
-     "p90Days": 2.5,
-     "sameDayPct": 79
-    },
-    {
-     "name": "Dead Animal",
-     "count": 1505,
-     "medianDays": 0.5,
-     "avgDays": 0.5,
-     "p90Days": 0.9,
-     "sameDayPct": 95
-    },
-    {
-     "name": "Debris in Street",
-     "count": 1042,
-     "medianDays": 0.7,
-     "avgDays": 2.1,
+     "name": "Injured / Sick Animal",
+     "count": 307,
+     "medianDays": 0.1,
+     "avgDays": 1.1,
      "p90Days": 3.0,
-     "sameDayPct": 67
+     "sameDayPct": 84
+    },
+    {
+     "name": "Traffic Signal New",
+     "count": 8,
+     "medianDays": 0.1,
+     "avgDays": 0.6,
+     "p90Days": 3.8,
+     "sameDayPct": 88
     }
    ],
    "slowest": [
     {
+     "name": "Park Comparable",
+     "count": 115,
+     "medianDays": 29.2,
+     "avgDays": 42.0,
+     "p90Days": 102.9,
+     "sameDayPct": 10
+    },
+    {
      "name": "Animal Bite",
-     "count": 392,
-     "medianDays": 9.9,
-     "avgDays": 10.5,
-     "p90Days": 18.0,
+     "count": 2016,
+     "medianDays": 10.7,
+     "avgDays": 14.3,
+     "p90Days": 22.8,
+     "sameDayPct": 9
+    },
+    {
+     "name": "Traffic Obstruction",
+     "count": 15,
+     "medianDays": 10.2,
+     "avgDays": 9.9,
+     "p90Days": 20.9,
      "sameDayPct": 7
     },
     {
-     "name": "Graffiti",
-     "count": 621,
-     "medianDays": 6.1,
-     "avgDays": 31.8,
-     "p90Days": 138.7,
-     "sameDayPct": 13
+     "name": "Vicious Dog",
+     "count": 800,
+     "medianDays": 8.2,
+     "avgDays": 15.0,
+     "p90Days": 26.9,
+     "sameDayPct": 10
     },
     {
      "name": "Park Playgrounds",
-     "count": 296,
-     "medianDays": 5.5,
-     "avgDays": 11.3,
-     "p90Days": 20.3,
-     "sameDayPct": 8
-    },
-    {
-     "name": "Park Building Plumbing",
-     "count": 119,
-     "medianDays": 4.2,
-     "avgDays": 10.2,
-     "p90Days": 18.0,
-     "sameDayPct": 20
-    },
-    {
-     "name": "Park Building Issue",
-     "count": 31,
-     "medianDays": 4.1,
-     "avgDays": 6.7,
-     "p90Days": 10.5,
-     "sameDayPct": 32
+     "count": 610,
+     "medianDays": 7.5,
+     "avgDays": 16.2,
+     "p90Days": 42.5,
+     "sameDayPct": 9
     }
    ]
   },
   "worstDay": {
-   "date": "2026-11-18",
-   "count": 240,
-   "dailyAvg": 64.0,
-   "xDaily": 3.8
+   "date": "2026-01-01",
+   "count": 573,
+   "dailyAvg": 204.8,
+   "xDaily": 2.8
   },
   "zips": {
    "fastest": {
-    "zip": "78754",
+    "zip": "78705",
     "medianDays": 0.1
    },
    "slowest": {
-    "zip": "78733",
-    "medianDays": 5.3
+    "zip": "78620",
+    "medianDays": 4.8
    }
   }
  },
  "zips": {
   "78704": {
    "area": "South Congress / Zilker",
-   "volume": 2319,
+   "volume": 6603,
    "rank": 1,
-   "zipCount": 58,
+   "zipCount": 62,
    "percentile": 0.02,
    "topLabel": "Top 10%",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 1273,
-     "share": 54.9
+     "count": 2853,
+     "share": 43.2
     },
     {
      "name": "Park Maintenance - Grounds",
-     "count": 197,
-     "share": 8.5
+     "count": 573,
+     "share": 8.7
     },
     {
-     "name": "Obstruction in Right of Way",
-     "count": 144,
-     "share": 6.2
+     "name": "Loose Dog",
+     "count": 328,
+     "share": 5.0
     }
    ],
    "response": {
-    "count": 2270,
-    "medianDays": 0.1,
-    "avgDays": 3.8,
+    "count": 6512,
+    "medianDays": 0.2,
+    "avgDays": 3.6,
     "p90Days": 5.8,
-    "sameDayPct": 75
+    "sameDayPct": 69
    },
    "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 10.2
+    "name": "Park Comparable",
+    "medianDays": 31.3
    },
    "worstDay": {
-    "date": "2026-08-29",
-    "count": 29,
-    "dailyAvg": 6.4,
-    "xDaily": 4.6
+    "date": "2026-04-11",
+    "count": 47,
+    "dailyAvg": 18.1,
+    "xDaily": 2.6
    },
    "setsApart": [
     {
      "name": "Park Electrical",
-     "quotient": 1.6,
-     "shareZip": 0.9,
+     "quotient": 1.8,
+     "shareZip": 1.1,
      "shareCity": 0.6,
-     "count": 22
+     "count": 70
     },
     {
-     "name": "Park Comparable",
-     "quotient": 1.6,
-     "shareZip": 0.4,
-     "shareCity": 0.2,
-     "count": 9
+     "name": "Park Playgrounds",
+     "quotient": 1.7,
+     "shareZip": 1.4,
+     "shareCity": 0.8,
+     "count": 95
     }
    ],
    "activity": {
-    "peakHour": 17,
-    "peakHourLabel": "5pm",
+    "peakHour": 15,
+    "peakHourLabel": "3pm",
     "peakDay": "Sat",
-    "weekendPct": 31,
-    "lateNightCount": 669
+    "weekendPct": 30,
+    "lateNightCount": 2014
    },
    "archetype": "OVERACHIEVER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "South Congress / Zilker (78704): 55% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #1 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "South Congress / Zilker (78704): 43% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #1 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
   "78702": {
    "area": "East Austin",
-   "volume": 2028,
+   "volume": 6208,
    "rank": 2,
-   "zipCount": 58,
+   "zipCount": 62,
    "percentile": 0.03,
    "topLabel": "Top 10%",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 1204,
-     "share": 59.4
+     "count": 2767,
+     "share": 44.6
     },
     {
-     "name": "Park Maintenance - Grounds",
-     "count": 167,
-     "share": 8.2
+     "name": "Outdoor Music Venue",
+     "count": 459,
+     "share": 7.4
     },
     {
-     "name": "Obstruction in Right of Way",
-     "count": 99,
-     "share": 4.9
+     "name": "Loose Dog",
+     "count": 439,
+     "share": 7.1
     }
    ],
    "response": {
-    "count": 1994,
-    "medianDays": 0.1,
-    "avgDays": 1.8,
-    "p90Days": 3.0,
-    "sameDayPct": 80
+    "count": 6146,
+    "medianDays": 0.2,
+    "avgDays": 2.3,
+    "p90Days": 3.7,
+    "sameDayPct": 74
    },
    "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 11.6
+    "name": "Park Comparable",
+    "medianDays": 44.1
    },
    "worstDay": {
     "date": "2026-09-12",
-    "count": 32,
-    "dailyAvg": 5.6,
-    "xDaily": 5.8
+    "count": 47,
+    "dailyAvg": 17.0,
+    "xDaily": 2.8
    },
    "setsApart": [
     {
+     "name": "Outdoor Music Venue",
+     "quotient": 2.5,
+     "shareZip": 7.4,
+     "shareCity": 3.0,
+     "count": 459
+    },
+    {
      "name": "Park Building Plumbing",
-     "quotient": 2.2,
-     "shareZip": 1.2,
-     "shareCity": 0.6,
-     "count": 25
+     "quotient": 1.9,
+     "shareZip": 0.7,
+     "shareCity": 0.4,
+     "count": 43
     }
    ],
    "activity": {
@@ -282,905 +289,1297 @@
     "peakHourLabel": "9pm",
     "peakDay": "Sat",
     "weekendPct": 35,
-    "lateNightCount": 690
+    "lateNightCount": 2128
    },
    "archetype": "OVERACHIEVER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "East Austin (78702): 59% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #2 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "East Austin (78702): 45% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #2 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
   "78701": {
    "area": "Downtown",
-   "volume": 1958,
+   "volume": 5997,
    "rank": 3,
-   "zipCount": 58,
+   "zipCount": 62,
    "percentile": 0.05,
    "topLabel": "Top 10%",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 1443,
-     "share": 73.7
+     "count": 2813,
+     "share": 46.9
     },
     {
-     "name": "Graffiti",
-     "count": 91,
-     "share": 4.6
+     "name": "Outdoor Music Venue",
+     "count": 1188,
+     "share": 19.8
     },
     {
-     "name": "Park Maintenance - Grounds",
-     "count": 81,
-     "share": 4.1
+     "name": "Loose Dog",
+     "count": 302,
+     "share": 5.0
     }
    ],
    "response": {
-    "count": 1900,
-    "medianDays": 0.1,
-    "avgDays": 4.4,
-    "p90Days": 2.9,
-    "sameDayPct": 85
+    "count": 5905,
+    "medianDays": 0.2,
+    "avgDays": 3.3,
+    "p90Days": 3.3,
+    "sameDayPct": 79
    },
    "lowlight": {
     "name": "Graffiti",
-    "medianDays": 130.5
+    "medianDays": 119.9
    },
    "worstDay": {
-    "date": "2026-11-05",
-    "count": 31,
-    "dailyAvg": 5.4,
-    "xDaily": 5.8
+    "date": "2026-11-01",
+    "count": 50,
+    "dailyAvg": 16.4,
+    "xDaily": 3.0
    },
    "setsApart": [
     {
-     "name": "Wildlife",
-     "quotient": 1.7,
-     "shareZip": 1.4,
-     "shareCity": 0.9,
-     "count": 28
+     "name": "Outdoor Music Venue",
+     "quotient": 6.6,
+     "shareZip": 19.8,
+     "shareCity": 3.0,
+     "count": 1188
     },
     {
-     "name": "Parking Violation",
+     "name": "Shared Micromobility",
+     "quotient": 3.4,
+     "shareZip": 0.7,
+     "shareCity": 0.2,
+     "count": 43
+    },
+    {
+     "name": "Bicycle Issue",
      "quotient": 1.6,
-     "shareZip": 73.7,
-     "shareCity": 46.9,
-     "count": 1443
+     "shareZip": 0.9,
+     "shareCity": 0.6,
+     "count": 53
     }
    ],
    "activity": {
     "peakHour": 21,
     "peakHourLabel": "9pm",
     "peakDay": "Sat",
-    "weekendPct": 33,
-    "lateNightCount": 502
+    "weekendPct": 34,
+    "lateNightCount": 1823
    },
    "archetype": "OVERACHIEVER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "Downtown (78701): 74% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #3 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "Downtown (78701): 47% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #3 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
   "78745": {
    "area": "South Austin",
-   "volume": 1286,
+   "volume": 4379,
    "rank": 4,
-   "zipCount": 58,
-   "percentile": 0.07,
+   "zipCount": 62,
+   "percentile": 0.06,
    "topLabel": "Top 10%",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 468,
-     "share": 36.4
+     "count": 1102,
+     "share": 25.2
     },
     {
-     "name": "Channels/Creeks/Drainage",
-     "count": 98,
-     "share": 7.6
+     "name": "Loose Dog",
+     "count": 346,
+     "share": 7.9
     },
     {
-     "name": "Obstruction in Right of Way",
-     "count": 92,
-     "share": 7.2
+     "name": "Dead Animal",
+     "count": 277,
+     "share": 6.3
     }
    ],
    "response": {
-    "count": 1263,
-    "medianDays": 0.5,
-    "avgDays": 3.5,
-    "p90Days": 7.9,
-    "sameDayPct": 67
+    "count": 4323,
+    "medianDays": 0.7,
+    "avgDays": 3.6,
+    "p90Days": 6.8,
+    "sameDayPct": 63
    },
    "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 11.8
+    "name": "New Sign Request",
+    "medianDays": 11.6
    },
    "worstDay": {
-    "date": "2026-11-14",
-    "count": 23,
-    "dailyAvg": 3.5,
-    "xDaily": 6.5
+    "date": "2026-01-01",
+    "count": 44,
+    "dailyAvg": 12.0,
+    "xDaily": 3.7
    },
    "setsApart": [
     {
+     "name": "Pothole",
+     "quotient": 2.9,
+     "shareZip": 0.8,
+     "shareCity": 0.3,
+     "count": 34
+    },
+    {
      "name": "Coyote Sighting",
-     "quotient": 3.7,
-     "shareZip": 3.0,
-     "shareCity": 0.8,
-     "count": 39
+     "quotient": 2.8,
+     "shareZip": 1.6,
+     "shareCity": 0.6,
+     "count": 70
     },
     {
      "name": "Flooding",
-     "quotient": 2.4,
-     "shareZip": 0.7,
-     "shareCity": 0.3,
-     "count": 9
-    },
-    {
-     "name": "Ditch",
-     "quotient": 2.3,
+     "quotient": 2.7,
      "shareZip": 0.6,
-     "shareCity": 0.3,
-     "count": 8
+     "shareCity": 0.2,
+     "count": 25
     },
     {
-     "name": "Channels/Creeks/Drainage",
+     "name": "Tree in ROW",
      "quotient": 2.0,
-     "shareZip": 7.6,
-     "shareCity": 3.8,
-     "count": 98
+     "shareZip": 0.5,
+     "shareCity": 0.2,
+     "count": 20
     }
    ],
    "activity": {
     "peakHour": 15,
     "peakHourLabel": "3pm",
-    "peakDay": "Fri",
+    "peakDay": "Tue",
     "weekendPct": 25,
-    "lateNightCount": 325
+    "lateNightCount": 1179
    },
    "archetype": "OVERACHIEVER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "South Austin (78745): 36% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #4 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "South Austin (78745): 25% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #4 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78703": {
-   "area": "West Austin",
-   "volume": 1067,
+  "78744": {
+   "area": "78744",
+   "volume": 3609,
    "rank": 5,
-   "zipCount": 58,
-   "percentile": 0.09,
+   "zipCount": 62,
+   "percentile": 0.08,
+   "topLabel": "Top 10%",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 786,
+     "share": 21.8
+    },
+    {
+     "name": "Parking Violation",
+     "count": 592,
+     "share": 16.4
+    },
+    {
+     "name": "Dead Animal",
+     "count": 284,
+     "share": 7.9
+    }
+   ],
+   "response": {
+    "count": 3585,
+    "medianDays": 0.9,
+    "avgDays": 4.4,
+    "p90Days": 7.7,
+    "sameDayPct": 54
+   },
+   "lowlight": {
+    "name": "Park Comparable",
+    "medianDays": 27.3
+   },
+   "worstDay": {
+    "date": "2026-07-05",
+    "count": 32,
+    "dailyAvg": 9.9,
+    "xDaily": 3.2
+   },
+   "setsApart": [
+    {
+     "name": "Park Building Issue",
+     "quotient": 3.0,
+     "shareZip": 0.9,
+     "shareCity": 0.3,
+     "count": 33
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 2.1,
+     "shareZip": 21.8,
+     "shareCity": 10.5,
+     "count": 786
+    },
+    {
+     "name": "Fireworks",
+     "quotient": 1.8,
+     "shareZip": 1.9,
+     "shareCity": 1.1,
+     "count": 69
+    },
+    {
+     "name": "Pothole",
+     "quotient": 1.6,
+     "shareZip": 0.4,
+     "shareCity": 0.3,
+     "count": 16
+    }
+   ],
+   "activity": {
+    "peakHour": 15,
+    "peakHourLabel": "3pm",
+    "peakDay": "Mon",
+    "weekendPct": 22,
+    "lateNightCount": 875
+   },
+   "archetype": "OVERACHIEVER",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78744 (78744): 22% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #5 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78753": {
+   "area": "North Austin",
+   "volume": 3301,
+   "rank": 6,
+   "zipCount": 62,
+   "percentile": 0.1,
    "topLabel": "Top 10%",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 564,
-     "share": 52.9
+     "count": 794,
+     "share": 24.1
     },
     {
-     "name": "Park Maintenance - Grounds",
-     "count": 82,
-     "share": 7.7
+     "name": "Loose Dog",
+     "count": 585,
+     "share": 17.7
     },
     {
-     "name": "Graffiti",
-     "count": 48,
-     "share": 4.5
+     "name": "Obstruction in Right of Way",
+     "count": 213,
+     "share": 6.5
     }
    ],
    "response": {
-    "count": 1039,
-    "medianDays": 0.1,
-    "avgDays": 6.2,
-    "p90Days": 8.8,
-    "sameDayPct": 72
+    "count": 3265,
+    "medianDays": 0.8,
+    "avgDays": 3.9,
+    "p90Days": 7.1,
+    "sameDayPct": 60
    },
    "lowlight": {
-    "name": "Graffiti",
-    "medianDays": 129.7
+    "name": "Park Electrical",
+    "medianDays": 12.1
    },
    "worstDay": {
-    "date": "2026-10-23",
-    "count": 14,
-    "dailyAvg": 2.9,
-    "xDaily": 4.8
+    "date": "2026-01-01",
+    "count": 59,
+    "dailyAvg": 9.0,
+    "xDaily": 6.5
    },
    "setsApart": [
     {
-     "name": "Park Building Plumbing",
-     "quotient": 3.3,
-     "shareZip": 1.9,
-     "shareCity": 0.6,
-     "count": 20
+     "name": "Fireworks",
+     "quotient": 2.0,
+     "shareZip": 2.1,
+     "shareCity": 1.1,
+     "count": 70
     },
     {
+     "name": "Injured / Sick Animal",
+     "quotient": 1.8,
+     "shareZip": 0.8,
+     "shareCity": 0.4,
+     "count": 25
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 1.7,
+     "shareZip": 17.7,
+     "shareCity": 10.5,
+     "count": 585
+    },
+    {
+     "name": "Channels/Creeks/Drainage",
+     "quotient": 1.6,
+     "shareZip": 3.8,
+     "shareCity": 2.4,
+     "count": 126
+    }
+   ],
+   "activity": {
+    "peakHour": 15,
+    "peakHourLabel": "3pm",
+    "peakDay": "Tue",
+    "weekendPct": 21,
+    "lateNightCount": 820
+   },
+   "archetype": "OVERACHIEVER",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "North Austin (78753): 24% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #6 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78758": {
+   "area": "North Austin",
+   "volume": 3071,
+   "rank": 7,
+   "zipCount": 62,
+   "percentile": 0.11,
+   "topLabel": "Top 30%",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 907,
+     "share": 29.5
+    },
+    {
+     "name": "Loose Dog",
+     "count": 471,
+     "share": 15.3
+    },
+    {
+     "name": "Dead Animal",
+     "count": 226,
+     "share": 7.4
+    }
+   ],
+   "response": {
+    "count": 3030,
+    "medianDays": 0.7,
+    "avgDays": 3.8,
+    "p90Days": 6.9,
+    "sameDayPct": 60
+   },
+   "lowlight": {
+    "name": "Park Electrical",
+    "medianDays": 21.0
+   },
+   "worstDay": {
+    "date": "2026-01-01",
+    "count": 36,
+    "dailyAvg": 8.4,
+    "xDaily": 4.3
+   },
+   "setsApart": [
+    {
+     "name": "Channels/Creeks/Drainage",
+     "quotient": 2.1,
+     "shareZip": 5.1,
+     "shareCity": 2.4,
+     "count": 156
+    },
+    {
+     "name": "Fireworks",
+     "quotient": 1.8,
+     "shareZip": 1.9,
+     "shareCity": 1.1,
+     "count": 58
+    },
+    {
+     "name": "Vicious Dog",
+     "quotient": 1.6,
+     "shareZip": 1.7,
+     "shareCity": 1.1,
+     "count": 53
+    },
+    {
+     "name": "Animal Care",
+     "quotient": 1.6,
+     "shareZip": 4.4,
+     "shareCity": 2.8,
+     "count": 136
+    }
+   ],
+   "activity": {
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Wed",
+    "weekendPct": 23,
+    "lateNightCount": 773
+   },
+   "archetype": "KEEN EYE",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "North Austin (78758): 30% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #7 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78741": {
+   "area": "East Riverside",
+   "volume": 3012,
+   "rank": 8,
+   "zipCount": 62,
+   "percentile": 0.13,
+   "topLabel": "Top 30%",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 455,
+     "share": 15.1
+    },
+    {
+     "name": "Loose Dog",
+     "count": 437,
+     "share": 14.5
+    },
+    {
+     "name": "Park Maintenance - Grounds",
+     "count": 310,
+     "share": 10.3
+    }
+   ],
+   "response": {
+    "count": 2972,
+    "medianDays": 0.9,
+    "avgDays": 4.5,
+    "p90Days": 8.4,
+    "sameDayPct": 53
+   },
+   "lowlight": {
+    "name": "Park Playgrounds",
+    "medianDays": 11.0
+   },
+   "worstDay": {
+    "date": "2026-11-10",
+    "count": 31,
+    "dailyAvg": 8.3,
+    "xDaily": 3.8
+   },
+   "setsApart": [
+    {
+     "name": "Obstruction in Right of Way",
+     "quotient": 1.8,
+     "shareZip": 8.4,
+     "shareCity": 4.6,
+     "count": 252
+    },
+    {
+     "name": "Animal Care",
+     "quotient": 1.8,
+     "shareZip": 4.9,
+     "shareCity": 2.8,
+     "count": 148
+    },
+    {
+     "name": "Park Maintenance - Grounds",
+     "quotient": 1.7,
+     "shareZip": 10.3,
+     "shareCity": 6.0,
+     "count": 310
+    },
+    {
+     "name": "Flooding",
+     "quotient": 1.7,
+     "shareZip": 0.4,
+     "shareCity": 0.2,
+     "count": 11
+    }
+   ],
+   "activity": {
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Tue",
+    "weekendPct": 24,
+    "lateNightCount": 715
+   },
+   "archetype": "KEEN EYE",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "East Riverside (78741): 15% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #8 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78703": {
+   "area": "West Austin",
+   "volume": 2712,
+   "rank": 9,
+   "zipCount": 62,
+   "percentile": 0.15,
+   "topLabel": "Top 30%",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 1131,
+     "share": 41.7
+    },
+    {
+     "name": "Park Maintenance - Grounds",
+     "count": 316,
+     "share": 11.7
+    },
+    {
+     "name": "Dead Animal",
+     "count": 134,
+     "share": 4.9
+    }
+   ],
+   "response": {
+    "count": 2654,
+    "medianDays": 0.2,
+    "avgDays": 4.9,
+    "p90Days": 8.6,
+    "sameDayPct": 67
+   },
+   "lowlight": {
+    "name": "Graffiti",
+    "medianDays": 85.1
+   },
+   "worstDay": {
+    "date": "2026-11-05",
+    "count": 21,
+    "dailyAvg": 7.4,
+    "xDaily": 2.8
+   },
+   "setsApart": [
+    {
      "name": "Park Playgrounds",
-     "quotient": 2.6,
-     "shareZip": 3.6,
-     "shareCity": 1.3,
-     "count": 38
+     "quotient": 3.3,
+     "shareZip": 2.8,
+     "shareCity": 0.8,
+     "count": 75
+    },
+    {
+     "name": "Park Building Plumbing",
+     "quotient": 2.9,
+     "shareZip": 1.1,
+     "shareCity": 0.4,
+     "count": 29
+    },
+    {
+     "name": "Tree in ROW",
+     "quotient": 2.1,
+     "shareZip": 0.5,
+     "shareCity": 0.2,
+     "count": 13
+    },
+    {
+     "name": "Park Maintenance - Grounds",
+     "quotient": 1.9,
+     "shareZip": 11.7,
+     "shareCity": 6.0,
+     "count": 316
     }
    ],
    "activity": {
     "peakHour": 17,
     "peakHourLabel": "5pm",
     "peakDay": "Fri",
-    "weekendPct": 26,
-    "lateNightCount": 271
-   },
-   "archetype": "OVERACHIEVER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "West Austin (78703): 53% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #5 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78758": {
-   "area": "North Austin",
-   "volume": 964,
-   "rank": 6,
-   "zipCount": 58,
-   "percentile": 0.1,
-   "topLabel": "Top 10%",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 421,
-     "share": 43.7
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 87,
-     "share": 9.0
-    },
-    {
-     "name": "Dead Animal",
-     "count": 76,
-     "share": 7.9
-    }
-   ],
-   "response": {
-    "count": 941,
-    "medianDays": 0.4,
-    "avgDays": 2.6,
-    "p90Days": 6.1,
-    "sameDayPct": 69
-   },
-   "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 12.4
-   },
-   "worstDay": {
-    "date": "2026-11-18",
-    "count": 21,
-    "dailyAvg": 2.6,
-    "xDaily": 8.0
-   },
-   "setsApart": [
-    {
-     "name": "Vicious Dog",
-     "quotient": 2.3,
-     "shareZip": 1.8,
-     "shareCity": 0.8,
-     "count": 17
-    },
-    {
-     "name": "Channels/Creeks/Drainage",
-     "quotient": 1.9,
-     "shareZip": 7.4,
-     "shareCity": 3.8,
-     "count": 71
-    },
-    {
-     "name": "Flooding",
-     "quotient": 1.8,
-     "shareZip": 0.5,
-     "shareCity": 0.3,
-     "count": 5
-    },
-    {
-     "name": "Animal Protection",
-     "quotient": 1.6,
-     "shareZip": 1.3,
-     "shareCity": 0.9,
-     "count": 13
-    }
-   ],
-   "activity": {
-    "peakHour": 15,
-    "peakHourLabel": "3pm",
-    "peakDay": "Tue",
-    "weekendPct": 27,
-    "lateNightCount": 262
-   },
-   "archetype": "OVERACHIEVER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "North Austin (78758): 44% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #6 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78753": {
-   "area": "North Austin",
-   "volume": 947,
-   "rank": 7,
-   "zipCount": 58,
-   "percentile": 0.12,
-   "topLabel": "Top 30%",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 398,
-     "share": 42.0
-    },
-    {
-     "name": "Dead Animal",
-     "count": 71,
-     "share": 7.5
-    },
-    {
-     "name": "Obstruction in Right of Way",
-     "count": 70,
-     "share": 7.4
-    }
-   ],
-   "response": {
-    "count": 925,
-    "medianDays": 0.3,
-    "avgDays": 2.3,
-    "p90Days": 4.9,
-    "sameDayPct": 72
-   },
-   "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 6.4
-   },
-   "worstDay": {
-    "date": "2026-09-22",
-    "count": 15,
-    "dailyAvg": 2.6,
-    "xDaily": 5.8
-   },
-   "setsApart": [
-    {
-     "name": "Loose Dog",
-     "quotient": 2.8,
-     "shareZip": 3.8,
-     "shareCity": 1.3,
-     "count": 36
-    },
-    {
-     "name": "Ditch",
-     "quotient": 2.8,
-     "shareZip": 0.7,
-     "shareCity": 0.3,
-     "count": 7
-    },
-    {
-     "name": "Vicious Dog",
-     "quotient": 2.3,
-     "shareZip": 1.8,
-     "shareCity": 0.8,
-     "count": 17
-    },
-    {
-     "name": "Channels/Creeks/Drainage",
-     "quotient": 1.6,
-     "shareZip": 5.9,
-     "shareCity": 3.8,
-     "count": 56
-    }
-   ],
-   "activity": {
-    "peakHour": 15,
-    "peakHourLabel": "3pm",
-    "peakDay": "Tue",
-    "weekendPct": 22,
-    "lateNightCount": 239
+    "weekendPct": 25,
+    "lateNightCount": 656
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
-   "shareText": "North Austin (78753): 42% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #7 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "West Austin (78703): 42% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #9 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78705": {
-   "area": "West Campus",
-   "volume": 898,
-   "rank": 8,
-   "zipCount": 58,
-   "percentile": 0.14,
-   "topLabel": "Top 30%",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 590,
-     "share": 65.7
-    },
-    {
-     "name": "Obstruction in Right of Way",
-     "count": 70,
-     "share": 7.8
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 53,
-     "share": 5.9
-    }
-   ],
-   "response": {
-    "count": 875,
-    "medianDays": 0.1,
-    "avgDays": 3.6,
-    "p90Days": 4.8,
-    "sameDayPct": 80
-   },
-   "lowlight": {
-    "name": "Graffiti",
-    "medianDays": 128.8
-   },
-   "worstDay": {
-    "date": "2026-10-08",
-    "count": 18,
-    "dailyAvg": 2.5,
-    "xDaily": 7.3
-   },
-   "setsApart": [],
-   "activity": {
-    "peakHour": 13,
-    "peakHourLabel": "1pm",
-    "peakDay": "Thu",
-    "weekendPct": 24,
-    "lateNightCount": 199
-   },
-   "archetype": "KEEN EYE",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "West Campus (78705): 66% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #8 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78744": {
-   "area": "78744",
-   "volume": 876,
-   "rank": 9,
-   "zipCount": 58,
+  "78723": {
+   "area": "Mueller",
+   "volume": 2516,
+   "rank": 10,
+   "zipCount": 62,
    "percentile": 0.16,
    "topLabel": "Top 30%",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 295,
-     "share": 33.7
-    },
-    {
-     "name": "Obstruction in Right of Way",
-     "count": 76,
-     "share": 8.7
-    },
-    {
-     "name": "Dead Animal",
-     "count": 73,
-     "share": 8.3
-    }
-   ],
-   "response": {
-    "count": 861,
-    "medianDays": 0.5,
-    "avgDays": 3.7,
-    "p90Days": 6.2,
-    "sameDayPct": 67
-   },
-   "lowlight": {
-    "name": "Park Comparable",
-    "medianDays": 24.2
-   },
-   "worstDay": {
-    "date": "2026-11-19",
-    "count": 15,
-    "dailyAvg": 2.4,
-    "xDaily": 6.2
-   },
-   "setsApart": [
-    {
-     "name": "Flood Risk",
-     "quotient": 3.0,
-     "shareZip": 0.7,
-     "shareCity": 0.2,
-     "count": 6
+     "count": 551,
+     "share": 21.9
     },
     {
      "name": "Loose Dog",
-     "quotient": 2.6,
-     "shareZip": 3.5,
-     "shareCity": 1.3,
-     "count": 31
+     "count": 329,
+     "share": 13.1
     },
     {
-     "name": "Loose Animal",
-     "quotient": 2.1,
-     "shareZip": 0.7,
-     "shareCity": 0.3,
-     "count": 6
-    },
-    {
-     "name": "Vicious Dog",
-     "quotient": 2.1,
-     "shareZip": 1.6,
-     "shareCity": 0.8,
-     "count": 14
-    }
-   ],
-   "activity": {
-    "peakHour": 14,
-    "peakHourLabel": "2pm",
-    "peakDay": "Mon",
-    "weekendPct": 22,
-    "lateNightCount": 191
-   },
-   "archetype": "KEEN EYE",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78744 (78744): 34% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #9 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78741": {
-   "area": "East Riverside",
-   "volume": 842,
-   "rank": 10,
-   "zipCount": 58,
-   "percentile": 0.17,
-   "topLabel": "Top 30%",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 205,
-     "share": 24.3
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 104,
-     "share": 12.4
-    },
-    {
-     "name": "Obstruction in Right of Way",
-     "count": 98,
-     "share": 11.6
+     "name": "Dead Animal",
+     "count": 180,
+     "share": 7.2
     }
    ],
    "response": {
-    "count": 819,
-    "medianDays": 0.6,
-    "avgDays": 3.5,
-    "p90Days": 8.0,
-    "sameDayPct": 63
+    "count": 2461,
+    "medianDays": 0.7,
+    "avgDays": 4.5,
+    "p90Days": 7.7,
+    "sameDayPct": 59
    },
    "lowlight": {
-    "name": "Park Electrical",
-    "medianDays": 10.3
+    "name": "Animal Bite",
+    "medianDays": 10.8
    },
    "worstDay": {
-    "date": "2026-09-28",
-    "count": 17,
-    "dailyAvg": 2.3,
-    "xDaily": 7.4
-   },
-   "setsApart": [
-    {
-     "name": "Flood Risk",
-     "quotient": 3.1,
-     "shareZip": 0.7,
-     "shareCity": 0.2,
-     "count": 6
-    },
-    {
-     "name": "Park Comparable",
-     "quotient": 3.0,
-     "shareZip": 0.7,
-     "shareCity": 0.2,
-     "count": 6
-    },
-    {
-     "name": "Animal Care",
-     "quotient": 2.4,
-     "shareZip": 2.0,
-     "shareCity": 0.9,
-     "count": 17
-    },
-    {
-     "name": "Ditch",
-     "quotient": 2.2,
-     "shareZip": 0.6,
-     "shareCity": 0.3,
-     "count": 5
-    }
-   ],
-   "activity": {
-    "peakHour": 14,
-    "peakHourLabel": "2pm",
-    "peakDay": "Mon",
-    "weekendPct": 24,
-    "lateNightCount": 190
-   },
-   "archetype": "KEEN EYE",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "East Riverside (78741): 24% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #10 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78723": {
-   "area": "Mueller",
-   "volume": 801,
-   "rank": 11,
-   "zipCount": 58,
-   "percentile": 0.19,
-   "topLabel": "Top 30%",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 257,
-     "share": 32.1
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 76,
-     "share": 9.5
-    },
-    {
-     "name": "Debris in Street",
-     "count": 65,
-     "share": 8.1
-    }
-   ],
-   "response": {
-    "count": 766,
-    "medianDays": 0.4,
-    "avgDays": 4.4,
-    "p90Days": 6.1,
-    "sameDayPct": 69
-   },
-   "lowlight": {
-    "name": "Graffiti",
-    "medianDays": 6.3
-   },
-   "worstDay": {
-    "date": "2026-10-08",
-    "count": 16,
-    "dailyAvg": 2.2,
-    "xDaily": 7.3
+    "date": "2026-01-01",
+    "count": 27,
+    "dailyAvg": 6.9,
+    "xDaily": 3.9
    },
    "setsApart": [
     {
      "name": "Park Electrical",
-     "quotient": 5.7,
-     "shareZip": 3.4,
-     "shareCity": 0.6,
-     "count": 27
-    },
-    {
-     "name": "Park Building Plumbing",
-     "quotient": 3.1,
+     "quotient": 2.8,
      "shareZip": 1.7,
      "shareCity": 0.6,
-     "count": 14
-    },
-    {
-     "name": "Animal Care",
-     "quotient": 2.2,
-     "shareZip": 1.9,
-     "shareCity": 0.9,
-     "count": 15
+     "count": 42
     },
     {
      "name": "Park Playgrounds",
+     "quotient": 2.4,
+     "shareZip": 2.0,
+     "shareCity": 0.8,
+     "count": 50
+    },
+    {
+     "name": "Park Building Plumbing",
+     "quotient": 2.2,
+     "shareZip": 0.8,
+     "shareCity": 0.4,
+     "count": 20
+    },
+    {
+     "name": "Storm Pipe",
      "quotient": 2.1,
-     "shareZip": 2.9,
-     "shareCity": 1.3,
-     "count": 23
+     "shareZip": 1.9,
+     "shareCity": 0.9,
+     "count": 48
     }
    ],
    "activity": {
     "peakHour": 15,
     "peakHourLabel": "3pm",
     "peakDay": "Thu",
-    "weekendPct": 24,
-    "lateNightCount": 173
+    "weekendPct": 23,
+    "lateNightCount": 574
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
-   "shareText": "Mueller (78723): 32% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #11 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "Mueller (78723): 22% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #10 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78705": {
+   "area": "West Campus",
+   "volume": 2475,
+   "rank": 11,
+   "zipCount": 62,
+   "percentile": 0.18,
+   "topLabel": "Top 30%",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 1244,
+     "share": 50.3
+    },
+    {
+     "name": "Park Maintenance - Grounds",
+     "count": 213,
+     "share": 8.6
+    },
+    {
+     "name": "Obstruction in Right of Way",
+     "count": 162,
+     "share": 6.5
+    }
+   ],
+   "response": {
+    "count": 2437,
+    "medianDays": 0.1,
+    "avgDays": 3.7,
+    "p90Days": 4.1,
+    "sameDayPct": 78
+   },
+   "lowlight": {
+    "name": "Graffiti",
+    "medianDays": 84.8
+   },
+   "worstDay": {
+    "date": "2026-08-28",
+    "count": 24,
+    "dailyAvg": 6.8,
+    "xDaily": 3.5
+   },
+   "setsApart": [
+    {
+     "name": "Shared Micromobility",
+     "quotient": 7.5,
+     "shareZip": 1.6,
+     "shareCity": 0.2,
+     "count": 39
+    },
+    {
+     "name": "Park Building Issue",
+     "quotient": 2.5,
+     "shareZip": 0.8,
+     "shareCity": 0.3,
+     "count": 19
+    },
+    {
+     "name": "Outdoor Music Venue",
+     "quotient": 2.0,
+     "shareZip": 5.9,
+     "shareCity": 3.0,
+     "count": 147
+    },
+    {
+     "name": "Parking Violation",
+     "quotient": 1.6,
+     "shareZip": 50.3,
+     "shareCity": 31.4,
+     "count": 1244
+    }
+   ],
+   "activity": {
+    "peakHour": 13,
+    "peakHourLabel": "1pm",
+    "peakDay": "Fri",
+    "weekendPct": 22,
+    "lateNightCount": 589
+   },
+   "archetype": "KEEN EYE",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "West Campus (78705): 50% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #11 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78748": {
+   "area": "South Austin",
+   "volume": 2214,
+   "rank": 12,
+   "zipCount": 62,
+   "percentile": 0.19,
+   "topLabel": "Top 30%",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 366,
+     "share": 16.5
+    },
+    {
+     "name": "Loose Dog",
+     "count": 236,
+     "share": 10.7
+    },
+    {
+     "name": "Dead Animal",
+     "count": 230,
+     "share": 10.4
+    }
+   ],
+   "response": {
+    "count": 2187,
+    "medianDays": 0.8,
+    "avgDays": 4.0,
+    "p90Days": 8.9,
+    "sameDayPct": 59
+   },
+   "lowlight": {
+    "name": "Park Playgrounds",
+    "medianDays": 15.7
+   },
+   "worstDay": {
+    "date": "2026-01-01",
+    "count": 31,
+    "dailyAvg": 6.1,
+    "xDaily": 5.1
+   },
+   "setsApart": [
+    {
+     "name": "Traffic Signal",
+     "quotient": 2.4,
+     "shareZip": 2.1,
+     "shareCity": 0.9,
+     "count": 47
+    },
+    {
+     "name": "Water Conservation Violation",
+     "quotient": 2.3,
+     "shareZip": 3.0,
+     "shareCity": 1.3,
+     "count": 67
+    },
+    {
+     "name": "Coyote Sighting",
+     "quotient": 2.2,
+     "shareZip": 1.3,
+     "shareCity": 0.6,
+     "count": 28
+    },
+    {
+     "name": "Wildlife",
+     "quotient": 1.9,
+     "shareZip": 3.0,
+     "shareCity": 1.6,
+     "count": 67
+    }
+   ],
+   "activity": {
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Thu",
+    "weekendPct": 22,
+    "lateNightCount": 574
+   },
+   "archetype": "KEEN EYE",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "South Austin (78748): 16% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #12 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
   "78751": {
    "area": "Hyde Park",
-   "volume": 787,
-   "rank": 12,
-   "zipCount": 58,
+   "volume": 2191,
+   "rank": 13,
+   "zipCount": 62,
    "percentile": 0.21,
    "topLabel": "Top 30%",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 478,
-     "share": 60.7
+     "count": 1122,
+     "share": 51.2
     },
     {
      "name": "Obstruction in Right of Way",
-     "count": 44,
-     "share": 5.6
+     "count": 155,
+     "share": 7.1
     },
     {
-     "name": "Graffiti",
-     "count": 31,
-     "share": 3.9
+     "name": "Debris in Street",
+     "count": 105,
+     "share": 4.8
     }
    ],
    "response": {
-    "count": 760,
-    "medianDays": 0.1,
-    "avgDays": 3.1,
+    "count": 2148,
+    "medianDays": 0.2,
+    "avgDays": 2.5,
     "p90Days": 3.8,
-    "sameDayPct": 78
+    "sameDayPct": 76
    },
    "lowlight": {
     "name": "Graffiti",
-    "medianDays": 97.9
+    "medianDays": 66.4
    },
    "worstDay": {
-    "date": "2026-09-05",
-    "count": 16,
-    "dailyAvg": 2.2,
-    "xDaily": 7.4
+    "date": "2026-05-09",
+    "count": 19,
+    "dailyAvg": 6.0,
+    "xDaily": 3.2
    },
    "setsApart": [
     {
+     "name": "Traffic Sign Maintenance",
+     "quotient": 2.5,
+     "shareZip": 0.6,
+     "shareCity": 0.2,
+     "count": 13
+    },
+    {
+     "name": "Tree in ROW",
+     "quotient": 1.8,
+     "shareZip": 0.4,
+     "shareCity": 0.2,
+     "count": 9
+    },
+    {
      "name": "Bicycle Issue",
-     "quotient": 2.6,
-     "shareZip": 1.4,
-     "shareCity": 0.5,
-     "count": 11
+     "quotient": 1.8,
+     "shareZip": 1.0,
+     "shareCity": 0.6,
+     "count": 22
+    },
+    {
+     "name": "Traffic Signal",
+     "quotient": 1.7,
+     "shareZip": 1.5,
+     "shareCity": 0.9,
+     "count": 33
     }
    ],
    "activity": {
     "peakHour": 0,
     "peakHourLabel": "12am",
     "peakDay": "Sat",
-    "weekendPct": 32,
-    "lateNightCount": 301
+    "weekendPct": 30,
+    "lateNightCount": 837
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
-   "shareText": "Hyde Park (78751): 61% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #12 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "Hyde Park (78751): 51% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #13 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
   "78757": {
    "area": "North Shoal Creek",
-   "volume": 721,
-   "rank": 13,
-   "zipCount": 58,
-   "percentile": 0.22,
+   "volume": 1965,
+   "rank": 14,
+   "zipCount": 62,
+   "percentile": 0.23,
    "topLabel": "Top 30%",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 264,
-     "share": 36.6
+     "count": 549,
+     "share": 27.9
     },
     {
-     "name": "Channels/Creeks/Drainage",
-     "count": 66,
-     "share": 9.2
+     "name": "Debris in Street",
+     "count": 147,
+     "share": 7.5
     },
     {
      "name": "Obstruction in Right of Way",
-     "count": 57,
-     "share": 7.9
+     "count": 146,
+     "share": 7.4
     }
    ],
    "response": {
-    "count": 710,
-    "medianDays": 0.5,
-    "avgDays": 2.7,
-    "p90Days": 6.1,
-    "sameDayPct": 69
+    "count": 1939,
+    "medianDays": 0.6,
+    "avgDays": 3.1,
+    "p90Days": 6.9,
+    "sameDayPct": 64
    },
    "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 8.9
+    "name": "Park Playgrounds",
+    "medianDays": 11.2
    },
    "worstDay": {
-    "date": "2026-10-28",
-    "count": 13,
-    "dailyAvg": 2.0,
-    "xDaily": 6.6
+    "date": "2026-02-13",
+    "count": 17,
+    "dailyAvg": 5.4,
+    "xDaily": 3.2
    },
    "setsApart": [
     {
-     "name": "Park Comparable",
-     "quotient": 2.9,
-     "shareZip": 0.7,
-     "shareCity": 0.2,
-     "count": 5
+     "name": "Park Electrical",
+     "quotient": 2.8,
+     "shareZip": 1.7,
+     "shareCity": 0.6,
+     "count": 33
     },
     {
-     "name": "Channels/Creeks/Drainage",
-     "quotient": 2.4,
-     "shareZip": 9.2,
-     "shareCity": 3.8,
+     "name": "Graffiti",
+     "quotient": 2.3,
+     "shareZip": 3.4,
+     "shareCity": 1.5,
      "count": 66
     },
     {
-     "name": "Park Electrical",
-     "quotient": 2.4,
-     "shareZip": 1.4,
-     "shareCity": 0.6,
-     "count": 10
+     "name": "Channels/Creeks/Drainage",
+     "quotient": 2.1,
+     "shareZip": 5.1,
+     "shareCity": 2.4,
+     "count": 101
     },
     {
-     "name": "Park Building Plumbing",
-     "quotient": 1.9,
-     "shareZip": 1.1,
-     "shareCity": 0.6,
-     "count": 8
+     "name": "Construction in Right of Way",
+     "quotient": 2.0,
+     "shareZip": 7.1,
+     "shareCity": 3.6,
+     "count": 139
     }
    ],
    "activity": {
-    "peakHour": 17,
-    "peakHourLabel": "5pm",
-    "peakDay": "Tue",
-    "weekendPct": 21,
-    "lateNightCount": 176
+    "peakHour": 14,
+    "peakHourLabel": "2pm",
+    "peakDay": "Fri",
+    "weekendPct": 22,
+    "lateNightCount": 497
    },
    "archetype": "KEEN EYE",
    "punchline": "finding parking is a blood sport",
-   "shareText": "North Shoal Creek (78757): 37% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #13 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "North Shoal Creek (78757): 28% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #14 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78748": {
-   "area": "South Austin",
-   "volume": 688,
-   "rank": 14,
-   "zipCount": 58,
+  "78759": {
+   "area": "Arboretum",
+   "volume": 1902,
+   "rank": 15,
+   "zipCount": 62,
    "percentile": 0.24,
    "topLabel": "Top 30%",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 195,
-     "share": 28.3
+     "count": 462,
+     "share": 24.3
     },
     {
      "name": "Dead Animal",
-     "count": 77,
-     "share": 11.2
+     "count": 369,
+     "share": 19.4
     },
     {
-     "name": "Construction in Right of Way",
-     "count": 58,
-     "share": 8.4
+     "name": "Loose Dog",
+     "count": 103,
+     "share": 5.4
     }
    ],
    "response": {
-    "count": 679,
+    "count": 1874,
     "medianDays": 0.6,
-    "avgDays": 3.9,
-    "p90Days": 10.0,
-    "sameDayPct": 67
+    "avgDays": 3.4,
+    "p90Days": 5.9,
+    "sameDayPct": 68
    },
    "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 10.3
+    "name": "New Sign Request",
+    "medianDays": 17.7
    },
    "worstDay": {
-    "date": "2026-11-19",
-    "count": 11,
-    "dailyAvg": 1.9,
-    "xDaily": 5.8
+    "date": "2026-08-27",
+    "count": 24,
+    "dailyAvg": 5.2,
+    "xDaily": 4.6
    },
    "setsApart": [
     {
-     "name": "Ditch",
-     "quotient": 3.8,
-     "shareZip": 1.0,
-     "shareCity": 0.3,
-     "count": 7
+     "name": "Dead Animal",
+     "quotient": 3.4,
+     "shareZip": 19.4,
+     "shareCity": 5.8,
+     "count": 369
     },
     {
-     "name": "Coyote Sighting",
-     "quotient": 2.6,
-     "shareZip": 2.2,
-     "shareCity": 0.8,
-     "count": 15
+     "name": "Injured / Sick Animal",
+     "quotient": 2.3,
+     "shareZip": 0.9,
+     "shareCity": 0.4,
+     "count": 18
     },
     {
      "name": "Water Conservation Violation",
-     "quotient": 2.5,
-     "shareZip": 3.2,
+     "quotient": 2.1,
+     "shareZip": 2.8,
      "shareCity": 1.3,
-     "count": 22
+     "count": 53
     },
     {
-     "name": "Construction in Right of Way",
+     "name": "Drainage Inlet",
+     "quotient": 1.8,
+     "shareZip": 1.9,
+     "shareCity": 1.1,
+     "count": 36
+    }
+   ],
+   "activity": {
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Thu",
+    "weekendPct": 21,
+    "lateNightCount": 416
+   },
+   "archetype": "KEEN EYE",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "Arboretum (78759): 24% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #15 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78754": {
+   "area": "Northeast Austin",
+   "volume": 1857,
+   "rank": 16,
+   "zipCount": 62,
+   "percentile": 0.26,
+   "topLabel": "Top 30%",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 767,
+     "share": 41.3
+    },
+    {
+     "name": "Animal Protection",
+     "count": 195,
+     "share": 10.5
+    },
+    {
+     "name": "Loose Dog",
+     "count": 175,
+     "share": 9.4
+    }
+   ],
+   "response": {
+    "count": 1831,
+    "medianDays": 0.3,
+    "avgDays": 3.3,
+    "p90Days": 5.7,
+    "sameDayPct": 65
+   },
+   "lowlight": {
+    "name": "Park Comparable",
+    "medianDays": 80.6
+   },
+   "worstDay": {
+    "date": "2026-06-14",
+    "count": 32,
+    "dailyAvg": 5.1,
+    "xDaily": 6.3
+   },
+   "setsApart": [
+    {
+     "name": "Bicycle Issue",
+     "quotient": 2.6,
+     "shareZip": 1.5,
+     "shareCity": 0.6,
+     "count": 27
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 2.5,
+     "shareZip": 10.5,
+     "shareCity": 4.1,
+     "count": 195
+    },
+    {
+     "name": "Animal Bite",
      "quotient": 2.2,
-     "shareZip": 8.4,
-     "shareCity": 3.8,
-     "count": 58
+     "shareZip": 6.0,
+     "shareCity": 2.7,
+     "count": 112
+    }
+   ],
+   "activity": {
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Fri",
+    "weekendPct": 26,
+    "lateNightCount": 460
+   },
+   "archetype": "KEEN EYE",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "Northeast Austin (78754): 41% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #16 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78749": {
+   "area": "78749",
+   "volume": 1725,
+   "rank": 17,
+   "zipCount": 62,
+   "percentile": 0.27,
+   "topLabel": "Top 30%",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 665,
+     "share": 38.6
+    },
+    {
+     "name": "Dead Animal",
+     "count": 118,
+     "share": 6.8
+    },
+    {
+     "name": "Park Maintenance - Grounds",
+     "count": 90,
+     "share": 5.2
+    }
+   ],
+   "response": {
+    "count": 1696,
+    "medianDays": 0.3,
+    "avgDays": 3.4,
+    "p90Days": 6.0,
+    "sameDayPct": 69
+   },
+   "lowlight": {
+    "name": "Park Building Plumbing",
+    "medianDays": 27.1
+   },
+   "worstDay": {
+    "date": "2026-06-03",
+    "count": 20,
+    "dailyAvg": 4.7,
+    "xDaily": 4.2
+   },
+   "setsApart": [
+    {
+     "name": "Street Light",
+     "quotient": 2.7,
+     "shareZip": 1.3,
+     "shareCity": 0.5,
+     "count": 23
+    },
+    {
+     "name": "Traffic Sign Maintenance",
+     "quotient": 2.7,
+     "shareZip": 0.6,
+     "shareCity": 0.2,
+     "count": 11
+    },
+    {
+     "name": "Water Conservation Violation",
+     "quotient": 2.6,
+     "shareZip": 3.4,
+     "shareCity": 1.3,
+     "count": 59
+    },
+    {
+     "name": "Bicycle Issue",
+     "quotient": 1.7,
+     "shareZip": 1.0,
+     "shareCity": 0.6,
+     "count": 17
+    }
+   ],
+   "activity": {
+    "peakHour": 1,
+    "peakHourLabel": "1am",
+    "peakDay": "Wed",
+    "weekendPct": 23,
+    "lateNightCount": 532
+   },
+   "archetype": "KEEN EYE",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "78749 (78749): 39% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #17 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78721": {
+   "area": "East Austin",
+   "volume": 1660,
+   "rank": 18,
+   "zipCount": 62,
+   "percentile": 0.29,
+   "topLabel": "Top 30%",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 332,
+     "share": 20.0
+    },
+    {
+     "name": "Parking Violation",
+     "count": 290,
+     "share": 17.5
+    },
+    {
+     "name": "Park Maintenance - Grounds",
+     "count": 171,
+     "share": 10.3
+    }
+   ],
+   "response": {
+    "count": 1638,
+    "medianDays": 0.9,
+    "avgDays": 4.9,
+    "p90Days": 10.1,
+    "sameDayPct": 52
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 13.0
+   },
+   "worstDay": {
+    "date": "2026-06-15",
+    "count": 15,
+    "dailyAvg": 4.5,
+    "xDaily": 3.3
+   },
+   "setsApart": [
+    {
+     "name": "Animal Care",
+     "quotient": 2.0,
+     "shareZip": 5.5,
+     "shareCity": 2.8,
+     "count": 92
+    },
+    {
+     "name": "Park Building Plumbing",
+     "quotient": 2.0,
+     "shareZip": 0.7,
+     "shareCity": 0.4,
+     "count": 12
+    },
+    {
+     "name": "Park Building Issue",
+     "quotient": 2.0,
+     "shareZip": 0.6,
+     "shareCity": 0.3,
+     "count": 10
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 1.9,
+     "shareZip": 20.0,
+     "shareCity": 10.5,
+     "count": 332
     }
    ],
    "activity": {
@@ -1188,363 +1587,288 @@
     "peakHourLabel": "2pm",
     "peakDay": "Mon",
     "weekendPct": 23,
-    "lateNightCount": 175
+    "lateNightCount": 416
    },
    "archetype": "KEEN EYE",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "South Austin (78748): 28% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #14 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "punchline": "the wildlife is undefeated",
+   "shareText": "East Austin (78721): 20% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #18 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78759": {
-   "area": "Arboretum",
-   "volume": 641,
-   "rank": 15,
-   "zipCount": 58,
-   "percentile": 0.26,
-   "topLabel": "Top 30%",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 182,
-     "share": 28.4
-    },
-    {
-     "name": "Dead Animal",
-     "count": 128,
-     "share": 20.0
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 48,
-     "share": 7.5
-    }
-   ],
-   "response": {
-    "count": 629,
-    "medianDays": 0.6,
-    "avgDays": 3.2,
-    "p90Days": 6.2,
-    "sameDayPct": 69
-   },
-   "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 8.9
-   },
-   "worstDay": {
-    "date": "2026-08-27",
-    "count": 24,
-    "dailyAvg": 1.8,
-    "xDaily": 13.7
-   },
-   "setsApart": [
-    {
-     "name": "Flood Risk",
-     "quotient": 3.4,
-     "shareZip": 0.8,
-     "shareCity": 0.2,
-     "count": 5
-    },
-    {
-     "name": "Dead Animal",
-     "quotient": 3.1,
-     "shareZip": 20.0,
-     "shareCity": 6.5,
-     "count": 128
-    },
-    {
-     "name": "Flooding",
-     "quotient": 2.7,
-     "shareZip": 0.8,
-     "shareCity": 0.3,
-     "count": 5
-    },
-    {
-     "name": "Water Conservation Violation",
-     "quotient": 2.4,
-     "shareZip": 3.1,
-     "shareCity": 1.3,
-     "count": 20
-    }
-   ],
-   "activity": {
-    "peakHour": 17,
-    "peakHourLabel": "5pm",
-    "peakDay": "Fri",
-    "weekendPct": 23,
-    "lateNightCount": 152
-   },
-   "archetype": "KEEN EYE",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "Arboretum (78759): 28% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #15 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78754": {
-   "area": "Northeast Austin",
-   "volume": 576,
-   "rank": 16,
-   "zipCount": 58,
-   "percentile": 0.28,
-   "topLabel": "Top 30%",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 372,
-     "share": 64.6
-    },
-    {
-     "name": "Debris in Street",
-     "count": 27,
-     "share": 4.7
-    },
-    {
-     "name": "Dead Animal",
-     "count": 26,
-     "share": 4.5
-    }
-   ],
-   "response": {
-    "count": 564,
-    "medianDays": 0.1,
-    "avgDays": 1.6,
-    "p90Days": 2.8,
-    "sameDayPct": 79
-   },
-   "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 6.2
-   },
-   "worstDay": {
-    "date": "2026-07-03",
-    "count": 24,
-    "dailyAvg": 1.6,
-    "xDaily": 15.2
-   },
-   "setsApart": [
-    {
-     "name": "Animal Protection",
-     "quotient": 2.0,
-     "shareZip": 1.7,
-     "shareCity": 0.9,
-     "count": 10
-    },
-    {
-     "name": "Bicycle Issue",
-     "quotient": 2.0,
-     "shareZip": 1.0,
-     "shareCity": 0.5,
-     "count": 6
-    },
-    {
-     "name": "Animal Bite",
-     "quotient": 1.5,
-     "shareZip": 2.6,
-     "shareCity": 1.7,
-     "count": 15
-    }
-   ],
-   "activity": {
-    "peakHour": 16,
-    "peakHourLabel": "4pm",
-    "peakDay": "Fri",
-    "weekendPct": 30,
-    "lateNightCount": 150
-   },
-   "archetype": "KEEN EYE",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "Northeast Austin (78754): 65% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #16 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78749": {
-   "area": "78749",
-   "volume": 547,
-   "rank": 17,
-   "zipCount": 58,
-   "percentile": 0.29,
-   "topLabel": "Top 30%",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 244,
-     "share": 44.6
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 41,
-     "share": 7.5
-    },
-    {
-     "name": "Channels/Creeks/Drainage",
-     "count": 38,
-     "share": 6.9
-    }
-   ],
-   "response": {
-    "count": 538,
-    "medianDays": 0.2,
-    "avgDays": 2.6,
-    "p90Days": 6.1,
-    "sameDayPct": 71
-   },
-   "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 10.3
-   },
-   "worstDay": {
-    "date": "2026-08-27",
-    "count": 11,
-    "dailyAvg": 1.5,
-    "xDaily": 7.3
-   },
-   "setsApart": [
-    {
-     "name": "Water Conservation Violation",
-     "quotient": 2.7,
-     "shareZip": 3.5,
-     "shareCity": 1.3,
-     "count": 19
-    },
-    {
-     "name": "Wildlife",
-     "quotient": 2.3,
-     "shareZip": 2.0,
-     "shareCity": 0.9,
-     "count": 11
-    },
-    {
-     "name": "Channels/Creeks/Drainage",
-     "quotient": 1.8,
-     "shareZip": 6.9,
-     "shareCity": 3.8,
-     "count": 38
-    },
-    {
-     "name": "Animal Bite",
-     "quotient": 1.7,
-     "shareZip": 2.9,
-     "shareCity": 1.7,
-     "count": 16
-    }
-   ],
-   "activity": {
-    "peakHour": 1,
-    "peakHourLabel": "1am",
-    "peakDay": "Thu",
-    "weekendPct": 22,
-    "lateNightCount": 171
-   },
-   "archetype": "KEEN EYE",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78749 (78749): 45% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #17 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78731": {
-   "area": "Allandale",
-   "volume": 541,
-   "rank": 18,
-   "zipCount": 58,
+  "78752": {
+   "area": "North Loop",
+   "volume": 1644,
+   "rank": 19,
+   "zipCount": 62,
    "percentile": 0.31,
    "topLabel": "Middle",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 174,
-     "share": 32.2
+     "count": 534,
+     "share": 32.5
     },
     {
-     "name": "Dead Animal",
-     "count": 79,
-     "share": 14.6
+     "name": "Loose Dog",
+     "count": 218,
+     "share": 13.3
     },
     {
      "name": "Debris in Street",
-     "count": 37,
+     "count": 111,
      "share": 6.8
     }
    ],
    "response": {
-    "count": 535,
-    "medianDays": 0.3,
-    "avgDays": 2.8,
-    "p90Days": 5.1,
-    "sameDayPct": 71
+    "count": 1620,
+    "medianDays": 0.6,
+    "avgDays": 3.4,
+    "p90Days": 6.6,
+    "sameDayPct": 64
    },
    "lowlight": {
-    "name": "Animal Care",
-    "medianDays": 13.3
+    "name": "Park Playgrounds",
+    "medianDays": 14.6
    },
    "worstDay": {
-    "date": "2026-11-02",
-    "count": 12,
-    "dailyAvg": 1.5,
-    "xDaily": 8.1
+    "date": "2026-01-01",
+    "count": 17,
+    "dailyAvg": 4.5,
+    "xDaily": 3.8
    },
    "setsApart": [
     {
-     "name": "Coyote Sighting",
-     "quotient": 4.5,
+     "name": "Animal Care",
+     "quotient": 1.8,
+     "shareZip": 5.0,
+     "shareCity": 2.8,
+     "count": 82
+    },
+    {
+     "name": "Bicycle Issue",
+     "quotient": 1.8,
+     "shareZip": 1.0,
+     "shareCity": 0.6,
+     "count": 17
+    },
+    {
+     "name": "Debris in Street",
+     "quotient": 1.6,
+     "shareZip": 6.8,
+     "shareCity": 4.3,
+     "count": 111
+    },
+    {
+     "name": "Channels/Creeks/Drainage",
+     "quotient": 1.5,
      "shareZip": 3.7,
-     "shareCity": 0.8,
-     "count": 20
+     "shareCity": 2.4,
+     "count": 61
+    }
+   ],
+   "activity": {
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Thu",
+    "weekendPct": 26,
+    "lateNightCount": 399
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "North Loop (78752): 32% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #19 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78724": {
+   "area": "78724",
+   "volume": 1592,
+   "rank": 20,
+   "zipCount": 62,
+   "percentile": 0.32,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 454,
+     "share": 28.5
     },
     {
-     "name": "Flooding",
-     "quotient": 3.9,
-     "shareZip": 1.1,
-     "shareCity": 0.3,
-     "count": 6
+     "name": "Parking Violation",
+     "count": 265,
+     "share": 16.6
     },
     {
-     "name": "Drainage Inlet",
-     "quotient": 2.3,
-     "shareZip": 5.9,
-     "shareCity": 2.6,
-     "count": 32
+     "name": "Animal Protection",
+     "count": 118,
+     "share": 7.4
+    }
+   ],
+   "response": {
+    "count": 1572,
+    "medianDays": 1.0,
+    "avgDays": 5.1,
+    "p90Days": 8.7,
+    "sameDayPct": 51
+   },
+   "lowlight": {
+    "name": "Park Maintenance - Grounds",
+    "medianDays": 8.9
+   },
+   "worstDay": {
+    "date": "2026-11-20",
+    "count": 17,
+    "dailyAvg": 4.4,
+    "xDaily": 3.9
+   },
+   "setsApart": [
+    {
+     "name": "Loose Animal",
+     "quotient": 3.0,
+     "shareZip": 1.7,
+     "shareCity": 0.6,
+     "count": 27
     },
     {
-     "name": "Dead Animal",
-     "quotient": 2.3,
-     "shareZip": 14.6,
-     "shareCity": 6.5,
-     "count": 79
+     "name": "Loose Dog",
+     "quotient": 2.7,
+     "shareZip": 28.5,
+     "shareCity": 10.5,
+     "count": 454
+    },
+    {
+     "name": "Injured / Sick Animal",
+     "quotient": 2.1,
+     "shareZip": 0.9,
+     "shareCity": 0.4,
+     "count": 14
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 1.8,
+     "shareZip": 7.4,
+     "shareCity": 4.1,
+     "count": 118
     }
    ],
    "activity": {
     "peakHour": 13,
     "peakHourLabel": "1pm",
-    "peakDay": "Wed",
-    "weekendPct": 18,
-    "lateNightCount": 102
+    "peakDay": "Mon",
+    "weekendPct": 21,
+    "lateNightCount": 417
    },
    "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "Allandale (78731): 32% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #18 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78724 (78724): 28% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #20 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78747": {
-   "area": "78747",
-   "volume": 524,
-   "rank": 19,
-   "zipCount": 58,
-   "percentile": 0.33,
+  "78731": {
+   "area": "Allandale",
+   "volume": 1489,
+   "rank": 21,
+   "zipCount": 62,
+   "percentile": 0.34,
    "topLabel": "Middle",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 348,
-     "share": 66.4
+     "count": 398,
+     "share": 26.7
     },
     {
      "name": "Dead Animal",
-     "count": 51,
-     "share": 9.7
+     "count": 239,
+     "share": 16.1
     },
     {
      "name": "Construction in Right of Way",
-     "count": 12,
-     "share": 2.3
+     "count": 105,
+     "share": 7.1
     }
    ],
    "response": {
-    "count": 519,
-    "medianDays": 0.1,
-    "avgDays": 1.3,
-    "p90Days": 1.9,
-    "sameDayPct": 84
+    "count": 1476,
+    "medianDays": 0.5,
+    "avgDays": 3.4,
+    "p90Days": 5.1,
+    "sameDayPct": 70
+   },
+   "lowlight": {
+    "name": "Park Comparable",
+    "medianDays": 23.0
+   },
+   "worstDay": {
+    "date": "2026-11-02",
+    "count": 18,
+    "dailyAvg": 4.1,
+    "xDaily": 4.4
+   },
+   "setsApart": [
+    {
+     "name": "Coyote Sighting",
+     "quotient": 3.5,
+     "shareZip": 2.0,
+     "shareCity": 0.6,
+     "count": 30
+    },
+    {
+     "name": "Dead Animal",
+     "quotient": 2.8,
+     "shareZip": 16.1,
+     "shareCity": 5.8,
+     "count": 239
+    },
+    {
+     "name": "Tree in ROW",
+     "quotient": 2.6,
+     "shareZip": 0.6,
+     "shareCity": 0.2,
+     "count": 9
+    },
+    {
+     "name": "Flooding",
+     "quotient": 2.5,
+     "shareZip": 0.5,
+     "shareCity": 0.2,
+     "count": 8
+    }
+   ],
+   "activity": {
+    "peakHour": 15,
+    "peakHourLabel": "3pm",
+    "peakDay": "Wed",
+    "weekendPct": 21,
+    "lateNightCount": 326
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "Allandale (78731): 27% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #21 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78747": {
+   "area": "78747",
+   "volume": 1376,
+   "rank": 22,
+   "zipCount": 62,
+   "percentile": 0.35,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 568,
+     "share": 41.3
+    },
+    {
+     "name": "Loose Dog",
+     "count": 152,
+     "share": 11.0
+    },
+    {
+     "name": "Dead Animal",
+     "count": 120,
+     "share": 8.7
+    }
+   ],
+   "response": {
+    "count": 1368,
+    "medianDays": 0.3,
+    "avgDays": 3.2,
+    "p90Days": 6.0,
+    "sameDayPct": 67
    },
    "lowlight": {
     "name": "Graffiti",
@@ -1552,420 +1876,120 @@
    },
    "worstDay": {
     "date": "2026-08-25",
-    "count": 21,
-    "dailyAvg": 1.4,
-    "xDaily": 14.6
+    "count": 23,
+    "dailyAvg": 3.8,
+    "xDaily": 6.1
    },
    "setsApart": [
     {
      "name": "Animal Care",
-     "quotient": 1.6,
-     "shareZip": 1.3,
-     "shareCity": 0.9,
-     "count": 7
-    },
-    {
-     "name": "Dead Animal",
-     "quotient": 1.5,
-     "shareZip": 9.7,
-     "shareCity": 6.5,
-     "count": 51
-    }
-   ],
-   "activity": {
-    "peakHour": 17,
-    "peakHourLabel": "5pm",
-    "peakDay": "Fri",
-    "weekendPct": 29,
-    "lateNightCount": 180
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78747 (78747): 66% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #19 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78752": {
-   "area": "North Loop",
-   "volume": 517,
-   "rank": 20,
-   "zipCount": 58,
-   "percentile": 0.34,
-   "topLabel": "Middle",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 258,
-     "share": 49.9
-    },
-    {
-     "name": "Obstruction in Right of Way",
-     "count": 43,
-     "share": 8.3
-    },
-    {
-     "name": "Debris in Street",
-     "count": 34,
-     "share": 6.6
-    }
-   ],
-   "response": {
-    "count": 508,
-    "medianDays": 0.2,
-    "avgDays": 2.3,
-    "p90Days": 4.5,
-    "sameDayPct": 75
-   },
-   "lowlight": {
-    "name": "Vicious Dog",
-    "medianDays": 13.5
-   },
-   "worstDay": {
-    "date": "2026-10-06",
-    "count": 10,
-    "dailyAvg": 1.4,
-    "xDaily": 7.1
-   },
-   "setsApart": [
-    {
-     "name": "Animal Care",
-     "quotient": 2.0,
-     "shareZip": 1.7,
-     "shareCity": 0.9,
-     "count": 9
-    },
-    {
-     "name": "Loose Dog",
-     "quotient": 1.7,
-     "shareZip": 2.3,
-     "shareCity": 1.3,
-     "count": 12
-    }
-   ],
-   "activity": {
-    "peakHour": 18,
-    "peakHourLabel": "6pm",
-    "peakDay": "Tue",
-    "weekendPct": 27,
-    "lateNightCount": 126
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "North Loop (78752): 50% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #20 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78721": {
-   "area": "East Austin",
-   "volume": 455,
-   "rank": 21,
-   "zipCount": 58,
-   "percentile": 0.36,
-   "topLabel": "Middle",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 116,
-     "share": 25.5
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 71,
-     "share": 15.6
-    },
-    {
-     "name": "Dead Animal",
-     "count": 47,
-     "share": 10.3
-    }
-   ],
-   "response": {
-    "count": 441,
-    "medianDays": 0.8,
-    "avgDays": 3.7,
-    "p90Days": 6.1,
-    "sameDayPct": 62
-   },
-   "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 11.5
-   },
-   "worstDay": {
-    "date": "2026-10-13",
-    "count": 12,
-    "dailyAvg": 1.2,
-    "xDaily": 9.6
-   },
-   "setsApart": [
-    {
-     "name": "Loose Dog",
-     "quotient": 3.8,
-     "shareZip": 5.1,
-     "shareCity": 1.3,
-     "count": 23
-    },
-    {
-     "name": "Animal Care",
-     "quotient": 3.1,
-     "shareZip": 2.6,
-     "shareCity": 0.9,
-     "count": 12
-    },
-    {
-     "name": "Bicycle Issue",
-     "quotient": 2.5,
-     "shareZip": 1.3,
-     "shareCity": 0.5,
-     "count": 6
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "quotient": 2.3,
-     "shareZip": 15.6,
-     "shareCity": 6.8,
-     "count": 71
-    }
-   ],
-   "activity": {
-    "peakHour": 14,
-    "peakHourLabel": "2pm",
-    "peakDay": "Wed",
-    "weekendPct": 22,
-    "lateNightCount": 113
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "East Austin (78721): 26% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #21 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78722": {
-   "area": "North University",
-   "volume": 380,
-   "rank": 22,
-   "zipCount": 58,
-   "percentile": 0.38,
-   "topLabel": "Middle",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 174,
-     "share": 45.8
-    },
-    {
-     "name": "Construction in Right of Way",
-     "count": 31,
-     "share": 8.2
-    },
-    {
-     "name": "Dead Animal",
-     "count": 26,
-     "share": 6.8
-    }
-   ],
-   "response": {
-    "count": 367,
-    "medianDays": 0.2,
-    "avgDays": 5.3,
-    "p90Days": 8.1,
-    "sameDayPct": 75
-   },
-   "lowlight": {
-    "name": "Graffiti",
-    "medianDays": 40.9
-   },
-   "worstDay": {
-    "date": "2026-11-06",
-    "count": 12,
-    "dailyAvg": 1.0,
-    "xDaily": 11.5
-   },
-   "setsApart": [
-    {
-     "name": "Construction in Right of Way",
-     "quotient": 2.2,
-     "shareZip": 8.2,
-     "shareCity": 3.8,
-     "count": 31
-    },
-    {
-     "name": "Park Electrical",
-     "quotient": 2.2,
-     "shareZip": 1.3,
-     "shareCity": 0.6,
-     "count": 5
-    },
-    {
-     "name": "Park Playgrounds",
-     "quotient": 2.0,
-     "shareZip": 2.6,
-     "shareCity": 1.3,
-     "count": 10
-    },
-    {
-     "name": "Graffiti",
-     "quotient": 1.8,
+     "quotient": 2.1,
      "shareZip": 5.8,
-     "shareCity": 3.2,
-     "count": 22
-    }
-   ],
-   "activity": {
-    "peakHour": 14,
-    "peakHourLabel": "2pm",
-    "peakDay": "Wed",
-    "weekendPct": 25,
-    "lateNightCount": 84
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "North University (78722): 46% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #22 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78724": {
-   "area": "78724",
-   "volume": 353,
-   "rank": 23,
-   "zipCount": 58,
-   "percentile": 0.4,
-   "topLabel": "Middle",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 145,
-     "share": 41.1
+     "shareCity": 2.8,
+     "count": 80
     },
-    {
-     "name": "Dead Animal",
-     "count": 30,
-     "share": 8.5
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 28,
-     "share": 7.9
-    }
-   ],
-   "response": {
-    "count": 344,
-    "medianDays": 0.2,
-    "avgDays": 2.7,
-    "p90Days": 4.2,
-    "sameDayPct": 70
-   },
-   "lowlight": {
-    "name": "Park Maintenance - Grounds",
-    "medianDays": 8.7
-   },
-   "worstDay": {
-    "date": "2026-10-03",
-    "count": 7,
-    "dailyAvg": 1.0,
-    "xDaily": 7.2
-   },
-   "setsApart": [
     {
      "name": "Loose Animal",
-     "quotient": 6.8,
-     "shareZip": 2.3,
-     "shareCity": 0.3,
-     "count": 8
+     "quotient": 2.0,
+     "shareZip": 1.2,
+     "shareCity": 0.6,
+     "count": 16
     },
     {
-     "name": "Loose Dog",
-     "quotient": 3.2,
-     "shareZip": 4.2,
-     "shareCity": 1.3,
-     "count": 15
+     "name": "Fireworks",
+     "quotient": 1.9,
+     "shareZip": 2.0,
+     "shareCity": 1.1,
+     "count": 28
     },
     {
-     "name": "Street Sweeping",
-     "quotient": 2.4,
-     "shareZip": 2.8,
-     "shareCity": 1.2,
-     "count": 10
-    },
-    {
-     "name": "Animal Care",
-     "quotient": 1.7,
-     "shareZip": 1.4,
-     "shareCity": 0.9,
-     "count": 5
+     "name": "Vicious Dog",
+     "quotient": 1.8,
+     "shareZip": 2.0,
+     "shareCity": 1.1,
+     "count": 27
     }
    ],
    "activity": {
-    "peakHour": 13,
-    "peakHourLabel": "1pm",
-    "peakDay": "Mon",
-    "weekendPct": 22,
-    "lateNightCount": 91
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Wed",
+    "weekendPct": 27,
+    "lateNightCount": 412
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "78724 (78724): 41% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #23 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78747 (78747): 41% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #22 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
   "78746": {
    "area": "78746",
-   "volume": 327,
-   "rank": 24,
-   "zipCount": 58,
-   "percentile": 0.41,
+   "volume": 1020,
+   "rank": 23,
+   "zipCount": 62,
+   "percentile": 0.37,
    "topLabel": "Middle",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 104,
-     "share": 31.8
+     "count": 229,
+     "share": 22.5
     },
     {
      "name": "Park Maintenance - Grounds",
-     "count": 37,
-     "share": 11.3
+     "count": 128,
+     "share": 12.5
     },
     {
-     "name": "Park Playgrounds",
-     "count": 24,
-     "share": 7.3
+     "name": "Loose Dog",
+     "count": 57,
+     "share": 5.6
     }
    ],
    "response": {
-    "count": 319,
-    "medianDays": 0.7,
-    "avgDays": 6.7,
-    "p90Days": 11.9,
-    "sameDayPct": 58
+    "count": 1005,
+    "medianDays": 0.9,
+    "avgDays": 6.6,
+    "p90Days": 12.3,
+    "sameDayPct": 51
    },
    "lowlight": {
-    "name": "Channels/Creeks/Drainage",
-    "medianDays": 7.9
+    "name": "Park Comparable",
+    "medianDays": 52.7
    },
    "worstDay": {
-    "date": "2026-09-16",
-    "count": 8,
-    "dailyAvg": 0.9,
-    "xDaily": 8.9
+    "date": "2026-06-27",
+    "count": 12,
+    "dailyAvg": 2.8,
+    "xDaily": 4.3
    },
    "setsApart": [
     {
-     "name": "Park Comparable",
-     "quotient": 6.5,
-     "shareZip": 1.5,
-     "shareCity": 0.2,
-     "count": 5
-    },
-    {
      "name": "Park Playgrounds",
-     "quotient": 5.5,
-     "shareZip": 7.3,
-     "shareCity": 1.3,
-     "count": 24
+     "quotient": 5.4,
+     "shareZip": 4.5,
+     "shareCity": 0.8,
+     "count": 46
     },
     {
      "name": "Park Building Plumbing",
-     "quotient": 5.4,
-     "shareZip": 3.1,
-     "shareCity": 0.6,
-     "count": 10
+     "quotient": 5.1,
+     "shareZip": 1.9,
+     "shareCity": 0.4,
+     "count": 19
     },
     {
-     "name": "Animal Protection",
-     "quotient": 2.1,
-     "shareZip": 1.8,
-     "shareCity": 0.9,
-     "count": 6
+     "name": "Park Building Issue",
+     "quotient": 4.2,
+     "shareZip": 1.3,
+     "shareCity": 0.3,
+     "count": 13
+    },
+    {
+     "name": "Park Electrical",
+     "quotient": 2.5,
+     "shareZip": 1.5,
+     "shareCity": 0.6,
+     "count": 15
     }
    ],
    "activity": {
@@ -1973,1910 +1997,2690 @@
     "peakHourLabel": "4pm",
     "peakDay": "Wed",
     "weekendPct": 23,
-    "lateNightCount": 69
+    "lateNightCount": 216
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "78746 (78746): 32% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #24 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78746 (78746): 22% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #23 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78727": {
-   "area": "78727",
-   "volume": 309,
-   "rank": 25,
-   "zipCount": 58,
-   "percentile": 0.43,
+  "78722": {
+   "area": "North University",
+   "volume": 976,
+   "rank": 24,
+   "zipCount": 62,
+   "percentile": 0.39,
    "topLabel": "Middle",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 107,
-     "share": 34.6
+     "count": 320,
+     "share": 32.8
     },
     {
-     "name": "Dead Animal",
-     "count": 39,
-     "share": 12.6
+     "name": "Loose Dog",
+     "count": 73,
+     "share": 7.5
     },
     {
-     "name": "Channels/Creeks/Drainage",
-     "count": 23,
-     "share": 7.4
+     "name": "Park Maintenance - Grounds",
+     "count": 71,
+     "share": 7.3
     }
    ],
    "response": {
-    "count": 305,
-    "medianDays": 0.5,
-    "avgDays": 3.2,
-    "p90Days": 7.6,
-    "sameDayPct": 71
+    "count": 958,
+    "medianDays": 0.6,
+    "avgDays": 5.1,
+    "p90Days": 9.1,
+    "sameDayPct": 65
    },
    "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 10.4
+    "name": "Graffiti",
+    "medianDays": 36.1
    },
    "worstDay": {
-    "date": "2026-10-22",
-    "count": 8,
-    "dailyAvg": 0.8,
-    "xDaily": 9.4
+    "date": "2026-11-06",
+    "count": 16,
+    "dailyAvg": 2.7,
+    "xDaily": 6.0
    },
    "setsApart": [
     {
-     "name": "Coyote Sighting",
+     "name": "Bicycle Issue",
      "quotient": 3.1,
-     "shareZip": 2.6,
-     "shareCity": 0.8,
-     "count": 8
+     "shareZip": 1.7,
+     "shareCity": 0.6,
+     "count": 17
     },
     {
-     "name": "Wildlife",
-     "quotient": 2.6,
-     "shareZip": 2.3,
-     "shareCity": 0.9,
-     "count": 7
+     "name": "Park Building Issue",
+     "quotient": 3.0,
+     "shareZip": 0.9,
+     "shareCity": 0.3,
+     "count": 9
     },
     {
-     "name": "Animal Protection",
-     "quotient": 2.2,
+     "name": "Shared Micromobility",
+     "quotient": 2.4,
+     "shareZip": 0.5,
+     "shareCity": 0.2,
+     "count": 5
+    },
+    {
+     "name": "Park Playgrounds",
+     "quotient": 2.3,
      "shareZip": 1.9,
-     "shareCity": 0.9,
-     "count": 6
-    },
-    {
-     "name": "Channels/Creeks/Drainage",
-     "quotient": 2.0,
-     "shareZip": 7.4,
-     "shareCity": 3.8,
-     "count": 23
-    }
-   ],
-   "activity": {
-    "peakHour": 14,
-    "peakHourLabel": "2pm",
-    "peakDay": "Thu",
-    "weekendPct": 17,
-    "lateNightCount": 66
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78727 (78727): 35% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #25 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78756": {
-   "area": "Crestview",
-   "volume": 268,
-   "rank": 26,
-   "zipCount": 58,
-   "percentile": 0.45,
-   "topLabel": "Middle",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 119,
-     "share": 44.4
-    },
-    {
-     "name": "Obstruction in Right of Way",
-     "count": 24,
-     "share": 9.0
-    },
-    {
-     "name": "Debris in Street",
-     "count": 19,
-     "share": 7.1
-    }
-   ],
-   "response": {
-    "count": 261,
-    "medianDays": 0.2,
-    "avgDays": 2.2,
-    "p90Days": 4.1,
-    "sameDayPct": 75
-   },
-   "lowlight": {
-    "name": "Park Maintenance - Grounds",
-    "medianDays": 4.8
-   },
-   "worstDay": {
-    "date": "2026-11-12",
-    "count": 12,
-    "dailyAvg": 0.7,
-    "xDaily": 16.3
-   },
-   "setsApart": [
-    {
-     "name": "Street Sweeping",
-     "quotient": 1.9,
-     "shareZip": 2.2,
-     "shareCity": 1.2,
-     "count": 6
-    },
-    {
-     "name": "Storm Pipe",
-     "quotient": 1.7,
-     "shareZip": 3.0,
-     "shareCity": 1.7,
-     "count": 8
-    },
-    {
-     "name": "Obstruction in Right of Way",
-     "quotient": 1.6,
-     "shareZip": 9.0,
-     "shareCity": 5.7,
-     "count": 24
-    },
-    {
-     "name": "Debris in Street",
-     "quotient": 1.6,
-     "shareZip": 7.1,
-     "shareCity": 4.5,
+     "shareCity": 0.8,
      "count": 19
     }
    ],
    "activity": {
     "peakHour": 14,
     "peakHourLabel": "2pm",
-    "peakDay": "Tue",
-    "weekendPct": 17,
-    "lateNightCount": 59
+    "peakDay": "Wed",
+    "weekendPct": 25,
+    "lateNightCount": 228
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "Crestview (78756): 44% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #26 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "North University (78722): 33% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #24 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78750": {
-   "area": "78750",
-   "volume": 214,
-   "rank": 27,
-   "zipCount": 58,
-   "percentile": 0.47,
+  "78727": {
+   "area": "78727",
+   "volume": 973,
+   "rank": 25,
+   "zipCount": 62,
+   "percentile": 0.4,
    "topLabel": "Middle",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 39,
-     "share": 18.2
+     "count": 194,
+     "share": 19.9
     },
     {
      "name": "Dead Animal",
-     "count": 37,
-     "share": 17.3
+     "count": 105,
+     "share": 10.8
     },
     {
-     "name": "Debris in Street",
-     "count": 25,
-     "share": 11.7
+     "name": "Loose Dog",
+     "count": 67,
+     "share": 6.9
     }
    ],
    "response": {
-    "count": 212,
-    "medianDays": 0.9,
+    "count": 960,
+    "medianDays": 0.7,
     "avgDays": 4.0,
-    "p90Days": 9.8,
-    "sameDayPct": 53
+    "p90Days": 7.5,
+    "sameDayPct": 62
    },
    "lowlight": {
-    "name": "Park Maintenance - Grounds",
-    "medianDays": 10.7
+    "name": "Park Electrical",
+    "medianDays": 19.2
    },
    "worstDay": {
-    "date": "2026-11-02",
-    "count": 5,
-    "dailyAvg": 0.6,
-    "xDaily": 8.5
+    "date": "2026-05-21",
+    "count": 10,
+    "dailyAvg": 2.7,
+    "xDaily": 3.8
    },
    "setsApart": [
     {
      "name": "Coyote Sighting",
-     "quotient": 4.5,
-     "shareZip": 3.7,
-     "shareCity": 0.8,
-     "count": 8
+     "quotient": 3.4,
+     "shareZip": 2.0,
+     "shareCity": 0.6,
+     "count": 19
     },
     {
-     "name": "Vicious Dog",
+     "name": "Injured / Sick Animal",
      "quotient": 3.0,
-     "shareZip": 2.3,
-     "shareCity": 0.8,
-     "count": 5
-    },
-    {
-     "name": "Dead Animal",
-     "quotient": 2.7,
-     "shareZip": 17.3,
-     "shareCity": 6.5,
-     "count": 37
-    },
-    {
-     "name": "Debris in Street",
-     "quotient": 2.6,
-     "shareZip": 11.7,
-     "shareCity": 4.5,
-     "count": 25
-    }
-   ],
-   "activity": {
-    "peakHour": 18,
-    "peakHourLabel": "6pm",
-    "peakDay": "Fri",
-    "weekendPct": 25,
-    "lateNightCount": 48
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78750 (78750): 18% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #27 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78617": {
-   "area": "78617",
-   "volume": 196,
-   "rank": 28,
-   "zipCount": 58,
-   "percentile": 0.48,
-   "topLabel": "Middle",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 80,
-     "share": 40.8
-    },
-    {
-     "name": "Dead Animal",
-     "count": 19,
-     "share": 9.7
-    },
-    {
-     "name": "Loose Dog",
-     "count": 16,
-     "share": 8.2
-    }
-   ],
-   "response": {
-    "count": 194,
-    "medianDays": 0.4,
-    "avgDays": 2.9,
-    "p90Days": 3.2,
-    "sameDayPct": 74
-   },
-   "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 12.9
-   },
-   "worstDay": {
-    "date": "2026-11-18",
-    "count": 9,
-    "dailyAvg": 0.5,
-    "xDaily": 16.8
-   },
-   "setsApart": [
-    {
-     "name": "Animal Protection",
-     "quotient": 6.5,
-     "shareZip": 5.6,
-     "shareCity": 0.9,
-     "count": 11
-    },
-    {
-     "name": "Loose Dog",
-     "quotient": 6.1,
-     "shareZip": 8.2,
-     "shareCity": 1.3,
-     "count": 16
-    },
-    {
-     "name": "Storm Pipe",
-     "quotient": 4.1,
-     "shareZip": 7.1,
-     "shareCity": 1.7,
-     "count": 14
-    },
-    {
-     "name": "Vicious Dog",
-     "quotient": 3.3,
-     "shareZip": 2.6,
-     "shareCity": 0.8,
-     "count": 5
-    }
-   ],
-   "activity": {
-    "peakHour": 19,
-    "peakHourLabel": "7pm",
-    "peakDay": "Tue",
-    "weekendPct": 20,
-    "lateNightCount": 56
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78617 (78617): 41% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #28 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78729": {
-   "area": "78729",
-   "volume": 193,
-   "rank": 29,
-   "zipCount": 58,
-   "percentile": 0.5,
-   "topLabel": "Middle",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 46,
-     "share": 23.8
-    },
-    {
-     "name": "Dead Animal",
-     "count": 17,
-     "share": 8.8
-    },
-    {
-     "name": "Obstruction in Right of Way",
-     "count": 16,
-     "share": 8.3
-    }
-   ],
-   "response": {
-    "count": 186,
-    "medianDays": 0.7,
-    "avgDays": 3.5,
-    "p90Days": 10.8,
-    "sameDayPct": 61
-   },
-   "lowlight": {
-    "name": "Vicious Dog",
-    "medianDays": 14.9
-   },
-   "worstDay": {
-    "date": "2026-10-13",
-    "count": 7,
-    "dailyAvg": 0.5,
-    "xDaily": 13.2
-   },
-   "setsApart": [
-    {
-     "name": "Animal Care",
-     "quotient": 7.3,
-     "shareZip": 6.2,
-     "shareCity": 0.9,
+     "shareZip": 1.2,
+     "shareCity": 0.4,
      "count": 12
     },
     {
-     "name": "Water Conservation Violation",
-     "quotient": 4.0,
-     "shareZip": 5.2,
-     "shareCity": 1.3,
-     "count": 10
+     "name": "Animal Care",
+     "quotient": 2.2,
+     "shareZip": 6.1,
+     "shareCity": 2.8,
+     "count": 59
+    },
+    {
+     "name": "Loose Animal",
+     "quotient": 2.0,
+     "shareZip": 1.1,
+     "shareCity": 0.6,
+     "count": 11
+    }
+   ],
+   "activity": {
+    "peakHour": 15,
+    "peakHourLabel": "3pm",
+    "peakDay": "Mon",
+    "weekendPct": 19,
+    "lateNightCount": 232
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "78727 (78727): 20% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #25 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78617": {
+   "area": "78617",
+   "volume": 972,
+   "rank": 26,
+   "zipCount": 62,
+   "percentile": 0.42,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 373,
+     "share": 38.4
+    },
+    {
+     "name": "Parking Violation",
+     "count": 121,
+     "share": 12.4
     },
     {
      "name": "Animal Protection",
-     "quotient": 3.0,
-     "shareZip": 2.6,
+     "count": 99,
+     "share": 10.2
+    }
+   ],
+   "response": {
+    "count": 966,
+    "medianDays": 1.0,
+    "avgDays": 6.4,
+    "p90Days": 9.0,
+    "sameDayPct": 46
+   },
+   "lowlight": {
+    "name": "Vicious Dog",
+    "medianDays": 10.9
+   },
+   "worstDay": {
+    "date": "2026-11-10",
+    "count": 14,
+    "dailyAvg": 2.7,
+    "xDaily": 5.3
+   },
+   "setsApart": [
+    {
+     "name": "Injured / Sick Animal",
+     "quotient": 7.0,
+     "shareZip": 2.9,
+     "shareCity": 0.4,
+     "count": 28
+    },
+    {
+     "name": "Storm Pipe",
+     "quotient": 3.7,
+     "shareZip": 3.3,
      "shareCity": 0.9,
-     "count": 5
+     "count": 32
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 3.6,
+     "shareZip": 38.4,
+     "shareCity": 10.5,
+     "count": 373
+    },
+    {
+     "name": "Vicious Dog",
+     "quotient": 3.0,
+     "shareZip": 3.3,
+     "shareCity": 1.1,
+     "count": 32
+    }
+   ],
+   "activity": {
+    "peakHour": 17,
+    "peakHourLabel": "5pm",
+    "peakDay": "Wed",
+    "weekendPct": 22,
+    "lateNightCount": 211
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78617 (78617): 38% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #26 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78750": {
+   "area": "78750",
+   "volume": 841,
+   "rank": 27,
+   "zipCount": 62,
+   "percentile": 0.44,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Dead Animal",
+     "count": 137,
+     "share": 16.3
+    },
+    {
+     "name": "Parking Violation",
+     "count": 107,
+     "share": 12.7
+    },
+    {
+     "name": "Debris in Street",
+     "count": 67,
+     "share": 8.0
+    }
+   ],
+   "response": {
+    "count": 831,
+    "medianDays": 0.9,
+    "avgDays": 4.5,
+    "p90Days": 9.3,
+    "sameDayPct": 53
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 10.2
+   },
+   "worstDay": {
+    "date": "2026-01-01",
+    "count": 12,
+    "dailyAvg": 2.3,
+    "xDaily": 5.2
+   },
+   "setsApart": [
+    {
+     "name": "Coyote Sighting",
+     "quotient": 4.8,
+     "shareZip": 2.7,
+     "shareCity": 0.6,
+     "count": 23
+    },
+    {
+     "name": "Dead Animal",
+     "quotient": 2.8,
+     "shareZip": 16.3,
+     "shareCity": 5.8,
+     "count": 137
+    },
+    {
+     "name": "Fireworks",
+     "quotient": 2.2,
+     "shareZip": 2.4,
+     "shareCity": 1.1,
+     "count": 20
     },
     {
      "name": "Animal Bite",
-     "quotient": 2.7,
-     "shareZip": 4.7,
-     "shareCity": 1.7,
-     "count": 9
+     "quotient": 2.1,
+     "shareZip": 5.6,
+     "shareCity": 2.7,
+     "count": 47
+    }
+   ],
+   "activity": {
+    "peakHour": 15,
+    "peakHourLabel": "3pm",
+    "peakDay": "Fri",
+    "weekendPct": 22,
+    "lateNightCount": 203
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78750 (78750): 16% of 311 complaints were about Dead Animal \u2014 the wildlife is undefeated Ranked #27 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78756": {
+   "area": "Crestview",
+   "volume": 771,
+   "rank": 28,
+   "zipCount": 62,
+   "percentile": 0.45,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 260,
+     "share": 33.7
+    },
+    {
+     "name": "Obstruction in Right of Way",
+     "count": 52,
+     "share": 6.7
+    },
+    {
+     "name": "Construction in Right of Way",
+     "count": 50,
+     "share": 6.5
+    }
+   ],
+   "response": {
+    "count": 754,
+    "medianDays": 0.4,
+    "avgDays": 3.0,
+    "p90Days": 5.1,
+    "sameDayPct": 68
+   },
+   "lowlight": {
+    "name": "Park Building Electric",
+    "medianDays": 21.8
+   },
+   "worstDay": {
+    "date": "2026-11-12",
+    "count": 15,
+    "dailyAvg": 2.1,
+    "xDaily": 7.1
+   },
+   "setsApart": [
+    {
+     "name": "Park Building Issue",
+     "quotient": 4.3,
+     "shareZip": 1.3,
+     "shareCity": 0.3,
+     "count": 10
+    },
+    {
+     "name": "Tree in ROW",
+     "quotient": 3.9,
+     "shareZip": 0.9,
+     "shareCity": 0.2,
+     "count": 7
+    },
+    {
+     "name": "Pothole",
+     "quotient": 2.9,
+     "shareZip": 0.8,
+     "shareCity": 0.3,
+     "count": 6
+    },
+    {
+     "name": "Storm Pipe",
+     "quotient": 1.9,
+     "shareZip": 1.7,
+     "shareCity": 0.9,
+     "count": 13
     }
    ],
    "activity": {
     "peakHour": 14,
     "peakHourLabel": "2pm",
     "peakDay": "Tue",
-    "weekendPct": 14,
-    "lateNightCount": 49
+    "weekendPct": 21,
+    "lateNightCount": 178
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "78729 (78729): 24% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #29 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "Crestview (78756): 34% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #28 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78660": {
+   "area": "Pflugerville",
+   "volume": 752,
+   "rank": 29,
+   "zipCount": 62,
+   "percentile": 0.47,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 222,
+     "share": 29.5
+    },
+    {
+     "name": "Loose Dog",
+     "count": 195,
+     "share": 25.9
+    },
+    {
+     "name": "Animal Protection",
+     "count": 73,
+     "share": 9.7
+    }
+   ],
+   "response": {
+    "count": 747,
+    "medianDays": 0.9,
+    "avgDays": 3.4,
+    "p90Days": 7.3,
+    "sameDayPct": 51
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 9.7
+   },
+   "worstDay": {
+    "date": "2026-01-01",
+    "count": 12,
+    "dailyAvg": 2.1,
+    "xDaily": 5.8
+   },
+   "setsApart": [
+    {
+     "name": "Vicious Dog",
+     "quotient": 2.9,
+     "shareZip": 3.2,
+     "shareCity": 1.1,
+     "count": 24
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 2.5,
+     "shareZip": 25.9,
+     "shareCity": 10.5,
+     "count": 195
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 2.4,
+     "shareZip": 9.7,
+     "shareCity": 4.1,
+     "count": 73
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 2.3,
+     "shareZip": 6.1,
+     "shareCity": 2.7,
+     "count": 46
+    }
+   ],
+   "activity": {
+    "peakHour": 18,
+    "peakHourLabel": "6pm",
+    "peakDay": "Wed",
+    "weekendPct": 23,
+    "lateNightCount": 184
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "Pflugerville (78660): 30% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #29 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78729": {
+   "area": "78729",
+   "volume": 683,
+   "rank": 30,
+   "zipCount": 62,
+   "percentile": 0.48,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 98,
+     "share": 14.3
+    },
+    {
+     "name": "Loose Dog",
+     "count": 82,
+     "share": 12.0
+    },
+    {
+     "name": "Animal Care",
+     "count": 54,
+     "share": 7.9
+    }
+   ],
+   "response": {
+    "count": 673,
+    "medianDays": 0.8,
+    "avgDays": 3.5,
+    "p90Days": 8.0,
+    "sameDayPct": 57
+   },
+   "lowlight": {
+    "name": "Vicious Dog",
+    "medianDays": 9.0
+   },
+   "worstDay": {
+    "date": "2026-01-01",
+    "count": 22,
+    "dailyAvg": 1.9,
+    "xDaily": 11.8
+   },
+   "setsApart": [
+    {
+     "name": "Traffic Signal",
+     "quotient": 5.0,
+     "shareZip": 4.4,
+     "shareCity": 0.9,
+     "count": 30
+    },
+    {
+     "name": "Fireworks",
+     "quotient": 3.2,
+     "shareZip": 3.4,
+     "shareCity": 1.1,
+     "count": 23
+    },
+    {
+     "name": "Animal Care",
+     "quotient": 2.8,
+     "shareZip": 7.9,
+     "shareCity": 2.8,
+     "count": 54
+    },
+    {
+     "name": "Loose Animal",
+     "quotient": 2.6,
+     "shareZip": 1.5,
+     "shareCity": 0.6,
+     "count": 10
+    }
+   ],
+   "activity": {
+    "peakHour": 15,
+    "peakHourLabel": "3pm",
+    "peakDay": "Tue",
+    "weekendPct": 20,
+    "lateNightCount": 185
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "78729 (78729): 14% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #30 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78735": {
+   "area": "78735",
+   "volume": 642,
+   "rank": 31,
+   "zipCount": 62,
+   "percentile": 0.5,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 86,
+     "share": 13.4
+    },
+    {
+     "name": "Loose Dog",
+     "count": 68,
+     "share": 10.6
+    },
+    {
+     "name": "Debris in Street",
+     "count": 52,
+     "share": 8.1
+    }
+   ],
+   "response": {
+    "count": 631,
+    "medianDays": 0.9,
+    "avgDays": 5.9,
+    "p90Days": 10.6,
+    "sameDayPct": 53
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 10.1
+   },
+   "worstDay": {
+    "date": "2026-02-12",
+    "count": 10,
+    "dailyAvg": 1.8,
+    "xDaily": 5.7
+   },
+   "setsApart": [
+    {
+     "name": "Pothole",
+     "quotient": 3.5,
+     "shareZip": 0.9,
+     "shareCity": 0.3,
+     "count": 6
+    },
+    {
+     "name": "Street Light",
+     "quotient": 3.2,
+     "shareZip": 1.6,
+     "shareCity": 0.5,
+     "count": 10
+    },
+    {
+     "name": "Graffiti",
+     "quotient": 2.6,
+     "shareZip": 3.9,
+     "shareCity": 1.5,
+     "count": 25
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 2.2,
+     "shareZip": 5.9,
+     "shareCity": 2.7,
+     "count": 38
+    }
+   ],
+   "activity": {
+    "peakHour": 17,
+    "peakHourLabel": "5pm",
+    "peakDay": "Thu",
+    "weekendPct": 26,
+    "lateNightCount": 153
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "78735 (78735): 13% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #31 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
   "78653": {
    "area": "Manor",
-   "volume": 170,
-   "rank": 30,
-   "zipCount": 58,
+   "volume": 616,
+   "rank": 32,
+   "zipCount": 62,
    "percentile": 0.52,
    "topLabel": "Middle",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 120,
-     "share": 70.6
-    },
-    {
-     "name": "Animal Bite",
-     "count": 12,
-     "share": 7.1
+     "count": 291,
+     "share": 47.2
     },
     {
      "name": "Loose Dog",
-     "count": 8,
-     "share": 4.7
-    }
-   ],
-   "response": {
-    "count": 169,
-    "medianDays": 0.2,
-    "avgDays": 1.3,
-    "p90Days": 3.2,
-    "sameDayPct": 82
-   },
-   "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 11.1
-   },
-   "worstDay": {
-    "date": "2026-09-05",
-    "count": 6,
-    "dailyAvg": 0.5,
-    "xDaily": 12.9
-   },
-   "setsApart": [
-    {
-     "name": "Animal Bite",
-     "quotient": 4.1,
-     "shareZip": 7.1,
-     "shareCity": 1.7,
-     "count": 12
-    },
-    {
-     "name": "Loose Dog",
-     "quotient": 3.5,
-     "shareZip": 4.7,
-     "shareCity": 1.3,
-     "count": 8
+     "count": 160,
+     "share": 26.0
     },
     {
      "name": "Animal Protection",
-     "quotient": 3.4,
-     "shareZip": 2.9,
-     "shareCity": 0.9,
-     "count": 5
+     "count": 32,
+     "share": 5.2
+    }
+   ],
+   "response": {
+    "count": 609,
+    "medianDays": 0.5,
+    "avgDays": 2.4,
+    "p90Days": 4.0,
+    "sameDayPct": 65
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 10.2
+   },
+   "worstDay": {
+    "date": "2026-06-02",
+    "count": 9,
+    "dailyAvg": 1.7,
+    "xDaily": 5.3
+   },
+   "setsApart": [
+    {
+     "name": "Injured / Sick Animal",
+     "quotient": 2.8,
+     "shareZip": 1.1,
+     "shareCity": 0.4,
+     "count": 7
     },
     {
-     "name": "Parking Violation",
-     "quotient": 1.5,
-     "shareZip": 70.6,
-     "shareCity": 46.9,
-     "count": 120
+     "name": "Loose Dog",
+     "quotient": 2.5,
+     "shareZip": 26.0,
+     "shareCity": 10.5,
+     "count": 160
+    },
+    {
+     "name": "Loose Animal",
+     "quotient": 2.3,
+     "shareZip": 1.3,
+     "shareCity": 0.6,
+     "count": 8
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 1.7,
+     "shareZip": 4.5,
+     "shareCity": 2.7,
+     "count": 28
     }
    ],
    "activity": {
     "peakHour": 12,
     "peakHourLabel": "12pm",
-    "peakDay": "Sat",
-    "weekendPct": 32,
-    "lateNightCount": 56
+    "peakDay": "Thu",
+    "weekendPct": 26,
+    "lateNightCount": 161
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "Manor (78653): 71% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #30 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "Manor (78653): 47% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #32 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78735": {
-   "area": "78735",
-   "volume": 150,
-   "rank": 31,
-   "zipCount": 58,
+  "78717": {
+   "area": "78717",
+   "volume": 426,
+   "rank": 33,
+   "zipCount": 62,
    "percentile": 0.53,
    "topLabel": "Middle",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 29,
-     "share": 19.3
+     "count": 108,
+     "share": 25.4
     },
     {
-     "name": "Park Maintenance - Grounds",
-     "count": 17,
-     "share": 11.3
+     "name": "Dead Animal",
+     "count": 62,
+     "share": 14.6
     },
     {
-     "name": "Graffiti",
-     "count": 16,
-     "share": 10.7
+     "name": "Loose Animal",
+     "count": 32,
+     "share": 7.5
     }
    ],
    "response": {
-    "count": 147,
-    "medianDays": 0.9,
-    "avgDays": 8.7,
-    "p90Days": 12.5,
-    "sameDayPct": 53
+    "count": 422,
+    "medianDays": 0.6,
+    "avgDays": 3.2,
+    "p90Days": 5.3,
+    "sameDayPct": 66
    },
    "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 11.9
+    "name": "Bicycle Issue",
+    "medianDays": 9.7
    },
    "worstDay": {
-    "date": "2026-10-03",
-    "count": 5,
-    "dailyAvg": 0.4,
-    "xDaily": 12.2
+    "date": "2026-03-19",
+    "count": 9,
+    "dailyAvg": 1.2,
+    "xDaily": 7.7
    },
    "setsApart": [
     {
+     "name": "Loose Animal",
+     "quotient": 13.1,
+     "shareZip": 7.5,
+     "shareCity": 0.6,
+     "count": 32
+    },
+    {
+     "name": "Street Light",
+     "quotient": 8.6,
+     "shareZip": 4.2,
+     "shareCity": 0.5,
+     "count": 18
+    },
+    {
      "name": "Vicious Dog",
-     "quotient": 4.3,
-     "shareZip": 3.3,
-     "shareCity": 0.8,
-     "count": 5
+     "quotient": 2.6,
+     "shareZip": 2.8,
+     "shareCity": 1.1,
+     "count": 12
     },
     {
-     "name": "Graffiti",
-     "quotient": 3.4,
-     "shareZip": 10.7,
-     "shareCity": 3.2,
-     "count": 16
-    },
-    {
-     "name": "Debris in Street",
-     "quotient": 2.2,
-     "shareZip": 10.0,
-     "shareCity": 4.5,
-     "count": 15
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "quotient": 1.7,
-     "shareZip": 11.3,
-     "shareCity": 6.8,
-     "count": 17
+     "name": "Dead Animal",
+     "quotient": 2.5,
+     "shareZip": 14.6,
+     "shareCity": 5.8,
+     "count": 62
     }
    ],
    "activity": {
     "peakHour": 15,
     "peakHourLabel": "3pm",
-    "peakDay": "Sat",
-    "weekendPct": 31,
-    "lateNightCount": 37
+    "peakDay": "Mon",
+    "weekendPct": 21,
+    "lateNightCount": 109
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "78735 (78735): 19% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #31 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78717 (78717): 25% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #33 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78660": {
-   "area": "Pflugerville",
-   "volume": 131,
-   "rank": 32,
-   "zipCount": 58,
+  "78725": {
+   "area": "78725",
+   "volume": 353,
+   "rank": 34,
+   "zipCount": 62,
    "percentile": 0.55,
    "topLabel": "Middle",
    "topIssues": [
     {
+     "name": "Loose Dog",
+     "count": 126,
+     "share": 35.7
+    },
+    {
      "name": "Parking Violation",
-     "count": 69,
-     "share": 52.7
+     "count": 31,
+     "share": 8.8
     },
     {
-     "name": "Debris in Street",
-     "count": 10,
-     "share": 7.6
-    },
-    {
-     "name": "Vicious Dog",
-     "count": 7,
-     "share": 5.3
+     "name": "Animal Protection",
+     "count": 28,
+     "share": 7.9
     }
    ],
    "response": {
-    "count": 129,
-    "medianDays": 0.2,
-    "avgDays": 2.1,
-    "p90Days": 5.0,
-    "sameDayPct": 71
+    "count": 349,
+    "medianDays": 1.0,
+    "avgDays": 6.5,
+    "p90Days": 15.0,
+    "sameDayPct": 46
    },
    "lowlight": {
     "name": "Animal Bite",
-    "medianDays": 14.2
+    "medianDays": 12.0
    },
    "worstDay": {
-    "date": "2026-11-14",
+    "date": "2026-03-19",
     "count": 7,
-    "dailyAvg": 0.4,
-    "xDaily": 19.5
+    "dailyAvg": 1.0,
+    "xDaily": 7.2
    },
    "setsApart": [
     {
-     "name": "Vicious Dog",
-     "quotient": 7.0,
-     "shareZip": 5.3,
-     "shareCity": 0.8,
-     "count": 7
+     "name": "Loose Animal",
+     "quotient": 13.4,
+     "shareZip": 7.6,
+     "shareCity": 0.6,
+     "count": 27
     },
     {
-     "name": "Wildlife",
-     "quotient": 5.3,
-     "shareZip": 4.6,
-     "shareCity": 0.9,
-     "count": 6
+     "name": "Loose Dog",
+     "quotient": 3.4,
+     "shareZip": 35.7,
+     "shareCity": 10.5,
+     "count": 126
+    },
+    {
+     "name": "Vicious Dog",
+     "quotient": 3.3,
+     "shareZip": 3.7,
+     "shareCity": 1.1,
+     "count": 13
     },
     {
      "name": "Animal Bite",
-     "quotient": 2.2,
-     "shareZip": 3.8,
-     "shareCity": 1.7,
-     "count": 5
-    },
-    {
-     "name": "Debris in Street",
-     "quotient": 1.7,
+     "quotient": 2.8,
      "shareZip": 7.6,
-     "shareCity": 4.5,
-     "count": 10
-    }
-   ],
-   "activity": {
-    "peakHour": 16,
-    "peakHourLabel": "4pm",
-    "peakDay": "Sat",
-    "weekendPct": 29,
-    "lateNightCount": 35
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "Pflugerville (78660): 53% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #32 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78717": {
-   "area": "78717",
-   "volume": 117,
-   "rank": 33,
-   "zipCount": 58,
-   "percentile": 0.57,
-   "topLabel": "Middle",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 44,
-     "share": 37.6
-    },
-    {
-     "name": "Dead Animal",
-     "count": 28,
-     "share": 23.9
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 8,
-     "share": 6.8
-    }
-   ],
-   "response": {
-    "count": 114,
-    "medianDays": 0.4,
-    "avgDays": 2.9,
-    "p90Days": 4.9,
-    "sameDayPct": 75
-   },
-   "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 12.7
-   },
-   "worstDay": {
-    "date": "2026-02-23",
-    "count": 5,
-    "dailyAvg": 0.3,
-    "xDaily": 15.6
-   },
-   "setsApart": [
-    {
-     "name": "Dead Animal",
-     "quotient": 3.7,
-     "shareZip": 23.9,
-     "shareCity": 6.5,
-     "count": 28
-    },
-    {
-     "name": "Drainage Inlet",
-     "quotient": 2.0,
-     "shareZip": 5.1,
-     "shareCity": 2.6,
-     "count": 6
+     "shareCity": 2.7,
+     "count": 27
     }
    ],
    "activity": {
     "peakHour": 15,
     "peakHourLabel": "3pm",
-    "peakDay": "Mon",
-    "weekendPct": 25,
-    "lateNightCount": 29
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78717 (78717): 38% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #33 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78739": {
-   "area": "78739",
-   "volume": 84,
-   "rank": 34,
-   "zipCount": 58,
-   "percentile": 0.59,
-   "topLabel": "Middle",
-   "topIssues": [
-    {
-     "name": "Dead Animal",
-     "count": 16,
-     "share": 19.0
-    },
-    {
-     "name": "Parking Violation",
-     "count": 15,
-     "share": 17.9
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 7,
-     "share": 8.3
-    }
-   ],
-   "response": {
-    "count": 82,
-    "medianDays": 0.9,
-    "avgDays": 3.8,
-    "p90Days": 8.3,
-    "sameDayPct": 54
-   },
-   "lowlight": {
-    "name": "Park Maintenance - Grounds",
-    "medianDays": 9.1
-   },
-   "worstDay": {
-    "date": "2026-10-28",
-    "count": 3,
-    "dailyAvg": 0.2,
-    "xDaily": 13.0
-   },
-   "setsApart": [
-    {
-     "name": "Park Playgrounds",
-     "quotient": 4.4,
-     "shareZip": 6.0,
-     "shareCity": 1.3,
-     "count": 5
-    },
-    {
-     "name": "Dead Animal",
-     "quotient": 2.9,
-     "shareZip": 19.0,
-     "shareCity": 6.5,
-     "count": 16
-    },
-    {
-     "name": "Drainage Inlet",
-     "quotient": 2.7,
-     "shareZip": 7.1,
-     "shareCity": 2.6,
-     "count": 6
-    },
-    {
-     "name": "Graffiti",
-     "quotient": 2.3,
-     "shareZip": 7.1,
-     "shareCity": 3.2,
-     "count": 6
-    }
-   ],
-   "activity": {
-    "peakHour": 15,
-    "peakHourLabel": "3pm",
-    "peakDay": "Mon",
-    "weekendPct": 18,
-    "lateNightCount": 15
+    "peakDay": "Thu",
+    "weekendPct": 23,
+    "lateNightCount": 88
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "the wildlife is undefeated",
-   "shareText": "78739 (78739): 19% of 311 complaints were about Dead Animal \u2014 the wildlife is undefeated Ranked #34 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78725 (78725): 36% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #34 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78725": {
-   "area": "78725",
-   "volume": 74,
+  "78739": {
+   "area": "78739",
+   "volume": 295,
    "rank": 35,
-   "zipCount": 58,
-   "percentile": 0.6,
+   "zipCount": 62,
+   "percentile": 0.56,
    "topLabel": "Middle",
    "topIssues": [
     {
-     "name": "Parking Violation",
-     "count": 20,
-     "share": 27.0
-    },
-    {
-     "name": "Channels/Creeks/Drainage",
-     "count": 10,
-     "share": 13.5
-    },
-    {
      "name": "Dead Animal",
-     "count": 10,
-     "share": 13.5
-    }
-   ],
-   "response": {
-    "count": 72,
-    "medianDays": 0.6,
-    "avgDays": 3.1,
-    "p90Days": 6.6,
-    "sameDayPct": 65
-   },
-   "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 8.4
-   },
-   "worstDay": {
-    "date": "2026-11-18",
-    "count": 4,
-    "dailyAvg": 0.2,
-    "xDaily": 19.7
-   },
-   "setsApart": [
-    {
-     "name": "Loose Dog",
-     "quotient": 8.0,
-     "shareZip": 10.8,
-     "shareCity": 1.3,
-     "count": 8
+     "count": 34,
+     "share": 11.5
     },
-    {
-     "name": "Animal Bite",
-     "quotient": 6.2,
-     "shareZip": 10.8,
-     "shareCity": 1.7,
-     "count": 8
-    },
-    {
-     "name": "Channels/Creeks/Drainage",
-     "quotient": 3.6,
-     "shareZip": 13.5,
-     "shareCity": 3.8,
-     "count": 10
-    },
-    {
-     "name": "Dead Animal",
-     "quotient": 2.1,
-     "shareZip": 13.5,
-     "shareCity": 6.5,
-     "count": 10
-    }
-   ],
-   "activity": {
-    "peakHour": 12,
-    "peakHourLabel": "12pm",
-    "peakDay": "Fri",
-    "weekendPct": 24,
-    "lateNightCount": 16
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78725 (78725): 27% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #35 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78726": {
-   "area": "78726",
-   "volume": 68,
-   "rank": 36,
-   "zipCount": 58,
-   "percentile": 0.62,
-   "topLabel": "Middle",
-   "topIssues": [
     {
      "name": "Parking Violation",
+     "count": 32,
+     "share": 10.8
+    },
+    {
+     "name": "Animal Protection",
      "count": 23,
-     "share": 33.8
-    },
-    {
-     "name": "Dead Animal",
-     "count": 13,
-     "share": 19.1
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 5,
-     "share": 7.4
+     "share": 7.8
     }
    ],
    "response": {
-    "count": 67,
-    "medianDays": 0.6,
-    "avgDays": 2.6,
-    "p90Days": 5.9,
-    "sameDayPct": 67
+    "count": 279,
+    "medianDays": 0.9,
+    "avgDays": 3.5,
+    "p90Days": 6.1,
+    "sameDayPct": 56
    },
    "lowlight": {
-    "name": "Park Maintenance - Grounds",
-    "medianDays": 5.9
+    "name": "Bicycle Issue",
+    "medianDays": 6.0
    },
    "worstDay": {
-    "date": "2026-11-02",
-    "count": 4,
-    "dailyAvg": 0.2,
-    "xDaily": 21.5
+    "date": "2026-01-01",
+    "count": 9,
+    "dailyAvg": 0.8,
+    "xDaily": 11.1
    },
    "setsApart": [
     {
-     "name": "Dead Animal",
-     "quotient": 3.0,
-     "shareZip": 19.1,
-     "shareCity": 6.5,
-     "count": 13
+     "name": "Traffic Signal",
+     "quotient": 8.5,
+     "shareZip": 7.5,
+     "shareCity": 0.9,
+     "count": 22
+    },
+    {
+     "name": "Park Playgrounds",
+     "quotient": 3.6,
+     "shareZip": 3.1,
+     "shareCity": 0.8,
+     "count": 9
+    },
+    {
+     "name": "Bicycle Issue",
+     "quotient": 3.6,
+     "shareZip": 2.0,
+     "shareCity": 0.6,
+     "count": 6
+    },
+    {
+     "name": "Wildlife",
+     "quotient": 3.2,
+     "shareZip": 5.1,
+     "shareCity": 1.6,
+     "count": 15
     }
    ],
    "activity": {
-    "peakHour": 16,
-    "peakHourLabel": "4pm",
-    "peakDay": "Fri",
-    "weekendPct": 21,
-    "lateNightCount": 17
+    "peakHour": 15,
+    "peakHourLabel": "3pm",
+    "peakDay": "Wed",
+    "weekendPct": 18,
+    "lateNightCount": 67
    },
    "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78726 (78726): 34% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #36 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78739 (78739): 12% of 311 complaints were about Dead Animal \u2014 the wildlife is undefeated Ranked #35 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
   "78736": {
    "area": "78736",
-   "volume": 60,
-   "rank": 37,
-   "zipCount": 58,
-   "percentile": 0.64,
+   "volume": 248,
+   "rank": 36,
+   "zipCount": 62,
+   "percentile": 0.58,
    "topLabel": "Middle",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 21,
-     "share": 35.0
-    },
-    {
-     "name": "Channels/Creeks/Drainage",
-     "count": 8,
-     "share": 13.3
+     "count": 45,
+     "share": 18.1
     },
     {
      "name": "Animal Bite",
-     "count": 8,
-     "share": 13.3
+     "count": 28,
+     "share": 11.3
+    },
+    {
+     "name": "Loose Dog",
+     "count": 22,
+     "share": 8.9
     }
    ],
    "response": {
-    "count": 58,
-    "medianDays": 0.3,
-    "avgDays": 2.3,
-    "p90Days": 7.3,
-    "sameDayPct": 71
+    "count": 240,
+    "medianDays": 0.8,
+    "avgDays": 4.9,
+    "p90Days": 10.7,
+    "sameDayPct": 59
    },
    "lowlight": {
     "name": "Animal Bite",
     "medianDays": 7.2
    },
    "worstDay": {
-    "date": "2026-09-23",
-    "count": 4,
-    "dailyAvg": 0.2,
-    "xDaily": 24.3
+    "date": "2026-06-08",
+    "count": 6,
+    "dailyAvg": 0.7,
+    "xDaily": 8.8
    },
    "setsApart": [
     {
      "name": "Animal Bite",
-     "quotient": 7.7,
-     "shareZip": 13.3,
-     "shareCity": 1.7,
-     "count": 8
+     "quotient": 4.2,
+     "shareZip": 11.3,
+     "shareCity": 2.7,
+     "count": 28
     },
     {
-     "name": "Channels/Creeks/Drainage",
-     "quotient": 3.5,
-     "shareZip": 13.3,
-     "shareCity": 3.8,
-     "count": 8
+     "name": "Wildlife",
+     "quotient": 3.1,
+     "shareZip": 4.8,
+     "shareCity": 1.6,
+     "count": 12
     },
     {
-     "name": "Dead Animal",
-     "quotient": 1.5,
-     "shareZip": 10.0,
-     "shareCity": 6.5,
-     "count": 6
+     "name": "Fireworks",
+     "quotient": 2.7,
+     "shareZip": 2.8,
+     "shareCity": 1.1,
+     "count": 7
+    },
+    {
+     "name": "Water Conservation Violation",
+     "quotient": 2.7,
+     "shareZip": 3.6,
+     "shareCity": 1.3,
+     "count": 9
     }
    ],
-   "activity": {
-    "peakHour": 17,
-    "peakHourLabel": "5pm",
-    "peakDay": "Wed",
-    "weekendPct": 22,
-    "lateNightCount": 7
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78736 (78736): 35% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #37 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78730": {
-   "area": "78730",
-   "volume": 52,
-   "rank": 38,
-   "zipCount": 58,
-   "percentile": 0.66,
-   "topLabel": "Middle",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 10,
-     "share": 19.2
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 5,
-     "share": 9.6
-    },
-    {
-     "name": "Debris in Street",
-     "count": 5,
-     "share": 9.6
-    }
-   ],
-   "response": {
-    "count": 50,
-    "medianDays": 1.1,
-    "avgDays": 3.1,
-    "p90Days": 8.7,
-    "sameDayPct": 48
-   },
-   "lowlight": {
-    "name": "Park Maintenance - Grounds",
-    "medianDays": 7.3
-   },
-   "worstDay": {
-    "date": "2026-11-18",
-    "count": 2,
-    "dailyAvg": 0.1,
-    "xDaily": 14.0
-   },
-   "setsApart": [
-    {
-     "name": "Coyote Sighting",
-     "quotient": 11.6,
-     "shareZip": 9.6,
-     "shareCity": 0.8,
-     "count": 5
-    },
-    {
-     "name": "Animal Bite",
-     "quotient": 5.6,
-     "shareZip": 9.6,
-     "shareCity": 1.7,
-     "count": 5
-    },
-    {
-     "name": "Debris in Street",
-     "quotient": 2.1,
-     "shareZip": 9.6,
-     "shareCity": 4.5,
-     "count": 5
-    }
-   ],
-   "activity": {
-    "peakHour": 17,
-    "peakHourLabel": "5pm",
-    "peakDay": "Wed",
-    "weekendPct": 21,
-    "lateNightCount": 15
-   },
-   "archetype": "SELECTIVE REPORTER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78730 (78730): 19% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #38 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78652": {
-   "area": "78652",
-   "volume": 26,
-   "rank": 39,
-   "zipCount": 58,
-   "percentile": 0.67,
-   "topLabel": "Middle",
-   "topIssues": [
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 4,
-     "share": 15.4
-    },
-    {
-     "name": "Construction in Right of Way",
-     "count": 4,
-     "share": 15.4
-    },
-    {
-     "name": "Loose Dog",
-     "count": 4,
-     "share": 15.4
-    }
-   ],
-   "response": {
-    "count": 24,
-    "medianDays": 0.3,
-    "avgDays": 3.4,
-    "p90Days": 5.9,
-    "sameDayPct": 62
-   },
-   "lowlight": {
-    "name": "Park Maintenance - Grounds",
-    "medianDays": 3.3
-   },
-   "worstDay": {
-    "date": "2026-11-17",
-    "count": 3,
-    "dailyAvg": 0.1,
-    "xDaily": 42.1
-   },
-   "setsApart": [],
    "activity": {
     "peakHour": 18,
     "peakHourLabel": "6pm",
     "peakDay": "Tue",
-    "weekendPct": 15,
-    "lateNightCount": 5
+    "weekendPct": 22,
+    "lateNightCount": 54
    },
    "archetype": "SELECTIVE REPORTER",
-   "punchline": "the city's small print gets written daily",
-   "shareText": "78652 (78652): 15% of 311 complaints were about Park Maintenance - Grounds \u2014 the city's small print gets written daily Ranked #39 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "punchline": "finding parking is a blood sport",
+   "shareText": "78736 (78736): 18% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #36 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78737": {
-   "area": "78737",
-   "volume": 23,
-   "rank": 40,
-   "zipCount": 58,
-   "percentile": 0.69,
+  "78726": {
+   "area": "78726",
+   "volume": 225,
+   "rank": 37,
+   "zipCount": 62,
+   "percentile": 0.6,
    "topLabel": "Middle",
    "topIssues": [
     {
-     "name": "Park Playgrounds",
-     "count": 6,
-     "share": 26.1
-    },
-    {
      "name": "Parking Violation",
-     "count": 3,
-     "share": 13.0
+     "count": 54,
+     "share": 24.0
     },
     {
-     "name": "Park Maintenance - Grounds",
-     "count": 2,
-     "share": 8.7
+     "name": "Animal Care",
+     "count": 21,
+     "share": 9.3
+    },
+    {
+     "name": "Dead Animal",
+     "count": 20,
+     "share": 8.9
     }
    ],
    "response": {
-    "count": 22,
-    "medianDays": 1.1,
+    "count": 223,
+    "medianDays": 0.8,
     "avgDays": 3.6,
-    "p90Days": 11.0,
-    "sameDayPct": 45
+    "p90Days": 7.9,
+    "sameDayPct": 58
    },
    "lowlight": {
-    "name": "Park Playgrounds",
-    "medianDays": 4.2
+    "name": "Animal Bite",
+    "medianDays": 12.0
    },
    "worstDay": {
-    "date": "2026-09-19",
-    "count": 2,
-    "dailyAvg": 0.1,
-    "xDaily": 31.7
+    "date": "2026-01-01",
+    "count": 6,
+    "dailyAvg": 0.6,
+    "xDaily": 9.7
    },
    "setsApart": [
     {
-     "name": "Park Playgrounds",
-     "quotient": 19.4,
-     "shareZip": 26.1,
-     "shareCity": 1.3,
+     "name": "Animal Care",
+     "quotient": 3.3,
+     "shareZip": 9.3,
+     "shareCity": 2.8,
+     "count": 21
+    },
+    {
+     "name": "Fireworks",
+     "quotient": 2.1,
+     "shareZip": 2.2,
+     "shareCity": 1.1,
+     "count": 5
+    },
+    {
+     "name": "Vicious Dog",
+     "quotient": 2.0,
+     "shareZip": 2.2,
+     "shareCity": 1.1,
+     "count": 5
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 1.9,
+     "shareZip": 8.0,
+     "shareCity": 4.1,
+     "count": 18
+    }
+   ],
+   "activity": {
+    "peakHour": 18,
+    "peakHourLabel": "6pm",
+    "peakDay": "Fri",
+    "weekendPct": 22,
+    "lateNightCount": 61
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "finding parking is a blood sport",
+   "shareText": "78726 (78726): 24% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #37 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78728": {
+   "area": "78728",
+   "volume": 202,
+   "rank": 38,
+   "zipCount": 62,
+   "percentile": 0.61,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 81,
+     "share": 40.1
+    },
+    {
+     "name": "Animal Protection",
+     "count": 32,
+     "share": 15.8
+    },
+    {
+     "name": "Animal Bite",
+     "count": 21,
+     "share": 10.4
+    }
+   ],
+   "response": {
+    "count": 199,
+    "medianDays": 1.2,
+    "avgDays": 4.9,
+    "p90Days": 11.4,
+    "sameDayPct": 35
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 10.6
+   },
+   "worstDay": {
+    "date": "2026-02-13",
+    "count": 5,
+    "dailyAvg": 0.6,
+    "xDaily": 9.0
+   },
+   "setsApart": [
+    {
+     "name": "Wildlife",
+     "quotient": 5.7,
+     "shareZip": 8.9,
+     "shareCity": 1.6,
+     "count": 18
+    },
+    {
+     "name": "Street Light",
+     "quotient": 5.0,
+     "shareZip": 2.5,
+     "shareCity": 0.5,
+     "count": 5
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 3.8,
+     "shareZip": 40.1,
+     "shareCity": 10.5,
+     "count": 81
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 3.8,
+     "shareZip": 10.4,
+     "shareCity": 2.7,
+     "count": 21
+    }
+   ],
+   "activity": {
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Tue",
+    "weekendPct": 16,
+    "lateNightCount": 44
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78728 (78728): 40% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #38 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78730": {
+   "area": "78730",
+   "volume": 184,
+   "rank": 39,
+   "zipCount": 62,
+   "percentile": 0.63,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Traffic Signal",
+     "count": 22,
+     "share": 12.0
+    },
+    {
+     "name": "Parking Violation",
+     "count": 20,
+     "share": 10.9
+    },
+    {
+     "name": "Debris in Street",
+     "count": 15,
+     "share": 8.2
+    }
+   ],
+   "response": {
+    "count": 182,
+    "medianDays": 0.9,
+    "avgDays": 6.5,
+    "p90Days": 19.9,
+    "sameDayPct": 53
+   },
+   "lowlight": {
+    "name": "Park Building Plumbing",
+    "medianDays": 26.4
+   },
+   "worstDay": {
+    "date": "2026-11-05",
+    "count": 17,
+    "dailyAvg": 0.5,
+    "xDaily": 33.7
+   },
+   "setsApart": [
+    {
+     "name": "Traffic Signal",
+     "quotient": 13.7,
+     "shareZip": 12.0,
+     "shareCity": 0.9,
+     "count": 22
+    },
+    {
+     "name": "Park Electrical",
+     "quotient": 10.0,
+     "shareZip": 6.0,
+     "shareCity": 0.6,
+     "count": 11
+    },
+    {
+     "name": "Coyote Sighting",
+     "quotient": 7.6,
+     "shareZip": 4.3,
+     "shareCity": 0.6,
+     "count": 8
+    },
+    {
+     "name": "Drainage Inlet",
+     "quotient": 3.1,
+     "shareZip": 3.3,
+     "shareCity": 1.1,
      "count": 6
     }
    ],
    "activity": {
-    "peakHour": 15,
-    "peakHourLabel": "3pm",
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Thu",
+    "weekendPct": 20,
+    "lateNightCount": 36
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "the streets are a choose-your-own-adventure",
+   "shareText": "78730 (78730): 12% of 311 complaints were about Traffic Signal \u2014 the streets are a choose-your-own-adventure Ranked #39 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78719": {
+   "area": "78719",
+   "volume": 109,
+   "rank": 40,
+   "zipCount": 62,
+   "percentile": 0.65,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 44,
+     "share": 40.4
+    },
+    {
+     "name": "Parking Violation",
+     "count": 11,
+     "share": 10.1
+    },
+    {
+     "name": "Animal Protection",
+     "count": 9,
+     "share": 8.3
+    }
+   ],
+   "response": {
+    "count": 107,
+    "medianDays": 1.1,
+    "avgDays": 4.8,
+    "p90Days": 8.0,
+    "sameDayPct": 40
+   },
+   "lowlight": {
+    "name": "Vicious Dog",
+    "medianDays": 15.0
+   },
+   "worstDay": {
+    "date": "2026-11-18",
+    "count": 3,
+    "dailyAvg": 0.3,
+    "xDaily": 10.0
+   },
+   "setsApart": [
+    {
+     "name": "Traffic Signal",
+     "quotient": 5.3,
+     "shareZip": 4.6,
+     "shareCity": 0.9,
+     "count": 5
+    },
+    {
+     "name": "Vicious Dog",
+     "quotient": 4.2,
+     "shareZip": 4.6,
+     "shareCity": 1.1,
+     "count": 5
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 3.8,
+     "shareZip": 40.4,
+     "shareCity": 10.5,
+     "count": 44
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 2.0,
+     "shareZip": 8.3,
+     "shareCity": 4.1,
+     "count": 9
+    }
+   ],
+   "activity": {
+    "peakHour": 20,
+    "peakHourLabel": "8pm",
     "peakDay": "Mon",
-    "weekendPct": 35,
-    "lateNightCount": 5
+    "weekendPct": 20,
+    "lateNightCount": 30
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78719 (78719): 40% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #40 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78652": {
+   "area": "78652",
+   "volume": 106,
+   "rank": 41,
+   "zipCount": 62,
+   "percentile": 0.66,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 25,
+     "share": 23.6
+    },
+    {
+     "name": "Animal Protection",
+     "count": 12,
+     "share": 11.3
+    },
+    {
+     "name": "Animal Bite",
+     "count": 11,
+     "share": 10.4
+    }
+   ],
+   "response": {
+    "count": 104,
+    "medianDays": 1.7,
+    "avgDays": 6.4,
+    "p90Days": 19.5,
+    "sameDayPct": 38
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 14.4
+   },
+   "worstDay": {
+    "date": "2026-02-13",
+    "count": 3,
+    "dailyAvg": 0.3,
+    "xDaily": 10.3
+   },
+   "setsApart": [
+    {
+     "name": "Vicious Dog",
+     "quotient": 5.1,
+     "shareZip": 5.7,
+     "shareCity": 1.1,
+     "count": 6
+    },
+    {
+     "name": "Water Conservation Violation",
+     "quotient": 4.2,
+     "shareZip": 5.7,
+     "shareCity": 1.3,
+     "count": 6
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 3.8,
+     "shareZip": 10.4,
+     "shareCity": 2.7,
+     "count": 11
+    },
+    {
+     "name": "Wildlife",
+     "quotient": 3.0,
+     "shareZip": 4.7,
+     "shareCity": 1.6,
+     "count": 5
+    }
+   ],
+   "activity": {
+    "peakHour": 18,
+    "peakHourLabel": "6pm",
+    "peakDay": "Thu",
+    "weekendPct": 23,
+    "lateNightCount": 23
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78652 (78652): 24% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #41 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78737": {
+   "area": "78737",
+   "volume": 92,
+   "rank": 42,
+   "zipCount": 62,
+   "percentile": 0.68,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Park Maintenance - Grounds",
+     "count": 15,
+     "share": 16.3
+    },
+    {
+     "name": "Animal Bite",
+     "count": 12,
+     "share": 13.0
+    },
+    {
+     "name": "Animal Protection",
+     "count": 12,
+     "share": 13.0
+    }
+   ],
+   "response": {
+    "count": 91,
+    "medianDays": 1.9,
+    "avgDays": 9.2,
+    "p90Days": 13.1,
+    "sameDayPct": 36
+   },
+   "lowlight": {
+    "name": "Park Playgrounds",
+    "medianDays": 11.1
+   },
+   "worstDay": {
+    "date": "2025-12-26",
+    "count": 5,
+    "dailyAvg": 0.3,
+    "xDaily": 19.8
+   },
+   "setsApart": [
+    {
+     "name": "Park Playgrounds",
+     "quotient": 15.5,
+     "shareZip": 13.0,
+     "shareCity": 0.8,
+     "count": 12
+    },
+    {
+     "name": "Wildlife",
+     "quotient": 5.5,
+     "shareZip": 8.7,
+     "shareCity": 1.6,
+     "count": 8
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 4.8,
+     "shareZip": 13.0,
+     "shareCity": 2.7,
+     "count": 12
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 3.2,
+     "shareZip": 13.0,
+     "shareCity": 4.1,
+     "count": 12
+    }
+   ],
+   "activity": {
+    "peakHour": 18,
+    "peakHourLabel": "6pm",
+    "peakDay": "Tue",
+    "weekendPct": 26,
+    "lateNightCount": 20
    },
    "archetype": "SELECTIVE REPORTER",
    "punchline": "the city's small print gets written daily",
-   "shareText": "78737 (78737): 26% of 311 complaints were about Park Playgrounds \u2014 the city's small print gets written daily Ranked #40 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78737 (78737): 16% of 311 complaints were about Park Maintenance - Grounds \u2014 the city's small print gets written daily Ranked #42 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78733": {
-   "area": "78733",
-   "volume": 22,
-   "rank": 41,
-   "zipCount": 58,
+  "78742": {
+   "area": "78742",
+   "volume": 84,
+   "rank": 43,
+   "zipCount": 62,
+   "percentile": 0.69,
+   "topLabel": "Middle",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 28,
+     "share": 33.3
+    },
+    {
+     "name": "Animal Care",
+     "count": 11,
+     "share": 13.1
+    },
+    {
+     "name": "Animal Protection",
+     "count": 8,
+     "share": 9.5
+    }
+   ],
+   "response": {
+    "count": 82,
+    "medianDays": 1.1,
+    "avgDays": 6.2,
+    "p90Days": 15.1,
+    "sameDayPct": 43
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 7.8
+   },
+   "worstDay": {
+    "date": "2026-03-05",
+    "count": 3,
+    "dailyAvg": 0.2,
+    "xDaily": 13.0
+   },
+   "setsApart": [
+    {
+     "name": "Animal Care",
+     "quotient": 4.7,
+     "shareZip": 13.1,
+     "shareCity": 2.8,
+     "count": 11
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 3.2,
+     "shareZip": 33.3,
+     "shareCity": 10.5,
+     "count": 28
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 2.3,
+     "shareZip": 9.5,
+     "shareCity": 4.1,
+     "count": 8
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 2.2,
+     "shareZip": 6.0,
+     "shareCity": 2.7,
+     "count": 5
+    }
+   ],
+   "activity": {
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Thu",
+    "weekendPct": 20,
+    "lateNightCount": 16
+   },
+   "archetype": "SELECTIVE REPORTER",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78742 (78742): 33% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #43 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78734": {
+   "area": "78734",
+   "volume": 77,
+   "rank": 44,
+   "zipCount": 62,
    "percentile": 0.71,
    "topLabel": "Bottom",
    "topIssues": [
     {
-     "name": "Park Maintenance - Grounds",
-     "count": 10,
-     "share": 45.5
+     "name": "Loose Dog",
+     "count": 33,
+     "share": 42.9
     },
     {
      "name": "Animal Bite",
-     "count": 3,
-     "share": 13.6
+     "count": 15,
+     "share": 19.5
     },
     {
-     "name": "Loose Dog",
-     "count": 2,
-     "share": 9.1
+     "name": "Animal Protection",
+     "count": 12,
+     "share": 15.6
     }
    ],
    "response": {
-    "count": 22,
-    "medianDays": 5.3,
-    "avgDays": 10.4,
-    "p90Days": 28.9,
-    "sameDayPct": 18
+    "count": 76,
+    "medianDays": 1.8,
+    "avgDays": 4.9,
+    "p90Days": 14.0,
+    "sameDayPct": 21
    },
    "lowlight": {
-    "name": "Park Maintenance - Grounds",
-    "medianDays": 9.6
+    "name": "Vicious Dog",
+    "medianDays": 17.5
    },
    "worstDay": {
-    "date": "2026-10-03",
+    "date": "2026-07-28",
     "count": 3,
-    "dailyAvg": 0.1,
-    "xDaily": 49.8
+    "dailyAvg": 0.2,
+    "xDaily": 14.2
    },
    "setsApart": [
     {
-     "name": "Park Maintenance - Grounds",
-     "quotient": 6.7,
-     "shareZip": 45.5,
-     "shareCity": 6.8,
-     "count": 10
+     "name": "Injured / Sick Animal",
+     "quotient": 15.8,
+     "shareZip": 6.5,
+     "shareCity": 0.4,
+     "count": 5
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 7.2,
+     "shareZip": 19.5,
+     "shareCity": 2.7,
+     "count": 15
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 4.1,
+     "shareZip": 42.9,
+     "shareCity": 10.5,
+     "count": 33
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 3.8,
+     "shareZip": 15.6,
+     "shareCity": 4.1,
+     "count": 12
     }
    ],
    "activity": {
     "peakHour": 19,
     "peakHourLabel": "7pm",
-    "peakDay": "Sat",
-    "weekendPct": 36,
-    "lateNightCount": 5
+    "peakDay": "Wed",
+    "weekendPct": 25,
+    "lateNightCount": 23
    },
    "archetype": "OBSERVER",
-   "punchline": "the city's small print gets written daily",
-   "shareText": "78733 (78733): 46% of 311 complaints were about Park Maintenance - Grounds \u2014 the city's small print gets written daily Ranked #41 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78734 (78734): 43% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #44 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78728": {
-   "area": "78728",
-   "volume": 22,
-   "rank": 42,
-   "zipCount": 58,
-   "percentile": 0.72,
+  "78669": {
+   "area": "78669",
+   "volume": 74,
+   "rank": 45,
+   "zipCount": 62,
+   "percentile": 0.73,
    "topLabel": "Bottom",
    "topIssues": [
     {
      "name": "Animal Bite",
-     "count": 4,
-     "share": 18.2
+     "count": 23,
+     "share": 31.1
     },
     {
-     "name": "Wildlife",
-     "count": 4,
-     "share": 18.2
+     "name": "Loose Dog",
+     "count": 19,
+     "share": 25.7
     },
     {
-     "name": "Water Conservation Violation",
-     "count": 3,
-     "share": 13.6
+     "name": "Animal Protection",
+     "count": 19,
+     "share": 25.7
     }
    ],
    "response": {
-    "count": 20,
-    "medianDays": 1.4,
-    "avgDays": 8.9,
-    "p90Days": 13.3,
-    "sameDayPct": 50
+    "count": 73,
+    "medianDays": 1.8,
+    "avgDays": 7.3,
+    "p90Days": 15.7,
+    "sameDayPct": 36
    },
    "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 12.3
+    "name": "Vicious Dog",
+    "medianDays": 21.1
    },
    "worstDay": {
-    "date": "2026-11-06",
-    "count": 1,
-    "dailyAvg": 0.1,
-    "xDaily": 16.6
+    "date": "2026-02-18",
+    "count": 2,
+    "dailyAvg": 0.2,
+    "xDaily": 9.9
    },
-   "setsApart": [],
+   "setsApart": [
+    {
+     "name": "Animal Bite",
+     "quotient": 11.4,
+     "shareZip": 31.1,
+     "shareCity": 2.7,
+     "count": 23
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 6.2,
+     "shareZip": 25.7,
+     "shareCity": 4.1,
+     "count": 19
+    },
+    {
+     "name": "Wildlife",
+     "quotient": 5.1,
+     "shareZip": 8.1,
+     "shareCity": 1.6,
+     "count": 6
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 2.4,
+     "shareZip": 25.7,
+     "shareCity": 10.5,
+     "count": 19
+    }
+   ],
    "activity": {
-    "peakHour": 18,
-    "peakHourLabel": "6pm",
-    "peakDay": "Wed",
-    "weekendPct": 32,
-    "lateNightCount": 5
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Thu",
+    "weekendPct": 19,
+    "lateNightCount": 11
    },
    "archetype": "OBSERVER",
    "punchline": "the city's small print gets written daily",
-   "shareText": "78728 (78728): 18% of 311 complaints were about Animal Bite \u2014 the city's small print gets written daily Ranked #42 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78669 (78669): 31% of 311 complaints were about Animal Bite \u2014 the city's small print gets written daily Ranked #45 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78712": {
-   "area": "78712",
-   "volume": 19,
-   "rank": 43,
-   "zipCount": 58,
+  "78610": {
+   "area": "78610",
+   "volume": 67,
+   "rank": 46,
+   "zipCount": 62,
    "percentile": 0.74,
    "topLabel": "Bottom",
    "topIssues": [
     {
-     "name": "Parking Violation",
-     "count": 13,
-     "share": 68.4
+     "name": "Loose Dog",
+     "count": 28,
+     "share": 41.8
     },
     {
-     "name": "Wildlife",
-     "count": 2,
-     "share": 10.5
+     "name": "Animal Protection",
+     "count": 16,
+     "share": 23.9
     },
     {
-     "name": "Drainage Inlet",
-     "count": 2,
-     "share": 10.5
+     "name": "Animal Bite",
+     "count": 8,
+     "share": 11.9
     }
    ],
    "response": {
-    "count": 19,
+    "count": 66,
+    "medianDays": 1.6,
+    "avgDays": 6.7,
+    "p90Days": 14.4,
+    "sameDayPct": 21
+   },
+   "lowlight": {
+    "name": "Vicious Dog",
+    "medianDays": 11.0
+   },
+   "worstDay": {
+    "date": "2026-01-14",
+    "count": 4,
+    "dailyAvg": 0.2,
+    "xDaily": 21.8
+   },
+   "setsApart": [
+    {
+     "name": "Vicious Dog",
+     "quotient": 8.1,
+     "shareZip": 9.0,
+     "shareCity": 1.1,
+     "count": 6
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 5.8,
+     "shareZip": 23.9,
+     "shareCity": 4.1,
+     "count": 16
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 4.4,
+     "shareZip": 11.9,
+     "shareCity": 2.7,
+     "count": 8
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 4.0,
+     "shareZip": 41.8,
+     "shareCity": 10.5,
+     "count": 28
+    }
+   ],
+   "activity": {
+    "peakHour": 15,
+    "peakHourLabel": "3pm",
+    "peakDay": "Wed",
+    "weekendPct": 15,
+    "lateNightCount": 10
+   },
+   "archetype": "OBSERVER",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78610 (78610): 42% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #46 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78733": {
+   "area": "78733",
+   "volume": 64,
+   "rank": 47,
+   "zipCount": 62,
+   "percentile": 0.76,
+   "topLabel": "Bottom",
+   "topIssues": [
+    {
+     "name": "Park Maintenance - Grounds",
+     "count": 18,
+     "share": 28.1
+    },
+    {
+     "name": "Loose Dog",
+     "count": 17,
+     "share": 26.6
+    },
+    {
+     "name": "Animal Protection",
+     "count": 8,
+     "share": 12.5
+    }
+   ],
+   "response": {
+    "count": 64,
+    "medianDays": 2.8,
+    "avgDays": 12.5,
+    "p90Days": 35.2,
+    "sameDayPct": 30
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 10.8
+   },
+   "worstDay": {
+    "date": "2026-10-03",
+    "count": 3,
+    "dailyAvg": 0.2,
+    "xDaily": 17.1
+   },
+   "setsApart": [
+    {
+     "name": "Park Maintenance - Grounds",
+     "quotient": 4.7,
+     "shareZip": 28.1,
+     "shareCity": 6.0,
+     "count": 18
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 4.0,
+     "shareZip": 10.9,
+     "shareCity": 2.7,
+     "count": 7
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 3.0,
+     "shareZip": 12.5,
+     "shareCity": 4.1,
+     "count": 8
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 2.5,
+     "shareZip": 26.6,
+     "shareCity": 10.5,
+     "count": 17
+    }
+   ],
+   "activity": {
+    "peakHour": 20,
+    "peakHourLabel": "8pm",
+    "peakDay": "Mon",
+    "weekendPct": 31,
+    "lateNightCount": 13
+   },
+   "archetype": "OBSERVER",
+   "punchline": "the city's small print gets written daily",
+   "shareText": "78733 (78733): 28% of 311 complaints were about Park Maintenance - Grounds \u2014 the city's small print gets written daily Ranked #47 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78732": {
+   "area": "78732",
+   "volume": 64,
+   "rank": 48,
+   "zipCount": 62,
+   "percentile": 0.77,
+   "topLabel": "Bottom",
+   "topIssues": [
+    {
+     "name": "Animal Bite",
+     "count": 14,
+     "share": 21.9
+    },
+    {
+     "name": "Loose Dog",
+     "count": 11,
+     "share": 17.2
+    },
+    {
+     "name": "Coyote Sighting",
+     "count": 10,
+     "share": 15.6
+    }
+   ],
+   "response": {
+    "count": 63,
+    "medianDays": 2.0,
+    "avgDays": 6.3,
+    "p90Days": 15.5,
+    "sameDayPct": 38
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 12.5
+   },
+   "worstDay": {
+    "date": "2026-02-04",
+    "count": 2,
+    "dailyAvg": 0.2,
+    "xDaily": 11.4
+   },
+   "setsApart": [
+    {
+     "name": "Coyote Sighting",
+     "quotient": 27.3,
+     "shareZip": 15.6,
+     "shareCity": 0.6,
+     "count": 10
+    },
+    {
+     "name": "Wildlife",
+     "quotient": 8.9,
+     "shareZip": 14.1,
+     "shareCity": 1.6,
+     "count": 9
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 8.1,
+     "shareZip": 21.9,
+     "shareCity": 2.7,
+     "count": 14
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 3.4,
+     "shareZip": 14.1,
+     "shareCity": 4.1,
+     "count": 9
+    }
+   ],
+   "activity": {
+    "peakHour": 18,
+    "peakHourLabel": "6pm",
+    "peakDay": "Thu",
+    "weekendPct": 14,
+    "lateNightCount": 14
+   },
+   "archetype": "OBSERVER",
+   "punchline": "the city's small print gets written daily",
+   "shareText": "78732 (78732): 22% of 311 complaints were about Animal Bite \u2014 the city's small print gets written daily Ranked #48 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78621": {
+   "area": "78621",
+   "volume": 57,
+   "rank": 49,
+   "zipCount": 62,
+   "percentile": 0.79,
+   "topLabel": "Bottom",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 34,
+     "share": 59.6
+    },
+    {
+     "name": "Animal Protection",
+     "count": 12,
+     "share": 21.1
+    },
+    {
+     "name": "Vicious Dog",
+     "count": 5,
+     "share": 8.8
+    }
+   ],
+   "response": {
+    "count": 57,
+    "medianDays": 1.7,
+    "avgDays": 4.2,
+    "p90Days": 10.4,
+    "sameDayPct": 28
+   },
+   "lowlight": {
+    "name": "Wildlife",
+    "medianDays": 6.9
+   },
+   "worstDay": {
+    "date": "2026-02-13",
+    "count": 3,
+    "dailyAvg": 0.2,
+    "xDaily": 19.2
+   },
+   "setsApart": [
+    {
+     "name": "Vicious Dog",
+     "quotient": 8.0,
+     "shareZip": 8.8,
+     "shareCity": 1.1,
+     "count": 5
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 5.7,
+     "shareZip": 59.6,
+     "shareCity": 10.5,
+     "count": 34
+    },
+    {
+     "name": "Animal Protection",
+     "quotient": 5.1,
+     "shareZip": 21.1,
+     "shareCity": 4.1,
+     "count": 12
+    }
+   ],
+   "activity": {
+    "peakHour": 17,
+    "peakHourLabel": "5pm",
+    "peakDay": "Tue",
+    "weekendPct": 19,
+    "lateNightCount": 9
+   },
+   "archetype": "OBSERVER",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78621 (78621): 60% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #49 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78641": {
+   "area": "78641",
+   "volume": 53,
+   "rank": 50,
+   "zipCount": 62,
+   "percentile": 0.81,
+   "topLabel": "Bottom",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 23,
+     "share": 43.4
+    },
+    {
+     "name": "Animal Protection",
+     "count": 19,
+     "share": 35.8
+    },
+    {
+     "name": "Animal Bite",
+     "count": 5,
+     "share": 9.4
+    }
+   ],
+   "response": {
+    "count": 53,
+    "medianDays": 2.2,
+    "avgDays": 6.6,
+    "p90Days": 11.5,
+    "sameDayPct": 23
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 9.1
+   },
+   "worstDay": {
+    "date": "2025-11-26",
+    "count": 2,
+    "dailyAvg": 0.1,
+    "xDaily": 13.8
+   },
+   "setsApart": [
+    {
+     "name": "Animal Protection",
+     "quotient": 8.7,
+     "shareZip": 35.8,
+     "shareCity": 4.1,
+     "count": 19
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 4.1,
+     "shareZip": 43.4,
+     "shareCity": 10.5,
+     "count": 23
+    },
+    {
+     "name": "Animal Bite",
+     "quotient": 3.5,
+     "shareZip": 9.4,
+     "shareCity": 2.7,
+     "count": 5
+    }
+   ],
+   "activity": {
+    "peakHour": 18,
+    "peakHourLabel": "6pm",
+    "peakDay": "Tue",
+    "weekendPct": 17,
+    "lateNightCount": 11
+   },
+   "archetype": "OBSERVER",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78641 (78641): 43% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #50 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78712": {
+   "area": "78712",
+   "volume": 47,
+   "rank": 51,
+   "zipCount": 62,
+   "percentile": 0.82,
+   "topLabel": "Bottom",
+   "topIssues": [
+    {
+     "name": "Parking Violation",
+     "count": 21,
+     "share": 44.7
+    },
+    {
+     "name": "Wildlife",
+     "count": 4,
+     "share": 8.5
+    },
+    {
+     "name": "Traffic Signal",
+     "count": 4,
+     "share": 8.5
+    }
+   ],
+   "response": {
+    "count": 47,
     "medianDays": 0.1,
-    "avgDays": 8.4,
+    "avgDays": 3.9,
     "p90Days": 0.9,
-    "sameDayPct": 95
+    "sameDayPct": 91
    },
    "lowlight": {
     "name": "Parking Violation",
     "medianDays": 0.1
    },
    "worstDay": {
-    "date": "2026-09-12",
-    "count": 2,
+    "date": "2026-11-05",
+    "count": 3,
     "dailyAvg": 0.1,
-    "xDaily": 38.4
+    "xDaily": 23.3
    },
    "setsApart": [],
    "activity": {
-    "peakHour": 23,
-    "peakHourLabel": "11pm",
-    "peakDay": "Sat",
-    "weekendPct": 37,
-    "lateNightCount": 5
+    "peakHour": 0,
+    "peakHourLabel": "12am",
+    "peakDay": "Wed",
+    "weekendPct": 34,
+    "lateNightCount": 14
    },
    "archetype": "OBSERVER",
    "punchline": "finding parking is a blood sport",
-   "shareText": "78712 (78712): 68% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #43 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78712 (78712): 45% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #51 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78719": {
-   "area": "78719",
-   "volume": 18,
-   "rank": 44,
-   "zipCount": 58,
-   "percentile": 0.76,
+  "78613": {
+   "area": "78613",
+   "volume": 41,
+   "rank": 52,
+   "zipCount": 62,
+   "percentile": 0.84,
    "topLabel": "Bottom",
    "topIssues": [
     {
      "name": "Parking Violation",
-     "count": 5,
-     "share": 27.8
-    },
-    {
-     "name": "Debris in Street",
-     "count": 4,
-     "share": 22.2
-    },
-    {
-     "name": "Construction in Right of Way",
-     "count": 3,
-     "share": 16.7
-    }
-   ],
-   "response": {
-    "count": 17,
-    "medianDays": 0.1,
-    "avgDays": 0.9,
-    "p90Days": 1.8,
-    "sameDayPct": 82
-   },
-   "lowlight": {
-    "name": "Construction in Right of Way",
-    "medianDays": 0.6
-   },
-   "worstDay": {
-    "date": "2026-11-11",
-    "count": 2,
-    "dailyAvg": 0.0,
-    "xDaily": 40.6
-   },
-   "setsApart": [],
-   "activity": {
-    "peakHour": 19,
-    "peakHourLabel": "7pm",
-    "peakDay": "Wed",
-    "weekendPct": 22,
-    "lateNightCount": 6
-   },
-   "archetype": "OBSERVER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78719 (78719): 28% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #44 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78742": {
-   "area": "78742",
-   "volume": 15,
-   "rank": 45,
-   "zipCount": 58,
-   "percentile": 0.78,
-   "topLabel": "Bottom",
-   "topIssues": [
-    {
-     "name": "Construction in Right of Way",
-     "count": 3,
-     "share": 20.0
-    },
-    {
-     "name": "Debris in Street",
-     "count": 3,
-     "share": 20.0
+     "count": 10,
+     "share": 24.4
     },
     {
      "name": "Animal Care",
-     "count": 3,
-     "share": 20.0
+     "count": 5,
+     "share": 12.2
+    },
+    {
+     "name": "Animal Bite",
+     "count": 4,
+     "share": 9.8
     }
    ],
    "response": {
-    "count": 14,
-    "medianDays": 0.2,
-    "avgDays": 1.0,
-    "p90Days": 3.2,
-    "sameDayPct": 71
+    "count": 38,
+    "medianDays": 0.6,
+    "avgDays": 3.8,
+    "p90Days": 11.0,
+    "sameDayPct": 58
    },
    "lowlight": {
-    "name": "Animal Care",
-    "medianDays": 0.3
+    "name": "Animal Bite",
+    "medianDays": 9.8
    },
    "worstDay": {
-    "date": "2026-07-31",
-    "count": 2,
-    "dailyAvg": 0.0,
-    "xDaily": 48.7
+    "date": "2026-11-20",
+    "count": 3,
+    "dailyAvg": 0.1,
+    "xDaily": 26.7
    },
-   "setsApart": [],
+   "setsApart": [
+    {
+     "name": "Animal Care",
+     "quotient": 4.4,
+     "shareZip": 12.2,
+     "shareCity": 2.8,
+     "count": 5
+    }
+   ],
    "activity": {
-    "peakHour": 14,
-    "peakHourLabel": "2pm",
+    "peakHour": 19,
+    "peakHourLabel": "7pm",
     "peakDay": "Fri",
-    "weekendPct": 20,
-    "lateNightCount": 1
+    "weekendPct": 32,
+    "lateNightCount": 12
    },
    "archetype": "OBSERVER",
-   "punchline": "the city's small print gets written daily",
-   "shareText": "78742 (78742): 20% of 311 complaints were about Construction in Right of Way \u2014 the city's small print gets written daily Ranked #45 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "punchline": "finding parking is a blood sport",
+   "shareText": "78613 (78613): 24% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #52 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78732": {
-   "area": "78732",
-   "volume": 12,
-   "rank": 46,
-   "zipCount": 58,
-   "percentile": 0.79,
+  "78738": {
+   "area": "78738",
+   "volume": 17,
+   "rank": 53,
+   "zipCount": 62,
+   "percentile": 0.85,
    "topLabel": "Bottom",
    "topIssues": [
     {
      "name": "Wildlife",
-     "count": 4,
-     "share": 33.3
-    },
-    {
-     "name": "Coyote Sighting",
-     "count": 4,
-     "share": 33.3
+     "count": 8,
+     "share": 47.1
     },
     {
      "name": "Animal Bite",
-     "count": 3,
-     "share": 25.0
+     "count": 4,
+     "share": 23.5
+    },
+    {
+     "name": "Loose Dog",
+     "count": 2,
+     "share": 11.8
     }
    ],
    "response": {
-    "count": 12,
-    "medianDays": 1.9,
-    "avgDays": 4.0,
-    "p90Days": 11.3,
-    "sameDayPct": 50
+    "count": 17,
+    "medianDays": 4.2,
+    "avgDays": 11.4,
+    "p90Days": 38.2,
+    "sameDayPct": 12
    },
    "lowlight": {
     "name": "Animal Bite",
-    "medianDays": 11.3
+    "medianDays": 27.0
    },
    "worstDay": {
-    "date": "2026-03-11",
+    "date": "2026-03-27",
     "count": 2,
     "dailyAvg": 0.0,
-    "xDaily": 60.8
+    "xDaily": 42.9
    },
-   "setsApart": [],
+   "setsApart": [
+    {
+     "name": "Wildlife",
+     "quotient": 29.9,
+     "shareZip": 47.1,
+     "shareCity": 1.6,
+     "count": 8
+    }
+   ],
    "activity": {
-    "peakHour": 1,
-    "peakHourLabel": "1am",
+    "peakHour": 13,
+    "peakHourLabel": "1pm",
     "peakDay": "Tue",
-    "weekendPct": 0,
-    "lateNightCount": 5
+    "weekendPct": 6,
+    "lateNightCount": 2
    },
    "archetype": "OBSERVER",
    "punchline": "the city's small print gets written daily",
-   "shareText": "78732 (78732): 33% of 311 complaints were about Wildlife \u2014 the city's small print gets written daily Ranked #46 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78738 (78738): 47% of 311 complaints were about Wildlife \u2014 the city's small print gets written daily Ranked #53 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78613": {
-   "area": "78613",
-   "volume": 11,
-   "rank": 47,
-   "zipCount": 58,
-   "percentile": 0.81,
-   "topLabel": "Bottom",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 6,
-     "share": 54.5
-    },
-    {
-     "name": "Dead Animal",
-     "count": 2,
-     "share": 18.2
-    },
-    {
-     "name": "Park Maintenance - Grounds",
-     "count": 1,
-     "share": 9.1
-    }
-   ],
-   "response": {
-    "count": 10,
-    "medianDays": 0.3,
-    "avgDays": 1.4,
-    "p90Days": 11.0,
-    "sameDayPct": 90
-   },
-   "lowlight": {
-    "name": "Parking Violation",
-    "medianDays": 0.2
-   },
-   "worstDay": {
-    "date": "2026-11-18",
-    "count": 2,
-    "dailyAvg": 0.0,
-    "xDaily": 66.4
-   },
-   "setsApart": [],
-   "activity": {
-    "peakHour": 15,
-    "peakHourLabel": "3pm",
-    "peakDay": "Wed",
-    "weekendPct": 18,
-    "lateNightCount": 4
-   },
-   "archetype": "OBSERVER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78613 (78613): 54% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #47 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78669": {
-   "area": "78669",
-   "volume": 11,
-   "rank": 48,
-   "zipCount": 58,
-   "percentile": 0.83,
+  "78645": {
+   "area": "78645",
+   "volume": 15,
+   "rank": 54,
+   "zipCount": 62,
+   "percentile": 0.87,
    "topLabel": "Bottom",
    "topIssues": [
     {
      "name": "Loose Dog",
-     "count": 3,
-     "share": 27.3
+     "count": 6,
+     "share": 40.0
     },
     {
      "name": "Animal Protection",
-     "count": 3,
-     "share": 27.3
+     "count": 6,
+     "share": 40.0
     },
     {
      "name": "Animal Bite",
-     "count": 2,
-     "share": 18.2
+     "count": 1,
+     "share": 6.7
     }
    ],
    "response": {
-    "count": 10,
-    "medianDays": 1.1,
-    "avgDays": 4.5,
-    "p90Days": 20.3,
-    "sameDayPct": 50
+    "count": 15,
+    "medianDays": 2.2,
+    "avgDays": 7.6,
+    "p90Days": 16.8,
+    "sameDayPct": 13
    },
    "lowlight": {
     "name": "Loose Dog",
-    "medianDays": 0.2
+    "medianDays": 5.1
    },
    "worstDay": {
-    "date": "2026-11-19",
-    "count": 2,
+    "date": "2026-07-25",
+    "count": 1,
     "dailyAvg": 0.0,
-    "xDaily": 66.4
+    "xDaily": 24.3
    },
-   "setsApart": [],
+   "setsApart": [
+    {
+     "name": "Animal Protection",
+     "quotient": 9.7,
+     "shareZip": 40.0,
+     "shareCity": 4.1,
+     "count": 6
+    },
+    {
+     "name": "Loose Dog",
+     "quotient": 3.8,
+     "shareZip": 40.0,
+     "shareCity": 10.5,
+     "count": 6
+    }
+   ],
    "activity": {
-    "peakHour": 15,
-    "peakHourLabel": "3pm",
-    "peakDay": "Mon",
+    "peakHour": 12,
+    "peakHourLabel": "12pm",
+    "peakDay": "Wed",
     "weekendPct": 27,
     "lateNightCount": 1
    },
    "archetype": "OBSERVER",
    "punchline": "the wildlife is undefeated",
-   "shareText": "78669 (78669): 27% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #48 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78645 (78645): 40% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #54 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78734": {
-   "area": "78734",
-   "volume": 9,
-   "rank": 49,
-   "zipCount": 58,
-   "percentile": 0.84,
+  "78615": {
+   "area": "78615",
+   "volume": 13,
+   "rank": 55,
+   "zipCount": 62,
+   "percentile": 0.89,
    "topLabel": "Bottom",
    "topIssues": [
     {
+     "name": "Loose Dog",
+     "count": 11,
+     "share": 84.6
+    },
+    {
      "name": "Animal Bite",
-     "count": 3,
-     "share": 33.3
+     "count": 1,
+     "share": 7.7
     },
     {
-     "name": "Storm Pipe",
-     "count": 2,
-     "share": 22.2
-    },
-    {
-     "name": "Coyote Sighting",
-     "count": 2,
-     "share": 22.2
+     "name": "Vicious Dog",
+     "count": 1,
+     "share": 7.7
     }
    ],
    "response": {
-    "count": 8,
-    "medianDays": 2.0,
-    "avgDays": 4.4,
-    "p90Days": 14.3,
+    "count": 13,
+    "medianDays": 1.1,
+    "avgDays": 4.7,
+    "p90Days": 16.1,
     "sameDayPct": 38
    },
    "lowlight": {
-    "name": "Animal Bite",
-    "medianDays": 3.7
+    "name": "Loose Dog",
+    "medianDays": 1.0
    },
    "worstDay": {
-    "date": "2026-07-28",
-    "count": 2,
+    "date": "2026-04-02",
+    "count": 3,
     "dailyAvg": 0.0,
-    "xDaily": 81.1
+    "xDaily": 84.2
    },
-   "setsApart": [],
-   "activity": {
-    "peakHour": 23,
-    "peakHourLabel": "11pm",
-    "peakDay": "Tue",
-    "weekendPct": 11,
-    "lateNightCount": 3
-   },
-   "archetype": "OBSERVER",
-   "punchline": "the city's small print gets written daily",
-   "shareText": "78734 (78734): 33% of 311 complaints were about Animal Bite \u2014 the city's small print gets written daily Ranked #49 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78621": {
-   "area": "78621",
-   "volume": 5,
-   "rank": 50,
-   "zipCount": 58,
-   "percentile": 0.86,
-   "topLabel": "Bottom",
-   "topIssues": [
-    {
-     "name": "Vicious Dog",
-     "count": 2,
-     "share": 40.0
-    },
+   "setsApart": [
     {
      "name": "Loose Dog",
-     "count": 1,
-     "share": 20.0
-    },
-    {
-     "name": "Wildlife",
-     "count": 1,
-     "share": 20.0
+     "quotient": 8.0,
+     "shareZip": 84.6,
+     "shareCity": 10.5,
+     "count": 11
     }
    ],
-   "response": {
-    "count": 5,
-    "medianDays": 5.8,
-    "avgDays": 14.2,
-    "p90Days": 57.0,
-    "sameDayPct": 20
-   },
-   "lowlight": null,
-   "worstDay": {
-    "date": "2026-10-31",
-    "count": 2,
-    "dailyAvg": 0.0,
-    "xDaily": 146.0
-   },
-   "setsApart": [],
    "activity": {
-    "peakHour": 19,
-    "peakHourLabel": "7pm",
-    "peakDay": "Sat",
-    "weekendPct": 40,
-    "lateNightCount": 1
+    "peakHour": 16,
+    "peakHourLabel": "4pm",
+    "peakDay": "Mon",
+    "weekendPct": 15,
+    "lateNightCount": 2
    },
    "archetype": "OBSERVER",
-   "punchline": "the city's small print gets written daily",
-   "shareText": "78621 (78621): 40% of 311 complaints were about Vicious Dog \u2014 the city's small print gets written daily Ranked #50 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78615 (78615): 85% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #55 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78610": {
-   "area": "78610",
-   "volume": 4,
-   "rank": 51,
-   "zipCount": 58,
-   "percentile": 0.88,
-   "topLabel": "Bottom",
-   "topIssues": [
-    {
-     "name": "Parking Violation",
-     "count": 1,
-     "share": 25.0
-    },
-    {
-     "name": "Animal Bite",
-     "count": 1,
-     "share": 25.0
-    },
-    {
-     "name": "Animal Protection",
-     "count": 1,
-     "share": 25.0
-    }
-   ],
-   "response": {
-    "count": 3,
-    "medianDays": 0.7,
-    "avgDays": 4.9,
-    "p90Days": 13.7,
-    "sameDayPct": 67
-   },
-   "lowlight": null,
-   "worstDay": {
-    "date": "2026-08-07",
-    "count": 1,
-    "dailyAvg": 0.0,
-    "xDaily": 91.2
-   },
-   "setsApart": [],
-   "activity": {
-    "peakHour": 22,
-    "peakHourLabel": "10pm",
-    "peakDay": "Tue",
-    "weekendPct": 0,
-    "lateNightCount": 3
-   },
-   "archetype": "OBSERVER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "78610 (78610): 25% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #51 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78664": {
-   "area": "Round Rock",
-   "volume": 2,
-   "rank": 52,
-   "zipCount": 58,
+  "78620": {
+   "area": "78620",
+   "volume": 11,
+   "rank": 56,
+   "zipCount": 62,
    "percentile": 0.9,
    "topLabel": "Bottom",
    "topIssues": [
     {
-     "name": "Parking Violation",
-     "count": 1,
-     "share": 50.0
+     "name": "Animal Bite",
+     "count": 5,
+     "share": 45.5
     },
     {
-     "name": "Flood Risk",
-     "count": 1,
-     "share": 50.0
-    }
-   ],
-   "response": {
-    "count": 2,
-    "medianDays": 1.3,
-    "avgDays": 1.3,
-    "p90Days": 2.5,
-    "sameDayPct": 50
-   },
-   "lowlight": null,
-   "worstDay": {
-    "date": "2026-08-12",
-    "count": 1,
-    "dailyAvg": 0.0,
-    "xDaily": 182.5
-   },
-   "setsApart": [],
-   "activity": {
-    "peakHour": 1,
-    "peakHourLabel": "1am",
-    "peakDay": "Wed",
-    "weekendPct": 50,
-    "lateNightCount": 1
-   },
-   "archetype": "OBSERVER",
-   "punchline": "finding parking is a blood sport",
-   "shareText": "Round Rock (78664): 50% of 311 complaints were about Parking Violation \u2014 finding parking is a blood sport Ranked #52 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78654": {
-   "area": "78654",
-   "volume": 2,
-   "rank": 53,
-   "zipCount": 58,
-   "percentile": 0.91,
-   "topLabel": "Bottom",
-   "topIssues": [
+     "name": "Wildlife",
+     "count": 2,
+     "share": 18.2
+    },
     {
      "name": "Loose Dog",
      "count": 1,
+     "share": 9.1
+    }
+   ],
+   "response": {
+    "count": 11,
+    "medianDays": 4.8,
+    "avgDays": 7.5,
+    "p90Days": 14.9,
+    "sameDayPct": 9
+   },
+   "lowlight": {
+    "name": "Animal Bite",
+    "medianDays": 12.0
+   },
+   "worstDay": {
+    "date": "2026-07-16",
+    "count": 1,
+    "dailyAvg": 0.0,
+    "xDaily": 33.2
+   },
+   "setsApart": [
+    {
+     "name": "Animal Bite",
+     "quotient": 16.7,
+     "shareZip": 45.5,
+     "shareCity": 2.7,
+     "count": 5
+    }
+   ],
+   "activity": {
+    "peakHour": 14,
+    "peakHourLabel": "2pm",
+    "peakDay": "Tue",
+    "weekendPct": 9,
+    "lateNightCount": 4
+   },
+   "archetype": "OBSERVER",
+   "punchline": "the city's small print gets written daily",
+   "shareText": "78620 (78620): 46% of 311 complaints were about Animal Bite \u2014 the city's small print gets written daily Ranked #56 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78654": {
+   "area": "78654",
+   "volume": 6,
+   "rank": 57,
+   "zipCount": 62,
+   "percentile": 0.92,
+   "topLabel": "Bottom",
+   "topIssues": [
+    {
+     "name": "Animal Protection",
+     "count": 3,
      "share": 50.0
+    },
+    {
+     "name": "Loose Dog",
+     "count": 2,
+     "share": 33.3
     },
     {
      "name": "Animal Bite",
      "count": 1,
-     "share": 50.0
+     "share": 16.7
     }
    ],
    "response": {
-    "count": 2,
-    "medianDays": 7.5,
-    "avgDays": 7.5,
+    "count": 6,
+    "medianDays": 5.5,
+    "avgDays": 5.1,
     "p90Days": 9.0,
-    "sameDayPct": 0
+    "sameDayPct": 17
    },
-   "lowlight": null,
+   "lowlight": {
+    "name": "Animal Protection",
+    "medianDays": 3.0
+   },
    "worstDay": {
     "date": "2026-10-27",
     "count": 1,
     "dailyAvg": 0.0,
-    "xDaily": 182.5
+    "xDaily": 60.8
    },
    "setsApart": [],
    "activity": {
     "peakHour": 18,
     "peakHourLabel": "6pm",
     "peakDay": "Tue",
-    "weekendPct": 0,
-    "lateNightCount": 0
+    "weekendPct": 33,
+    "lateNightCount": 1
    },
    "archetype": "CHILL",
-   "punchline": "the wildlife is undefeated",
-   "shareText": "78654 (78654): 50% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #53 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "punchline": "the city's small print gets written daily",
+   "shareText": "78654 (78654): 50% of 311 complaints were about Animal Protection \u2014 the city's small print gets written daily Ranked #57 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78641": {
-   "area": "78641",
-   "volume": 2,
-   "rank": 54,
-   "zipCount": 58,
-   "percentile": 0.93,
+  "78664": {
+   "area": "Round Rock",
+   "volume": 3,
+   "rank": 58,
+   "zipCount": 62,
+   "percentile": 0.94,
    "topLabel": "Bottom",
    "topIssues": [
     {
-     "name": "Animal Bite",
+     "name": "Construction in Right of Way",
+     "count": 1,
+     "share": 33.3
+    },
+    {
+     "name": "Parking Violation",
+     "count": 1,
+     "share": 33.3
+    },
+    {
+     "name": "Flood Risk",
+     "count": 1,
+     "share": 33.3
+    }
+   ],
+   "response": {
+    "count": 3,
+    "medianDays": 1.8,
+    "avgDays": 1.4,
+    "p90Days": 2.5,
+    "sameDayPct": 33
+   },
+   "lowlight": null,
+   "worstDay": {
+    "date": "2026-03-22",
+    "count": 1,
+    "dailyAvg": 0.0,
+    "xDaily": 121.7
+   },
+   "setsApart": [],
+   "activity": {
+    "peakHour": 18,
+    "peakHourLabel": "6pm",
+    "peakDay": "Sun",
+    "weekendPct": 67,
+    "lateNightCount": 1
+   },
+   "archetype": "CHILL",
+   "punchline": "the city's small print gets written daily",
+   "shareText": "Round Rock (78664): 33% of 311 complaints were about Construction in Right of Way \u2014 the city's small print gets written daily Ranked #58 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78612": {
+   "area": "78612",
+   "volume": 2,
+   "rank": 59,
+   "zipCount": 62,
+   "percentile": 0.95,
+   "topLabel": "Bottom",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
      "count": 1,
      "share": 50.0
     },
@@ -3888,14 +4692,14 @@
    ],
    "response": {
     "count": 2,
-    "medianDays": 6.0,
-    "avgDays": 6.0,
-    "p90Days": 12.0,
-    "sameDayPct": 50
+    "medianDays": 6.5,
+    "avgDays": 6.5,
+    "p90Days": 11.7,
+    "sameDayPct": 0
    },
    "lowlight": null,
    "worstDay": {
-    "date": "2026-07-31",
+    "date": "2026-08-26",
     "count": 1,
     "dailyAvg": 0.0,
     "xDaily": 182.5
@@ -3904,38 +4708,83 @@
    "activity": {
     "peakHour": 14,
     "peakHourLabel": "2pm",
-    "peakDay": "Fri",
+    "peakDay": "Wed",
+    "weekendPct": 0,
+    "lateNightCount": 1
+   },
+   "archetype": "CHILL",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78612 (78612): 50% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #59 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78640": {
+   "area": "78640",
+   "volume": 2,
+   "rank": 60,
+   "zipCount": 62,
+   "percentile": 0.97,
+   "topLabel": "Bottom",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 1,
+     "share": 50.0
+    },
+    {
+     "name": "Vicious Dog",
+     "count": 1,
+     "share": 50.0
+    }
+   ],
+   "response": {
+    "count": 2,
+    "medianDays": 3.5,
+    "avgDays": 3.5,
+    "p90Days": 5.8,
+    "sameDayPct": 0
+   },
+   "lowlight": null,
+   "worstDay": {
+    "date": "2026-05-06",
+    "count": 1,
+    "dailyAvg": 0.0,
+    "xDaily": 182.5
+   },
+   "setsApart": [],
+   "activity": {
+    "peakHour": 17,
+    "peakHourLabel": "5pm",
+    "peakDay": "Wed",
     "weekendPct": 50,
     "lateNightCount": 0
    },
    "archetype": "CHILL",
-   "punchline": "the city's small print gets written daily",
-   "shareText": "78641 (78641): 50% of 311 complaints were about Animal Bite \u2014 the city's small print gets written daily Ranked #54 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78640 (78640): 50% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #60 of 62 Austin areas by volume. austin311.com/wrapped/"
   },
-  "78738": {
-   "area": "78738",
+  "78663": {
+   "area": "78663",
    "volume": 1,
-   "rank": 55,
-   "zipCount": 58,
-   "percentile": 0.95,
+   "rank": 61,
+   "zipCount": 62,
+   "percentile": 0.98,
    "topLabel": "Bottom",
    "topIssues": [
     {
-     "name": "Animal Bite",
+     "name": "Loose Dog",
      "count": 1,
      "share": 100.0
     }
    ],
    "response": {
     "count": 1,
-    "medianDays": 4.2,
-    "avgDays": 4.2,
-    "p90Days": 4.2,
+    "medianDays": 1.3,
+    "avgDays": 1.3,
+    "p90Days": 1.3,
     "sameDayPct": 0
    },
    "lowlight": null,
    "worstDay": {
-    "date": "2026-11-18",
+    "date": "2026-08-21",
     "count": 1,
     "dailyAvg": 0.0,
     "xDaily": 365.0
@@ -3944,133 +4793,53 @@
    "activity": {
     "peakHour": 13,
     "peakHourLabel": "1pm",
-    "peakDay": "Wed",
+    "peakDay": "Fri",
     "weekendPct": 0,
-    "lateNightCount": 0
-   },
-   "archetype": "CHILL",
-   "punchline": "the city's small print gets written daily",
-   "shareText": "78738 (78738): 100% of 311 complaints were about Animal Bite \u2014 the city's small print gets written daily Ranked #55 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78640": {
-   "area": "78640",
-   "volume": 1,
-   "rank": 56,
-   "zipCount": 58,
-   "percentile": 0.97,
-   "topLabel": "Bottom",
-   "topIssues": [
-    {
-     "name": "Vicious Dog",
-     "count": 1,
-     "share": 100.0
-    }
-   ],
-   "response": {
-    "count": 1,
-    "medianDays": 5.8,
-    "avgDays": 5.8,
-    "p90Days": 5.8,
-    "sameDayPct": 0
-   },
-   "lowlight": null,
-   "worstDay": {
-    "date": "2026-10-03",
-    "count": 1,
-    "dailyAvg": 0.0,
-    "xDaily": 365.0
-   },
-   "setsApart": [],
-   "activity": {
-    "peakHour": 20,
-    "peakHourLabel": "8pm",
-    "peakDay": "Sat",
-    "weekendPct": 100,
-    "lateNightCount": 0
-   },
-   "archetype": "CHILL",
-   "punchline": "the city's small print gets written daily",
-   "shareText": "78640 (78640): 100% of 311 complaints were about Vicious Dog \u2014 the city's small print gets written daily Ranked #56 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78645": {
-   "area": "78645",
-   "volume": 1,
-   "rank": 57,
-   "zipCount": 58,
-   "percentile": 0.98,
-   "topLabel": "Bottom",
-   "topIssues": [
-    {
-     "name": "Animal Protection",
-     "count": 1,
-     "share": 100.0
-    }
-   ],
-   "response": {
-    "count": 1,
-    "medianDays": 16.8,
-    "avgDays": 16.8,
-    "p90Days": 16.8,
-    "sameDayPct": 0
-   },
-   "lowlight": null,
-   "worstDay": {
-    "date": "2026-10-21",
-    "count": 1,
-    "dailyAvg": 0.0,
-    "xDaily": 365.0
-   },
-   "setsApart": [],
-   "activity": {
-    "peakHour": 20,
-    "peakHourLabel": "8pm",
-    "peakDay": "Wed",
-    "weekendPct": 0,
-    "lateNightCount": 0
-   },
-   "archetype": "CHILL",
-   "punchline": "the city's small print gets written daily",
-   "shareText": "78645 (78645): 100% of 311 complaints were about Animal Protection \u2014 the city's small print gets written daily Ranked #57 of 58 Austin areas by volume. austin311.com/wrapped/"
-  },
-  "78620": {
-   "area": "78620",
-   "volume": 1,
-   "rank": 58,
-   "zipCount": 58,
-   "percentile": 1.0,
-   "topLabel": "Bottom",
-   "topIssues": [
-    {
-     "name": "Coyote Sighting",
-     "count": 1,
-     "share": 100.0
-    }
-   ],
-   "response": {
-    "count": 1,
-    "medianDays": 3.2,
-    "avgDays": 3.2,
-    "p90Days": 3.2,
-    "sameDayPct": 0
-   },
-   "lowlight": null,
-   "worstDay": {
-    "date": "2026-05-17",
-    "count": 1,
-    "dailyAvg": 0.0,
-    "xDaily": 365.0
-   },
-   "setsApart": [],
-   "activity": {
-    "peakHour": 14,
-    "peakHourLabel": "2pm",
-    "peakDay": "Sun",
-    "weekendPct": 100,
     "lateNightCount": 0
    },
    "archetype": "CHILL",
    "punchline": "the wildlife is undefeated",
-   "shareText": "78620 (78620): 100% of 311 complaints were about Coyote Sighting \u2014 the wildlife is undefeated Ranked #58 of 58 Austin areas by volume. austin311.com/wrapped/"
+   "shareText": "78663 (78663): 100% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #61 of 62 Austin areas by volume. austin311.com/wrapped/"
+  },
+  "78634": {
+   "area": "78634",
+   "volume": 1,
+   "rank": 62,
+   "zipCount": 62,
+   "percentile": 1.0,
+   "topLabel": "Bottom",
+   "topIssues": [
+    {
+     "name": "Loose Dog",
+     "count": 1,
+     "share": 100.0
+    }
+   ],
+   "response": {
+    "count": 1,
+    "medianDays": 1.0,
+    "avgDays": 1.0,
+    "p90Days": 1.0,
+    "sameDayPct": 0
+   },
+   "lowlight": null,
+   "worstDay": {
+    "date": "2026-03-05",
+    "count": 1,
+    "dailyAvg": 0.0,
+    "xDaily": 365.0
+   },
+   "setsApart": [],
+   "activity": {
+    "peakHour": 19,
+    "peakHourLabel": "7pm",
+    "peakDay": "Thu",
+    "weekendPct": 0,
+    "lateNightCount": 0
+   },
+   "archetype": "CHILL",
+   "punchline": "the wildlife is undefeated",
+   "shareText": "78634 (78634): 100% of 311 complaints were about Loose Dog \u2014 the wildlife is undefeated Ranked #62 of 62 Austin areas by volume. austin311.com/wrapped/"
   }
  }
 }
