@@ -48,6 +48,22 @@ def _mark_throttled():
     _throttled_until = time.monotonic() + THROTTLE_COOLDOWN
 
 
+def throttle_active() -> bool:
+    """True while the 403 cooldown is in effect.
+
+    The cooldown is only armed after a request burns its whole 403 retry ladder,
+    i.e. the block outlived 15s + 30s + 60s + 120s of backoff. That makes it a
+    reliable "we are actually blocked" signal, unlike a single 403 that recovers
+    on the next attempt.
+
+    Callers that loop over many requests — the month-by-month trend backfill in
+    particular — should stop early on this instead of firing requests that are
+    doomed: every one still costs a full retry ladder, and a long block turns a
+    cache backfill into hundreds of wasted requests.
+    """
+    return _throttle_cooldown_active()
+
+
 def _retry_delay(
     status: int, retries: int, retry_after: Optional[str]
 ) -> Optional[float]:

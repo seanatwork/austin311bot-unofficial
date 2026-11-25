@@ -14,6 +14,8 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Optional, List, Dict, Any
 
+from open311_client import throttle_active
+
 logger = logging.getLogger(__name__)
 
 # Default cache location (in repo root, excluded from git)
@@ -105,6 +107,18 @@ def set_cache_metadata(key: str, value: str):
             INSERT OR REPLACE INTO cache_metadata (key, value, updated_at)
             VALUES (?, ?, ?)
         """, (key, value, now))
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def delete_cache_metadata(key: str):
+    """Remove a metadata value (a no-op when it is not there)."""
+    if not CACHE_DB.exists():
+        return
+    conn = sqlite3.connect(CACHE_DB)
+    try:
+        conn.execute("DELETE FROM cache_metadata WHERE key = ?", (key,))
         conn.commit()
     finally:
         conn.close()
@@ -320,6 +334,13 @@ def clear_cache(category: Optional[str] = None):
         
         if category:
             cursor.execute("DELETE FROM service_requests WHERE category = ?", (category,))
+            # Partial-month markers name service codes, not categories, so they
+            # cannot be matched against what was just deleted. Drop them all
+            # rather than leave a marker claiming a month is fetched while its
+            # rows are gone (that would skip the code forever).
+            cursor.execute(
+                "DELETE FROM cache_metadata WHERE key LIKE 'month_partial::%'"
+            )
             logger.info(f"Cleared cache for category '{category}'")
         else:
             cursor.execute("DELETE FROM service_requests")
@@ -570,6 +591,31 @@ def get_all_categories() -> list:
 MONTHLY_MAX_PAGES = 10   # default per-(code, month) page cap
 MONTHLY_PAGE_SIZE = 100  # Open311 max per_page
 
+# A cold cache wants a full year (13 months × every code) in one run. That burst
+# is what trips the city WAF: it starts answering 403 to the runner's IP, every
+# remaining month fails, nothing gets marked complete, and the next run repeats
+# the identical doomed burst — the loop that kept the weekly job red in Nov 2026.
+# Cap how many months one run attempts so a cold cache fills in over a few runs
+# (newest first, so the most useful months land first) instead of all at once.
+BACKFILL_MONTHS_PER_RUN = 6
+
+# Coverage of the most recent fetch_monthly_with_cache() call. Generators that
+# cannot render what they fetched (e.g. a trends page with half a year) need to
+# tell "the API throttled us" apart from "there is genuinely no data"; the
+# caller reads this instead of having every fetch_*_monthly return a tuple.
+_last_coverage: dict = {}
+
+
+def last_fetch_coverage() -> dict:
+    """Coverage summary of the most recent fetch_monthly_with_cache() call.
+
+    Keys: category, months_in_window, months_scheduled, months_attempted,
+    months_complete, months_deferred, months_with_data, months_missing, records,
+    complete, throttled. Empty dict when no monthly fetch has run in this
+    process.
+    """
+    return dict(_last_coverage)
+
 
 def _month_key(dt) -> str:
     return dt.strftime("%Y-%m")
@@ -601,6 +647,44 @@ def mark_month_complete(service_codes, month_start):
     """Record that a calendar month was fetched end-to-end (all pages, no
     errors) for `service_codes`, so future cache-aware fetches skip it."""
     set_cache_metadata(_month_complete_meta_key(service_codes, _month_key(month_start)), "1")
+
+
+def _month_partial_meta_key(service_codes, month_key) -> str:
+    codes = ",".join(sorted(service_codes))
+    return f"month_partial::{codes}::{month_key}"
+
+
+def mark_month_partial(service_codes, month_start, codes_done):
+    """Record which service codes finished for a month that is *not* complete.
+
+    Without this, a month that half-succeeded is re-downloaded whole on the next
+    run — including every code that already worked — so a throttled backfill
+    keeps re-spending its request budget on pages it already has and never
+    catches up. Recording the finished codes makes the retry cover the gap only.
+    """
+    done = sorted(set(codes_done))
+    if not done:
+        return
+    set_cache_metadata(
+        _month_partial_meta_key(service_codes, _month_key(month_start)),
+        ",".join(done),
+    )
+
+
+def partial_month_codes(service_codes, month_start) -> set:
+    """Service codes already fetched for a month that is still incomplete."""
+    raw = get_cache_metadata(
+        _month_partial_meta_key(service_codes, _month_key(month_start))
+    )
+    return {code for code in (raw or "").split(",") if code}
+
+
+def clear_month_partial(service_codes, month_start):
+    """Drop the partial marker for a month that has since completed (or was
+    never partially fetched)."""
+    delete_cache_metadata(
+        _month_partial_meta_key(service_codes, _month_key(month_start))
+    )
 
 
 def is_month_complete(service_codes, month_start) -> bool:
@@ -668,6 +752,7 @@ def fetch_monthly_with_cache(
     page_delay=0.6,
     code_delay=1.0,
     now=None,
+    max_backfill_months=BACKFILL_MONTHS_PER_RUN,
 ):
     """Fetch Open311 records month-by-month for `service_codes` across the last
     `months_back` months.
@@ -687,6 +772,8 @@ def fetch_monthly_with_cache(
         max_pages: Cap on pages per (code, month).
         page_delay / code_delay: Throttle sleeps between pages / months.
         now: Override the clock (used by tests).
+        max_backfill_months: Cap on how many months one cache-aware run
+            attempts (BACKFILL_MONTHS_PER_RUN). None disables the cap.
     """
     if use_cache:
         init_cache()
@@ -702,17 +789,63 @@ def fetch_monthly_with_cache(
         if use_cache
         else window_months(months_back, now)
     )
-    logger.info(f"Will fetch {len(months_to_fetch)} month(s) of {category} data")
+    # Full window the page is asking for (months_to_fetch shrinks as months get
+    # marked complete, so it cannot be the denominator for "how complete is the
+    # chart?").
+    months_in_window = len(window_months(months_back, now))
+
+    # Spread a cold-cache backfill over several runs instead of one burst. The
+    # list is newest-first, so the months a page needs most are fetched first and
+    # whatever is left over is picked up by the next run.
+    months_deferred = 0
+    if (
+        use_cache
+        and max_backfill_months
+        and len(months_to_fetch) > max_backfill_months
+    ):
+        months_deferred = len(months_to_fetch) - max_backfill_months
+        months_to_fetch = months_to_fetch[:max_backfill_months]
+
+    logger.info(
+        f"Will fetch {len(months_to_fetch)} month(s) of {category} data"
+        + (f" ({months_deferred} month(s) deferred to a later run)" if months_deferred else "")
+    )
 
     cached_ids = {r.get("service_request_id") for r in cached_records}
     seen_ids = set(cached_ids)
     new_records: list = []
     fresh_records: list = []
+    months_attempted = 0
+    months_complete = 0
+    throttled = False
 
     for month_start in months_to_fetch:  # newest first
+        # A sustained 403 block fails every request it touches, and each one
+        # still costs the full retry ladder. Stop here rather than spend the
+        # budget (and the job's runtime) on requests that cannot succeed; the
+        # months not reached stay missing and are retried next run.
+        if throttle_active():
+            throttled = True
+            logger.warning(
+                f"311 API is throttling this runner — stopped backfill for "
+                f"{category}; remaining months retried next run"
+            )
+            break
         month_end = _month_end(month_start, now)
+        month_key = _month_key(month_start)
+        already_done = (
+            partial_month_codes(service_codes, month_start) if use_cache else set()
+        )
+        codes_todo = [code for code in service_codes if code not in already_done]
+        if already_done:
+            logger.info(
+                f"{month_key}: resuming {category}, "
+                f"{len(already_done)} code(s) already cached"
+            )
         month_ok = True
-        for code in service_codes:
+        done_codes = set(already_done)
+        months_attempted += 1
+        for code in codes_todo:
             finished = False
             try:
                 page = 1
@@ -748,12 +881,30 @@ def fetch_monthly_with_cache(
                 logger.warning(
                     f"Monthly {category} fetch failed {code} {_month_key(month_start)}: {e}"
                 )
-            if not finished:
+            if finished:
+                done_codes.add(code)
+            else:
                 month_ok = False
         # Never mark the current (still-accumulating) month complete — it must
         # be re-fetched every run so cached data stays fresh to today.
-        if use_cache and month_ok and month_start != current_month:
-            mark_month_complete(service_codes, month_start)
+        if use_cache and month_start != current_month:
+            if month_ok:
+                mark_month_complete(service_codes, month_start)
+                clear_month_partial(service_codes, month_start)
+                months_complete += 1
+            elif done_codes:
+                # Some codes landed before the block. Remember them so the retry
+                # fetches only the gap instead of re-downloading the whole month.
+                mark_month_partial(service_codes, month_start, done_codes)
+        if throttle_active():
+            throttled = True
+            remaining = len(months_to_fetch) - months_attempted
+            if remaining:
+                logger.warning(
+                    f"311 API is throttling this runner — {remaining} month(s) of "
+                    f"{category} deferred to a later run"
+                )
+            break
         time.sleep(code_delay)
 
     if use_cache and new_records:
@@ -775,4 +926,44 @@ def fetch_monthly_with_cache(
     result = slice_records_to_window(result, months_back, now)
     if keep is not None:
         result = [r for r in result if keep(r)]
+
+    # "Complete" = no *past* month is still missing from the cache. The current
+    # month is excluded on purpose: it is refetched every run and never marked
+    # complete, so a routine 403 on it must not read as a partial backfill (that
+    # would freeze the page over a one-week hiccup). A month with genuinely zero
+    # reports still counts as complete — it is marked complete when the fetch
+    # succeeds, so an empty month is not mistaken for a gap.
+    past_missing = 0
+    if use_cache:
+        past_missing = sum(
+            1
+            for m in window_months(months_back, now)
+            if m != current_month and not is_month_complete(service_codes, m)
+        )
+    covered_months = {
+        (r.get("requested_datetime") or "")[:7]
+        for r in result
+        if (r.get("requested_datetime") or "")
+    } - {""}
+    global _last_coverage
+    _last_coverage = {
+        "category": category,
+        "months_in_window": months_in_window,
+        "months_scheduled": len(months_to_fetch),
+        "months_attempted": months_attempted,
+        "months_complete": months_complete,
+        "months_deferred": months_deferred,
+        "months_with_data": len(covered_months),
+        "months_missing": past_missing,
+        "records": len(result),
+        "complete": past_missing == 0,
+        "throttled": throttled or throttle_active(),
+    }
+    logger.info(
+        f"{category} coverage: {len(covered_months)}/{months_in_window} month(s) "
+        f"with data, {months_complete} newly complete, "
+        f"{past_missing} past month(s) still missing"
+        + (", API throttled" if _last_coverage["throttled"] else "")
+    )
+
     return attach_service_labels(result, label_map)

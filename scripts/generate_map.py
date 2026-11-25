@@ -9,6 +9,7 @@ Run locally:
 
 Run in CI (GitHub Actions) with AUSTINAPIKEY set for higher rate limits.
 """
+import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -278,6 +279,31 @@ CATEGORY_MAPS = {
 }
 
 
+def _soft_skip(category: str, reason: str) -> None:
+    """Skip a generator without failing the run.
+
+    Used when the only thing wrong is upstream: the city API is throttling this
+    runner (HTTP 403) and/or the Open311 cache is only partly backfilled, so the
+    page we could build now is thinner than the one already published. Keeping
+    the committed page is better than replacing a complete chart with a partial
+    one, and it must not go red — nothing here needs a human, and a red run every
+    week for a known-throttled upstream is how real failures get ignored.
+
+    Surfaced as an annotation plus a job-summary entry so the skip stays visible.
+    """
+    message = f"{category} skipped: {reason}"
+    print(f"::warning::{message}")
+    print(f"⏳ {message}")
+    summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary_path:
+        try:
+            with open(summary_path, "a", encoding="utf-8") as fh:
+                fh.write(f"### ⚠️ `{category}` skipped\n\n{reason}\n\n")
+        except OSError:
+            pass
+    sys.exit(0)
+
+
 def main():
     if len(sys.argv) < 2:
         print("Usage: python scripts/generate_map.py <category>")
@@ -303,9 +329,47 @@ def main():
     print(f"Generating {category} map (last {days_back} days)...")
     buf, summary = generator_func(days_back)
 
+    # Coverage of the monthly Open311 fetch behind this generator, if it used
+    # one. Generators that read Socrata or a plain _fetch_code leave this empty,
+    # in which case `complete` defaults to True and nothing below changes.
+    from open311_cache import last_fetch_coverage
+
+    coverage = last_fetch_coverage()
+
     if not buf:
+        if coverage.get("throttled") and not coverage.get("records"):
+            # Nothing cached to fall back on and the API is blocking us: keep the
+            # previously published page and let the run stay green.
+            _soft_skip(
+                category,
+                "the 311 API is throttling this runner (HTTP 403) and the "
+                "Open311 cache holds no records to render, so the previously "
+                "published page was kept",
+            )
         print(f"Map generation failed: {summary}")
         sys.exit(1)
+
+    if not coverage.get("complete", True) and (
+        coverage.get("months_deferred") or coverage.get("throttled")
+    ):
+        bits = []
+        if coverage.get("months_deferred"):
+            bits.append(
+                f"{coverage['months_deferred']} month(s) of backfill deferred to "
+                f"the next run"
+            )
+        if coverage.get("throttled"):
+            bits.append("the 311 API throttled this runner")
+        if coverage.get("months_missing"):
+            bits.append(f"{coverage['months_missing']} past month(s) still missing")
+        _soft_skip(
+            category,
+            " and ".join(bits)
+            + f" (only {coverage.get('months_with_data', 0)} of "
+            f"{coverage.get('months_in_window', 0)} month(s) with data), so the "
+            "previously published page was kept rather than replaced with a "
+            "thinner one",
+        )
 
     now_str = format_central_time()
     last_ran_span = (

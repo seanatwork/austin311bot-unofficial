@@ -79,7 +79,11 @@ No app server to deploy — "deployment" means regenerating the static output. W
 
 **Why one weekly job:** the Open311 generators gate on a ~6-day cache, so daily re-renders mostly rewrote week-old data. Day-sensitive leftovers (pools, fire, shelter, court, querystore) are cheap. `querystore` runs **last** on purpose: it refreshes the shared Open311 cache, so running it earlier would make the maps' 6-day gates skip their own refetch. Monday 14:00 UTC clears the 12:30 digest push. Actions cache expires after 7 days idle, so a lost cache means the next run backfills a full year (~76 min observed) and gets throttled; `cache-keepalive.yml` re-saves the DB every 2–3 days so this cannot happen from scheduling delay alone. It shares the `weekly-data` concurrency group with `weekly.yml` so the two never touch the cache at once.
 
-Each generator step is `continue-on-error: true` with a unique `id`, and the commit step is `if: always() && !cancelled()`, so one flaky source can't discard the other twenty steps' work. `scripts/ci_report_failures.py` runs last: it turns failed step outcomes into a job summary and exits non-zero, so the run goes red **after** good data is committed. `weekly.yml` accepts a `workflow_dispatch` `categories` input that guards only the `generate_map.py` steps; shared steps always run. `AUSTINAPIKEY` must be set as an Actions secret (429/403 throttling during keyless local runs is normal).
+Each generator step is `continue-on-error: true` with a unique `id`, and the commit step is `if: always() && !cancelled()`, so one flaky source can't discard the other twenty steps' work. `scripts/ci_report_failures.py` runs last: it turns failed step outcomes into a job summary and exits non-zero, so the run goes red **after** good data is committed.
+
+`generate_map.py` has a third outcome besides write/fail: a **soft skip**. When the only problem is upstream — the 311 API is throttling the runner (HTTP 403) and/or the Open311 cache is only partly backfilled — it prints a `::warning::`, appends a line to the job summary and exits **0**, leaving the previously published page untouched. That is deliberate: replacing a complete chart with a half-backfilled one is worse for visitors, and a red run every week for a known-throttled upstream trains people to ignore red. A generator that produces nothing for any *other* reason still exits 1.
+
+`weekly.yml` accepts a `workflow_dispatch` `categories` input that guards only the `generate_map.py` steps; shared steps always run. `AUSTINAPIKEY` must be set as an Actions secret (429/403 throttling during keyless local runs is normal).
 
 The Open311 cache uses `actions/cache/restore@v4` + `actions/cache/save@v4`, not plain `actions/cache@v4`: the plain action saves in a post step gated on `success()`, so a red run silently discarded the refreshed cache. `cache/save` writes inline and survives failures.
 
@@ -152,11 +156,20 @@ Common pattern: fetch month-by-month (30-day windows) to avoid the Open311 pagin
 
 All Open311 trend fetchers (`fetch_*_monthly` in graffiti, homeless, noise, parking, parks, storm, animalsvc and `animalsvc/dead_animal_bot.py`) delegate to **`open311_cache.fetch_monthly_with_cache()`** — a shared cache-aware driver. It always fetches the current month (fresh to today) and only backfills past months that aren't already cached end-to-end (tracked per code-set + month). Do **not** switch trend generators back to `use_cache=False` full-year refetches: doing so re-downloads a 365-day window for every category each week, which repeatedly blew the CI `timeout-minutes` cap and froze the trend pages.
 
+Three behaviours there keep a throttled backfill from turning into a permanent red loop:
+
+- **Bounded backfill** (`BACKFILL_MONTHS_PER_RUN`, default 6): a cold cache fetches at most six months per run, newest first, and defers the rest. Unbounded, a cold cache fires a full year at the API in one burst, which is what triggers the 403 block in the first place.
+- **Throttle early-stop**: once `open311_client.throttle_active()` is true (the 403 retry ladder was exhausted, so the block is real and not a blip), the month loop breaks instead of spending the budget on requests that cannot succeed.
+- **Partial-month markers** (`month_partial::<codes>::<YYYY-MM>`): if some codes land before a block, the retry fetches only the missing codes instead of re-downloading the whole month.
+
+`last_fetch_coverage()` exposes what the last call actually achieved (`months_requested/attempted/complete/deferred/with_data/missing`, `records`, `complete`, `throttled`); `generate_map.py` uses it for the soft-skip decision. `complete` means *no past month is still missing*, not "recent months had records" — a genuinely quiet month is marked complete when its fetch succeeds, and the current month is excluded because it is refetched every run.
+
 ### Shared utilities
 
 **`open311_client.py`**
 - `open311_get(session, url, params, retries=0)` — GET with exponential backoff (up to 8 retries; 15s starting delay for 429, respects `Retry-After`).
-- **Throttling shows up as 403, not 429.** A datacenter-IP burst gets 403 on every request for ~2–3 min, then recovers. `open311_get` retries 403 on a bounded 15s/30s/60s/120s ladder, then fails fast for `THROTTLE_COOLDOWN` rather than burning the job timeout. Callers tolerate a failed code.
+- **Throttling shows up as 403, not 429.** A datacenter-IP burst gets 403 on every request for ~2–3 min, then recovers. `open311_get` retries 403 on a bounded 15s/30s/60s/120s ladder, then fails fast for `THROTTLE_COOLDOWN` rather than burning the job timeout. Callers tolerate a failed code. `throttle_active()` reports whether that cooldown is armed; long request loops (the month backfill) use it to stop early.
+- A live block can outlast the ladder by a long way — the Nov 2026 runs saw 403s for ~100 minutes, not the expected ~3.
 - `og_meta_tags(slug="")` — Open Graph + Twitter Card meta tags for a docs page
 - `SITE_BASE_URL` — `https://austin311.com`
 
